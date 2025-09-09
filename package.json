@@ -1,0 +1,28 @@
+{
+	"name": "b3s",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"devDependencies": {
+		"@types/bun": "latest",
+		"daisyui": "^5.0.54",
+		"wrangler": "^4.34.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"workspaces": [
+		"packages/*"
+	],
+	"scripts": {
+		"dev": "bun --filter '*' dev",
+		"dev:frontend": "bun --filter 'frontend' dev",
+		"dev:backend": "bun --filter 'backend' dev",
+		"deploy:frontend": "bun --filter 'frontend' deploy",
+		"deploy:backend": "bun --filter 'backend' deploy",
+		"format": "biome format --write"
+	},
+	"dependencies": {
+		"@biomejs/biome": "^2.2.2"
+	}
+}

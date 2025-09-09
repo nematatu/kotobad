@@ -1,0 +1,21 @@
+import { z } from "zod";
+
+export const ThreadSchema = z.object({
+	id: z.number().int().positive(),
+	title: z.string().min(1),
+	createdAt: z.string(),
+	updatedAt: z.string().nullable(),
+	postCount: z.number().int().nonnegative(),
+	authorId: z.number().int().positive(),
+	isPinned: z.boolean().optional(),
+	isClosed: z.boolean().optional(),
+	author: z.object({
+		username: z.string().optional(),
+	}),
+});
+export const CreateThreadSchema = ThreadSchema.pick({
+	title: true,
+});
+
+export const EditThreadSchema = ThreadSchema.partial();
+export const ThreadListSchema = z.array(ThreadSchema);

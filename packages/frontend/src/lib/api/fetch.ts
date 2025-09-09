@@ -1,0 +1,22 @@
+type fetchArgs = Parameters<typeof fetch>;
+
+export async function fetcher<T>(
+	url: fetchArgs[0],
+	args: fetchArgs[1] = {},
+): Promise<T> {
+	let init: RequestInit = args ?? {};
+
+	// ブラウザで動いているときだけ cookie を送受信する
+	if (typeof window !== "undefined") {
+		init = {
+			...init,
+			credentials: init.credentials ?? "include",
+		};
+	}
+
+	const res = await fetch(url, init);
+	if (!res.ok) {
+		throw new Error(`Fetch error: ${res.status}`);
+	}
+	return res.json() as Promise<T>;
+}

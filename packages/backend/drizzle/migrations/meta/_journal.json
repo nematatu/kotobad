@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1755851104238,
+      "tag": "0000_eager_thor_girl",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1756384222149,
+      "tag": "0001_clean_donald_blake",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1756385158748,
+      "tag": "0002_pink_starbolt",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1756385244400,
+      "tag": "0003_true_northstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1756392089955,
+      "tag": "0004_organic_wind_dancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1756489816233,
+      "tag": "0005_chilly_dark_phoenix",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1756658817607,
+      "tag": "0006_square_apocalypse",
+      "breakpoints": true
+    }
+  ]
+}
