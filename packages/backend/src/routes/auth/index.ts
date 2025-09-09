@@ -10,6 +10,6 @@ const authRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(signupRoute, signupRouter)
 	.openapi(loginRoute, loginRouter)
 	.openapi(logoutRoute, logoutRouter)
-	.openapi(MeRoute, MeRouter)
+	.openapi(MeRoute, MeRouter);
 
-export default authRouter
+export default authRouter;

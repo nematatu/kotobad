@@ -32,7 +32,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 					<CardFooter>
 						<div>
 							{thread.author.username}
-            {thread.createdAt}
+							{thread.createdAt}
 						</div>
 					</CardFooter>
 				</Card>

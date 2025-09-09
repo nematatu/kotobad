@@ -27,12 +27,12 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 			origin: allowedOrigin,
 			allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 			allowHeaders: ["Content-Type", "Authorization"],
-      credentials: true
+			credentials: true,
 		}),
 	)
-  .use("/auth/me", authMiddleware) 
+	.use("/auth/me", authMiddleware)
 	.route("/bbs", bbsRouter)
-	.route("/auth", authRouter)
+	.route("/auth", authRouter);
 
 mainRouter.use("/doc/*", async (c, next) => {
 	const auth = basicAuth({

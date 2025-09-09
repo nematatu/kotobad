@@ -36,7 +36,7 @@ export async function login(values: AuthType.LoginSignupUserType) {
 export function logout() {
 	type resType = InferResponseType<typeof client.auth.logout.$delete>;
 	return fetcher<resType>(API_URLS.LOGOUT, {
-		method: "POST",
+		method: "DELETE",
 		credentials: "include",
 	});
 }

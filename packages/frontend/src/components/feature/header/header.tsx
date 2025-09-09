@@ -1,9 +1,25 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ThemeMenuToggle from "../darkMode/themeMenuToggle";
+import { useUser } from "../provider/UserProvider";
+import { logout } from "@/lib/api/auth";
 
 const Header = () => {
+	const { user, setUser } = useUser();
+
+	const handleLogout = async () => {
+		console.log("logout click");
+		try {
+			await logout();
+			setUser(null);
+			console.log("logout finish");
+		} catch (e: any) {
+			console.error(e.message);
+		}
+	};
 	return (
 		<div className="sticky top-0 z-50 w-full border-b bg-yellow-200 dark:bg-gray-800">
 			<div className="flex h-24 items-center px-4">
@@ -24,22 +40,34 @@ const Header = () => {
 
 				<div className="flex flex-1 items-center justify-end space-x-2">
 					<ThemeMenuToggle />
-					<Button variant="outline" asChild>
-						<Link
-							href="/auth/login"
-							className="text-sm font-medium  transition-colors hover:text-primary"
+					{user ? (
+						<Button
+							className="text-sm font-medium cursor-pointer transition-colors hover:text-primary"
+							variant="outline"
+							onClick={handleLogout}
 						>
-							ログイン
-						</Link>
-					</Button>
-					<Button variant="outline" asChild>
-						<Link
-							href="/auth/signup"
-							className="text-sm font-medium  transition-colors hover:text-primary"
-						>
-							新規会員登録
-						</Link>
-					</Button>
+							ログアウト
+						</Button>
+					) : (
+						<div>
+							<Button className="cursor-pointer" variant="outline" asChild>
+								<Link
+									href="/auth/login"
+									className="text-sm font-medium  transition-colors hover:text-primary"
+								>
+									ログイン
+								</Link>
+							</Button>
+							<Button className="cursor-pointer" variant="outline" asChild>
+								<Link
+									href="/auth/signup"
+									className="text-sm font-medium  transition-colors hover:text-primary"
+								>
+									新規会員登録
+								</Link>
+							</Button>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
