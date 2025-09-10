@@ -34,7 +34,8 @@ export const logoutRouter: RouteHandler<
 	AppEnvironment
 > = async (c) => {
 	try {
-		deleteCookie(c, "token");
+		deleteCookie(c, "accessToken");
+		deleteCookie(c, "refreshToken");
 		return c.json({ message: "Logout successfully!" }, 201);
 	} catch (e) {
 		return c.json({ error: "internal server error" }, 500);

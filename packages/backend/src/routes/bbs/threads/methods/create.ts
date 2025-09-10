@@ -4,7 +4,7 @@ import {
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
 import { ErrorResponse } from "../../../../models/error";
-import { threads } from "../../../../../drizzle/schema"; 
+import { threads } from "../../../../../drizzle/schema";
 import { eq } from "drizzle-orm"; // Import eq for querying
 import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../../types";
