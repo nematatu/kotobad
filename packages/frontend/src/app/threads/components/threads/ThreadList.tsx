@@ -22,10 +22,10 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 	}, [threads]);
 
 	return (
-		<div className="flex flex-col gap-y-4">
+		<div className="flex flex-col gap-y-4 p-5">
 			{threadList.map((thread) => (
-				<Card key={thread.id}>
-					<CardHeader>
+				<Card key={thread.id} className="p-2 border-2 cursor-pointer dark:hover:border-blue-400 hover:border-blue-400">
+					<CardHeader className="text-3xl">
 						<CardTitle>{thread.title}</CardTitle>
 					</CardHeader>
 					<CardContent>カードコンテンツ</CardContent>

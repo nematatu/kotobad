@@ -19,4 +19,8 @@ export const API_URLS = {
 		process.env.NODE_ENV === "production"
 			? "https://cloudflare/"
 			: "http://localhost:8787/bbs/threads",
+	CREATE_THREADS:
+		process.env.NODE_ENV === "production"
+			? "https://cloudflare/"
+			: "http://localhost:8787/bbs/threads/create",
 };
