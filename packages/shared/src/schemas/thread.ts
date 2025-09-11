@@ -18,4 +18,7 @@ export const CreateThreadSchema = ThreadSchema.pick({
 });
 
 export const EditThreadSchema = ThreadSchema.partial();
-export const ThreadListSchema = z.array(ThreadSchema);
+export const ThreadListSchema = z.object({
+	threads: z.array(ThreadSchema),
+	totalCount: z.number(),
+});

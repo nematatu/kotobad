@@ -21,8 +21,8 @@ export const OpenAPIThreadSchema = BaseThreadSchema.ThreadSchema.openapi(
 );
 
 export const OpenAPICreateThreadSchema =
-	BaseThreadSchema.CreateThreadSchema.openapi("CreatePostSchema");
+	BaseThreadSchema.CreateThreadSchema.openapi("CreateThreadSchema");
 export const OpenAPIEditThreadSchema =
-	BaseThreadSchema.EditThreadSchema.openapi("EditPostSchema");
+	BaseThreadSchema.EditThreadSchema.openapi("EditThreadSchema");
 export const OpenAPIThreadListSchema =
-	BaseThreadSchema.ThreadListSchema.openapi("PostListSchema");
+	BaseThreadSchema.ThreadListSchema.openapi("ThreadListSchema");

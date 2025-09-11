@@ -4,9 +4,11 @@ import { API_URLS } from "../config/apiUrls";
 import { InferResponseType } from "hono";
 import { ThreadType } from "@b3s/shared/src/types";
 
-export async function getAllThreads() {
+export async function getAllThreads(page: number = 1) {
 	type resType = InferResponseType<typeof client.bbs.threads.$get>;
-	return fetcher<resType>(API_URLS.THREADS, { method: "GET" });
+	return fetcher<resType>(`${API_URLS.THREADS}?page=${page}`, {
+		method: "GET",
+	});
 }
 
 export async function createThread(values: ThreadType.CreateThreadType) {

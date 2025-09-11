@@ -139,7 +139,7 @@ export const CreateThreadForm = ({ onCreated }: Props) => {
 						{error && <p className="text-red-500">{error}</p>}
 
 						<Button
-							className="my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
+							className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
 							type="submit"
 						>
 							新規スレッド作成
