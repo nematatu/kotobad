@@ -22,7 +22,6 @@ export function ThreadPagination({
 }: Props) {
 	const totalPages = Math.ceil(totalCount / perPage);
 
-	console.log(currentPage);
 	return (
 		<Pagination className="flex justify-end">
 			<PaginationContent>

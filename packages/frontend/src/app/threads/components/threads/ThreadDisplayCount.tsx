@@ -14,7 +14,6 @@ export function ThreadDisplayCount({
 	const startIndex = (currentPage - 1) * 20 + 1;
 	const endIndex = Math.min(currentPage * perPage, totalCount);
 
-	console.log(currentPage);
 	return (
 		<div className="dark:text-gray-300 whitespace-normal sm:whitespace-nowrap">
 			{totalCount} 件中 {startIndex} ~ {endIndex} を表示中
