@@ -43,12 +43,17 @@ export const CreateThreadForm = ({ onCreated }: Props) => {
 		setError(null);
 		try {
 			const res = await createThread(values);
-			if ("error" in res) throw new Error(res.error);
 			//TODO エラーのステータスコードで表示するエラー文の分岐
 			// TODO 分岐する文章をconstantsにまとめる
 			// TODO コンポーネント分けする
 			// TODO exciteのやつが使いやすかったからパクるのあり
-			onCreated(res);
+			// 型ガード
+			if ("id" in res) {
+				onCreated(res); // 成功レスポンスだけ渡す
+				form.reset();
+			} else {
+				throw new Error(res.error);
+			}
 			console.log("新規スレッド作成", values);
 		} catch (e: any) {
 			if (e.status === 401) {
@@ -62,7 +67,7 @@ export const CreateThreadForm = ({ onCreated }: Props) => {
 	return (
 		<Card>
 			<div className="w-[100%] p-4">
-				<h1 className="mb-8 text-xl font-bold underline underline-offset-7">
+				<h1 className="mb-8 text-md sm:text-xl font-bold underline underline-offset-7">
 					新規スレッド作成
 				</h1>
 				<Form {...form}>
@@ -84,7 +89,7 @@ export const CreateThreadForm = ({ onCreated }: Props) => {
 												required: "タイトルは必須です",
 											})}
 											placeholder="例: 〇〇の試合について"
-											className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
+											className="w-full sm:w-1/3 outline-2 focus:border-blue-600 placeholder-gray-500/50"
 										/>
 									</FormControl>
 									<FormMessage />

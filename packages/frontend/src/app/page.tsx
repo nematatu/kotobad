@@ -1,18 +1,13 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
 	return (
 		<div className="flex flex-col gap-y-4">
-			<div className="w-32 h-32 p-2 bg-blue-400">
-				<Button variant="outline" size="lg" className="w-full">
-					hello
-				</Button>
-			</div>
-			<div className="w-32 h-32 p-2 bg-blue-400">
-				<Button variant="outline" size="lg" className="w-full">
-					world
-				</Button>
-			</div>
+			<Link href="/threads">
+				<div className="text-blue-400 underline font-bold text-3xl">
+					スレッド一覧へ
+				</div>
+			</Link>
 		</div>
 	);
 }

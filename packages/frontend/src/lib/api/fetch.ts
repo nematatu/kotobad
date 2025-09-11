@@ -15,8 +15,10 @@ export async function fetcher<T>(
 	}
 
 	const res = await fetch(url, init);
-	if (!res.ok) {
-		throw new Error(`Fetch error: ${res.status}`);
+	if (!res.ok || "error" in res) {
+		const error: any = new Error(`Fetch error: ${res.status}`);
+		error.status = res.status;
+		throw error;
 	}
 	return res.json() as Promise<T>;
 }

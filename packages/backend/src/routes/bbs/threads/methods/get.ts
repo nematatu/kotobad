@@ -139,7 +139,7 @@ export const getAllThreadRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const page = Number(c.req.query("page") || "1");
-		const limit = 3;
+		const limit = 20;
 
 		const [threadsResult, totalCountResult] = await Promise.all([
 			db.query.threads.findMany({
