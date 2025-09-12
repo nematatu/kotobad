@@ -1,18 +1,15 @@
 "use client";
 
+import { PERPAGE } from "@b3s/shared/src/config/thread";
+
 type Props = {
 	currentPage: number;
 	totalCount: number;
-	perPage?: number;
 };
 
-export function ThreadDisplayCount({
-	currentPage,
-	totalCount,
-	perPage = 20,
-}: Props) {
-	const startIndex = (currentPage - 1) * 20 + 1;
-	const endIndex = Math.min(currentPage * perPage, totalCount);
+export function ThreadDisplayCount({ currentPage, totalCount }: Props) {
+	const startIndex = (currentPage - 1) * PERPAGE + 1;
+	const endIndex = Math.min(currentPage * PERPAGE, totalCount);
 
 	return (
 		<div className="dark:text-gray-300 whitespace-normal sm:whitespace-nowrap">

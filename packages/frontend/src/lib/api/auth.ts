@@ -1,12 +1,12 @@
 import { client } from "./honoClient";
 import { fetcher } from "./fetch";
-import { API_URLS } from "../config/apiUrls";
+import { getApiUrl } from "../config/apiUrls";
 import { AuthType } from "@b3s/shared/src/types/";
 import { InferResponseType } from "hono";
 
 export async function getMe() {
 	type resType = InferResponseType<typeof client.auth.me.$get>;
-	const res = fetcher<resType>(API_URLS.ME, {
+	const res = fetcher<resType>(getApiUrl("ME"), {
 		method: "GET",
 		credentials: "include",
 	});
@@ -17,7 +17,7 @@ export async function getMe() {
 
 export async function signup(values: AuthType.LoginSignupUserType) {
 	type resType = InferResponseType<typeof client.auth.signup.$post>;
-	return fetcher<resType>(API_URLS.SIGN_UP, {
+	return fetcher<resType>(getApiUrl("SIGN_UP"), {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),
@@ -25,7 +25,7 @@ export async function signup(values: AuthType.LoginSignupUserType) {
 }
 export async function login(values: AuthType.LoginSignupUserType) {
 	type resType = InferResponseType<typeof client.auth.login.$post>;
-	return fetcher<resType>(API_URLS.LOGIN, {
+	return fetcher<resType>(getApiUrl("LOGIN"), {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),
@@ -35,7 +35,7 @@ export async function login(values: AuthType.LoginSignupUserType) {
 
 export function logout() {
 	type resType = InferResponseType<typeof client.auth.logout.$delete>;
-	return fetcher<resType>(API_URLS.LOGOUT, {
+	return fetcher<resType>(getApiUrl("LOGOUT"), {
 		method: "DELETE",
 		credentials: "include",
 	});

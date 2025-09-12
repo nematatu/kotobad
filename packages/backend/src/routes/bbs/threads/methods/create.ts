@@ -60,7 +60,6 @@ export const createThreadRouter: RouteHandler<
 	const db = c.get("db");
 	const user = c.get("user");
 
-	console.log(user);
 	let validatedData;
 	try {
 		validatedData = c.req.valid("json");

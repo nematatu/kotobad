@@ -14,20 +14,6 @@ export const createPostRoute = createRoute({
 	path: "/create",
 	description: "新規投稿の作成",
 	request: {
-		query: z.object({
-			thread_id: z.preprocess(
-				(val) => {
-					if (Array.isArray(val)) {
-						return val[0];
-					}
-					return val;
-				},
-				z.string().openapi({
-					description: "親スレッドID",
-					example: "1",
-				}),
-			),
-		}),
 		body: {
 			content: {
 				"application/json": {
@@ -42,6 +28,14 @@ export const createPostRoute = createRoute({
 			content: {
 				"application/json": {
 					schema: OpenAPIPostSchema,
+				},
+			},
+		},
+		400: {
+			description: "バリデーションエラー",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
 				},
 			},
 		},
@@ -72,13 +66,20 @@ export const createPostRouter: RouteHandler<
 		const db = c.get("db");
 		const user = c.get("user");
 
-		const { thread_id } = c.req.valid("query");
-		const id = Number(thread_id);
+		let validatedData;
+		try {
+			validatedData = c.req.valid("json");
+		} catch (err: any) {
+			console.error("Validation error:", err.errors);
+			return c.json({ error: "Validation failed" }, 400);
+		}
 
-		const validatedData = c.req.valid("json");
+		let { threadId } = validatedData as z.infer<typeof OpenAPICreatePostSchema>;
+
+		threadId = Number(threadId);
 
 		const thread = await db.query.threads.findFirst({
-			where: eq(threads.id, id),
+			where: eq(threads.id, threadId),
 		});
 
 		if (!thread) {
@@ -88,10 +89,9 @@ export const createPostRouter: RouteHandler<
 		const result = await db
 			.insert(posts)
 			.values({
-				title: validatedData.title,
-				description: validatedData.description,
+				post: validatedData.post,
 				authorId: user.id,
-				threadId: id,
+				threadId: threadId,
 			})
 			.returning({ insertedId: posts.id });
 

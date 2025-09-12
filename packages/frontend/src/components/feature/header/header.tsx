@@ -49,7 +49,7 @@ const Header = () => {
 							ログアウト
 						</Button>
 					) : (
-						<div>
+						<div className="space-x-2">
 							<Button className="cursor-pointer" variant="outline" asChild>
 								<Link
 									href="/auth/login"

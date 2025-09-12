@@ -1,4 +1,5 @@
 "use client";
+import { PERPAGE } from "@b3s/shared/src/config/thread";
 
 import {
 	Pagination,
@@ -12,18 +13,18 @@ import {
 type Props = {
 	currentPage: number;
 	totalCount: number;
-	perPage?: number; // 1ページあたりの件数
+	position?: "start" | "center" | "end";
 };
 
 export function ThreadPagination({
 	currentPage,
 	totalCount,
-	perPage = 20,
+	position = "center",
 }: Props) {
-	const totalPages = Math.ceil(totalCount / perPage);
+	const totalPages = Math.ceil(totalCount / PERPAGE);
 
 	return (
-		<Pagination className="flex justify-end">
+		<Pagination className={`flex justify-${position}`}>
 			<PaginationContent>
 				{/* 前へ */}
 				{currentPage > 1 && (

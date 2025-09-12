@@ -2,11 +2,10 @@ import { z } from "zod";
 
 export const PostSchema = z.object({
 	id: z.number().int().positive(),
-	title: z.string().min(1),
-	description: z.string().min(1),
+	post: z.string().min(1),
 	authorId: z.number().int().positive(),
-	createdAt: z.date(),
-	updatedAt: z.date().nullable(),
+	createdAt: z.string(),
+	updatedAt: z.string().nullable(),
 	author: z
 		.object({
 			username: z.string(),
@@ -15,8 +14,9 @@ export const PostSchema = z.object({
 });
 
 export const CreatePostSchema = PostSchema.pick({
-	title: true,
-	description: true,
+	post: true,
+}).extend({
+	threadId: z.number().int().positive(),
 });
 
 export const EditPostSchema = CreatePostSchema.partial();

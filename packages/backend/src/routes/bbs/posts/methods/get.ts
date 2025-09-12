@@ -1,4 +1,3 @@
-import postRouter from "../index";
 import { createRoute, z } from "@hono/zod-openapi";
 import {
 	OpenAPIPostListSchema,
@@ -7,6 +6,49 @@ import {
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { AppEnvironment } from "../../../../types";
 import { RouteHandler } from "@hono/zod-openapi";
+
+export const getPostByThreadIdRoute = createRoute({
+	method: "get",
+	path: "/byThreadId/{threadId}",
+	description: "指定したスレッドの投稿をリストで取得します",
+	request: {
+		params: z.object({
+			threadId: z.string().openapi({
+				param: {
+					name: "threadId",
+					in: "path",
+				},
+				example: "123",
+			}),
+		}),
+	},
+	responses: {
+		200: {
+			description: "投稿のリスト",
+			content: {
+				"application/json": {
+					schema: OpenAPIPostListSchema,
+				},
+			},
+		},
+		404: {
+			description: "投稿が見つかりません",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		500: {
+			description: "サーバーエラー",
+			content: {
+				"application/json": {
+					schema: ErrorResponse,
+				},
+			},
+		},
+	},
+});
 
 export const getAllPostRoute = createRoute({
 	method: "get",
@@ -34,13 +76,13 @@ export const getAllPostRoute = createRoute({
 
 export const getPostByIdRoute = createRoute({
 	method: "get",
-	path: "/{id}",
+	path: "/{postId}",
 	description: "idから投稿を取得",
 	request: {
 		params: z.object({
-			id: z.string().openapi({
+			postId: z.string().openapi({
 				param: {
-					name: "id",
+					name: "postId",
 					in: "path",
 				},
 				example: "123",
@@ -121,6 +163,38 @@ export const searchPostRoute = createRoute({
 	},
 });
 
+export const getPostByThreadIdRouter: RouteHandler<
+	typeof getPostByThreadIdRoute,
+	AppEnvironment
+> = async (c) => {
+	try {
+		const db = c.get("db");
+		const threadId = Number(c.req.param("threadId"));
+		console.log("threadId", threadId);
+
+		const posts = await db.query.posts.findMany({
+			where: (posts, { eq }) => eq(posts.threadId, threadId),
+			with: {
+				author: {
+					columns: {
+						username: true,
+					},
+				},
+			},
+			orderBy: (posts, { asc }) => [asc(posts.createdAt)],
+		});
+
+		if (!posts) {
+			return c.json({ error: "Post not found" }, 404);
+		}
+
+		return c.json(posts, 200);
+	} catch (e: any) {
+		console.error(e);
+		return c.json({ error: "Failed to fetch post", message: e.message }, 500);
+	}
+};
+
 export const getAllPostRouter: RouteHandler<
 	typeof getAllPostRoute,
 	AppEnvironment
@@ -155,7 +229,7 @@ export const getPostByIdRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const id = Number(c.req.param("id"));
+		const id = Number(c.req.param("postId"));
 
 		const post = await db.query.posts.findFirst({
 			where: (posts, { eq }) => eq(posts.id, id),
@@ -191,11 +265,7 @@ export const searchPostRouter: RouteHandler<
 		}
 
 		const posts = await db.query.posts.findMany({
-			where: (posts, { or, like }) =>
-				or(
-					like(posts.title, `%${query}%`),
-					like(posts.description, `%${query}%`),
-				),
+			where: (posts, { or, like }) => or(like(posts.post, `%${query}%`)),
 			with: {
 				author: {
 					columns: {

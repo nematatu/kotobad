@@ -8,6 +8,7 @@ import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../../types";
 import { threads } from "../../../../../drizzle/schema";
 import { count } from "drizzle-orm";
+import { PERPAGE } from "@b3s/shared/src/config/thread";
 
 export const getAllThreadRoute = createRoute({
 	method: "get",
@@ -138,24 +139,40 @@ export const getAllThreadRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const page = Number(c.req.query("page") || "1");
-		const limit = 20;
+		const pageParam = c.req.query("page");
+		const page = pageParam ? Number(pageParam) : undefined;
+		const limit = PERPAGE;
 
-		const [threadsResult, totalCountResult] = await Promise.all([
-			db.query.threads.findMany({
-				with: {
-					author: {
-						columns: {
-							username: true,
+		let threadsResult;
+		let totalCountResult;
+
+		if (page) {
+			// ページ指定あり → ページネーション
+			[threadsResult, totalCountResult] = await Promise.all([
+				db.query.threads.findMany({
+					with: {
+						author: {
+							columns: { username: true },
 						},
 					},
-				},
-				limit: limit,
-				offset: (page - 1) * limit,
-				orderBy: (threads, { desc }) => [desc(threads.createdAt)],
-			}),
-			db.select({ value: count() }).from(threads),
-		]);
+					limit: limit,
+					offset: (page - 1) * limit,
+					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
+				}),
+				db.select({ value: count() }).from(threads),
+			]);
+		} else {
+			// ページ指定なし → 全件取得
+			[threadsResult, totalCountResult] = await Promise.all([
+				db.query.threads.findMany({
+					with: {
+						author: { columns: { username: true } },
+					},
+					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
+				}),
+				db.select({ value: count() }).from(threads),
+			]);
+		}
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
 		if (!threadsResult || totalCount === 0) {

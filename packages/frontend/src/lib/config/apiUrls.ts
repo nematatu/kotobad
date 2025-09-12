@@ -1,26 +1,24 @@
-export const API_URLS = {
-	SIGN_UP:
-		process.env.NODE_ENV === "production"
-			? "https://cloudflare/"
-			: "http://localhost:8787/auth/signup",
-	LOGIN:
-		process.env.NODE_ENV === "production"
-			? "https://cloudflare/"
-			: "http://localhost:8787/auth/login",
-	LOGOUT:
-		process.env.NODE_ENV === "production"
-			? "https://cloudflare/"
-			: "http://localhost:8787/auth/logout",
-	ME:
-		process.env.NODE_ENV === "production"
-			? "https://cloudflare/"
-			: "http://localhost:8787/auth/me",
-	THREADS:
-		process.env.NODE_ENV === "production"
-			? "https://cloudflare/"
-			: "http://localhost:8787/bbs/threads",
-	CREATE_THREADS:
-		process.env.NODE_ENV === "production"
-			? "https://cloudflare/"
-			: "http://localhost:8787/bbs/threads/create",
+const ENV = process.env.NODE_ENV;
+
+const BASE_URL =
+	ENV === "production"
+		? process.env.NEXT_PUBLIC_API_URL_PRODUCT!
+		: process.env.NEXT_PUBLIC_API_URL!;
+
+export const API_PATH = {
+	SIGN_UP: "auth/signup",
+	LOGIN: "auth/login",
+	LOGOUT: "auth/logout",
+	ME: "auth/me",
+	GET_ALL_THREADS: "bbs/threads",
+	CREATE_THREAD: "bbs/threads/create",
+	GET_ALL_POSTS: "bbs/posts",
+	CREATE_POST: "bbs/posts/create",
+	GET_POSTS_BY_THREADID: "bbs/posts/byThreadId",
+} as const;
+
+export type ApiPathKey = keyof typeof API_PATH;
+
+export const getApiUrl = (key: ApiPathKey): string => {
+	return `${BASE_URL}${API_PATH[key]}`;
 };

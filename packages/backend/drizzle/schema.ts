@@ -59,8 +59,7 @@ export const threads = sqliteTable("threads", {
 
 export const posts = sqliteTable("posts", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
-	title: text("title").notNull(),
-	description: text("description").notNull(),
+	post: text("post").notNull(),
 	threadId: integer("thread_id")
 		.notNull()
 		.references(() => threads.id),
@@ -75,10 +74,7 @@ export const posts = sqliteTable("posts", {
 	),
 });
 
-export const postsTitleIdx = index("title_idx").on(posts.title);
-export const postsDescriptionIdx = index("description_idx").on(
-	posts.description,
-);
+export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);
 
 export const postsRelations = relations(posts, ({ one }) => ({

@@ -7,6 +7,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 
 const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/threads/create", authMiddleware)
+	.use("/posts/create", authMiddleware)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter);
 
