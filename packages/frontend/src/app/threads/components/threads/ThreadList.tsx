@@ -36,11 +36,13 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								{getRelativeDate(thread.createdAt)}
 							</span>
 
-							{thread.threadLabels?.map((tl: LabelType.LabelType) => (
-								<span key={tl.labelId} className="">
-									{tl.labels.name}
-								</span>
-							))}
+							{thread.threadLabels?.map(
+								(tl: LabelType.ThreadThreadLabelType) => (
+									<span key={tl.labelId} className="">
+										{tl.labels.name}
+									</span>
+								),
+							)}
 						</div>
 						{/* 右側：作成者 + 日付 */}
 						<div className="flex flex-col items-end gap-y-1 text-gray-500 text-xs sm:text-sm whitespace-nowrap">

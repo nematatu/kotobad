@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 // import { useUser } from "@/components/feature/provider/UserProvider";
 import { createThread } from "@/lib/api/threads";
-import { ThreadType } from "@b3s/shared/src/types";
+import { LabelType, ThreadType } from "@b3s/shared/src/types";
 import { LabelListType } from "@b3s/shared/src/types/label";
 
 type CreateThreadType = {
@@ -158,8 +158,8 @@ export const CreateThreadForm = ({
 
 						{error && <p className="text-red-500">{error}</p>}
 						<div>
-							{labels.map((label) => (
-								<div key={label.labelId}>{label.labels.name}</div>
+							{labels.map((label: LabelType.LabelType) => (
+								<div key={label.id}>{label.name}</div>
 							))}
 						</div>
 
