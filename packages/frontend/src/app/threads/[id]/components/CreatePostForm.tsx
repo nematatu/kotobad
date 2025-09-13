@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 import { createPost } from "@/lib/api/posts";
 import type { CreatePostType } from "@b3s/shared/src/types/post";
+import { useState } from "react";
 
 type CreatePostFormProps = {
 	threadId: number;
@@ -21,6 +22,7 @@ export const CreatePostForm = ({
 	threadId,
 	onSuccess,
 }: CreatePostFormProps) => {
+	const [error, setError] = useState<string | null>(null);
 	const form = useForm<CreatePostType>({
 		defaultValues: {
 			post: "",
@@ -31,16 +33,20 @@ export const CreatePostForm = ({
 	const handleSubmit = async (values: CreatePostType) => {
 		console.log("values", values);
 		try {
-			const res = await createPost(values);
+			await createPost(values);
 			if (onSuccess) onSuccess();
-			console.log("新規ポスト作成", res);
+			form.reset();
 		} catch (e: any) {
-			console.error(e);
+			if (e.status === 401) {
+				setError("ログインが必要です");
+			} else {
+				setError(e.message);
+			}
 		}
 	};
 
 	return (
-		<Card className="my-4">
+		<Card className="my-4 sm:w-1/2">
 			<div className="w-[100%] p-4">
 				<h1 className="mb-4 text-md sm:text-xl font-bold ">書き込み</h1>
 				<Form {...form}>
@@ -115,6 +121,8 @@ export const CreatePostForm = ({
 						{/* 		</FormItem> */}
 						{/* 	)} */}
 						{/* /> */}
+
+						{error && <p className="text-red-500">{error}</p>}
 						<Button
 							className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
 							type="submit"

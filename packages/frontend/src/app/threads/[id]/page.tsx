@@ -40,7 +40,7 @@ export default async function ThreadDetailPage({ params }: Props) {
 	}
 
 	return (
-		<div className="p-6">
+		<div className="p-4">
 			<ThreadDetailClient
 				thread={targetThread}
 				initialPosts={postsRes as PostListType}

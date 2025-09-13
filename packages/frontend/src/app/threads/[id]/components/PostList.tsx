@@ -19,13 +19,10 @@ export const PostList = ({ posts }: PostListProps) => {
 	return (
 		<div className="radius-sm flex flex-col sm:p-5">
 			{postList.map((post) => (
-				<div
-					key={post.id}
-					className={`p-4 min-h-14 flex items-center border  hover:bg-gray-100 dark:hover:bg-gray-800`}
-				>
+				<div key={post.id} className={`p-4 min-h-14 flex items-center border`}>
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
 						<div className="min-w-0 flex-1 pr-4">
-							<span className="font-bold  block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
+							<span className="block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
 								{post.post}
 							</span>
 							<span className="text-gray-500 text-sm">

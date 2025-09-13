@@ -37,7 +37,7 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 	};
 
 	return (
-		<div className="p-6">
+		<div>
 			<div className="flex pb-6 justify-between items-start">
 				<div className="text-2xl sm:text-3xl font-bold max-w-[80%] break-words">
 					{thread.title}
@@ -46,8 +46,14 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 					{new Date(thread.createdAt).toLocaleString()}
 				</p>
 			</div>
-			<PostList posts={posts} />
-			<CreatePostForm threadId={thread.id} onSuccess={refreshPosts} />
+			<div className="flex justify-center">
+				<div className="sm:w-1/2">
+					<PostList posts={posts} />
+				</div>
+			</div>
+			<div className="flex justify-center">
+				<CreatePostForm threadId={thread.id} onSuccess={refreshPosts} />
+			</div>
 		</div>
 	);
 }
