@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ThreadThreadLabelSchema } from "./label";
 
 export const ThreadSchema = z.object({
 	id: z.number().int().positive(),
@@ -12,7 +13,9 @@ export const ThreadSchema = z.object({
 	author: z.object({
 		username: z.string().optional(),
 	}),
+	threadLabels: z.array(ThreadThreadLabelSchema),
 });
+
 export const CreateThreadSchema = ThreadSchema.pick({
 	title: true,
 });

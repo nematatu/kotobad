@@ -4,18 +4,21 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThreadList } from "./ThreadList";
 import { CreateThread } from "./CreateThread";
-import { ThreadType } from "@b3s/shared/src/types";
 import { ThreadPagination } from "./ThreadPageNation";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { PERPAGE } from "@b3s/shared/src/config/thread";
+import { ThreadType } from "@b3s/shared/src/types";
+import { LabelListType } from "@b3s/shared/src/types/label";
 
 type Props = {
+	labels: LabelListType;
 	initialThreads: ThreadType.ThreadType[];
 	currentPage: number;
 	totalCount: number;
 };
 
 export default function ThreadPageClient({
+	labels,
 	initialThreads,
 	currentPage,
 	totalCount,
@@ -35,7 +38,7 @@ export default function ThreadPageClient({
 	return (
 		<div className="px-5">
 			<div className="text-2xl sm:text-3xl font-bold pb-6">スレッド一覧</div>
-			<CreateThread onCreated={handleCreated} />
+			<CreateThread labels={labels} onCreated={handleCreated} />
 			<div className="flex items-center my-2">
 				<ThreadDisplayCount currentPage={currentPage} totalCount={totalCount} />
 				<ThreadPagination

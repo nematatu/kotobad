@@ -57,6 +57,20 @@
       "when": 1757692337586,
       "tag": "0007_naive_grey_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1757748098210,
+      "tag": "0008_magenta_changeling",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1757749666848,
+      "tag": "0009_peaceful_blade",
+      "breakpoints": true
     }
   ]
 }

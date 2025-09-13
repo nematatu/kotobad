@@ -154,6 +154,11 @@ export const getAllThreadRouter: RouteHandler<
 						author: {
 							columns: { username: true },
 						},
+						threadLabels: {
+							with: {
+								labels: true,
+							},
+						},
 					},
 					limit: limit,
 					offset: (page - 1) * limit,
@@ -167,6 +172,11 @@ export const getAllThreadRouter: RouteHandler<
 				db.query.threads.findMany({
 					with: {
 						author: { columns: { username: true } },
+						threadLabels: {
+							with: {
+								labels: true,
+							},
+						},
 					},
 					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
 				}),
@@ -205,6 +215,11 @@ export const getThreadByIdRouter: RouteHandler<
 						username: true,
 					},
 				},
+				threadLabels: {
+					with: {
+						labels: true,
+					},
+				},
 			},
 		});
 
@@ -240,6 +255,11 @@ export const searchThreadRouter: RouteHandler<
 					author: {
 						columns: {
 							username: true,
+						},
+					},
+					threadLabels: {
+						with: {
+							labels: true,
 						},
 					},
 				},

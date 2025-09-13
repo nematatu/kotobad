@@ -74,6 +74,20 @@ export const posts = sqliteTable("posts", {
 	),
 });
 
+export const labels = sqliteTable("labels", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	name: text("labelname").notNull(),
+});
+
+export const threadLabels = sqliteTable("thread_Label", {
+	threadId: integer("threadId")
+		.notNull()
+		.references(() => threads.id),
+	labelId: integer("labelId")
+		.notNull()
+		.references(() => labels.id),
+});
+
 export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);
 
@@ -94,9 +108,25 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 		references: [users.id],
 	}),
 	posts: many(posts),
+	threadLabels: many(threadLabels),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
 	posts: many(posts),
 	threads: many(threads),
+}));
+
+export const labelRelations = relations(labels, ({ many }) => ({
+	threadLabels: many(threadLabels),
+}));
+
+export const threadLabelRelations = relations(threadLabels, ({ one }) => ({
+	thread: one(threads, {
+		fields: [threadLabels.threadId],
+		references: [threads.id],
+	}),
+	labels: one(labels, {
+		fields: [threadLabels.labelId],
+		references: [labels.id],
+	}),
 }));

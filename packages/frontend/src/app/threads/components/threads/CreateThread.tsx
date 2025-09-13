@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 // import { useUser } from "@/components/feature/provider/UserProvider";
 import { createThread } from "@/lib/api/threads";
 import { ThreadType } from "@b3s/shared/src/types";
+import { LabelListType } from "@b3s/shared/src/types/label";
 
 type CreateThreadType = {
 	title: string;
@@ -22,10 +23,14 @@ type CreateThreadType = {
 };
 
 type CreateThreadFormProps = {
+	labels: LabelListType;
 	onCreated: (newThread: ThreadType.ThreadType) => void;
 };
 
-export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
+export const CreateThreadForm = ({
+	labels,
+	onCreated,
+}: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	// const {user} = useUser()
 
@@ -152,6 +157,11 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 						{/* /> */}
 
 						{error && <p className="text-red-500">{error}</p>}
+						<div>
+							{labels.map((label) => (
+								<div key={label.labelId}>{label.labels.name}</div>
+							))}
+						</div>
 
 						<Button
 							className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
@@ -167,10 +177,11 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 };
 
 type CreateThreadProps = {
+	labels: LabelListType;
 	onCreated: (newThread: ThreadType.ThreadType) => void;
 };
 
-export const CreateThread = ({ onCreated }: CreateThreadProps) => {
+export const CreateThread = ({ labels, onCreated }: CreateThreadProps) => {
 	const [isOpenForm, setIsOpenForm] = useState(false);
 
 	const handleToggleForm = () => {
@@ -186,7 +197,7 @@ export const CreateThread = ({ onCreated }: CreateThreadProps) => {
 				＋スレッド作成
 			</Button>
 
-			{isOpenForm && <CreateThreadForm onCreated={onCreated} />}
+			{isOpenForm && <CreateThreadForm labels={labels} onCreated={onCreated} />}
 		</div>
 	);
 };
