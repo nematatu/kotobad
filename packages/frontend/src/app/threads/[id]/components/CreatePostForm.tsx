@@ -8,10 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { createPost } from "@/lib/api/posts";
 import type { CreatePostType } from "@b3s/shared/src/types/post";
-import { useState } from "react";
 
 type CreatePostFormProps = {
 	threadId: number;
@@ -35,7 +35,9 @@ export const CreatePostForm = ({
 		try {
 			await createPost(values);
 			if (onSuccess) onSuccess();
+
 			form.reset();
+			setTimeout(() => form.setFocus("post"), 1);
 		} catch (e: any) {
 			if (e.status === 401) {
 				setError("ログインが必要です");
@@ -48,11 +50,11 @@ export const CreatePostForm = ({
 	return (
 		<Card className="my-4 sm:w-1/2">
 			<div className="w-[100%] p-4">
-				<h1 className="mb-4 text-md sm:text-xl font-bold ">書き込み</h1>
+				<h1 className="mb-4 text-md sm:text-xl font-bold mb-6">書き込み</h1>
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(handleSubmit)}
-						className="space-y-6"
+						className="space-y-2"
 					>
 						<FormField
 							control={form.control}
@@ -71,12 +73,21 @@ export const CreatePostForm = ({
 											})}
 											placeholder="内容"
 											className="w-full sm:h-14 sm:w-1/3 outline-2 focus:border-blue-600 placeholder-gray-500/50"
+											onKeyDown={(e) => {
+												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+													e.preventDefault();
+													form.handleSubmit(handleSubmit)();
+												}
+											}}
 										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
+						<p className="text-neutral-400 font-sm">
+							Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
+						</p>
 
 						{/* 名前 */}
 						{/* <FormField */}

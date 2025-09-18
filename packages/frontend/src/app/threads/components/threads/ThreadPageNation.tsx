@@ -23,6 +23,8 @@ export function ThreadPagination({
 }: Props) {
 	const totalPages = Math.ceil(totalCount / PERPAGE);
 
+	if (totalCount === 0) return;
+
 	return (
 		<Pagination className={`flex justify-${position}`}>
 			<PaginationContent>

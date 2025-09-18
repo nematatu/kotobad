@@ -23,6 +23,6 @@
 		},
 		"types": ["./cloudflare-env.d.ts", "node"]
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/auth/logout"],
+	"include": ["svg.d.ts", "next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/auth/logout", "next.config.js"],
 	"exclude": ["node_modules"]
 }

@@ -36,20 +36,31 @@ export default function ThreadPageClient({
 
 	const currentThreads = [...threads, ...initialThreads].slice(0, PERPAGE);
 	return (
-		<div className="px-5">
-			<div className="text-2xl sm:text-3xl font-bold pb-6">スレッド一覧</div>
-			<CreateThread labels={labels} onCreated={handleCreated} />
-			<div className="flex items-center my-2">
-				<ThreadDisplayCount currentPage={currentPage} totalCount={totalCount} />
-				<ThreadPagination
-					currentPage={currentPage}
-					totalCount={totalCount}
-					position="end"
-				/>
-			</div>
-			<ThreadList threads={currentThreads} />
-			<div className="flex justify-end">
-				<ThreadPagination currentPage={currentPage} totalCount={totalCount} />
+		<div className="flex flex-col items-center">
+			<div className="w-full max-w-[50%]">
+				<div className="text-2xl sm:text-3xl font-bold pb-6">スレッド一覧</div>
+				<CreateThread labels={labels} onCreated={handleCreated} />
+				<div className="flex items-center my-2">
+					<ThreadDisplayCount
+						currentPage={currentPage}
+						totalCount={totalCount}
+					/>
+					<ThreadPagination
+						currentPage={currentPage}
+						totalCount={totalCount}
+						position="end"
+					/>
+				</div>
+				{totalCount === 0 ? (
+					<div className="flex justify-center text-2xl">
+						スレッドがありません...
+					</div>
+				) : (
+					<ThreadList threads={currentThreads} />
+				)}
+				<div className="flex justify-end">
+					<ThreadPagination currentPage={currentPage} totalCount={totalCount} />
+				</div>
 			</div>
 		</div>
 	);

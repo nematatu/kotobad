@@ -102,6 +102,11 @@ export const createPostRouter: RouteHandler<
 			with: { author: true },
 		});
 
+		await db
+			.update(threads)
+			.set({ postCount: thread.postCount + 1, updatedAt: new Date() })
+			.where(eq(threads.id, threadId));
+
 		return c.json(newPostWithAuthor, 201);
 	} catch (e: any) {
 		console.error(e);

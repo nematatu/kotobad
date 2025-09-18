@@ -6,6 +6,7 @@ import type { ThreadType } from "@b3s/shared/src/types/thread";
 import { formatDate } from "@/utils/date/formatDate";
 import { getRelativeDate } from "@/utils/date/getRelativeDate";
 import { LabelType } from "@b3s/shared/src/types";
+import ChatIcon from "@/assets/threads/chat.svg";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -29,12 +30,18 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
 						{/* 左側：タイトル + 投稿日時 */}
 						<div className="min-w-0 flex-1 pr-4">
-							<span className="font-bold group-hover:text-blue-500 block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
-								{thread.title}
-							</span>
-							<span className="text-gray-500 text-sm">
-								{getRelativeDate(thread.createdAt)}
-							</span>
+							<div className="flex space-x-4">
+								<span className="font-bold group-hover:text-blue-500 block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
+									{thread.title}
+								</span>
+							</div>
+							<div className="flex items-center space-x-1 text-gray-500">
+								<span className="text-sm">
+									{getRelativeDate(thread.createdAt)}
+								</span>
+								<ChatIcon className="mr-1" style={{ width: 15, height: 15 }} />
+								<div>{thread.postCount}</div>
+							</div>
 
 							{thread.threadLabels?.map(
 								(tl: LabelType.ThreadThreadLabelType) => (

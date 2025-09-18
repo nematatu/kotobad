@@ -8,7 +8,7 @@ type Props = {
 };
 
 export function ThreadDisplayCount({ currentPage, totalCount }: Props) {
-	const startIndex = (currentPage - 1) * PERPAGE + 1;
+	const startIndex = totalCount === 0 ? 0 : (currentPage - 1) * PERPAGE + 1;
 	const endIndex = Math.min(currentPage * PERPAGE, totalCount);
 
 	return (

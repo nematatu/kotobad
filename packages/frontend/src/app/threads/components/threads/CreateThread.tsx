@@ -15,6 +15,9 @@ import { Card } from "@/components/ui/card";
 import { createThread } from "@/lib/api/threads";
 import { LabelType, ThreadType } from "@b3s/shared/src/types";
 import { LabelListType } from "@b3s/shared/src/types/label";
+import { CategoryColorMap, LabelColorMap } from "@/lib/config/labelColor";
+import { useMemo } from "react";
+import { groupLabels } from "@/utils/label/groupLabels";
 
 type CreateThreadType = {
 	title: string;
@@ -31,6 +34,8 @@ export const CreateThreadForm = ({
 	labels,
 	onCreated,
 }: CreateThreadFormProps) => {
+	const groupedLabels = useMemo(() => groupLabels(labels), [labels]);
+
 	const [error, setError] = useState<string | null>(null);
 	// const {user} = useUser()
 
@@ -70,11 +75,10 @@ export const CreateThreadForm = ({
 	return (
 		<Card className="my-4">
 			<div className="w-[100%] p-4">
-				<h1 className="mb-4 text-md sm:text-xl font-bold ">スレッド作成</h1>
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(handleSubmit)}
-						className="space-y-6"
+						className="space-y-3"
 					>
 						{/* スレッドタイトル */}
 						<FormField
@@ -157,10 +161,32 @@ export const CreateThreadForm = ({
 						{/* /> */}
 
 						{error && <p className="text-red-500">{error}</p>}
-						<div>
-							{labels.map((label: LabelType.LabelType) => (
-								<div key={label.id}>{label.name}</div>
-							))}
+
+						<div className="space-y-2">
+							<div className="font-bold">ラベルを追加</div>
+							<div className="flex flex-col space-y-2 text-white">
+								{Object.entries(groupedLabels).map(
+									([category, subGroups], index) => (
+										<div key={category} className="flex items-center">
+											<div
+												className={`${CategoryColorMap[index]} p-2 font-bold mr-2 text-black`}
+											>
+												{category}
+											</div>
+											{Object.entries(subGroups).map(
+												([subCategory, labels]) => (
+													<div
+														key={subCategory}
+														className=" space-x-2 text-black"
+													>
+														{`▶`} {subCategory}
+													</div>
+												),
+											)}
+										</div>
+									),
+								)}
+							</div>
 						</div>
 
 						<Button
@@ -183,10 +209,10 @@ type CreateThreadProps = {
 
 export const CreateThread = ({ labels, onCreated }: CreateThreadProps) => {
 	const [isOpenForm, setIsOpenForm] = useState(false);
-
 	const handleToggleForm = () => {
 		setIsOpenForm((prev) => !prev);
 	};
+
 	return (
 		<div>
 			<Button
@@ -194,7 +220,7 @@ export const CreateThread = ({ labels, onCreated }: CreateThreadProps) => {
 				type="submit"
 				onClick={handleToggleForm}
 			>
-				＋スレッド作成
+				{isOpenForm ? "▲" : "▼"} スレッド作成
 			</Button>
 
 			{isOpenForm && <CreateThreadForm labels={labels} onCreated={onCreated} />}

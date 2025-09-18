@@ -8,6 +8,7 @@ import { threads } from "../../../../../drizzle/schema";
 import { eq } from "drizzle-orm"; // Import eq for querying
 import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../../types";
+import { SimpleErrorResponse } from "@b3s/shared/src/schemas/error";
 
 export const createThreadRoute = createRoute({
 	method: "post",

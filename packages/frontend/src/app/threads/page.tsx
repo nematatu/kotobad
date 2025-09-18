@@ -13,7 +13,6 @@ export default async function Page({ searchParams }: Props) {
 	const currentPage = Number(searchParams?.page ?? "1");
 
 	const labelRes = await getAllLabels();
-	console.log(labelRes);
 	const threadRes = await getAllThreads(currentPage);
 
 	console.log("res", threadRes);

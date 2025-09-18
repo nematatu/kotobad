@@ -145,10 +145,11 @@ export const getAllThreadRouter: RouteHandler<
 
 		let threadsResult;
 		let totalCountResult;
+		let postCountResult;
 
 		if (page) {
 			// ページ指定あり → ページネーション
-			[threadsResult, totalCountResult] = await Promise.all([
+			[threadsResult, totalCountResult, postCountResult] = await Promise.all([
 				db.query.threads.findMany({
 					with: {
 						author: {
@@ -165,10 +166,13 @@ export const getAllThreadRouter: RouteHandler<
 					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
 				}),
 				db.select({ value: count() }).from(threads),
+				db.query.posts.findMany({
+					where: (posts, { eq }) => eq(threads.id, posts.threadId),
+				}),
 			]);
 		} else {
 			// ページ指定なし → 全件取得
-			[threadsResult, totalCountResult] = await Promise.all([
+			[threadsResult, totalCountResult, postCountResult] = await Promise.all([
 				db.query.threads.findMany({
 					with: {
 						author: { columns: { username: true } },
@@ -181,14 +185,15 @@ export const getAllThreadRouter: RouteHandler<
 					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
 				}),
 				db.select({ value: count() }).from(threads),
+				db.query.posts.findMany({
+					where: (posts, { eq }) => eq(threads.id, posts.threadId),
+				}),
 			]);
 		}
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
-		if (!threadsResult || totalCount === 0) {
-			return c.json({ error: "threads not found" }, 404);
-		}
 
+		console.log(postCountResult);
 		return c.json({ threads: threadsResult, totalCount: totalCount }, 200);
 	} catch (e: any) {
 		console.error(e);

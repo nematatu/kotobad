@@ -21,17 +21,24 @@ export const PostList = ({ posts }: PostListProps) => {
 			{postList.map((post) => (
 				<div key={post.id} className={`p-4 min-h-14 flex items-center border`}>
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
-						<div className="min-w-0 flex-1 pr-4">
-							<span className="block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
-								{post.post}
-							</span>
+						<div className="flex-col">
+							<div className="flex">
+								<span className="text-gray-500 mr-2 text-sm">{post.id}</span>
+								<div className="gap-y-1 text-xs sm:text-sm whitespace-nowrap space-x-2">
+									<span className="text-black">{post.author?.username}</span>
+									<span className="text-gray-500">
+										{formatDate(post.createdAt)}
+									</span>
+								</div>
+							</div>
+							<div className="flex-1">
+								<span className="block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
+									{post.post}
+								</span>
+							</div>
 							<span className="text-gray-500 text-sm">
 								{getRelativeDate(post.createdAt)}
 							</span>
-						</div>
-						<div className="flex flex-col items-end gap-y-1 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
-							<span>作成者: {post.author?.username}</span>
-							<span>{formatDate(post.createdAt)}</span>
 						</div>
 					</div>
 				</div>
