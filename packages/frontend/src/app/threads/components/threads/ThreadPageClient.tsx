@@ -37,8 +37,9 @@ export default function ThreadPageClient({
 	const currentThreads = [...threads, ...initialThreads].slice(0, PERPAGE);
 	return (
 		<div className="flex flex-col items-center">
-			<div className="w-full max-w-[50%]">
-				<div className="text-2xl sm:text-3xl font-bold pb-6">スレッド一覧</div>
+			<div className="w-full sm:max-w-[50%]">
+                <div className="p-2">
+				<div className="text-xl sm:text-2xl sm:text-3xl font-bold pb-1 sm:py-4">スレッド一覧</div>
 				<CreateThread labels={labels} onCreated={handleCreated} />
 				<div className="flex items-center my-2">
 					<ThreadDisplayCount
@@ -51,6 +52,7 @@ export default function ThreadPageClient({
 						position="end"
 					/>
 				</div>
+        </div>
 				{totalCount === 0 ? (
 					<div className="flex justify-center text-2xl">
 						スレッドがありません...

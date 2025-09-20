@@ -26,6 +26,7 @@ export default async function Page({ searchParams }: Props) {
 	const threadsResponse: ThreadType.ThreadListType =
 		ThreadListSchema.parse(threadRes);
 	const threads: ThreadType.ThreadType[] = threadsResponse.threads;
+    console.log("labels", labels)
 
 	const totalCount: number = threadsResponse.totalCount;
 

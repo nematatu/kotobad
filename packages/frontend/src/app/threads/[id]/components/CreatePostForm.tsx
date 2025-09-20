@@ -48,8 +48,8 @@ export const CreatePostForm = ({
 	};
 
 	return (
-		<Card className="my-4 sm:w-1/2">
-			<div className="w-[100%] p-4">
+		<Card className="my-4 w-full sm:w-1/2">
+			<div className="p-4">
 				<h1 className="mb-4 text-md sm:text-xl font-bold mb-6">書き込み</h1>
 				<Form {...form}>
 					<form
@@ -85,7 +85,7 @@ export const CreatePostForm = ({
 								</FormItem>
 							)}
 						/>
-						<p className="text-neutral-400 font-sm">
+						<p className="hidden sm:block text-neutral-400 font-sm">
 							Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
 						</p>
 

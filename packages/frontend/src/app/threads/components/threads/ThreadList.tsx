@@ -31,7 +31,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 						{/* 左側：タイトル + 投稿日時 */}
 						<div className="min-w-0 flex-1 pr-4">
 							<div className="flex space-x-4">
-								<span className="font-bold group-hover:text-blue-500 block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
+								<span className="font-bold text-lg sm:text-xl group-hover:text-blue-500 block  text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
 									{thread.title}
 								</span>
 							</div>
@@ -39,8 +39,8 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								<span className="text-sm">
 									{getRelativeDate(thread.createdAt)}
 								</span>
-								<ChatIcon className="mr-1" style={{ width: 15, height: 15 }} />
-								<div>{thread.postCount}</div>
+								<ChatIcon className="mr-1" style={{ width: 12, height: 12 }} />
+								<div className="text-sm">{thread.postCount}</div>
 							</div>
 
 							{thread.threadLabels?.map(
