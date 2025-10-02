@@ -16,7 +16,13 @@ export async function fetcher<T>(
 
 	const res = await fetch(url, init);
 	if (!res.ok || "error" in res) {
-		console.error(res);
+    let errorBody: any = null;
+  try {
+    errorBody = await res.json();
+  } catch {
+    errorBody = await res.text();
+  }
+  console.error("Fetch error:", res.status, errorBody);
 		const error: any = new Error(`Fetch error: ${res.status}`);
 		error.status = res.status;
 		throw error;

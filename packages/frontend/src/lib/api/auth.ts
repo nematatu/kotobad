@@ -6,7 +6,7 @@ import { InferResponseType } from "hono";
 
 export async function getMe() {
 	type resType = InferResponseType<typeof client.auth.me.$get>;
-	const res = fetcher<resType>(getApiUrl("ME"), {
+	const res = await fetcher<resType>(getApiUrl("ME"), {
 		method: "GET",
 		credentials: "include",
 	});

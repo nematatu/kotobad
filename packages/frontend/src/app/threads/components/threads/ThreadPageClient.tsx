@@ -11,14 +11,12 @@ import { ThreadType } from "@b3s/shared/src/types";
 import { LabelListType } from "@b3s/shared/src/types/label";
 
 type Props = {
-	labels: LabelListType;
 	initialThreads: ThreadType.ThreadType[];
 	currentPage: number;
 	totalCount: number;
 };
 
 export default function ThreadPageClient({
-	labels,
 	initialThreads,
 	currentPage,
 	totalCount,
@@ -40,7 +38,7 @@ export default function ThreadPageClient({
 			<div className="w-full sm:max-w-[50%]">
                 <div className="p-2">
 				<div className="text-xl sm:text-2xl sm:text-3xl font-bold pb-1 sm:py-4">スレッド一覧</div>
-				<CreateThread labels={labels} onCreated={handleCreated} />
+				<CreateThread  onCreated={handleCreated} />
 				<div className="flex items-center my-2">
 					<ThreadDisplayCount
 						currentPage={currentPage}

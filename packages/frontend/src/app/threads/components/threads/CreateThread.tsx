@@ -23,12 +23,10 @@ type CreateThreadType = {
 };
 
 type CreateThreadFormProps = {
-	labels: LabelListType;
 	onCreated: (newThread: ThreadType.ThreadType) => void;
 };
 
 export const CreateThreadForm = ({
-	labels,
 	onCreated,
 }: CreateThreadFormProps) => {
 
@@ -198,11 +196,10 @@ export const CreateThreadForm = ({
 };
 
 type CreateThreadProps = {
-	labels: LabelListType;
 	onCreated: (newThread: ThreadType.ThreadType) => void;
 };
 
-export const CreateThread = ({ labels, onCreated }: CreateThreadProps) => {
+export const CreateThread = ({ onCreated }: CreateThreadProps) => {
 	const [isOpenForm, setIsOpenForm] = useState(false);
 	const handleToggleForm = () => {
 		setIsOpenForm((prev) => !prev);
@@ -218,7 +215,7 @@ export const CreateThread = ({ labels, onCreated }: CreateThreadProps) => {
 				{isOpenForm ? "▲" : "▼"} スレッド作成
 			</Button>
 
-			{isOpenForm && <CreateThreadForm labels={labels} onCreated={onCreated} />}
+			{isOpenForm && <CreateThreadForm onCreated={onCreated} />}
 		</div>
 	);
 };
