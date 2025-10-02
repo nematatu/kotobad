@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import type { UserTokenPayload } from "../types";
 
+console.log("hello")
+console.log(process.env);
 const ACCESS_SECRET = process.env.ACCESS_SECRET!;
 const REFRESH_SECRET = process.env.REFRESH_SECRET!;
 

@@ -13,7 +13,10 @@
 		}
 	], 
   "vars": {
-      "APP_ENV": "development"
+      "APP_ENV": "development",
+      "JWT_SECRET": "$JWT_SECRET",
+      "REFRESH_SECRET": "$REFRESH_SECRET",
+      "ACCESS_SECRET": "$ACCESS_SECRET"
   }, 
   "env": {
       "dev-prod": {

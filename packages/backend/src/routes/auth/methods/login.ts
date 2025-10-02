@@ -56,7 +56,7 @@ export const loginRoute = createRoute({
 				},
 			},
 		},
-		409: {
+		500: {
 			description: "パスワードが異なります",
 			content: {
 				"application/json": {
@@ -95,12 +95,13 @@ export const loginRouter: RouteHandler<
 			id: user.id,
 			username: user.username,
 		};
-		const accessToken = signAccessToken(accessTokenpayload);
 
 		const refreshTokenpayload: UserTokenPayload = {
 			id: user.id,
 			username: user.username,
 		};
+		const accessToken = signAccessToken(accessTokenpayload);
+
 		const refreshToken = signRefreshToken(refreshTokenpayload);
 
 		setCookie(c, "accessToken", accessToken, {
@@ -119,7 +120,7 @@ export const loginRouter: RouteHandler<
 
 		return c.json({ message: "Login successfully!" }, 201);
 	} catch (e) {
-		return c.json({ error: "internal server error" }, 409);
+		return c.json({ error: "internal server error" }, 500);
 	}
 };
 

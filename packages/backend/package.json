@@ -2,7 +2,7 @@
 	"name": "@b3s/backend",
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev --ip 0.0.0.0 --port 8787 --env-file .dev.vars",
+		"dev": "wrangler dev --ip 0.0.0.0 --port 8787",
 		"dev:prod": "wrangler dev --ip 0.0.0.0 --port 8787 -e dev-prod",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
