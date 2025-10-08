@@ -46,7 +46,7 @@ const Header = () => {
         >
             <div className="flex h-20 items-center px-4">
                 <Link href="/">
-                    <LogoIcon className="w-20 h-20 text-gray-800 dark:text-gray-200" />
+                    {/* <LogoIcon className="w-20 h-20 text-gray-800 dark:text-gray-200" /> */}
                 </Link>
                 <div className="flex flex-1 items-center justify-end space-x-2">
                     <ThemeMenuToggle />

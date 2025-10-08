@@ -5,11 +5,13 @@ import { getPostByThreadId } from "@/lib/api/posts";
 import { PostListType } from "@b3s/shared/src/types/post";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 
-type Props = {
-	params: { id: string };
+export type Props = {
+  params: Promise<{ id: string }>;
 };
 
+
 export default async function ThreadDetailPage({ params }: Props) {
+  const resolvedParams = await params;
 	const threadRes = await getAllThreads();
 	try {
 		if ("error" in threadRes) {
@@ -20,7 +22,7 @@ export default async function ThreadDetailPage({ params }: Props) {
 	}
 	const threads: ThreadType.ThreadType[] = threadRes.threads;
 
-	const { id } = params;
+	const id = resolvedParams.id;
 	const threadId = Number(id);
 	const targetThread = threads.find(
 		(t: ThreadType.ThreadType) => t.id === threadId,

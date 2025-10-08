@@ -3,7 +3,6 @@ import { AppEnvironment } from "../../../types";
 
 import { createPostRoute, createPostRouter } from "./methods/create";
 import { deletePostRoute, deletePostRouter } from "./methods/delete";
-import { editPostRoute, editPostRouter } from "./methods/edit";
 import {
 	getPostByThreadIdRoute,
 	getAllPostRoute,
@@ -18,7 +17,6 @@ import {
 const postRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(createPostRoute, createPostRouter)
 	.openapi(deletePostRoute, deletePostRouter)
-	.openapi(editPostRoute, editPostRouter)
 	.openapi(getPostByThreadIdRoute, getPostByThreadIdRouter)
 	.openapi(getAllPostRoute, getAllPostRouter)
 	.openapi(getPostByIdRoute, getPostByIdRouter)

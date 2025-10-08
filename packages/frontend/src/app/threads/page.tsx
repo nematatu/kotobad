@@ -3,12 +3,12 @@ import { ThreadListSchema } from "@b3s/shared/src/schemas/thread";
 import { ThreadType } from "@b3s/shared/src/types";
 import ThreadPageClient from "./components/threads/ThreadPageClient";
 
-type Props = {
-	searchParams?: { page?: string };
+export type Props = {
+  searchParams?: Promise<{ page?: string }>; 
 };
 
 export default async function Page({ searchParams }: Props) {
-  const params = await searchParams;
+  const params = searchParams ? await searchParams : {};
   const currentPage = Number(params?.page ?? "1");
 
 	const threadRes = await getAllThreads(currentPage);

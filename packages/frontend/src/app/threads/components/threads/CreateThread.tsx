@@ -18,8 +18,6 @@ import { LabelListType } from "@b3s/shared/src/types/label";
 
 type CreateThreadType = {
 	title: string;
-	// author: string;
-	// content: string;
 };
 
 type CreateThreadFormProps = {
@@ -36,8 +34,6 @@ export const CreateThreadForm = ({
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
-			// author: user ? user.username : "",
-			// content: "",
 		},
 	});
 
@@ -45,13 +41,8 @@ export const CreateThreadForm = ({
 		setError(null);
 		try {
 			const res = await createThread(values);
-			//TODO エラーのステータスコードで表示するエラー文の分岐
-			// TODO 分岐する文章をconstantsにまとめる
-			// TODO コンポーネント分けする
-			// TODO exciteのやつが使いやすかったからパクるのあり
-			// 型ガード
 			if ("id" in res) {
-				onCreated(res); // 成功レスポンスだけ渡す
+				onCreated(res);
 				form.reset();
 			} else {
 				throw new Error(res.error);
@@ -74,7 +65,6 @@ export const CreateThreadForm = ({
 						onSubmit={form.handleSubmit(handleSubmit)}
 						className="space-y-3"
 					>
-						{/* スレッドタイトル */}
 						<FormField
 							control={form.control}
 							name="title"
@@ -158,28 +148,6 @@ export const CreateThreadForm = ({
 
 						<div className="space-y-2">
 							<div className="font-bold">ラベルを追加</div>
-							<div className="flex flex-col space-y-2 text-white">
-
-							{/* 			<div key={category} className="flex items-center"> */}
-							{/* 				<div */}
-							{/* 					className={`${CategoryColorMap[index]} p-2 font-bold mr-2 text-black`} */}
-							{/* 				> */}
-							{/* 					{category} */}
-							{/* 				</div> */}
-							{/* 				{Object.entries(subGroups).map( */}
-							{/* 					([subCategory, labels]) => ( */}
-							{/* 						<div */}
-							{/* 							key={subCategory} */}
-							{/* 							className=" space-x-2 text-black" */}
-							{/* 						> */}
-							{/* 							{`▶`} {subCategory} */}
-							{/* 						</div> */}
-							{/* 					), */}
-							{/* 				)} */}
-							{/* 			</div> */}
-							{/* 		), */}
-							{/* 	)} */}
-							</div>
 						</div>
 
 						<Button
