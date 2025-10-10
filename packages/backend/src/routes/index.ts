@@ -8,7 +8,7 @@ import { cors } from "hono/cors";
 import { authMiddleware } from "../middleware/auth";
 
 const rawOrigins =
-	process.env.CORS_ORIGIN ?? "http://localhost:3000,http://localhost:8787";
+	process.env.ALLOWED_ORIGIN ?? "http://localhost:3000,http://localhost:8787";
 
 const allowedOrigin = rawOrigins
 	.split(",")
