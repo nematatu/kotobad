@@ -7,10 +7,13 @@ import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { authMiddleware } from "../middleware/auth";
 
-const allowedOrigin =
-	process.env.NODE_ENV === "production"
-		? "https://example.com"
-		: "http://localhost:3000";
+const rawOrigins =
+	process.env.CORS_ORIGIN ?? "http://localhost:3000,http://localhost:8787";
+
+const allowedOrigin = rawOrigins
+	.split(",")
+	.map((origin) => origin.trim())
+	.filter(Boolean);
 
 const mainRouter = new OpenAPIHono<AppEnvironment>()
 	.doc("/specification", {
@@ -24,7 +27,12 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 	.use(
 		"/*",
 		cors({
-			origin: allowedOrigin,
+			origin(origin) {
+				if (!origin) {
+					return "";
+				}
+				return allowedOrigin.includes(origin) ? origin : "";
+			},
 			allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 			allowHeaders: ["Content-Type", "Authorization"],
 			credentials: true,
