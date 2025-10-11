@@ -9,6 +9,20 @@ import { getPostByThreadId } from "@/lib/api/posts";
 import BreadCrumb from "./BreadCrumbs";
 import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
 
+const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
+	year: "numeric",
+	month: "2-digit",
+	day: "2-digit",
+	hour: "2-digit",
+	minute: "2-digit",
+	second: "2-digit",
+	hour12: false,
+	timeZone: "Asia/Tokyo",
+});
+
+const formatDateTime = (value: string | number | Date) =>
+	dateFormatter.format(new Date(value));
+
 type Props = {
     thread: ThreadType.ThreadType;
     initialPosts: PostListType;
@@ -59,13 +73,13 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
             </div>
             <div className="flex flex-col items-center justify-center">
                 <div className="flex flex-col w-full items-center p-4 sm:py-7">
-                    <div className="text-xl sm:text-3xl font-bold break-words">
-                        {thread.title}
-                    </div>
-                    <p className="text-gray-400">
-                        {new Date(thread.createdAt).toLocaleString()}
-                    </p>
-                </div>
+					<div className="text-xl sm:text-3xl font-bold break-words">
+						{thread.title}
+					</div>
+					<p className="text-gray-400">
+						{formatDateTime(thread.createdAt)}
+					</p>
+				</div>
                 <div className="w-full sm:w-1/2">
                     <PostList posts={posts} />
                 </div>
