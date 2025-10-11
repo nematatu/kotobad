@@ -86,8 +86,13 @@ export const createPostRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
-		const { insertedId } = await db.transaction(async (tx) => {
-			const [{ maxLocalId }] = await tx
+		let insertedId: number | null = null;
+		let attempts = 0;
+
+		while (insertedId === null && attempts < 3) {
+			attempts += 1;
+
+			const [{ maxLocalId }] = await db
 				.select({
 					maxLocalId: sql<number>`coalesce(max(${posts.localId}), 0)`,
 				})
@@ -96,38 +101,50 @@ export const createPostRouter: RouteHandler<
 
 			const nextLocalId = (maxLocalId ?? 0) + 1;
 
-			const result = await tx
-				.insert(posts)
-				.values({
-					post: validatedData.post,
-					authorId: user.id,
-					threadId: threadId,
-					localId: nextLocalId,
-				})
-				.returning({
-					insertedId: posts.id,
-				});
+			try {
+				const result = await db
+					.insert(posts)
+					.values({
+						post: validatedData.post,
+						authorId: user.id,
+						threadId: threadId,
+						localId: nextLocalId,
+					})
+					.returning({
+						insertedId: posts.id,
+					});
 
-			await tx
-				.update(threads)
-				.set({
-					postCount: sql`${threads.postCount} + 1`,
-					updatedAt: new Date(),
-				})
-				.where(eq(threads.id, threadId));
+				insertedId = result[0].insertedId;
 
-			return { insertedId: result[0].insertedId };
-		});
+				await db
+					.update(threads)
+					.set({
+						postCount: sql`${threads.postCount} + 1`,
+						updatedAt: new Date(),
+					})
+					.where(eq(threads.id, threadId));
+			} catch (error: any) {
+				const message: string = error?.message ?? "";
+
+				if (
+					message.includes("posts_thread_local_unique") ||
+					message.includes("posts.thread_id")
+				) {
+					continue;
+				}
+
+				throw error;
+			}
+		}
+
+		if (insertedId === null) {
+			throw new Error("Failed to allocate post local id");
+		}
 
 		const newPostWithAuthor = await db.query.posts.findFirst({
 			where: eq(posts.id, insertedId),
 			with: { author: true },
 		});
-
-		await db
-			.update(threads)
-			.set({ postCount: thread.postCount + 1, updatedAt: new Date() })
-			.where(eq(threads.id, threadId));
 
 		return c.json(newPostWithAuthor, 201);
 	} catch (e: any) {

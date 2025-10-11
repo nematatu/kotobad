@@ -18,8 +18,8 @@
 		"dev": "bun --filter '*' dev",
 		"dev:frontend": "bun --filter 'frontend' dev",
 		"dev:backend": "bun --filter 'backend' dev",
-		"deploy:frontend": "bun --filter 'frontend' deploy",
-		"deploy:backend": "bun --filter 'backend' deploy",
+		"deploy:frontend": "bun --filter'@kotobad/frontend' deploy",
+		"deploy:backend": "bun --filter '@kotobad/backend' deploy",
 		"format": "biome format --write"
 	},
 	"dependencies": {
