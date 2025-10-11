@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { LuEye } from "react-icons/lu";
 import Link from "next/link";
 import { signup } from "@/lib/api/auth";
-import type { LoginSignupUserType } from "@b3s/shared/src/types/auth";
+import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
 
 type SignupSchema = LoginSignupUserType & {
 	confirmPassword: string;

@@ -1,4 +1,4 @@
-import { BaseLabelSchema } from "@b3s/shared/src/schemas";
+import { BaseLabelSchema } from "@kotobad/shared/src/schemas";
 
 export const OpenAPILabelSchema = BaseLabelSchema.ThreadLabelSchema.openapi(
 	"LabelSchema",

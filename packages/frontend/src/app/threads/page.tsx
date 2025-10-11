@@ -1,6 +1,6 @@
 import { getAllThreads } from "@/lib/api/threads";
-import { ThreadListSchema } from "@b3s/shared/src/schemas/thread";
-import { ThreadType } from "@b3s/shared/src/types";
+import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
+import { ThreadType } from "@kotobad/shared/src/types";
 import ThreadPageClient from "./components/threads/ThreadPageClient";
 
 export type Props = {

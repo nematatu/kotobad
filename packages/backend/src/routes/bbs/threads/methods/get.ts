@@ -8,7 +8,7 @@ import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../../types";
 import { threads } from "../../../../../drizzle/schema";
 import { count } from "drizzle-orm";
-import { PERPAGE } from "@b3s/shared/src/config/thread";
+import { PERPAGE } from "@kotobad/shared/src/config/thread";
 
 export const getAllThreadRoute = createRoute({
 	method: "get",

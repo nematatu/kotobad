@@ -1,4 +1,4 @@
-import { BaseThreadSchema } from "@b3s/shared/src/schemas";
+import { BaseThreadSchema } from "@kotobad/shared/src/schemas";
 
 export const OpenAPIThreadSchema =
 	BaseThreadSchema.ThreadSchema.openapi("ThreadSchema");

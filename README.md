@@ -1,4 +1,4 @@
-# b3s
+# kotobad
 
 To install dependencies:
 

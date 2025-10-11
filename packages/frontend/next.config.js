@@ -2,7 +2,7 @@ const { initOpenNextCloudflareForDev } = require("@opennextjs/cloudflare");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@b3s/shared"],
+  transpilePackages: ["@kotobad/shared"],
   experimental: {
     externalDir: true,
   },

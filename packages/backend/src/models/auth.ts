@@ -1,4 +1,4 @@
-import { BaseAuthSchema } from "@b3s/shared/src/schemas";
+import { BaseAuthSchema } from "@kotobad/shared/src/schemas";
 
 export const OpenAPILoginSignupSchema =
 	BaseAuthSchema.LoginSignupSchema.openapi("LoginSignUpSchema", {

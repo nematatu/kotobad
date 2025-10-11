@@ -1,5 +1,5 @@
 {
-	"name": "@b3s/backend",
+	"name": "@kotobad/backend",
 	"type": "module",
 	"scripts": {
 		"dev": "wrangler dev --ip 0.0.0.0 --port 8787",
@@ -13,8 +13,8 @@
 	},
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.10.0",
-		"@b3s/frontend": "workspace:*",
-		"@b3s/shared": "workspace:*",
+		"@kotobad/frontend": "workspace:*",
+		"@kotobad/shared": "workspace:*",
 		"@hono/swagger-ui": "^0.5.2",
 		"@hono/zod-openapi": "^1.1.0",
 		"@hono/zod-validator": "^0.7.2",
@@ -29,6 +29,6 @@
 		"@svgr/webpack": "^8.1.0",
 		"@types/bcryptjs": "^3.0.0",
 		"drizzle-kit": "^0.31.4",
-		"wrangler": "^4.4.0"
+		"wrangler": "^4.42.2"
 	}
 }

@@ -1,7 +1,7 @@
 import { client } from "./honoClient";
 import { fetcher } from "./fetch";
 import { getApiUrl } from "../config/apiUrls";
-import { AuthType } from "@b3s/shared/src/types/";
+import { AuthType } from "@kotobad/shared/src/types/";
 import { InferResponseType } from "hono";
 
 export async function getMe() {

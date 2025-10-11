@@ -1,6 +1,6 @@
 "use client";
 
-import { PERPAGE } from "@b3s/shared/src/config/thread";
+import { PERPAGE } from "@kotobad/shared/src/config/thread";
 
 type Props = {
 	currentPage: number;

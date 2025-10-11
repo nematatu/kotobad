@@ -1,7 +1,7 @@
 import { RouteHandler, createRoute, z } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../types";
 import { deleteCookie } from "hono/cookie";
-import { SimpleErrorResponse } from "@b3s/shared/src/schemas/error";
+import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 
 export const logoutRoute = createRoute({
 	method: "delete",

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { PostList } from "./PostList";
 import { CreatePostForm } from "./CreatePostForm";
-import { ThreadType } from "@b3s/shared/src/types";
-import { PostListType } from "@b3s/shared/src/types/post";
+import { ThreadType } from "@kotobad/shared/src/types";
+import { PostListType } from "@kotobad/shared/src/types/post";
 import { getPostByThreadId } from "@/lib/api/posts";
 import BreadCrumb from "./BreadCrumbs";
 import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";

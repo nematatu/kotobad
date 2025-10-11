@@ -6,7 +6,7 @@ import { AppEnvironment, UserTokenPayload } from "../../../types";
 import { setCookie } from "hono/cookie";
 import { signAccessToken, signRefreshToken } from "../../../utils/jwt";
 import { OpenAPILoginSignupSchema } from "../../../models/auth";
-import { SimpleErrorResponse } from "@b3s/shared/src/schemas/error";
+import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 
 export const loginRoute = createRoute({
 	method: "post",

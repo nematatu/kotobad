@@ -1,4 +1,4 @@
-import { BasePostSchema } from "@b3s/shared/src/schemas";
+import { BasePostSchema } from "@kotobad/shared/src/schemas";
 
 export const OpenAPIPostSchema = BasePostSchema.PostSchema.openapi(
 	"PostSchema",

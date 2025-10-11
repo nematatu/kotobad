@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { users } from "../../../../drizzle/schema";
 import { RouteHandler, createRoute, z } from "@hono/zod-openapi";
 import { OpenAPILoginSignupSchema } from "../../../models/auth";
-import { SimpleErrorResponse } from "@b3s/shared/src/schemas/error";
+import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 
 export const signupRoute = createRoute({
 	method: "post",

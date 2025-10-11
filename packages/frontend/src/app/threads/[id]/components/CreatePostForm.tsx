@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { createPost } from "@/lib/api/posts";
-import type { CreatePostType } from "@b3s/shared/src/types/post";
+import type { CreatePostType } from "@kotobad/shared/src/types/post";
 
 type CreatePostFormProps = {
 	threadId: number;

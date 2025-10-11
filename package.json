@@ -1,12 +1,12 @@
 {
-	"name": "b3s",
+	"name": "kotobad",
 	"module": "index.ts",
 	"type": "module",
 	"private": true,
 	"devDependencies": {
 		"@types/bun": "latest",
 		"daisyui": "^5.0.54",
-		"wrangler": "^4.34.0"
+		"wrangler": "^4.42.2"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
@@ -24,6 +24,6 @@
 	},
 	"dependencies": {
 		"@biomejs/biome": "^2.2.2",
-		"b3s": "."
+		"kotobad": "."
 	}
 }

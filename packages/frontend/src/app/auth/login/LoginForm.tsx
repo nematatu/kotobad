@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { LuEye } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { login, getMe } from "@/lib/api/auth";
-import type { LoginSignupUserType } from "@b3s/shared/src/types/auth";
+import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
 import { useUser } from "@/components/feature/provider/UserProvider";
 
 export const LoginForm = () => {

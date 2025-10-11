@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { getAllThreads } from "@/lib/api/threads";
-import { ThreadType } from "@b3s/shared/src/types";
+import { ThreadType } from "@kotobad/shared/src/types";
 import { getPostByThreadId } from "@/lib/api/posts";
-import { PostListType } from "@b3s/shared/src/types/post";
+import { PostListType } from "@kotobad/shared/src/types/post";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 
 export type Props = {

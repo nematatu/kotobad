@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { PostListType } from "@b3s/shared/src/types/post";
+import type { PostListType } from "@kotobad/shared/src/types/post";
 import { formatDate } from "@/utils/date/formatDate";
 import { getRelativeDate } from "@/utils/date/getRelativeDate";
 

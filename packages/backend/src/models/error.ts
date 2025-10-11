@@ -1,4 +1,4 @@
-import { BaseErrorSchema } from "@b3s/shared/src/schemas";
+import { BaseErrorSchema } from "@kotobad/shared/src/schemas";
 
 export const ErrorResponse =
 	BaseErrorSchema.ErrorResponse.openapi("ErrorResponse");

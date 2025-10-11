@@ -1,6 +1,6 @@
 "use client";
 import { useState, useContext, createContext } from "react";
-import { UserJWTType } from "@b3s/shared/src/types/auth";
+import { UserJWTType } from "@kotobad/shared/src/types/auth";
 
 export type User = UserJWTType | null;
 

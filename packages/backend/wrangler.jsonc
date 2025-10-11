@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "b3s-backend",
+	"name": "kotobad-backend",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-08-22",
 	"compatibility_flags": ["nodejs_compat"],

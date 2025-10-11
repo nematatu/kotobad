@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import type { UserTokenPayload } from "@b3s/backend/src/types";
+import type { UserTokenPayload } from "@kotobad/backend/src/types";
 
 export function verifyJwtServer(
 	token: string,

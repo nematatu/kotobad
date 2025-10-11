@@ -2,7 +2,7 @@ import { client } from "./honoClient";
 import { fetcher } from "./fetch";
 import { getApiUrl } from "../config/apiUrls";
 import { InferResponseType } from "hono";
-import { PostType } from "@b3s/shared/src/types";
+import { PostType } from "@kotobad/shared/src/types";
 
 export async function getPostByThreadId(threadId: number) {
 	type resType = InferResponseType<
