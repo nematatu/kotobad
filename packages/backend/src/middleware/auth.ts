@@ -37,6 +37,7 @@ export const authMiddleware = createMiddleware<AppEnvironment>(
 				setCookie(c, "accessToken", newAccessToken, {
 					httpOnly: true,
 					secure: true,
+					sameSite: "none",
 				});
 
 				c.set("user", refreshPayload);
