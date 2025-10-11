@@ -6,6 +6,7 @@ export const OpenAPIPostSchema = BasePostSchema.PostSchema.openapi(
 		description: "ポストスキーマ",
 		example: {
 			id: 1,
+			localId: 1,
 			title: "Honoはいいぞ",
 			description: "Honoは速くて使いやすい",
 			authorId: 1,

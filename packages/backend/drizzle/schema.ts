@@ -4,6 +4,7 @@ import {
 	integer,
 	index,
 	customType,
+	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { sql, relations } from "drizzle-orm";
 
@@ -59,6 +60,7 @@ export const threads = sqliteTable("threads", {
 
 export const posts = sqliteTable("posts", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
+	localId: integer("local_id").notNull(),
 	post: text("post").notNull(),
 	threadId: integer("thread_id")
 		.notNull()
@@ -72,7 +74,12 @@ export const posts = sqliteTable("posts", {
 	updatedAt: timestamp("updated_at").$onUpdate(
 		() => sql`(strftime('%s', 'now'))`,
 	),
-});
+}, (table) => ({
+	threadLocalUnique: uniqueIndex("posts_thread_local_unique").on(
+		table.threadId,
+		table.localId,
+	),
+}));
 
 export const japanTournaments = sqliteTable("japanTournaments", {
 	id: integer("id").primaryKey({ autoIncrement: true }),

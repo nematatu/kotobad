@@ -181,7 +181,7 @@ export const getPostByThreadIdRouter: RouteHandler<
 					},
 				},
 			},
-			orderBy: (posts, { asc }) => [asc(posts.createdAt)],
+			orderBy: (posts, { asc }) => [asc(posts.localId)],
 		});
 
 		if (!posts) {

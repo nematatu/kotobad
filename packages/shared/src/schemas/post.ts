@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const PostSchema = z.object({
 	id: z.number().int().positive(),
+	localId: z.number().int().positive(),
 	post: z.string().min(1),
 	authorId: z.number().int().positive(),
 	createdAt: z.string(),

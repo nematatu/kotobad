@@ -19,11 +19,16 @@ export const PostList = ({ posts }: PostListProps) => {
 	return (
 		<div className="radius-sm flex flex-col">
 			{postList.map((post, i) => (
-				<div key={post.id} className={`p-4 min-h-14 flex items-center border ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}>
+				<div
+					key={post.id}
+					className={`p-4 min-h-14 flex items-center border ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}
+				>
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
 						<div className="flex-col">
 							<div className="flex">
-								<span className="text-gray-500 mr-2 text-sm">{post.id}</span>
+								<span className="text-gray-500 mr-2 text-sm">
+									{post.localId ?? post.id}
+								</span>
 								<div className="flex items-center gap-y-1 text-xs sm:text-sm whitespace-nowrap space-x-1">
 									<span className="text-gray-500">{post.author?.username}</span>
 									<span className="text-gray-500">

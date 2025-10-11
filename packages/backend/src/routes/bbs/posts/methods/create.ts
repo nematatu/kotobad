@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { posts, threads } from "../../../../../drizzle/schema";
 import {
 	OpenAPICreatePostSchema,
@@ -86,19 +86,41 @@ export const createPostRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
-		const result = await db
-			.insert(posts)
-			.values({
-				post: validatedData.post,
-				authorId: user.id,
-				threadId: threadId,
-			})
-			.returning({ insertedId: posts.id });
+		const { insertedId } = await db.transaction(async (tx) => {
+			const [{ maxLocalId }] = await tx
+				.select({
+					maxLocalId: sql<number>`coalesce(max(${posts.localId}), 0)`,
+				})
+				.from(posts)
+				.where(eq(posts.threadId, threadId));
 
-		const newPostId = result[0].insertedId;
+			const nextLocalId = (maxLocalId ?? 0) + 1;
+
+			const result = await tx
+				.insert(posts)
+				.values({
+					post: validatedData.post,
+					authorId: user.id,
+					threadId: threadId,
+					localId: nextLocalId,
+				})
+				.returning({
+					insertedId: posts.id,
+				});
+
+			await tx
+				.update(threads)
+				.set({
+					postCount: sql`${threads.postCount} + 1`,
+					updatedAt: new Date(),
+				})
+				.where(eq(threads.id, threadId));
+
+			return { insertedId: result[0].insertedId };
+		});
 
 		const newPostWithAuthor = await db.query.posts.findFirst({
-			where: eq(posts.id, newPostId),
+			where: eq(posts.id, insertedId),
 			with: { author: true },
 		});
 
