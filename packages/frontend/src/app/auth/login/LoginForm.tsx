@@ -51,7 +51,7 @@ export const LoginForm = () => {
     };
 
     return (
-        <div className="w-[20%]">
+        <div className="w-[70%] md:w-[20%]">
             <h1 className="mb-8 text-xl font-bold underline underline-offset-7">
                 ログインフォーム
             </h1>
