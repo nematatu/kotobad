@@ -17,6 +17,8 @@ jobs:
             workdir: packages/backend
           - project: frontend
             workdir: packages/frontend
+    env:
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
