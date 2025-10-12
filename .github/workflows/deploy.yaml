@@ -1,62 +1,64 @@
-name: Deploy
+name: Deploy to Cloudflare
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy ${{ matrix.project }}
+  deploy-frontend:
+    name: Deploy frontend (Next.js)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project: [backend, frontend]
-        include:
-          - project: backend
-            workdir: packages/backend
-          - project: frontend
-            workdir: packages/frontend
+    defaults:
+      run:
+        working-directory: apps/frontend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js (for Wrangler)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Set up Bun (for build)
-        uses: oven-sh/setup-bun@v1
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
       - name: Install dependencies
-        working-directory: ${{ matrix.workdir }}
-        run: bun install
+        run: bun install --frozen-lockfile
 
-      # ✅ Next.js ビルド + ダミー manifest 生成（App Router用）
-      - name: Build frontend bundle
-        if: matrix.project == 'frontend'
-        working-directory: ${{ matrix.workdir }}
-        run: |
-          bun run build
-          mkdir -p .next/server
-          echo '{}' > .next/server/pages-manifest.json
-          mkdir -p .next/standalone/packages/frontend/.next/server
-          echo '{}' > .next/standalone/packages/frontend/.next/server/pages-manifest.json
-          bunx --bun @opennextjs/cloudflare build
+      - name: Build
+        run: bun run build
 
-      # ✅ Wrangler v4 を Node.js 環境に直接インストール
-      - name: Install Wrangler v4
-        run: npm install -g wrangler@4.42.2
-
-      # ✅ デプロイ実行
-      - name: Deploy with Wrangler
-        working-directory: ${{ matrix.workdir }}
-        run: wrangler deploy --env dev-prod --verbose
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .vercel/output/static --project-name=my-frontend
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NODE_VERSION: 20
+          BUN_VERSION: 1.1.20
+
+  deploy-backend:
+    name: Deploy backend (Hono + D1)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
