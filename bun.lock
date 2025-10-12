@@ -1357,7 +1357,6 @@
 
     "kleur": ["kleur@4.1.5", "", {}, ""],
 
-    "kotobad": ["kotobad@file:", { "dependencies": { "@biomejs/biome": "^2.2.2" }, "devDependencies": { "@types/bun": "latest", "daisyui": "^5.0.54", "wrangler": "^4.34.0" }, "peerDependencies": { "typescript": "^5" } }],
 
     "lazy-cache": ["lazy-cache@1.0.4", "", {}, "sha512-RE2g0b5VGZsOCFOCgP7omTRYFqydmZkBwl5oNnQ1lDYC57uyO9KqNnNVxT7COSHTxrRCWVcAVOcbjk+tvh/rgQ=="],
 
