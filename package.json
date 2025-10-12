@@ -22,8 +22,7 @@
 		"deploy:backend": "bun --filter '@kotobad/backend' deploy",
 		"format": "biome format --write"
 	},
-	"dependencies": {
-		"@biomejs/biome": "^2.2.2",
-		"kotobad": "."
-	}
+        "dependencies": {
+                "@biomejs/biome": "^2.2.2"
+        }
 }
