@@ -1,4 +1,5 @@
 import { hc } from "hono/client";
 import { AppType } from "@kotobad/backend/src/";
+import { getApiBaseUrl } from "../config/apiUrls";
 
-export const client = hc<AppType>(process.env.NEXT_PUBLIC_API_URL!);
+export const client = hc<AppType>(getApiBaseUrl());
