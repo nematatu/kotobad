@@ -35,7 +35,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --verbose
+          command: deploy 
 
       # 🔍 Wrangler の詳細ログを出力
       - name: Show Wrangler logs if present
