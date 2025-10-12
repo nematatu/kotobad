@@ -37,18 +37,12 @@ jobs:
           command: deploy .open-next/worker.js
 
   deploy-backend:
-    name: Deploy backend (Hono + D1)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/backend
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -58,4 +52,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy src/index.ts
+          command: deploy packages/backend/src/index.ts
