@@ -22,16 +22,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Bun
+      - name: Set up Node.js (for Wrangler)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Set up Bun (for build)
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: "latest"
+          bun-version: latest
 
       - name: Install dependencies
         working-directory: ${{ matrix.workdir }}
         run: bun install
 
-      - name: Build (only frontend)
+      # ✅ Next.js ビルド + ダミー manifest 生成（App Router用）
+      - name: Build frontend bundle
         if: matrix.project == 'frontend'
         working-directory: ${{ matrix.workdir }}
         run: |
@@ -40,16 +47,16 @@ jobs:
           echo '{}' > .next/server/pages-manifest.json
           mkdir -p .next/standalone/packages/frontend/.next/server
           echo '{}' > .next/standalone/packages/frontend/.next/server/pages-manifest.json
-          echo "✅ dummy pages-manifest created"
           bunx --bun @opennextjs/cloudflare build
 
-      # ✅ Wranglerをnpmではなくbun経由で入れる
-      - name: Install Wrangler manually
-        run: bun add -g wrangler@3
+      # ✅ Wrangler v4 を Node.js 環境に直接インストール
+      - name: Install Wrangler v4
+        run: npm install -g wrangler@4.42.2
 
+      # ✅ デプロイ実行
       - name: Deploy with Wrangler
         working-directory: ${{ matrix.workdir }}
-        run: wrangler deploy --env dev-prod
+        run: wrangler deploy --env dev-prod --verbose
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
