@@ -30,6 +30,15 @@ jobs:
         working-directory: ${{ matrix.workdir }}
         run: bun install --frozen-lockfile
 
+      - name: Restore Next.js cache
+        if: matrix.project == 'frontend'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/${{ matrix.workdir }}/.next/cache
+          key: ${{ runner.os }}-next-cache-${{ matrix.project }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-next-cache-${{ matrix.project }}-
+
       - name: Build frontend bundle
         if: matrix.project == 'frontend'
         working-directory: ${{ matrix.workdir }}
