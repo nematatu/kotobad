@@ -147,7 +147,7 @@ export const CreateThreadForm = ({
 						{error && <p className="text-red-500">{error}</p>}
 
 						<div className="space-y-2">
-							<div className="font-bold">ラベルを追加</div>
+							<div className="font-bold">ラベル</div>
 						</div>
 
 						<Button
