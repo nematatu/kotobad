@@ -39,26 +39,22 @@ jobs:
           NODE_VERSION: 20
           BUN_VERSION: 1.1.20
 
+jobs:
   deploy-backend:
-    name: Deploy backend (Hono + D1)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/backend
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Deploy Worker
+      - name: Deploy backend worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
+          command: deploy src/index.ts
