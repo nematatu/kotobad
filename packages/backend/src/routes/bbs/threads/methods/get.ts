@@ -9,6 +9,7 @@ import { AppEnvironment } from "../../../../types";
 import { threads } from "../../../../../drizzle/schema";
 import { count } from "drizzle-orm";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
+import { toThreadResponse } from "./transform";
 
 export const getAllThreadRoute = createRoute({
 	method: "get",
@@ -185,7 +186,8 @@ export const getAllThreadRouter: RouteHandler<
 		}
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
-		return c.json({ threads: threadsResult, totalCount: totalCount }, 200);
+		const threadsResponse = threadsResult.map((thread) => toThreadResponse(thread));
+		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
 	} catch (e: any) {
 		console.error(e);
 		return c.json(
@@ -223,7 +225,7 @@ export const getThreadByIdRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
-		return c.json(thread, 200);
+		return c.json(toThreadResponse(thread), 200);
 	} catch (e: any) {
 		console.error(e);
 		return c.json({ error: "Failed to fetch thread", message: e.message }, 500);
@@ -271,7 +273,8 @@ export const searchThreadRouter: RouteHandler<
 			return c.json({ error: "threads not found" }, 404);
 		}
 
-		return c.json({ threads: threadsResult, totalCount: totalCount }, 200);
+		const threadsResponse = threadsResult.map((thread) => toThreadResponse(thread));
+		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
 	} catch (e: any) {
 		console.error(e);
 		return c.json(
