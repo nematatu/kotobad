@@ -35,7 +35,7 @@ jobs:
       - name: Build frontend bundle
         if: matrix.project == 'frontend'
         working-directory: ${{ matrix.workdir }}
-        run: bunx --bun @opennextjs/cloudflare build --openNextConfigPath .open-next.config.mjs
+        run: bunx --bun @opennextjs/cloudflare build --openNextConfigPath packages/frontend/.open-next.config.mjs
 
       - name: Deploy with Wrangler
         uses: cloudflare/wrangler-action@v3
