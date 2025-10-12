@@ -27,6 +27,7 @@ jobs:
           bun-version: "latest"
 
       - name: Install dependencies
+        working-directory: ${{ matrix.workdir }}
         run: bun install --frozen-lockfile
 
       - name: Build frontend bundle
