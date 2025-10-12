@@ -35,7 +35,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy .open-next/server-functions/default/index.mjs
 
   deploy-backend:
     runs-on: ubuntu-latest
