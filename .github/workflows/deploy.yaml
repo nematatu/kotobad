@@ -35,7 +35,15 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy 
+          command: deploy --verbose
+        working-directory: packages/frontend
+
+      # 🔍 Wrangler の詳細ログを出力
+      - name: Show Wrangler logs if present
+        if: failure()
+        run: |
+          echo "---- Wrangler logs ----"
+          find /home/runner/.config/.wrangler/logs -type f -name "wrangler-*.log" -exec cat {} \; || echo "No Wrangler logs found"
 
   deploy-backend:
     runs-on: ubuntu-latest
