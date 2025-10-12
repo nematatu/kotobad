@@ -5,10 +5,10 @@ import {
 } from "../../../../models/threads";
 import { ErrorResponse } from "../../../../models/error";
 import { threads } from "../../../../../drizzle/schema";
-import { eq } from "drizzle-orm"; // Import eq for querying
+import { eq } from "drizzle-orm";
 import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../../types";
-import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
+import { toThreadResponse } from "./transform";
 
 export const createThreadRoute = createRoute({
 	method: "post",
@@ -65,8 +65,12 @@ export const createThreadRouter: RouteHandler<
 	try {
 		validatedData = c.req.valid("json");
 	} catch (err: any) {
-		console.error("Validation error:", err.errors);
-		return c.json({ error: "Validation failed", details: err.errors }, 400);
+		const details =
+			err instanceof z.ZodError
+				? JSON.stringify(err.issues)
+				: err?.message ?? "Invalid payload";
+		console.error("Validation error:", details);
+		return c.json({ error: "Validation failed", details }, 400);
 	}
 	const { title } = validatedData as z.infer<typeof OpenAPICreateThreadSchema>;
 
@@ -80,17 +84,34 @@ export const createThreadRouter: RouteHandler<
 			})
 			.returning({ id: threads.id });
 
-		console.log(result);
 		const newThreadId = result[0].id;
 
 		const createdThreadResult = await db.query.threads.findFirst({
 			where: eq(threads.id, newThreadId),
-			with: { author: true },
+			with: {
+				author: {
+					columns: { username: true },
+				},
+				threadLabels: {
+					with: {
+						labels: true,
+					},
+				},
+			},
 		});
 
-		return c.json(createdThreadResult, 201);
+		if (!createdThreadResult) {
+			return c.json(
+				{ error: "Thread not found after creation", details: "" },
+				400,
+			);
+		}
+
+		return c.json(
+			toThreadResponse(createdThreadResult),
+			201,
+		);
 	} catch (e: any) {
-		// console.error(e);
 		return c.json({ error: "internal server error", message: e.message }, 500);
 	}
 };

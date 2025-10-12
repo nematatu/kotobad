@@ -8,6 +8,7 @@ import {
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnvironment } from "../../../../types";
+import { toThreadResponse } from "./transform";
 
 export const editThreadRoute = createRoute({
 	method: "put",
@@ -102,10 +103,23 @@ export const editThreadRouter: RouteHandler<
 
 		const editThreadResult = await db.query.threads.findFirst({
 			where: eq(threads.id, newEdietedThreadId),
-			with: { author: true },
+			with: {
+				author: {
+					columns: { username: true },
+				},
+				threadLabels: {
+					with: {
+						labels: true,
+					},
+				},
+			},
 		});
 
-		return c.json(editThreadResult, 200);
+		if (!editThreadResult) {
+			return c.json({ error: "Thread not found" }, 404);
+		}
+
+		return c.json(toThreadResponse(editThreadResult), 200);
 	} catch (e: any) {
 		console.error(e);
 		return c.json({ error: "Failed to edit post", message: e.message }, 500);
