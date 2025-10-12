@@ -1,64 +1,65 @@
-name: Deploy to Cloudflare
+name: Deploy
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  deploy-frontend:
-    name: Deploy frontend (Next.js on Workers via OpenNext)
+  deploy:
+    name: Deploy ${{ matrix.project }}
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/frontend
-
+    strategy:
+      matrix:
+        project: [backend, frontend]
+        include:
+          - project: backend
+            workdir: packages/backend
+          - project: frontend
+            workdir: packages/frontend
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build and Bundle (OpenNext Cloudflare)
+      - name: Restore Next.js cache
+        if: matrix.project == 'frontend'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/${{ matrix.workdir }}/.next/cache
+          key: ${{ runner.os }}-next-cache-${{ matrix.project }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-next-cache-${{ matrix.project }}-
+            ${{ runner.os }}-next-cache-
+
+      - name: Deploy backend with Wrangler
+        if: matrix.project == 'backend'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --minify
+          workingDirectory: ${{ matrix.workdir }}
+
+      - name: Build frontend bundle with OpenNext
+        if: matrix.project == 'frontend'
+        working-directory: ${{ matrix.workdir }}
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
         run: bun run cf:build
 
-      - name: Verify .open-next output
-        run: ls -R .open-next
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy 
-          workingDirectory: packages/frontend
-
-      # 🔍 Wrangler の詳細ログを出力
-      - name: Show Wrangler logs if present
-        if: failure()
-        run: |
-          echo "---- Wrangler logs ----"
-          find /home/runner/.config/.wrangler/logs -type f -name "wrangler-*.log" -exec cat {} \; || echo "No Wrangler logs found"
-
-  deploy-backend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Deploy backend worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy packages/backend/src/index.ts
+      - name: Deploy frontend with OpenNext CLI
+        if: matrix.project == 'frontend'
+        working-directory: ${{ matrix.workdir }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: bunx --bun @opennextjs/cloudflare deploy --skipBuild
