@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ${{ matrix.workdir }}
-        run: bun install --frozen-lockfile
+        run: bun install
 
       - name: Build frontend bundle
         if: matrix.project == 'frontend'
