@@ -25,6 +25,8 @@ jobs:
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: "latest"
+      - name: Ensure .next/cache exists
+        run: mkdir -p packages/frontend/.next/cache
 
       - name: Install dependencies
         working-directory: ${{ matrix.workdir }}
