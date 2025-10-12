@@ -5,7 +5,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "kotobad-frontend",
-	"main": ".open-next/worker.js",
+  "main": ".open-next/server-functions/default/index.mjs",
 	"compatibility_date": "2025-03-01",
 	"compatibility_flags": ["nodejs_compat_v2", "global_fetch_strictly_public"],
 	"assets": {

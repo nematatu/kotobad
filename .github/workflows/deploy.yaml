@@ -36,6 +36,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy 
+          workingDirectory: packages/frontend
 
       # 🔍 Wrangler の詳細ログを出力
       - name: Show Wrangler logs if present
