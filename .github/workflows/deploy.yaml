@@ -62,7 +62,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           NEXT_TELEMETRY_DISABLED: "1"
-        run: bunx --bun @opennextjs/cloudflare deploy --config wrangler.jsonc
+        run: bun run deploy 
 
       - name: Show recent Cloudflare deployments
         if: matrix.project == 'frontend'
