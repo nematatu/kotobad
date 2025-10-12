@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: projects/frontend
+        working-directory: packages/frontend
 
     steps:
       - name: Checkout
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: projects/backend
+        working-directory: packages/backend
 
     steps:
       - name: Checkout
