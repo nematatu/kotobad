@@ -13,7 +13,7 @@
 		"directory": ".open-next/assets"
 	},
   "build": {
-    "upload_format": "modules"
+    "upload": "modules"
   }, 
 	"observability": {
 		"enabled": true
