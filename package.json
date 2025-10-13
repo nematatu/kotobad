@@ -27,7 +27,7 @@
 		"prepare": "husky"
 	},
   "lint-staged": {
-      "src/**/*.{ts,tsx,json}": [
+      "packages/**/*.{ts,tsx,json}": [
           "bunx biome format --write", 
           "bunx biome lint --write", 
           "bunx biome check"
