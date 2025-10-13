@@ -117,12 +117,17 @@ jobs:
     needs:
       - deploy_backend
       - deploy_frontend
+
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Create comment file
-        if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
+        if: ${{ needs.deploy_backend.outputs.preview_url || needs.deploy_frontend.outputs.preview_url }}
         env:
           BACKEND_URL: ${{ needs.deploy_backend.outputs.preview_url }}
           FRONTEND_URL: ${{ needs.deploy_frontend.outputs.preview_url }}
@@ -130,19 +135,27 @@ jobs:
           cat <<EOF > comment.md
           ## 🚀 Preview Deployments
           <table>
-            <tr>
-              <th scope="row">Backend Preview URL</th>
-              <td><a href="${BACKEND_URL}" target="_blank" rel="noopener noreferrer">${BACKEND_URL}</a></td>
-            </tr>
-            <tr>
-              <th scope="row">Frontend Preview URL</th>
-              <td><a href="${FRONTEND_URL}" target="_blank" rel="noopener noreferrer">${FRONTEND_URL}</a></td>
-            </tr>
+            <tr><th>Backend</th><td><a href="${BACKEND_URL}">${BACKEND_URL}</a></td></tr>
+            <tr><th>Frontend</th><td><a href="${FRONTEND_URL}">${FRONTEND_URL}</a></td></tr>
           </table>
           EOF
 
+      - name: Debug preview outputs
+        continue-on-error: true
+        run: |
+          echo "GITHUB_OUTPUT path: ${GITHUB_OUTPUT:-'(not set)'}"
+          if [ -n "${GITHUB_OUTPUT}" ] && [ -f "${GITHUB_OUTPUT}" ]; then
+            echo "----- GITHUB_OUTPUT contents -----"
+            cat "${GITHUB_OUTPUT}"
+          else
+            echo "GITHUB_OUTPUT file is unavailable."
+          fi
+          echo "Backend preview url: ${{ needs.deploy_backend.outputs.preview_url }}"
+          echo "Frontend preview url: ${{ needs.deploy_frontend.outputs.preview_url }}"
+
       - name: Post preview URLs as PR comment
-        if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr comment ${{ github.event.number }} --body-file comment.md
+        if: ${{ needs.deploy_backend.outputs.preview_url || needs.deploy_frontend.outputs.preview_url }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: comment.md
