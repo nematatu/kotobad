@@ -126,6 +126,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      - name: echo preview urls
+        run: echo ${{GITHUB_OUTPUT}}
+
       - name: Create comment file
         if: ${{ needs.deploy_backend.outputs.preview_url && needs.deploy_frontend.outputs.preview_url }}
         env:
