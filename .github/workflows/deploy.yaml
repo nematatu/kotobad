@@ -118,6 +118,9 @@ jobs:
       - deploy_backend
       - deploy_frontend
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Create comment file
         if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
         env:
@@ -141,5 +144,5 @@ jobs:
       - name: Post preview URLs as PR comment
         if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr comment ${{ github.event.number }} --body-file comment.md
