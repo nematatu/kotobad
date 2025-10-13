@@ -1,21 +1,21 @@
 "use client";
+import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormControl,
-	FormMessage,
-	FormField,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { LuEye } from "react-icons/lu";
-import { useRouter } from "next/navigation";
-import { login, getMe } from "@/lib/api/auth";
-import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
 import { useUser } from "@/components/feature/provider/UserProvider";
+import { Button } from "@/components/ui/button";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { getMe, login } from "@/lib/api/auth";
 
 export const LoginForm = () => {
 	const router = useRouter();
@@ -45,8 +45,10 @@ export const LoginForm = () => {
 			}
 			setUser(me);
 			router.push("/");
-		} catch (e: any) {
-			setError(e.message);
+		} catch (error: unknown) {
+			const message =
+				error instanceof Error ? error.message : "ログインに失敗しました";
+			setError(message);
 		}
 	};
 
@@ -97,7 +99,7 @@ export const LoginForm = () => {
 														value === form.getValues("password") ||
 														"パスワードが一致しません",
 												})}
-												type={showPassword == false ? "password" : "text"}
+												type={showPassword === false ? "password" : "text"}
 												placeholder="パスワード"
 												className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
 											/>

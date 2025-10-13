@@ -1,0 +1,3 @@
+packages/frontend/.next/
+packages/frontend/.next/**/*
+**/.next/**

@@ -1,12 +1,12 @@
+import { relations, sql } from "drizzle-orm";
 import {
+	customType,
+	index,
+	integer,
 	sqliteTable,
 	text,
-	integer,
-	index,
-	customType,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { sql, relations } from "drizzle-orm";
 
 const timestamp = customType<{ data: Date; driverData: number }>({
 	dataType() {
@@ -25,7 +25,7 @@ const boolean = customType<{ data: boolean; driverData: number }>({
 		return "integer";
 	},
 	fromDriver(value: number): boolean {
-		return value === 1 ? true : false;
+		return value === 1;
 	},
 	toDriver(value: boolean): number {
 		return value === true ? 1 : 0;

@@ -1,17 +1,17 @@
+import type { CreatePostType } from "@kotobad/shared/src/types/post";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
 	Form,
-	FormItem,
 	FormControl,
-	FormMessage,
 	FormField,
+	FormItem,
+	FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { createPost } from "@/lib/api/posts";
-import type { CreatePostType } from "@kotobad/shared/src/types/post";
 
 type CreatePostFormProps = {
 	threadId: number;
@@ -38,11 +38,19 @@ export const CreatePostForm = ({
 
 			form.reset();
 			setTimeout(() => form.setFocus("post"), 1);
-		} catch (e: any) {
-			if (e.status === 401) {
+		} catch (error: unknown) {
+			if (
+				typeof error === "object" &&
+				error !== null &&
+				"status" in error &&
+				typeof (error as { status?: unknown }).status === "number" &&
+				(error as { status: number }).status === 401
+			) {
 				setError("ログインが必要です");
 			} else {
-				setError(e.message);
+				const message =
+					error instanceof Error ? error.message : "不明なエラーが発生しました";
+				setError(message);
 			}
 		}
 	};

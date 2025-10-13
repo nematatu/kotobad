@@ -1,13 +1,14 @@
+import type { RouteHandler } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { threads } from "../../../../../drizzle/schema";
-import { createRoute, z } from "@hono/zod-openapi";
+import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIEditThreadSchema,
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
-import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import type { RouteHandler } from "@hono/zod-openapi";
 import type { AppEnvironment } from "../../../../types";
+import { getErrorMessage } from "../../../../utils/errors";
 import { toThreadResponse } from "./transform";
 
 export const editThreadRoute = createRoute({
@@ -120,9 +121,12 @@ export const editThreadRouter: RouteHandler<
 		}
 
 		return c.json(toThreadResponse(editThreadResult), 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to edit post", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to edit post", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 

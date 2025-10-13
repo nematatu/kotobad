@@ -6,10 +6,10 @@ import { deleteThreadRoute, deleteThreadRouter } from "./methods/delete";
 import { editThreadRoute, editThreadRouter } from "./methods/edit";
 import {
 	getAllThreadRoute,
-	getThreadByIdRoute,
-	searchThreadRoute,
 	getAllThreadRouter,
+	getThreadByIdRoute,
 	getThreadByIdRouter,
+	searchThreadRoute,
 	searchThreadRouter,
 } from "./methods/get";
 

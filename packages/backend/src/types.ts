@@ -1,9 +1,9 @@
 import type { D1Database } from "@cloudflare/workers-types";
-import type { Context } from "hono";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
+import type { Context } from "hono";
+import type { z } from "zod";
 import type * as schema from "../drizzle/schema";
 import type { OpenAPIPostSchema } from "./models/posts";
-import type { z } from "zod";
 
 export type Bindings = {
 	DB: D1Database;
@@ -35,4 +35,4 @@ export type AppEnvironment = {
 	Variables: Variables;
 };
 
-export type AppContext = Context<AppEnvironment, any, ValidationOutput>;
+export type AppContext = Context<AppEnvironment, string, ValidationOutput>;

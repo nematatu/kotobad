@@ -1,12 +1,12 @@
 "use client";
 
+import type { LabelType } from "@kotobad/shared/src/types";
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import ChatIcon from "@/assets/threads/chat.svg";
 import { formatDate } from "@/utils/date/formatDate";
 import { getRelativeDate } from "@/utils/date/getRelativeDate";
-import type { LabelType } from "@kotobad/shared/src/types";
-import ChatIcon from "@/assets/threads/chat.svg";
 
 type ThreadListType = {
 	threads: ThreadType[];

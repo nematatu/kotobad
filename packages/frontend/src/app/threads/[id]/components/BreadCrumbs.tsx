@@ -24,9 +24,7 @@ export default function BreadCrumb({
 
 	return (
 		<Breadcrumb>
-			<BreadcrumbList
-				className={`${sizeClasses["sm"]} sm:${sizeClasses[size]}`}
-			>
+			<BreadcrumbList className={`${sizeClasses.sm} sm:${sizeClasses[size]}`}>
 				<BreadcrumbItem>
 					<BreadcrumbLink href="/">ホーム</BreadcrumbLink>
 				</BreadcrumbItem>

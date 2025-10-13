@@ -33,7 +33,7 @@ export function ThreadPagination({
 					<PaginationItem>
 						<PaginationPrevious
 							href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
-							className={currentPage == 1 ? "hidden pointer-events-none" : ""}
+							className={currentPage === 1 ? "hidden pointer-events-none" : ""}
 						/>
 					</PaginationItem>
 				)}

@@ -1,9 +1,10 @@
+import type { RouteHandler } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import { createRoute, z } from "@hono/zod-openapi";
-import type { RouteHandler } from "@hono/zod-openapi";
 import type { AppEnvironment } from "../../../../types";
+import { getErrorMessage } from "../../../../utils/errors";
 
 export const deleteThreadRoute = createRoute({
 	method: "delete",
@@ -84,9 +85,12 @@ export const deleteThreadRouter: RouteHandler<
 		await db.delete(threads).where(eq(threads.id, id));
 
 		return c.json({ message: "Deleted Successfully!" }, 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to delete post", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to delete post", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 

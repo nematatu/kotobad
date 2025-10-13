@@ -1,17 +1,16 @@
 "use client";
 
+import { PERPAGE } from "@kotobad/shared/src/config/thread";
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ThreadList } from "./ThreadList";
 import { CreateThread } from "./CreateThread";
-import { ThreadPagination } from "./ThreadPageNation";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
-import { PERPAGE } from "@kotobad/shared/src/config/thread";
-import { ThreadType } from "@kotobad/shared/src/types";
-import { LabelListType } from "@kotobad/shared/src/types/label"
+import { ThreadList } from "./ThreadList";
+import { ThreadPagination } from "./ThreadPageNation";
 
 type Props = {
-	initialThreads: ThreadType.ThreadType[];
+	initialThreads: ThreadType[];
 	currentPage: number;
 	totalCount: number;
 };
@@ -21,10 +20,10 @@ export default function ThreadPageClient({
 	currentPage,
 	totalCount,
 }: Props) {
-	const [threads, setThreads] = useState<ThreadType.ThreadType[]>([]);
+	const [threads, setThreads] = useState<ThreadType[]>([]);
 	const router = useRouter();
 
-	const handleCreated = (newThread: ThreadType.ThreadType) => {
+	const handleCreated = (newThread: ThreadType) => {
 		if (currentPage === 1) {
 			setThreads((prev) => [newThread, ...prev]);
 		} else {
@@ -55,7 +54,7 @@ export default function ThreadPageClient({
 				</div>
 				{totalCount === 0 ? (
 					<div className="flex justify-center text-2xl">
-						スレッドがありません
+						スレッドがありません...
 					</div>
 				) : (
 					<ThreadList threads={currentThreads} />

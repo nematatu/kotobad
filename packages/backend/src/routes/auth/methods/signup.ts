@@ -1,9 +1,9 @@
-import type { AppEnvironment } from "../../../types";
+import { createRoute, type RouteHandler, z } from "@hono/zod-openapi";
+import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 import bcrypt from "bcryptjs";
 import { users } from "../../../../drizzle/schema";
-import { type RouteHandler, createRoute, z } from "@hono/zod-openapi";
 import { OpenAPILoginSignupSchema } from "../../../models/auth";
-import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
+import type { AppEnvironment } from "../../../types";
 
 export const signupRoute = createRoute({
 	method: "post",
@@ -72,7 +72,7 @@ export const signupRouter: RouteHandler<
 		const newUser = result[0];
 
 		return c.json({ id: newUser.id, username: newUser.username }, 201);
-	} catch (e) {
+	} catch (_e) {
 		return c.json({ error: "Username already exists" }, 409);
 	}
 };

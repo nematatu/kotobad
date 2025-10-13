@@ -1,7 +1,7 @@
-import { type RouteHandler, createRoute, z } from "@hono/zod-openapi";
-import type { AppEnvironment } from "../../../types";
-import { deleteCookie } from "hono/cookie";
+import { createRoute, type RouteHandler, z } from "@hono/zod-openapi";
 import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
+import { deleteCookie } from "hono/cookie";
+import type { AppEnvironment } from "../../../types";
 
 export const logoutRoute = createRoute({
 	method: "delete",
@@ -37,7 +37,7 @@ export const logoutRouter: RouteHandler<
 		deleteCookie(c, "accessToken");
 		deleteCookie(c, "refreshToken");
 		return c.json({ message: "Logout successfully!" }, 201);
-	} catch (e) {
+	} catch (_e) {
 		return c.json({ error: "internal server error" }, 500);
 	}
 };

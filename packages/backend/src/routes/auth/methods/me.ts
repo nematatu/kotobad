@@ -1,7 +1,7 @@
-import { type RouteHandler, createRoute } from "@hono/zod-openapi";
-import type { AppEnvironment } from "../../../types";
-import { OpenAPIUserJWTSchema } from "../../../models/auth";
+import { createRoute, type RouteHandler } from "@hono/zod-openapi";
 import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
+import { OpenAPIUserJWTSchema } from "../../../models/auth";
+import type { AppEnvironment } from "../../../types";
 
 export const MeRoute = createRoute({
 	method: "get",

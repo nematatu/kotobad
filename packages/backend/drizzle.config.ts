@@ -1,5 +1,6 @@
-import { readdirSync } from "fs";
+import { readdirSync } from "node:fs";
 import { defineConfig } from "drizzle-kit";
+import { requireEnv } from "./src/utils/env";
 
 const isProduction = process.env.NODE_ENV === "production";
 const sqliteDirPath = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
@@ -14,9 +15,9 @@ const config = isProduction
 			dialect: "sqlite",
 			driver: "d1-http",
 			dbCredentials: {
-				accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
-				databaseId: process.env.CLOUDFLARE_DATABASE_ID!,
-				token: process.env.CLOUDFLARE_TOKEN!,
+				accountId: requireEnv("CLOUDFLARE_ACCOUNT_ID"),
+				databaseId: requireEnv("CLOUDFLARE_DATABASE_ID"),
+				token: requireEnv("CLOUDFLARE_TOKEN"),
 			},
 		})
 	: defineConfig({

@@ -1,12 +1,12 @@
-import { eq } from "drizzle-orm";
-import bcrypt from "bcryptjs";
-import { users } from "../../../../drizzle/schema";
-import { type RouteHandler, createRoute, z } from "@hono/zod-openapi";
-import type { AppEnvironment, UserTokenPayload } from "../../../types";
-import { setCookie } from "hono/cookie";
-import { signAccessToken, signRefreshToken } from "../../../utils/jwt";
-import { OpenAPILoginSignupSchema } from "../../../models/auth";
+import { createRoute, type RouteHandler, z } from "@hono/zod-openapi";
 import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
+import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
+import { setCookie } from "hono/cookie";
+import { users } from "../../../../drizzle/schema";
+import { OpenAPILoginSignupSchema } from "../../../models/auth";
+import type { AppEnvironment, UserTokenPayload } from "../../../types";
+import { signAccessToken, signRefreshToken } from "../../../utils/jwt";
 
 export const loginRoute = createRoute({
 	method: "post",
@@ -119,7 +119,7 @@ export const loginRouter: RouteHandler<
 		});
 
 		return c.json({ message: "Login successfully!" }, 201);
-	} catch (e) {
+	} catch (_e) {
 		return c.json({ error: "internal server error" }, 500);
 	}
 };

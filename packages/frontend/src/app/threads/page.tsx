@@ -1,6 +1,9 @@
-import { getAllThreads } from "@/lib/api/threads";
 import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
-import type { ThreadType } from "@kotobad/shared/src/types";
+import type {
+	ThreadListType,
+	ThreadType,
+} from "@kotobad/shared/src/types/thread";
+import { getAllThreads } from "@/lib/api/threads";
 import ThreadPageClient from "./components/threads/ThreadPageClient";
 
 export type Props = {
@@ -15,9 +18,8 @@ export default async function Page({ searchParams }: Props) {
 
 	console.log("res", threadRes);
 
-	const threadsResponse: ThreadType.ThreadListType =
-		ThreadListSchema.parse(threadRes);
-	const threads: ThreadType.ThreadType[] = threadsResponse.threads;
+	const threadsResponse: ThreadListType = ThreadListSchema.parse(threadRes);
+	const threads: ThreadType[] = threadsResponse.threads;
 
 	const totalCount: number = threadsResponse.totalCount;
 

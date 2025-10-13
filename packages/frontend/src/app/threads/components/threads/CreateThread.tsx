@@ -1,27 +1,26 @@
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
 	Form,
+	FormControl,
+	FormField,
 	FormItem,
 	FormLabel,
-	FormControl,
 	FormMessage,
-	FormField,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { Card } from "@/components/ui/card";
 // import { useUser } from "@/components/feature/provider/UserProvider";
 import { createThread } from "@/lib/api/threads";
-import type { ThreadType } from "@kotobad/shared/src/types";
-import { LabelListType } from "@kotobad/shared/src/types/label";
 
 type CreateThreadType = {
 	title: string;
 };
 
 type CreateThreadFormProps = {
-	onCreated: (newThread: ThreadType.ThreadType) => void;
+	onCreated: (newThread: ThreadType) => void;
 };
 
 export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
@@ -45,11 +44,19 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 				throw new Error(res.error);
 			}
 			console.log("新規スレッド作成", values);
-		} catch (e: any) {
-			if (e.status === 401) {
+		} catch (error: unknown) {
+			if (
+				typeof error === "object" &&
+				error !== null &&
+				"status" in error &&
+				typeof (error as { status?: unknown }).status === "number" &&
+				(error as { status: number }).status === 401
+			) {
 				setError("ログインが必要です");
 			} else {
-				setError(e.message);
+				const message =
+					error instanceof Error ? error.message : "不明なエラーが発生しました";
+				setError(message);
 			}
 		}
 	};
@@ -161,7 +168,7 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 };
 
 type CreateThreadProps = {
-	onCreated: (newThread: ThreadType.ThreadType) => void;
+	onCreated: (newThread: ThreadType) => void;
 };
 
 export const CreateThread = ({ onCreated }: CreateThreadProps) => {
@@ -174,7 +181,7 @@ export const CreateThread = ({ onCreated }: CreateThreadProps) => {
 		<div>
 			<Button
 				className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
-				type="submit"
+				type="button"
 				onClick={handleToggleForm}
 			>
 				{isOpenForm ? "▲" : "▼"} スレッド作成

@@ -1,5 +1,5 @@
-import type { BaseAuthSchema } from "../schemas";
 import type { z } from "zod";
+import type { BaseAuthSchema } from "../schemas";
 
 export type LoginSignupUserType = z.infer<
 	typeof BaseAuthSchema.LoginSignupSchema

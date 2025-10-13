@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { PostList } from "./PostList";
-import { CreatePostForm } from "./CreatePostForm";
-import type { ThreadType } from "@kotobad/shared/src/types";
 import type { PostListType } from "@kotobad/shared/src/types/post";
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { useEffect, useState } from "react";
+import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
 import { getPostByThreadId } from "@/lib/api/posts";
 import BreadCrumb from "./BreadCrumbs";
-import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
+import { CreatePostForm } from "./CreatePostForm";
+import { PostList } from "./PostList";
 
 const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
 	year: "numeric",
@@ -24,7 +24,7 @@ const formatDateTime = (value: string | number | Date) =>
 	dateFormatter.format(new Date(value));
 
 type Props = {
-	thread: ThreadType.ThreadType;
+	thread: ThreadType;
 	initialPosts: PostListType;
 };
 
@@ -88,6 +88,7 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
                 `}
 			>
 				<button
+					type="button"
 					onClick={() =>
 						window.scrollTo({
 							top: document.body.scrollHeight,

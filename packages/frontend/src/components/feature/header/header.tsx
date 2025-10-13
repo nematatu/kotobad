@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import LogoIcon from "@/assets/logo/logo.svg";
 import { Button } from "@/components/ui/button";
+import { logout } from "@/lib/api/auth";
 import ThemeMenuToggle from "../darkMode/themeMenuToggle";
 import { useUser } from "../provider/UserProvider";
-import { logout } from "@/lib/api/auth";
-import LogoIcon from "@/assets/logo/logo.svg";
-import { useState, useEffect } from "react";
 
 const Header = () => {
 	const { user, setUser } = useUser();
@@ -20,8 +19,10 @@ const Header = () => {
 			await logout();
 			setUser(null);
 			console.log("logout finish");
-		} catch (e: any) {
-			console.error(e.message);
+		} catch (error: unknown) {
+			const message =
+				error instanceof Error ? error.message : "ログアウトに失敗しました";
+			console.error(message);
 		}
 	};
 

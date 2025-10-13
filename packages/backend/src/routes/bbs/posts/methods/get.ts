@@ -1,11 +1,12 @@
+import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIPostListSchema,
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
-import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import type { AppEnvironment } from "../../../../types";
-import type { RouteHandler } from "@hono/zod-openapi";
+import { getErrorMessage } from "../../../../utils/errors";
 
 export const getPostByThreadIdRoute = createRoute({
 	method: "get",
@@ -189,9 +190,12 @@ export const getPostByThreadIdRouter: RouteHandler<
 		}
 
 		return c.json(posts, 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch post", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to fetch post", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 
@@ -217,9 +221,12 @@ export const getAllPostRouter: RouteHandler<
 		});
 
 		return c.json(posts, 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch posts", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to fetch posts", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 
@@ -247,9 +254,12 @@ export const getPostByIdRouter: RouteHandler<
 		}
 
 		return c.json(post, 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch post", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to fetch post", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 
@@ -281,9 +291,12 @@ export const searchPostRouter: RouteHandler<
 		}
 
 		return c.json(posts, 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch posts", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to fetch posts", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 

@@ -1,13 +1,14 @@
-import { createRoute, type z } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { eq, sql } from "drizzle-orm";
 import { posts, threads } from "../../../../../drizzle/schema";
+import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPICreatePostSchema,
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
-import type { RouteHandler } from "@hono/zod-openapi";
-import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import type { AppEnvironment } from "../../../../types";
+import { getErrorMessage } from "../../../../utils/errors";
 
 export const createPostRoute = createRoute({
 	method: "post",
@@ -66,15 +67,19 @@ export const createPostRouter: RouteHandler<
 		const db = c.get("db");
 		const user = c.get("user");
 
-		let validatedData;
+		let validatedData: z.infer<typeof OpenAPICreatePostSchema>;
 		try {
 			validatedData = c.req.valid("json");
-		} catch (err: any) {
-			console.error("Validation error:", err.errors);
+		} catch (error: unknown) {
+			if (error instanceof z.ZodError) {
+				console.error("Validation error:", error.issues);
+			} else {
+				console.error("Validation error:", error);
+			}
 			return c.json({ error: "Validation failed" }, 400);
 		}
 
-		let { threadId } = validatedData as z.infer<typeof OpenAPICreatePostSchema>;
+		let { threadId } = validatedData;
 
 		threadId = Number(threadId);
 
@@ -123,8 +128,8 @@ export const createPostRouter: RouteHandler<
 						updatedAt: new Date(),
 					})
 					.where(eq(threads.id, threadId));
-			} catch (error: any) {
-				const message: string = error?.message ?? "";
+			} catch (error: unknown) {
+				const message = getErrorMessage(error);
 
 				if (
 					message.includes("posts_thread_local_unique") ||
@@ -147,9 +152,12 @@ export const createPostRouter: RouteHandler<
 		});
 
 		return c.json(newPostWithAuthor, 201);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to create post", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to create post", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 

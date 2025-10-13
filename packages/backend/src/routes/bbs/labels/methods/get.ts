@@ -1,8 +1,9 @@
-import { createRoute } from "@hono/zod-openapi";
-import { OpenAPILabelListSchema } from "../../../../models/labels";
-import { ErrorResponse } from "../../../../models/error";
 import type { RouteHandler } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
+import { ErrorResponse } from "../../../../models/error";
+import { OpenAPILabelListSchema } from "../../../../models/labels";
 import type { AppEnvironment } from "../../../../types";
+import { getErrorMessage } from "../../../../utils/errors";
 
 export const getAllLabelRoute = createRoute({
 	method: "get",
@@ -38,10 +39,13 @@ export const getAllLabelRouter: RouteHandler<
 		const labelsResult = await db.query.labels.findMany({});
 
 		return c.json(labelsResult, 200);
-	} catch (e: any) {
-		console.error(e);
+	} catch (error: unknown) {
+		console.error(error);
 		return c.json(
-			{ error: "Failed to fetch threads", message: e.message },
+			{
+				error: "Failed to fetch threads",
+				message: getErrorMessage(error),
+			},
 			500,
 		);
 	}

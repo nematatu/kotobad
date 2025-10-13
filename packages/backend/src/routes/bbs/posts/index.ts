@@ -4,13 +4,13 @@ import type { AppEnvironment } from "../../../types";
 import { createPostRoute, createPostRouter } from "./methods/create";
 import { deletePostRoute, deletePostRouter } from "./methods/delete";
 import {
-	getPostByThreadIdRoute,
 	getAllPostRoute,
-	getPostByIdRoute,
-	searchPostRoute,
-	getPostByThreadIdRouter,
 	getAllPostRouter,
+	getPostByIdRoute,
 	getPostByIdRouter,
+	getPostByThreadIdRoute,
+	getPostByThreadIdRouter,
+	searchPostRoute,
 	searchPostRouter,
 } from "./methods/get";
 

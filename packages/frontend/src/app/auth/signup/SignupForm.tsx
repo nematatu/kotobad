@@ -1,31 +1,31 @@
 "use client";
+import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
+import Link from "next/link";
 import { useState } from "react";
-import {
-	Form,
-	FormItem,
-	FormLabel,
-	FormControl,
-	FormMessage,
-	FormField,
-} from "@/components/ui/form";
-import { useModal } from "@/hooks/useModal";
-import {
-	Dialog,
-	DialogContent,
-	DialogTitle,
-	DialogDescription,
-	DialogClose,
-	DialogHeader,
-	DialogTrigger,
-	DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { LuEye } from "react-icons/lu";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useModal } from "@/hooks/useModal";
 import { signup } from "@/lib/api/auth";
-import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
 
 type SignupSchema = LoginSignupUserType & {
 	confirmPassword: string;
@@ -61,8 +61,10 @@ export const SignupForm = () => {
 
 			setRegisterdUsername(res.username);
 			setOpen();
-		} catch (e: any) {
-			setError(e.message);
+		} catch (error: unknown) {
+			const message =
+				error instanceof Error ? error.message : "登録に失敗しました";
+			setError(message);
 		}
 	};
 
@@ -109,7 +111,7 @@ export const SignupForm = () => {
 											{...form.register("password", {
 												required: "パスワードは必須です",
 											})}
-											type={showPassword == false ? "password" : "text"}
+											type={showPassword === false ? "password" : "text"}
 											placeholder="パスワード"
 											className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
 										/>

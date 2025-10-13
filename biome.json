@@ -1,12 +1,16 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
 		"useIgnoreFile": false
 	},
 	"files": {
-		"includes": ["packages/**/*.ts", "packages/**/*.tsx"]
+		"includes": [
+			"packages/**/src/**/*.ts",
+			"packages/**/src/**/*.tsx",
+			"packages/backend/drizzle.config.ts"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -14,9 +18,28 @@
 	},
 	"linter": {
 		"enabled": true,
-		"rules": {
-			"recommended": true
+			"rules": {
+				"recommended": true,
+				"style": {
+			"noNonNullAssertion": "warn"
+		},
+		"suspicious": {
+			"noExplicitAny": "warn",
+			"noImplicitAnyLet": "warn",
+			"noDocumentCookie": "warn"
+		},
+		"security": {
+			"noDangerouslySetInnerHtml": "warn"
+		},
+		"correctness": {
+			"noNestedComponentDefinitions": "warn"
+		},
+		"a11y": {
+			"useSemanticElements": "warn",
+			"useFocusableInteractive": "warn",
+			"useAriaPropsForRole": "warn"
 		}
+	}
 	},
 	"javascript": {
 		"formatter": {

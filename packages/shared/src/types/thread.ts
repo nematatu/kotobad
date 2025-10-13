@@ -1,10 +1,10 @@
-import type {
-	ThreadSchema,
-	CreateThreadSchema,
-	ThreadListSchema,
-	EditThreadSchema,
-} from "../schemas/thread";
 import type { z } from "zod";
+import type {
+	CreateThreadSchema,
+	EditThreadSchema,
+	ThreadListSchema,
+	ThreadSchema,
+} from "../schemas/thread";
 
 export type ThreadType = z.infer<typeof ThreadSchema>;
 

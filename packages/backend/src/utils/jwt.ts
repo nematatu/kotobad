@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 import type { UserTokenPayload } from "../types";
+import { requireEnv } from "./env";
 
-console.log("hello");
-console.log(process.env);
-const ACCESS_SECRET = process.env.ACCESS_SECRET!;
-const REFRESH_SECRET = process.env.REFRESH_SECRET!;
+const ACCESS_SECRET = requireEnv("ACCESS_SECRET");
+const REFRESH_SECRET = requireEnv("REFRESH_SECRET");
 
 export const signAccessToken = (payload: UserTokenPayload) => {
 	return jwt.sign(payload, ACCESS_SECRET, { expiresIn: "15m" });

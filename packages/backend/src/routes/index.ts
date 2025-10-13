@@ -1,11 +1,11 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
-import type { AppEnvironment } from "../types";
-import authRouter from "./auth";
-import bbsRouter from "./bbs";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { authMiddleware } from "../middleware/auth";
+import type { AppEnvironment } from "../types";
+import authRouter from "./auth";
+import bbsRouter from "./bbs";
 
 const rawOrigins =
 	process.env.ALLOWED_ORIGIN ??

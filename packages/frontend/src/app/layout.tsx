@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Head from "next/head";
+import { cookies } from "next/headers";
 import { ThemeProvider } from "@/components/feature/darkMode/themeProvider";
 import Header from "@/components/feature/header/header";
-
-import { cookies } from "next/headers";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 import { verifyJwtServer } from "@/lib/token/jwt.server";
-import Head from "next/head";
 
 export const metadata: Metadata = {
 	title: "Create Next App",
@@ -22,13 +21,18 @@ export default async function RootLayout({
 	const token = cookieStore.get("accessToken")?.value ?? null;
 
 	let initialUser = null;
-	if (token) {
+	const jwtSecret = process.env.JWT_SECRET;
+
+	if (token && jwtSecret) {
 		try {
-			const payload = await verifyJwtServer(token, process.env.JWT_SECRET!);
+			const payload = await verifyJwtServer(token, jwtSecret);
 			initialUser = { id: payload.id, username: payload.username };
-		} catch (e) {
+		} catch (_e) {
 			initialUser = null;
 		}
+	} else if (token) {
+		console.warn("JWT_SECRET is not set; skipping token verification.");
+		initialUser = null;
 	}
 
 	return (

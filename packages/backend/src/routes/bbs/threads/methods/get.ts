@@ -1,14 +1,15 @@
+import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { PERPAGE } from "@kotobad/shared/src/config/thread";
+import { count } from "drizzle-orm";
+import { threads } from "../../../../../drizzle/schema";
+import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIThreadListSchema,
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
-import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import type { RouteHandler } from "@hono/zod-openapi";
 import type { AppEnvironment } from "../../../../types";
-import { threads } from "../../../../../drizzle/schema";
-import { count } from "drizzle-orm";
-import { PERPAGE } from "@kotobad/shared/src/config/thread";
+import { getErrorMessage } from "../../../../utils/errors";
 import { toThreadResponse } from "./transform";
 
 export const getAllThreadRoute = createRoute({
@@ -144,8 +145,8 @@ export const getAllThreadRouter: RouteHandler<
 		const page = pageParam ? Number(pageParam) : undefined;
 		const limit = PERPAGE;
 
-		let threadsResult;
-		let totalCountResult;
+		let threadsResult: Awaited<ReturnType<typeof db.query.threads.findMany>>;
+		let totalCountResult: Array<{ value: number | null }>;
 
 		if (page) {
 			// ページ指定あり → ページネーション
@@ -190,10 +191,13 @@ export const getAllThreadRouter: RouteHandler<
 			toThreadResponse(thread),
 		);
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
-	} catch (e: any) {
-		console.error(e);
+	} catch (error: unknown) {
+		console.error(error);
 		return c.json(
-			{ error: "Failed to fetch threads", message: e.message },
+			{
+				error: "Failed to fetch threads",
+				message: getErrorMessage(error),
+			},
 			500,
 		);
 	}
@@ -228,9 +232,12 @@ export const getThreadByIdRouter: RouteHandler<
 		}
 
 		return c.json(toThreadResponse(thread), 200);
-	} catch (e: any) {
-		console.error(e);
-		return c.json({ error: "Failed to fetch thread", message: e.message }, 500);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to fetch thread", message: getErrorMessage(error) },
+			500,
+		);
 	}
 };
 
@@ -279,10 +286,13 @@ export const searchThreadRouter: RouteHandler<
 			toThreadResponse(thread),
 		);
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
-	} catch (e: any) {
-		console.error(e);
+	} catch (error: unknown) {
+		console.error(error);
 		return c.json(
-			{ error: "Failed to fetch threads", message: e.message },
+			{
+				error: "Failed to fetch threads",
+				message: getErrorMessage(error),
+			},
 			500,
 		);
 	}

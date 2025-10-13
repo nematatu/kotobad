@@ -1,5 +1,5 @@
-import { createMiddleware } from "hono/factory";
 import { getCookie, setCookie } from "hono/cookie";
+import { createMiddleware } from "hono/factory";
 import type { AppEnvironment } from "../types";
 import {
 	signAccessToken,
@@ -19,7 +19,7 @@ export const authMiddleware = createMiddleware<AppEnvironment>(
 
 			c.set("user", payload);
 			await next();
-		} catch (error) {
+		} catch (_error) {
 			const refreshToken = getCookie(c, "refreshToken");
 
 			if (!refreshToken) {
@@ -42,7 +42,7 @@ export const authMiddleware = createMiddleware<AppEnvironment>(
 
 				c.set("user", refreshPayload);
 				await next();
-			} catch (e) {}
+			} catch (_e) {}
 			return c.json({ error: "Invalid token" }, 401);
 		}
 	},

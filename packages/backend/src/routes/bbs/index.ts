@@ -1,10 +1,11 @@
 // import { Hono } from "hono";
-import type { AppEnvironment } from "../../types";
-import { authMiddleware } from "../../middleware/auth";
-import threadRouter from "./threads";
-import postRouter from "./posts";
-import labelRouter from "./labels";
+
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { authMiddleware } from "../../middleware/auth";
+import type { AppEnvironment } from "../../types";
+import labelRouter from "./labels";
+import postRouter from "./posts";
+import threadRouter from "./threads";
 
 const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/threads/create", authMiddleware)

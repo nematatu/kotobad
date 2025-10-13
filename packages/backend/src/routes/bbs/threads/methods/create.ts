@@ -1,13 +1,14 @@
+import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { eq } from "drizzle-orm";
+import { threads } from "../../../../../drizzle/schema";
+import { ErrorResponse } from "../../../../models/error";
 import {
 	OpenAPICreateThreadSchema,
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
-import { ErrorResponse } from "../../../../models/error";
-import { threads } from "../../../../../drizzle/schema";
-import { eq } from "drizzle-orm";
-import type { RouteHandler } from "@hono/zod-openapi";
 import type { AppEnvironment } from "../../../../types";
+import { getErrorMessage } from "../../../../utils/errors";
 import { toThreadResponse } from "./transform";
 
 export const createThreadRoute = createRoute({
@@ -61,18 +62,18 @@ export const createThreadRouter: RouteHandler<
 	const db = c.get("db");
 	const user = c.get("user");
 
-	let validatedData;
+	let validatedData: z.infer<typeof OpenAPICreateThreadSchema>;
 	try {
 		validatedData = c.req.valid("json");
-	} catch (err: any) {
+	} catch (error: unknown) {
 		const details =
-			err instanceof z.ZodError
-				? JSON.stringify(err.issues)
-				: (err?.message ?? "Invalid payload");
+			error instanceof z.ZodError
+				? JSON.stringify(error.issues)
+				: getErrorMessage(error);
 		console.error("Validation error:", details);
 		return c.json({ error: "Validation failed", details }, 400);
 	}
-	const { title } = validatedData as z.infer<typeof OpenAPICreateThreadSchema>;
+	const { title } = validatedData;
 
 	try {
 		const result = await db
@@ -108,8 +109,14 @@ export const createThreadRouter: RouteHandler<
 		}
 
 		return c.json(toThreadResponse(createdThreadResult), 201);
-	} catch (e: any) {
-		return c.json({ error: "internal server error", message: e.message }, 500);
+	} catch (error: unknown) {
+		return c.json(
+			{
+				error: "internal server error",
+				message: getErrorMessage(error),
+			},
+			500,
+		);
 	}
 };
 
