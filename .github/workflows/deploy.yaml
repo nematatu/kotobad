@@ -141,8 +141,10 @@ jobs:
           </table>
           EOF
 
-      - name: Post preview URLs as PR comment
-        if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr comment ${{ github.event.number }} --body-file comment.md
+    - name: Post preview URLs as PR comment
+      if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh auth setup-git
+        gh pr comment ${{ github.event.pull_request.number }} --body-file comment.md
