@@ -148,6 +148,4 @@ jobs:
           body-path: comment.md
 
       - name: echo preview urls
-        run: |
-          echo ${{GITHUB_OUTPUT}}
-          echo "Frontend preview URL: ${{ needs.deploy_frontend.outputs.preview_url }}"
+        run: echo ${{GITHUB_OUTPUT}}
