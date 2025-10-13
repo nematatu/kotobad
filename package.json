@@ -23,13 +23,14 @@
 		"deploy:frontend": "bun --filter '@kotobad/frontend' deploy",
 		"deploy:backend": "bun --filter '@kotobad/backend' deploy",
 		"format": "biome format --write",
+		"lint": "biome lint --write",
 		"prepare": "husky"
 	},
   "lint-staged": {
       "src/**/*.{ts,tsx,json}": [
           "bun run format", 
-          "bunx biome lint", 
-        "bunx biome check"
+          "bun run lint", 
+          "bunx biome check"
       ]
   },
 	"dependencies": {
