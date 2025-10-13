@@ -7,17 +7,56 @@ on:
   pull_request:
 
 jobs:
-  deploy:
-    name: Deploy ${{ matrix.project }}
+  deploy_backend:
+    name: Deploy backend
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project: [backend, frontend]
-        include:
-          - project: backend
-            workdir: packages/backend
-          - project: frontend
-            workdir: packages/frontend
+    outputs:
+      preview_url: ${{ steps.store_backend_preview.outputs.preview_url }}
+    env:
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_API_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_API_URL_PRODUCT }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Deploy backend (production)
+        if: github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config wrangler.jsonc --minify
+          workingDirectory: packages/backend
+
+      - name: Deploy backend preview version
+        if: github.event_name == 'pull_request'
+        id: backend-preview
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload --config wrangler.jsonc --message "Preview ${{ github.head_ref || github.ref_name }}"
+          workingDirectory: packages/backend
+
+      - name: Store backend preview url
+        if: github.event_name == 'pull_request'
+        id: store_backend_preview
+        run: echo "preview_url=${{ steps.backend-preview.outputs.deployment-url }}" >> "$GITHUB_OUTPUT"
+
+  deploy_frontend:
+    name: Deploy frontend
+    runs-on: ubuntu-latest
+    needs: deploy_backend
+    outputs:
+      preview_url: ${{ steps.store_frontend_preview.outputs.preview_url }}
     env:
       NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_API_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_API_URL_PRODUCT }}
@@ -34,44 +73,22 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Restore Next.js cache
-        if: matrix.project == 'frontend'
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/${{ matrix.workdir }}/.next/cache
-          key: ${{ runner.os }}-next-cache-${{ matrix.project }}-${{ hashFiles('bun.lock') }}
+          path: ${{ github.workspace }}/packages/frontend/.next/cache
+          key: ${{ runner.os }}-next-cache-${{ hashFiles('bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-next-cache-${{ matrix.project }}-
             ${{ runner.os }}-next-cache-
 
-      - name: Deploy backend (production)
-        if: matrix.project == 'backend' && github.event_name == 'push'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.jsonc --minify
-          workingDirectory: ${{ matrix.workdir }}
-
-      - name: Deploy backend preview version
-        if: matrix.project == 'backend' && github.event_name == 'pull_request'
-        id: backend-preview
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config wrangler.jsonc --message "Preview ${{ github.head_ref }}"
-          workingDirectory: ${{ matrix.workdir }}
-
       - name: Build frontend bundle with OpenNext
-        if: matrix.project == 'frontend'
-        working-directory: ${{ matrix.workdir }}
+        working-directory: packages/frontend
         env:
           NEXT_TELEMETRY_DISABLED: "1"
         run: bun run cf:build
 
       - name: Deploy frontend (production)
-        if: matrix.project == 'frontend' && github.event_name == 'push'
-        working-directory: ${{ matrix.workdir }}
+        if: github.event_name == 'push'
+        working-directory: packages/frontend
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -79,17 +96,50 @@ jobs:
         run: bun run deploy
 
       - name: Deploy frontend preview version
-        if: matrix.project == 'frontend' && github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request'
         id: frontend-preview
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config wrangler.jsonc --message "Preview ${{ github.head_ref }}"
-          workingDirectory: ${{ matrix.workdir }}
+          command: versions upload --config wrangler.jsonc --message "Preview ${{ github.head_ref || github.ref_name }}"
+          workingDirectory: packages/frontend
 
-      - name: Output preview deployment URLs
+      - name: Store frontend preview url
         if: github.event_name == 'pull_request'
+        id: store_frontend_preview
+        run: echo "preview_url=${{ steps.frontend-preview.outputs.deployment-url }}" >> "$GITHUB_OUTPUT"
+
+  comment_preview_urls:
+    name: Comment preview URLs
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs:
+      - deploy_backend
+      - deploy_frontend
+    steps:
+      - name: Create comment file
+        if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
+        env:
+          BACKEND_URL: ${{ needs.deploy_backend.outputs.preview_url }}
+          FRONTEND_URL: ${{ needs.deploy_frontend.outputs.preview_url }}
         run: |
-          echo "Backend preview:  ${{ steps.backend-preview.outputs.deployment-url }}"
-          echo "Frontend preview: ${{ steps.frontend-preview.outputs.deployment-url }}"
+          cat <<'EOF' > comment.md
+          ## 🚀 Preview Deployments
+          <table>
+            <tr>
+              <th scope="row">Backend Preview URL</th>
+              <td><a href="$BACKEND_URL" target="_blank" rel="noopener noreferrer">$BACKEND_URL</a></td>
+            </tr>
+            <tr>
+              <th scope="row">Frontend Preview URL</th>
+              <td><a href="$FRONTEND_URL" target="_blank" rel="noopener noreferrer">$FRONTEND_URL</a></td>
+            </tr>
+          </table>
+          EOF
+
+      - name: Post preview URLs as PR comment
+        if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr comment ${{ github.event.number }} --body-file comment.md
