@@ -3,8 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - '**'
 
 jobs:
   deploy:
@@ -20,7 +19,6 @@ jobs:
             workdir: packages/frontend
     env:
       NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-      NEXT_PUBLIC_API_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_API_URL_PRODUCT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,23 +41,22 @@ jobs:
             ${{ runner.os }}-next-cache-${{ matrix.project }}-
             ${{ runner.os }}-next-cache-
 
-      - name: Deploy backend (production)
-        if: matrix.project == 'backend' && github.event_name == 'push'
+      - name: Deploy backend with Wrangler (production)
+        if: matrix.project == 'backend' && github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.jsonc --minify
+          command: deploy --minify --env production
           workingDirectory: ${{ matrix.workdir }}
 
-      - name: Deploy backend preview version
-        if: matrix.project == 'backend' && github.event_name == 'pull_request'
-        id: backend-preview
+      - name: Deploy backend with Wrangler (preview)
+        if: matrix.project == 'backend' && github.ref != 'refs/heads/main'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config wrangler.jsonc --message "Preview ${GITHUB_REF_NAME}"
+          command: deploy --minify --env preview
           workingDirectory: ${{ matrix.workdir }}
 
       - name: Build frontend bundle with OpenNext
@@ -69,8 +66,8 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
         run: bun run cf:build
 
-      - name: Deploy frontend (production)
-        if: matrix.project == 'frontend' && github.event_name == 'push'
+      - name: Deploy frontend with OpenNext CLI (production)
+        if: matrix.project == 'frontend' && github.ref == 'refs/heads/main'
         working-directory: ${{ matrix.workdir }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -78,18 +75,19 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
         run: bun run deploy
 
-      - name: Deploy frontend preview version
-        if: matrix.project == 'frontend' && github.event_name == 'pull_request'
-        id: frontend-preview
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config wrangler.jsonc --message "Preview ${GITHUB_REF_NAME}"
-          workingDirectory: ${{ matrix.workdir }}
+      - name: Deploy frontend with OpenNext CLI (preview)
+        if: matrix.project == 'frontend' && github.ref != 'refs/heads/main'
+        working-directory: ${{ matrix.workdir }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: bun run deploy:preview
 
-      - name: Output preview deployment URLs
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "Backend preview:  ${{ steps.backend-preview.outputs.deployment-url }}"
-          echo "Frontend preview: ${{ steps.frontend-preview.outputs.deployment-url }}"
+      - name: Show recent Cloudflare deployments
+        if: matrix.project == 'frontend'
+        working-directory: ${{ matrix.workdir }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deployments list --config wrangler.jsonc
