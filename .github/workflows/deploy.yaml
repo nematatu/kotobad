@@ -81,11 +81,12 @@ jobs:
       - name: Deploy frontend preview version
         if: matrix.project == 'frontend' && github.event_name == 'pull_request'
         id: frontend-preview
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          NEXT_TELEMETRY_DISABLED: "1"
-        run: versions upload --config wrangler.jsonc --message "Preview ${GITHUB_REF_NAME}"
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload --config wrangler.jsonc --message "Preview ${GITHUB_REF_NAME}"
+          workingDirectory: ${{ matrix.workdir }}
 
       - name: Output preview deployment URLs
         if: github.event_name == 'pull_request'
