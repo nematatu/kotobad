@@ -43,6 +43,8 @@ export default async function RootLayout({
     try { theme = localStorage.getItem('theme'); } catch(e) {}
     if (theme && theme === 'dark') {
       document.documentElement.classList.add('dark');
+    } else if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
