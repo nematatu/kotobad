@@ -146,6 +146,3 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-path: comment.md
-
-      - name: echo preview urls
-        run: echo ${{GITHUB_OUTPUT}}
