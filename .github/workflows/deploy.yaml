@@ -59,7 +59,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config wrangler.jsonc --message "Preview ${GITHUB_REF_NAME}"
+          command: versions upload --config wrangler.jsonc --message "Preview ${{ github.ref_name }}"
           workingDirectory: ${{ matrix.workdir }}
 
       - name: Build frontend bundle with OpenNext
@@ -85,7 +85,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --config wrangler.jsonc --message "Preview ${GITHUB_REF_NAME}"
+          command: versions upload --config wrangler.jsonc --message "Preview ${{ github.ref_name }}"
           workingDirectory: ${{ matrix.workdir }}
 
       - name: Output preview deployment URLs
