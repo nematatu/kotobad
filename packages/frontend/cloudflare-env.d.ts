@@ -398,7 +398,7 @@ declare const performance: Performance;
 declare const Cloudflare: Cloudflare;
 declare const origin: string;
 declare const navigator: Navigator;
-interface TestController {}
+type TestController = {}
 interface ExecutionContext {
 	waitUntil(promise: Promise<any>): void;
 	passThroughOnException(): void;
@@ -2595,7 +2595,7 @@ interface TraceItem {
 interface TraceItemAlarmEventInfo {
 	readonly scheduledTime: Date;
 }
-interface TraceItemCustomEventInfo {}
+type TraceItemCustomEventInfo = {}
 interface TraceItemScheduledEventInfo {
 	readonly scheduledTime: number;
 	readonly cron: string;
@@ -7311,7 +7311,7 @@ declare abstract class D1PreparedStatement {
 // but this will ensure type checking on older versions still passes.
 // TypeScript's interface merging will ensure our empty interface is effectively
 // ignored when `Disposable` is included in the standard lib.
-interface Disposable {}
+type Disposable = {}
 /**
  * An email message that can be sent from a Worker.
  */
@@ -7901,7 +7901,7 @@ declare namespace Rpc {
 	};
 }
 declare namespace Cloudflare {
-	interface Env {}
+	type Env = {}
 }
 declare module "cloudflare:node" {
 	export interface DefaultHandler {

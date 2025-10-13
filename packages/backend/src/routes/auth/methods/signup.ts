@@ -1,7 +1,7 @@
-import { AppEnvironment } from "../../../types";
+import type { AppEnvironment } from "../../../types";
 import bcrypt from "bcryptjs";
 import { users } from "../../../../drizzle/schema";
-import { RouteHandler, createRoute, z } from "@hono/zod-openapi";
+import { type RouteHandler, createRoute, z } from "@hono/zod-openapi";
 import { OpenAPILoginSignupSchema } from "../../../models/auth";
 import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 

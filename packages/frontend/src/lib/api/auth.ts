@@ -1,8 +1,8 @@
-import { client } from "./honoClient";
+import type { client } from "./honoClient";
 import { fetcher } from "./fetch";
 import { getApiUrl } from "../config/apiUrls";
-import { AuthType } from "@kotobad/shared/src/types/";
-import { InferResponseType } from "hono";
+import type { AuthType } from "@kotobad/shared/src/types/";
+import type { InferResponseType } from "hono";
 
 export async function getMe() {
 	type resType = InferResponseType<typeof client.auth.me.$get>;

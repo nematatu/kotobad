@@ -4,8 +4,8 @@ import {
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import { AppEnvironment } from "../../../../types";
-import { RouteHandler } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../../types";
+import type { RouteHandler } from "@hono/zod-openapi";
 
 export const getPostByThreadIdRoute = createRoute({
 	method: "get",

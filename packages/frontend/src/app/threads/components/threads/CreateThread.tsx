@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { Card } from "@/components/ui/card";
 // import { useUser } from "@/components/feature/provider/UserProvider";
 import { createThread } from "@/lib/api/threads";
-import { ThreadType } from "@kotobad/shared/src/types";
+import type { ThreadType } from "@kotobad/shared/src/types";
 import { LabelListType } from "@kotobad/shared/src/types/label";
 
 type CreateThreadType = {

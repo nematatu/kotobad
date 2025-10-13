@@ -1,13 +1,13 @@
-import { createRoute, z } from "@hono/zod-openapi";
+import { createRoute, type z } from "@hono/zod-openapi";
 import { eq, sql } from "drizzle-orm";
 import { posts, threads } from "../../../../../drizzle/schema";
 import {
 	OpenAPICreatePostSchema,
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
-import { RouteHandler } from "@hono/zod-openapi";
+import type { RouteHandler } from "@hono/zod-openapi";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import { AppEnvironment } from "../../../../types";
+import type { AppEnvironment } from "../../../../types";
 
 export const createPostRoute = createRoute({
 	method: "post",

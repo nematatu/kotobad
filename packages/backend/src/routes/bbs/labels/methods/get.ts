@@ -1,8 +1,8 @@
 import { createRoute } from "@hono/zod-openapi";
 import { OpenAPILabelListSchema } from "../../../../models/labels";
 import { ErrorResponse } from "../../../../models/error";
-import { RouteHandler } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../../types";
+import type { RouteHandler } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../../types";
 
 export const getAllLabelRoute = createRoute({
 	method: "get",

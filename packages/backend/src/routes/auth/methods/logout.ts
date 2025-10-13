@@ -1,5 +1,5 @@
-import { RouteHandler, createRoute, z } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../types";
+import { type RouteHandler, createRoute, z } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../types";
 import { deleteCookie } from "hono/cookie";
 import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 

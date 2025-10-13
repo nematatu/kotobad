@@ -8,7 +8,7 @@ import { ThreadPagination } from "./ThreadPageNation";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { ThreadType } from "@kotobad/shared/src/types";
-import { LabelListType } from "@kotobad/shared/src/types/label";
+import { LabelListType } from "@kotobad/shared/src/types/label
 
 type Props = {
 	initialThreads: ThreadType.ThreadType[];

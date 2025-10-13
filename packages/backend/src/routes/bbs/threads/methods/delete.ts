@@ -2,8 +2,8 @@ import { eq } from "drizzle-orm";
 import { threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { createRoute, z } from "@hono/zod-openapi";
-import { RouteHandler } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../../types";
+import type { RouteHandler } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../../types";
 
 export const deleteThreadRoute = createRoute({
 	method: "delete",

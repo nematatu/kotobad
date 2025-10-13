@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { users } from "../../../../drizzle/schema";
-import { RouteHandler, createRoute, z } from "@hono/zod-openapi";
-import { AppEnvironment, UserTokenPayload } from "../../../types";
+import { type RouteHandler, createRoute, z } from "@hono/zod-openapi";
+import type { AppEnvironment, UserTokenPayload } from "../../../types";
 import { setCookie } from "hono/cookie";
 import { signAccessToken, signRefreshToken } from "../../../utils/jwt";
 import { OpenAPILoginSignupSchema } from "../../../models/auth";

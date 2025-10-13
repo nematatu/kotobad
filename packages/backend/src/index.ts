@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { db } from "./middleware/db";
-import { AppEnvironment } from "./types";
+import type { AppEnvironment } from "./types";
 import { prettyJSON } from "hono/pretty-json";
 import mainRouter from "./routes";
 import { ZodError } from "zod";

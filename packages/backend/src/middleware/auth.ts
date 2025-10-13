@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { getCookie, setCookie } from "hono/cookie";
-import { AppEnvironment } from "../types";
+import type { AppEnvironment } from "../types";
 import {
 	signAccessToken,
 	verifyAccessToken,

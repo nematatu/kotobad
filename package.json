@@ -28,8 +28,8 @@
 	},
   "lint-staged": {
       "src/**/*.{ts,tsx,json}": [
-          "bun run format", 
-          "bun run lint", 
+          "bux biome format --write", 
+          "bux biome lint --write", 
           "bunx biome check"
       ]
   },

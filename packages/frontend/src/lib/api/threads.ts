@@ -1,8 +1,8 @@
-import { client } from "./honoClient";
+import type { client } from "./honoClient";
 import { fetcher } from "./fetch";
 import { getApiUrl } from "../config/apiUrls";
-import { InferResponseType } from "hono";
-import { ThreadType } from "@kotobad/shared/src/types";
+import type { InferResponseType } from "hono";
+import type { ThreadType } from "@kotobad/shared/src/types";
 
 export async function getAllThreads(page?: number) {
 	type resType = InferResponseType<typeof client.bbs.threads.$get>;

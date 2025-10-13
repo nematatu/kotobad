@@ -1,7 +1,7 @@
-import { client } from "./honoClient";
+import type { client } from "./honoClient";
 import { fetcher } from "./fetch";
 import { getApiUrl } from "../config/apiUrls";
-import { InferResponseType } from "hono";
+import type { InferResponseType } from "hono";
 
 export async function getAllLabels() {
 	type resType = InferResponseType<typeof client.bbs.labels.$get>;

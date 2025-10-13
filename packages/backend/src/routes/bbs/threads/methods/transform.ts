@@ -1,5 +1,5 @@
-import { z } from "@hono/zod-openapi";
-import { OpenAPIThreadSchema } from "../../../../models/threads";
+import type { z } from "@hono/zod-openapi";
+import type { OpenAPIThreadSchema } from "../../../../models/threads";
 
 export type ThreadQueryResult = {
 	id: number;

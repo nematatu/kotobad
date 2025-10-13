@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@/utils/date/formatDate";
 import { getRelativeDate } from "@/utils/date/getRelativeDate";
-import { LabelType } from "@kotobad/shared/src/types";
+import type { LabelType } from "@kotobad/shared/src/types";
 import ChatIcon from "@/assets/threads/chat.svg";
 
 type ThreadListType = {

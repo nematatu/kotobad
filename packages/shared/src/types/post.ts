@@ -1,10 +1,10 @@
-import {
+import type {
 	PostSchema,
 	CreatePostSchema,
 	PostListSchema,
 	EditPostSchema,
 } from "../schemas/post";
-import { z } from "zod";
+import type { z } from "zod";
 
 export type PostType = z.infer<typeof PostSchema>;
 

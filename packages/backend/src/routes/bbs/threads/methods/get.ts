@@ -4,8 +4,8 @@ import {
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import { RouteHandler } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../../types";
+import type { RouteHandler } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../../types";
 import { threads } from "../../../../../drizzle/schema";
 import { count } from "drizzle-orm";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";

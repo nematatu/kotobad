@@ -1,6 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
-import { AppEnvironment } from "../types";
+import type { AppEnvironment } from "../types";
 import authRouter from "./auth";
 import bbsRouter from "./bbs";
 import { basicAuth } from "hono/basic-auth";

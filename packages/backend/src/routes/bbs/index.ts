@@ -1,5 +1,5 @@
 // import { Hono } from "hono";
-import { AppEnvironment } from "../../types";
+import type { AppEnvironment } from "../../types";
 import { authMiddleware } from "../../middleware/auth";
 import threadRouter from "./threads";
 import postRouter from "./posts";

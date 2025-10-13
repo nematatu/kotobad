@@ -1,5 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../types";
+import type { AppEnvironment } from "../../../types";
 
 import { getAllLabelRoute, getAllLabelRouter } from "./methods/get";
 

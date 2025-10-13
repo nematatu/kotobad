@@ -6,8 +6,8 @@ import {
 import { ErrorResponse } from "../../../../models/error";
 import { threads } from "../../../../../drizzle/schema";
 import { eq } from "drizzle-orm";
-import { RouteHandler } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../../types";
+import type { RouteHandler } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../../types";
 import { toThreadResponse } from "./transform";
 
 export const createThreadRoute = createRoute({

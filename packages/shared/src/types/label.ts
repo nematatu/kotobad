@@ -1,9 +1,9 @@
-import {
+import type {
 	ThreadLabelSchema,
 	LabelListSchema,
 	ThreadThreadLabelSchema,
 } from "../schemas/label";
-import { z } from "zod";
+import type { z } from "zod";
 
 export type LabelType = z.infer<typeof ThreadLabelSchema>;
 

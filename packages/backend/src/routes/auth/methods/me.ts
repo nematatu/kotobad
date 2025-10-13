@@ -1,5 +1,5 @@
-import { RouteHandler, createRoute } from "@hono/zod-openapi";
-import { AppEnvironment } from "../../../types";
+import { type RouteHandler, createRoute } from "@hono/zod-openapi";
+import type { AppEnvironment } from "../../../types";
 import { OpenAPIUserJWTSchema } from "../../../models/auth";
 import { SimpleErrorResponse } from "@kotobad/shared/src/schemas/error";
 
