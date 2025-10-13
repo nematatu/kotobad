@@ -55,7 +55,7 @@ export default function ThreadPageClient({
 				</div>
 				{totalCount === 0 ? (
 					<div className="flex justify-center text-2xl">
-						スレッドがありません...
+						スレッドがありません
 					</div>
 				) : (
 					<ThreadList threads={currentThreads} />

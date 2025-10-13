@@ -28,7 +28,8 @@
   "lint-staged": {
       "src/**/*.{ts,tsx,json}": [
           "bun run format", 
-          "bunx biome lint"
+          "bunx biome lint", 
+        "bunx biome check"
       ]
   },
 	"dependencies": {
