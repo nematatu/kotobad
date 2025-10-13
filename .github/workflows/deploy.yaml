@@ -127,7 +127,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create comment file
-        if: ${{ needs.deploy_backend.outputs.preview_url && needs.deploy_frontend.outputs.preview_url }}
+        if: ${{ needs.deploy_backend.outputs.preview_url || needs.deploy_frontend.outputs.preview_url }}
         env:
           BACKEND_URL: ${{ needs.deploy_backend.outputs.preview_url }}
           FRONTEND_URL: ${{ needs.deploy_frontend.outputs.preview_url }}
@@ -154,7 +154,7 @@ jobs:
           echo "Frontend preview url: ${{ needs.deploy_frontend.outputs.preview_url }}"
 
       - name: Post preview URLs as PR comment
-        if: ${{ needs.deploy_backend.outputs.preview_url && needs.deploy_frontend.outputs.preview_url }}
+        if: ${{ needs.deploy_backend.outputs.preview_url || needs.deploy_frontend.outputs.preview_url }}
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
