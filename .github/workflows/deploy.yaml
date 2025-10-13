@@ -127,16 +127,16 @@ jobs:
           BACKEND_URL: ${{ needs.deploy_backend.outputs.preview_url }}
           FRONTEND_URL: ${{ needs.deploy_frontend.outputs.preview_url }}
         run: |
-          cat <<'EOF' > comment.md
+          cat <<EOF > comment.md
           ## 🚀 Preview Deployments
           <table>
             <tr>
               <th scope="row">Backend Preview URL</th>
-              <td><a href="$BACKEND_URL" target="_blank" rel="noopener noreferrer">$BACKEND_URL</a></td>
+              <td><a href="${BACKEND_URL}" target="_blank" rel="noopener noreferrer">${BACKEND_URL}</a></td>
             </tr>
             <tr>
               <th scope="row">Frontend Preview URL</th>
-              <td><a href="$FRONTEND_URL" target="_blank" rel="noopener noreferrer">$FRONTEND_URL</a></td>
+              <td><a href="${FRONTEND_URL}" target="_blank" rel="noopener noreferrer">${FRONTEND_URL}</a></td>
             </tr>
           </table>
           EOF
