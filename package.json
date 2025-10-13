@@ -26,7 +26,10 @@
 		"prepare": "husky"
 	},
   "lint-staged": {
-      "src/**/*.{ts,tsx,json}": "bun run format"
+      "src/**/*.{ts,tsx,json}": [
+          "bun run format", 
+          "bunx biome lint"
+      ]
   },
 	"dependencies": {
 		"@biomejs/biome": "^2.2.2"
