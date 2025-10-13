@@ -148,7 +148,6 @@ jobs:
           body-path: comment.md
 
       - name: echo preview urls
-        if: ${{ needs.deploy_backend.outputs.preview_url != '' && needs.deploy_frontend.outputs.preview_url != '' }}
         run: |
           echo ${{GITHUB_OUTPUT}}
           echo "Frontend preview URL: ${{ needs.deploy_frontend.outputs.preview_url }}"
