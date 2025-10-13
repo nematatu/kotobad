@@ -41,9 +41,10 @@ export default async function RootLayout({
   try {
     var theme = null;
     try { theme = localStorage.getItem('theme'); } catch(e) {}
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (theme === 'dark' || (theme === null && prefersDark)) {
+    if (theme && theme === 'dark') {
       document.documentElement.classList.add('dark');
+    } else if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
@@ -57,8 +58,8 @@ export default async function RootLayout({
                 <UserProvider initialUser={initialUser}>
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="system"
-                        enableSystem
+                        defaultTheme="light"
+                        enableSystem={false}
                         disableTransitionOnChange
                     >
                         <Header />
