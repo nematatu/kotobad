@@ -126,10 +126,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
-      - name: echo preview urls
-        run: echo ${{GITHUB_OUTPUT}}
-
       - name: Create comment file
         if: ${{ needs.deploy_backend.outputs.preview_url && needs.deploy_frontend.outputs.preview_url }}
         env:
@@ -143,6 +139,19 @@ jobs:
             <tr><th>Frontend</th><td><a href="${FRONTEND_URL}">${FRONTEND_URL}</a></td></tr>
           </table>
           EOF
+
+      - name: Debug preview outputs
+        continue-on-error: true
+        run: |
+          echo "GITHUB_OUTPUT path: ${GITHUB_OUTPUT:-'(not set)'}"
+          if [ -n "${GITHUB_OUTPUT}" ] && [ -f "${GITHUB_OUTPUT}" ]; then
+            echo "----- GITHUB_OUTPUT contents -----"
+            cat "${GITHUB_OUTPUT}"
+          else
+            echo "GITHUB_OUTPUT file is unavailable."
+          fi
+          echo "Backend preview url: ${{ needs.deploy_backend.outputs.preview_url }}"
+          echo "Frontend preview url: ${{ needs.deploy_frontend.outputs.preview_url }}"
 
       - name: Post preview URLs as PR comment
         if: ${{ needs.deploy_backend.outputs.preview_url && needs.deploy_frontend.outputs.preview_url }}
