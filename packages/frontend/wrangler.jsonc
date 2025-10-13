@@ -12,9 +12,17 @@
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
 	},
-	"observability": {
-		"enabled": true
-	}
+        "observability": {
+                "enabled": true
+        },
+        "env": {
+                "preview": {
+                        "name": "kotobad-frontend-preview"
+                },
+                "production": {
+                        "name": "kotobad-frontend"
+                }
+        }
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

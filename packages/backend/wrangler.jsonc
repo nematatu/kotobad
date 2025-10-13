@@ -12,19 +12,29 @@
 			"migrations_dir": "drizzle/migrations"
 		}
 	], 
-  "vars": {
-      "APP_ENV": "development",
-      "JWT_SECRET": "$JWT_SECRET",
-      "REFRESH_SECRET": "$REFRESH_SECRET",
-      "ACCESS_SECRET": "$ACCESS_SECRET"
-  }, 
-  "env": {
-      "dev-prod": {
-            "vars": {
-                "APP_ENV": "production"
-            }
-      }
-  }
+        "vars": {
+                "APP_ENV": "development",
+                "JWT_SECRET": "$JWT_SECRET",
+                "REFRESH_SECRET": "$REFRESH_SECRET",
+                "ACCESS_SECRET": "$ACCESS_SECRET"
+        },
+        "env": {
+                "preview": {
+                        "vars": {
+                                "APP_ENV": "preview"
+                        }
+                },
+                "production": {
+                        "vars": {
+                                "APP_ENV": "production"
+                        }
+                },
+                "dev-prod": {
+                        "vars": {
+                                "APP_ENV": "production"
+                        }
+                }
+        }
 	// "vars": {
 	//   "MY_VAR": "my-variable"
 	// },
