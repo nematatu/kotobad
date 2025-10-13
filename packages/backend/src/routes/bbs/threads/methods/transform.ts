@@ -23,8 +23,9 @@ export type ThreadQueryResult = {
 	}>;
 };
 
-type ThreadLabelQueryResult =
-	NonNullable<ThreadQueryResult["threadLabels"]>[number];
+type ThreadLabelQueryResult = NonNullable<
+	ThreadQueryResult["threadLabels"]
+>[number];
 
 export const toThreadResponse = <T extends ThreadQueryResult>(
 	thread: T,
@@ -32,7 +33,9 @@ export const toThreadResponse = <T extends ThreadQueryResult>(
 	const threadLabels =
 		thread.threadLabels
 			?.filter(
-				(label): label is ThreadLabelQueryResult & {
+				(
+					label,
+				): label is ThreadLabelQueryResult & {
 					labels: { id: number; name: string };
 				} => Boolean(label.labels),
 			)

@@ -58,28 +58,32 @@ export const threads = sqliteTable("threads", {
 	isClosed: boolean("isClosed").default(false).notNull(),
 });
 
-export const posts = sqliteTable("posts", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	localId: integer("local_id").notNull(),
-	post: text("post").notNull(),
-	threadId: integer("thread_id")
-		.notNull()
-		.references(() => threads.id),
-	authorId: integer("author_id")
-		.notNull()
-		.references(() => users.id),
-	createdAt: timestamp("created_at")
-		.default(sql`(strftime('%s', 'now'))`)
-		.notNull(),
-	updatedAt: timestamp("updated_at").$onUpdate(
-		() => sql`(strftime('%s', 'now'))`,
-	),
-}, (table) => ({
-	threadLocalUnique: uniqueIndex("posts_thread_local_unique").on(
-		table.threadId,
-		table.localId,
-	),
-}));
+export const posts = sqliteTable(
+	"posts",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		localId: integer("local_id").notNull(),
+		post: text("post").notNull(),
+		threadId: integer("thread_id")
+			.notNull()
+			.references(() => threads.id),
+		authorId: integer("author_id")
+			.notNull()
+			.references(() => users.id),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+		updatedAt: timestamp("updated_at").$onUpdate(
+			() => sql`(strftime('%s', 'now'))`,
+		),
+	},
+	(table) => ({
+		threadLocalUnique: uniqueIndex("posts_thread_local_unique").on(
+			table.threadId,
+			table.localId,
+		),
+	}),
+);
 
 export const japanTournaments = sqliteTable("japanTournaments", {
 	id: integer("id").primaryKey({ autoIncrement: true }),

@@ -10,8 +10,8 @@ const resolveBaseUrl = () => {
 
 	const raw =
 		ENV === "production"
-			? prodCandidate ?? ""
-			: devCandidate ?? prodCandidate ?? "";
+			? (prodCandidate ?? "")
+			: (devCandidate ?? prodCandidate ?? "");
 
 	if (!raw) {
 		throw new Error(

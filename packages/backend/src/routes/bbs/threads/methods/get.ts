@@ -186,7 +186,9 @@ export const getAllThreadRouter: RouteHandler<
 		}
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
-		const threadsResponse = threadsResult.map((thread) => toThreadResponse(thread));
+		const threadsResponse = threadsResult.map((thread) =>
+			toThreadResponse(thread),
+		);
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
 	} catch (e: any) {
 		console.error(e);
@@ -273,7 +275,9 @@ export const searchThreadRouter: RouteHandler<
 			return c.json({ error: "threads not found" }, 404);
 		}
 
-		const threadsResponse = threadsResult.map((thread) => toThreadResponse(thread));
+		const threadsResponse = threadsResult.map((thread) =>
+			toThreadResponse(thread),
+		);
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
 	} catch (e: any) {
 		console.error(e);

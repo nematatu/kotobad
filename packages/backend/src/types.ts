@@ -9,7 +9,7 @@ export type Bindings = {
 	DB: D1Database;
 	JWT_SECRET: string;
 	APP_ENV?: "development" | "production";
-  ALLOWED_ORIGINS?: string;
+	ALLOWED_ORIGINS?: string;
 };
 
 export type UserTokenPayload = {

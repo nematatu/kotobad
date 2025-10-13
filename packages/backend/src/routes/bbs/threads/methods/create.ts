@@ -68,7 +68,7 @@ export const createThreadRouter: RouteHandler<
 		const details =
 			err instanceof z.ZodError
 				? JSON.stringify(err.issues)
-				: err?.message ?? "Invalid payload";
+				: (err?.message ?? "Invalid payload");
 		console.error("Validation error:", details);
 		return c.json({ error: "Validation failed", details }, 400);
 	}
@@ -107,10 +107,7 @@ export const createThreadRouter: RouteHandler<
 			);
 		}
 
-		return c.json(
-			toThreadResponse(createdThreadResult),
-			201,
-		);
+		return c.json(toThreadResponse(createdThreadResult), 201);
 	} catch (e: any) {
 		return c.json({ error: "internal server error", message: e.message }, 500);
 	}

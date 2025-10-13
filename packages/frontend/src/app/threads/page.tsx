@@ -4,12 +4,12 @@ import { ThreadType } from "@kotobad/shared/src/types";
 import ThreadPageClient from "./components/threads/ThreadPageClient";
 
 export type Props = {
-  searchParams?: Promise<{ page?: string }>; 
+	searchParams?: Promise<{ page?: string }>;
 };
 
 export default async function Page({ searchParams }: Props) {
-  const params = searchParams ? await searchParams : {};
-  const currentPage = Number(params?.page ?? "1");
+	const params = searchParams ? await searchParams : {};
+	const currentPage = Number(params?.page ?? "1");
 
 	const threadRes = await getAllThreads(currentPage);
 

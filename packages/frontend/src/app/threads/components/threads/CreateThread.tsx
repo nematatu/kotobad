@@ -24,10 +24,7 @@ type CreateThreadFormProps = {
 	onCreated: (newThread: ThreadType.ThreadType) => void;
 };
 
-export const CreateThreadForm = ({
-	onCreated,
-}: CreateThreadFormProps) => {
-
+export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	// const {user} = useUser()
 

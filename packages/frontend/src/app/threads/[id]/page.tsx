@@ -6,12 +6,11 @@ import { PostListType } from "@kotobad/shared/src/types/post";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 
 export type Props = {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 };
 
-
 export default async function ThreadDetailPage({ params }: Props) {
-  const resolvedParams = await params;
+	const resolvedParams = await params;
 	const threadRes = await getAllThreads();
 	try {
 		if ("error" in threadRes) {

@@ -36,21 +36,23 @@ export default function ThreadPageClient({
 	return (
 		<div className="flex flex-col items-center">
 			<div className="w-full sm:max-w-[50%]">
-                <div className="p-2">
-				<div className="text-xl sm:text-2xl sm:text-3xl font-bold pb-1 sm:py-4">スレッド一覧</div>
-				<CreateThread  onCreated={handleCreated} />
-				<div className="flex items-center my-2">
-					<ThreadDisplayCount
-						currentPage={currentPage}
-						totalCount={totalCount}
-					/>
-					<ThreadPagination
-						currentPage={currentPage}
-						totalCount={totalCount}
-						position="end"
-					/>
+				<div className="p-2">
+					<div className="text-xl sm:text-2xl sm:text-3xl font-bold pb-1 sm:py-4">
+						スレッド一覧
+					</div>
+					<CreateThread onCreated={handleCreated} />
+					<div className="flex items-center my-2">
+						<ThreadDisplayCount
+							currentPage={currentPage}
+							totalCount={totalCount}
+						/>
+						<ThreadPagination
+							currentPage={currentPage}
+							totalCount={totalCount}
+							position="end"
+						/>
+					</div>
 				</div>
-        </div>
 				{totalCount === 0 ? (
 					<div className="flex justify-center text-2xl">
 						スレッドがありません...
