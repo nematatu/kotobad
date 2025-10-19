@@ -13,6 +13,9 @@ const resolveBaseUrl = () => {
 			? (prodCandidate ?? "")
 			: (devCandidate ?? prodCandidate ?? "");
 
+	if (typeof window !== "undefined" && ENV !== "production") {
+		return ensureTrailingSlash(`http://${window.location.hostname}:8787`);
+	}
 	if (!raw) {
 		throw new Error(
 			"NEXT_PUBLIC_API_URL (または NEXT_PUBLIC_API_URL_PRODUCT) が設定されていません。",
