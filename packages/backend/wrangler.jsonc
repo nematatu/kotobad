@@ -12,13 +12,6 @@
 			"migrations_dir": "drizzle/migrations"
 		}
 	], 
-        "vars": {
-                "APP_ENV": "development",
-                "JWT_SECRET": "$JWT_SECRET",
-                "REFRESH_SECRET": "$REFRESH_SECRET",
-                "ACCESS_SECRET": "$ACCESS_SECRET",
-                "ALLOWED_ORIGIN": "$ALLOWED_ORIGIN"
-        },
         "env": {
                 "preview": {
                         "vars": {
