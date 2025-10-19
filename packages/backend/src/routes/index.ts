@@ -7,9 +7,7 @@ import type { AppEnvironment } from "../types";
 import authRouter from "./auth";
 import bbsRouter from "./bbs";
 
-const rawOrigins =
-	process.env.ALLOWED_ORIGIN ??
-	"http://localhost:3000,http://localhost:8787,https://kotobad.com";
+const rawOrigins = process.env.ALLOWED_ORIGIN ?? "http://localhost:3000";
 
 const allowedOrigin = rawOrigins
 	.split(",")

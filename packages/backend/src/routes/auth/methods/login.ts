@@ -104,17 +104,19 @@ export const loginRouter: RouteHandler<
 
 		const refreshToken = signRefreshToken(refreshTokenpayload);
 
+		const isProduction = c.env.APP_ENV === "production";
+
 		setCookie(c, "accessToken", accessToken, {
 			httpOnly: true,
-			secure: true,
-			sameSite: "none",
+			secure: isProduction,
+			sameSite: "lax",
 			maxAge: 60 * 15,
 		});
 
 		setCookie(c, "refreshToken", refreshToken, {
 			httpOnly: true,
-			secure: true,
-			sameSite: "none",
+			secure: isProduction,
+			sameSite: "lax",
 			maxAge: 60 * 60 * 24 * 30,
 		});
 
