@@ -4,7 +4,7 @@ import type {
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
 import { getAllThreads } from "@/lib/api/threads";
-import ThreadPageClient from "./components/threads/ThreadPageClient";
+import ThreadPageClient from "./components/view/ThreadPageClient";
 
 export type Props = {
 	searchParams?: Promise<{ page?: string }>;
