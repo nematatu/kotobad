@@ -44,5 +44,5 @@ export const API_PATH = {
 
 export type ApiPathKey = keyof typeof API_PATH;
 
-export const getApiUrl = (key: ApiPathKey): string =>
-	`${BASE_URL}${API_PATH[key]}`;
+export const getApiUrl = (key: ApiPathKey): URL =>
+	new URL(API_PATH[key], BASE_URL);
