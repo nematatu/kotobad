@@ -109,14 +109,14 @@ export const loginRouter: RouteHandler<
 		setCookie(c, "accessToken", accessToken, {
 			httpOnly: true,
 			secure: isProduction,
-			sameSite: "none",
+			sameSite: "lax",
 			maxAge: 60 * 15,
 		});
 
 		setCookie(c, "refreshToken", refreshToken, {
 			httpOnly: true,
 			secure: isProduction,
-			sameSite: "none",
+			sameSite: "lax",
 			maxAge: 60 * 60 * 24 * 30,
 		});
 
