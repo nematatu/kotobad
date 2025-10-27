@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 	return NextResponse.json(res);
 }
 
-export async function getAllThreads(page: number) {
+async function getAllThreads(page: number) {
 	type resType = InferResponseType<typeof client.bbs.threads.$get>;
 	return BffFetcher<resType>(`${getApiUrl("GET_ALL_THREADS")}?page=${page}`, {
 		method: "GET",
