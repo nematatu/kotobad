@@ -21,7 +21,7 @@ const resolveBaseUrl = () => {
 
 	if (!raw) {
 		throw new Error(
-			"NEXT_PUBLIC_API_URL (または NEXT_PUBLIC_API_URL_PRODUCT) が設定されていません。",
+			"NEXT_PUBLIC_FRONTEND_URL (または NEXT_PUBLIC_FRONTEND_URL_PRODUCT) が設定されていません。",
 		);
 	}
 
