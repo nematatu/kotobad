@@ -19,8 +19,6 @@ export default async function Page({ searchParams }: Props) {
 	const fetchthreadRes = await fetch(targetUrl);
 	const threadRes = await fetchthreadRes.json();
 
-	console.log("res", threadRes);
-
 	const threadsResponse: ThreadListType = ThreadListSchema.parse(threadRes);
 	const threads: ThreadType[] = threadsResponse.threads;
 
