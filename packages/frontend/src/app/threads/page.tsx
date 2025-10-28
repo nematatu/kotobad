@@ -3,6 +3,7 @@ import type {
 	ThreadListType,
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import ThreadPageClient from "./components/view/ThreadPageClient";
 
 export type Props = {
@@ -13,9 +14,7 @@ export default async function Page({ searchParams }: Props) {
 	const params = searchParams ? await searchParams : {};
 	const currentPage = Number(params?.page ?? "1");
 
-	const fetchthreadRes = await fetch(
-		"http://localhost:3000/threads/api/getAllThreads",
-	);
+	const fetchthreadRes = await fetch(getBffApiUrl("GET_ALL_THREADS"));
 	const threadRes = await fetchthreadRes.json();
 
 	console.log("res", threadRes);

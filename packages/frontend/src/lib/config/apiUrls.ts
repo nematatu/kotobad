@@ -1,33 +1,6 @@
-const ENV = process.env.NODE_ENV;
+import { getApiBaseUrl } from "../api/url/BaseUrl";
 
-const ensureTrailingSlash = (value: string): string =>
-	value.endsWith("/") ? value : `${value}/`;
-
-const resolveBaseUrl = () => {
-	const prodCandidate =
-		process.env.NEXT_PUBLIC_API_URL_PRODUCT ?? process.env.NEXT_PUBLIC_API_URL;
-	const devCandidate = process.env.NEXT_PUBLIC_API_URL;
-
-	const raw =
-		ENV === "production"
-			? (prodCandidate ?? "")
-			: (devCandidate ?? prodCandidate ?? "");
-
-	if (typeof window !== "undefined" && ENV !== "production") {
-		return ensureTrailingSlash(`http://${window.location.hostname}:8787`);
-	}
-	if (!raw) {
-		throw new Error(
-			"NEXT_PUBLIC_API_URL (または NEXT_PUBLIC_API_URL_PRODUCT) が設定されていません。",
-		);
-	}
-
-	return ensureTrailingSlash(raw);
-};
-
-const BASE_URL = resolveBaseUrl();
-
-export const getApiBaseUrl = () => BASE_URL;
+const BASE_URL = getApiBaseUrl();
 
 export const API_PATH = {
 	SIGN_UP: "auth/signup",
