@@ -14,7 +14,7 @@ const ensureTrailingSlash = (value: string): string =>
 
 const resolveBaseUrl = () => {
 	if (typeof window !== "undefined" && env !== "production") {
-		return ensureTrailingSlash(`http://${window.location.hostname}:8787`);
+		return ensureTrailingSlash(`http://${window.location.hostname}:3000`);
 	}
 
 	const raw = apiUrlMap[env];
