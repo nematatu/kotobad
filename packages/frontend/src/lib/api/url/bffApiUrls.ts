@@ -8,6 +8,7 @@ export const BFF_API_PATH = {
 	LOGOUT: "auth/api/logout",
 	ME: "auth/api/me",
 	GET_ALL_THREADS: "threads/api/getAllThreads",
+	GET_THREAD_BY_ID: "threads/api/getThreadById/",
 	CREATE_THREAD: "threads/api/createThread",
 	GET_ALL_POSTS: "threads/api/getAllPosts",
 	CREATE_POST: "threads/api/createPost",

@@ -10,7 +10,8 @@ export async function BffFetcher<T>(
 	options: fetchArgs[1] = {},
 ): Promise<T> {
 	const { headers, cache, ...init } = options;
-	const cookieHeader = cookies().toString();
+	const cookieStore = await cookies();
+	const cookieHeader = cookieStore.toString();
 
 	const mergeHeaders = toHeaders(headers);
 	if (cookieHeader) {

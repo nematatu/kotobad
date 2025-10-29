@@ -8,6 +8,7 @@ export const API_PATH = {
 	LOGOUT: "auth/logout",
 	ME: "auth/me",
 	GET_ALL_THREADS: "bbs/threads",
+	GET_THREAD_BY_ID: "bbs/threads/",
 	CREATE_THREAD: "bbs/threads/create",
 	GET_ALL_POSTS: "bbs/posts",
 	CREATE_POST: "bbs/posts/create",
