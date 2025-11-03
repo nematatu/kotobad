@@ -18,28 +18,28 @@
 	},
 	"linter": {
 		"enabled": true,
-			"rules": {
-				"recommended": true,
-				"style": {
-			"noNonNullAssertion": "warn"
-		},
-		"suspicious": {
-			"noExplicitAny": "warn",
-			"noImplicitAnyLet": "warn",
-			"noDocumentCookie": "warn"
-		},
-		"security": {
-			"noDangerouslySetInnerHtml": "warn"
-		},
-		"correctness": {
-			"noNestedComponentDefinitions": "warn"
-		},
-		"a11y": {
-			"useSemanticElements": "warn",
-			"useFocusableInteractive": "warn",
-			"useAriaPropsForRole": "warn"
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noNonNullAssertion": "warn"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn",
+				"noImplicitAnyLet": "warn",
+				"noDocumentCookie": "warn"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "warn"
+			},
+			"correctness": {
+				"noNestedComponentDefinitions": "warn"
+			},
+			"a11y": {
+				"useSemanticElements": "warn",
+				"useFocusableInteractive": "warn",
+				"useAriaPropsForRole": "warn"
+			}
 		}
-	}
 	},
 	"javascript": {
 		"formatter": {
