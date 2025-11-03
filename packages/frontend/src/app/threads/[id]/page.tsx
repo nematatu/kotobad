@@ -6,11 +6,12 @@ import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 
 export type Props = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 export default async function ThreadDetailPage({ params }: Props) {
-	const threadId = params.id;
+	const renderedparams = await params;
+	const threadId = renderedparams.id;
 
 	const targetUrl = new URL(String(threadId), getBffApiUrl("GET_THREAD_BY_ID"));
 	const res = await fetch(targetUrl);

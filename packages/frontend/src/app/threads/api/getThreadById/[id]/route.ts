@@ -5,11 +5,12 @@ import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 type Params = {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 };
 
 export async function GET(_req: Request, { params }: Params) {
-	const { id } = params;
+	const renderedparams = await params;
+	const { id } = renderedparams;
 
 	try {
 		const res = await getThreadById(id);
