@@ -6,21 +6,24 @@ import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 
 export type Props = {
-	params: Promise<{ id: string }>;
+	params: { id: string };
 };
 
 export default async function ThreadDetailPage({ params }: Props) {
-	const resolvedParams = await params;
-	const threadId = resolvedParams.id;
+	const threadId = params.id;
 
 	const targetUrl = new URL(String(threadId), getBffApiUrl("GET_THREAD_BY_ID"));
 	const res = await fetch(targetUrl);
-	const threadBody = await res.json();
-	const targetThread = ThreadSchema.parse(threadBody);
-
-	if (!targetThread) {
+	if (res.status === 404) {
 		return notFound();
 	}
+	if (!res.ok) {
+		throw new Error(
+			`Failed to fetch thread detail: ${res.status} ${res.statusText}`,
+		);
+	}
+	const threadBody = await res.json();
+	const targetThread = ThreadSchema.parse(threadBody);
 
 	const postsRes = await getPostByThreadId(Number(threadId));
 	if ("error" in postsRes) {
