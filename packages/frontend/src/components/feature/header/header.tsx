@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo/logo.svg";
+import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/api/auth";
 import ThemeMenuToggle from "../darkMode/themeMenuToggle";
@@ -14,7 +15,6 @@ const Header = () => {
 	const [showHeader, setShowHeader] = useState(true);
 
 	const handleLogout = async () => {
-		console.log("logout click");
 		try {
 			await logout();
 			setUser(null);
@@ -43,11 +43,14 @@ const Header = () => {
 
 	return (
 		<div
-			className={`sticky top-0 z-50 w-full border-b bg-yellow-200 dark:bg-gray-800 transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
+			className={`sticky top-0 z-50 w-full border-b bg-gray-200 dark:bg-gray-800 transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
 		>
 			<div className="flex h-20 items-center px-4">
 				<Link href="/">
-					<LogoIcon className="w-20 h-20 text-gray-800 dark:text-gray-200" />
+					<div className="flex items-center space-x-2">
+						<LogoIcon className="w-12 h-12 ext-gray-800 dark:text-gray-200" />
+						<LogoMojiIcon className="w-35 h-35 text-gray-800 dark:text-gray-200" />
+					</div>
 				</Link>
 				<div className="flex flex-1 items-center justify-end space-x-2">
 					<ThemeMenuToggle />
