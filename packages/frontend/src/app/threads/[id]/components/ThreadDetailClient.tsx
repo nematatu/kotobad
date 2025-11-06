@@ -28,28 +28,31 @@ type Props = {
 	initialPosts: PostListType;
 };
 
+const sortByCreatedAt = (list: PostListType) =>
+	[...list].sort(
+		(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+	);
+
 export default function ThreadDetailClient({ thread, initialPosts }: Props) {
+	const normalizedInitialPosts = Array.isArray(initialPosts)
+		? initialPosts
+		: [];
+
 	const [posts, setPosts] = useState<PostListType>(
-		[...initialPosts].sort(
-			(a, b) =>
-				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-		),
+		sortByCreatedAt(normalizedInitialPosts),
 	);
 
 	const refreshPosts = async () => {
-		const latestPosts = await getPostByThreadId(thread.id);
-
-		// エラー判定
-		if ("error" in latestPosts) {
-			console.error(latestPosts.error);
-			return;
+		try {
+			const latestPosts = await getPostByThreadId(thread.id);
+			if (!Array.isArray(latestPosts)) {
+				console.error("レスポンス形式が不正です", latestPosts);
+				return;
+			}
+			setPosts(sortByCreatedAt(latestPosts));
+		} catch (error) {
+			console.error("投稿の取得に失敗しました", error);
 		}
-		setPosts(
-			[...latestPosts].sort(
-				(a, b) =>
-					new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-			),
-		);
 	};
 
 	const [showScrollBotton, setShowScrollBotton] = useState(true);

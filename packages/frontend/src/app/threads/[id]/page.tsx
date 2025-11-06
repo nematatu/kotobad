@@ -1,5 +1,5 @@
+import { PostListSchema } from "@kotobad/shared/src/schemas/post";
 import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
-import type { PostListType } from "@kotobad/shared/src/types/post";
 import { notFound } from "next/navigation";
 import { getPostByThreadId } from "@/lib/api/posts";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
@@ -28,16 +28,11 @@ export default async function ThreadDetailPage({ params }: Props) {
 	const targetThread = ThreadSchema.parse(threadBody);
 
 	const postsRes = await getPostByThreadId(Number(threadId));
-	if ("error" in postsRes) {
-		return <div>{postsRes.error}</div>;
-	}
+	const parsedPosts = PostListSchema.parse(postsRes);
 
 	return (
 		<div className="p-1 sm:p-4">
-			<ThreadDetailClient
-				thread={targetThread}
-				initialPosts={postsRes as PostListType}
-			/>
+			<ThreadDetailClient thread={targetThread} initialPosts={parsedPosts} />
 		</div>
 	);
 }
