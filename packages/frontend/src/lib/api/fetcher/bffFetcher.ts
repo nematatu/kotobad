@@ -10,6 +10,13 @@ export type BffFetcherError = Error & {
 	body?: string;
 };
 
+const toUrlString = (input: fetchArgs[0]): string => {
+	if (typeof input === "string") return input;
+	if (input instanceof URL) return input.toString();
+	if (input instanceof Request) return input.url;
+	return String(input);
+};
+
 export async function BffFetcher<T>(
 	url: fetchArgs[0],
 	options: fetchArgs[1] = {},
@@ -23,11 +30,16 @@ export async function BffFetcher<T>(
 		mergeHeaders.set("cookie", cookieHeader);
 	}
 
-	const response = await fetch(url, {
-		...init,
-		headers: mergeHeaders,
-		cache: cache ?? "no-cache",
-	});
+	let response: Response;
+	try {
+		response = await fetch(url, {
+			...init,
+			headers: mergeHeaders,
+			cache: cache ?? "no-cache",
+		});
+	} catch (error) {
+		throw error;
+	}
 
 	//TODO RFCにAPIのエラー型出たらしいので試したい
 	if (!response.ok) {

@@ -37,9 +37,7 @@ export async function GET(req: Request) {
 }
 
 async function getAllThreads(page: number) {
-	console.log("api");
 	type resType = InferResponseType<typeof client.bbs.threads.$get>;
-	console.log(4);
 	const url = await getApiUrl("GET_ALL_THREADS");
 	url.searchParams.set("page", String(page));
 	return BffFetcher<resType>(url, {
