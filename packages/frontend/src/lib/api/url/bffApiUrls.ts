@@ -1,7 +1,5 @@
 import { getApiBaseUrl } from "./BaseBffUrl";
 
-const BASE_URL = getApiBaseUrl();
-
 export const BFF_API_PATH = {
 	SIGN_UP: "auth/api/signup",
 	LOGIN: "auth/api/login",
@@ -18,5 +16,7 @@ export const BFF_API_PATH = {
 
 export type BffApiPathKey = keyof typeof BFF_API_PATH;
 
-export const getBffApiUrl = (key: BffApiPathKey): URL =>
-	new URL(BFF_API_PATH[key], BASE_URL);
+export const getBffApiUrl = async (key: BffApiPathKey): Promise<URL> => {
+	const baseUrl = await getApiBaseUrl();
+	return new URL(BFF_API_PATH[key], baseUrl);
+};

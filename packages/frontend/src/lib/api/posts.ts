@@ -8,21 +8,28 @@ export async function getPostByThreadId(threadId: number) {
 	type resType = InferResponseType<
 		(typeof client.bbs.posts.byThreadId)[":threadId"]["$get"]
 	>;
-	return fetcher<resType>(`${getApiUrl("GET_POSTS_BY_THREADID")}/${threadId}`, {
+	const baseUrl = await getApiUrl("GET_POSTS_BY_THREADID");
+	const url = new URL(String(threadId), baseUrl);
+	return fetcher<resType>(url, {
 		method: "GET",
 	});
 }
 
 export async function getAllPosts(page?: number) {
 	type resType = InferResponseType<typeof client.bbs.posts.$get>;
-	return fetcher<resType>(`${getApiUrl("GET_ALL_POSTS")}?page=${page}`, {
+	const url = await getApiUrl("GET_ALL_POSTS");
+	if (typeof page === "number") {
+		url.searchParams.set("page", String(page));
+	}
+	return fetcher<resType>(url, {
 		method: "GET",
 	});
 }
 
 export async function createPost(values: PostType.CreatePostType) {
 	type resType = InferResponseType<typeof client.bbs.posts.create.$post>;
-	return fetcher<resType>(getApiUrl("CREATE_POST"), {
+	const url = await getApiUrl("CREATE_POST");
+	return fetcher<resType>(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),

@@ -19,7 +19,8 @@ export async function POST(req: Request) {
 
 async function createThread(values: ThreadType.CreateThreadType) {
 	type resType = InferResponseType<typeof client.bbs.threads.create.$post>;
-	return BffFetcher<resType>(getApiUrl("CREATE_THREAD"), {
+	const url = await getApiUrl("CREATE_THREAD");
+	return BffFetcher<resType>(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),

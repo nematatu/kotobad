@@ -1,7 +1,5 @@
 import { getApiBaseUrl } from "../api/url/BaseUrl";
 
-const BASE_URL = getApiBaseUrl();
-
 export const API_PATH = {
 	SIGN_UP: "auth/signup",
 	LOGIN: "auth/login",
@@ -18,5 +16,7 @@ export const API_PATH = {
 
 export type ApiPathKey = keyof typeof API_PATH;
 
-export const getApiUrl = (key: ApiPathKey): URL =>
-	new URL(API_PATH[key], BASE_URL);
+export const getApiUrl = async (key: ApiPathKey): Promise<URL> => {
+	const baseUrl = await getApiBaseUrl();
+	return new URL(API_PATH[key], baseUrl);
+};

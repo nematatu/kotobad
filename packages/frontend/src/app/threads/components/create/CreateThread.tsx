@@ -38,7 +38,8 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 		setError(null);
 		try {
 			// const res = await createThread(values);
-			const response = await fetch(getBffApiUrl("CREATE_THREAD"), {
+			const endpoint = await getBffApiUrl("CREATE_THREAD");
+			const response = await fetch(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(values),

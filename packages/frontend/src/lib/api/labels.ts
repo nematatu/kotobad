@@ -5,7 +5,8 @@ import type { client } from "./honoClient";
 
 export async function getAllLabels() {
 	type resType = InferResponseType<typeof client.bbs.labels.$get>;
-	return fetcher<resType>(`${getApiUrl("GET_ALL_LABELS")}`, {
+	const url = await getApiUrl("GET_ALL_LABELS");
+	return fetcher<resType>(url, {
 		method: "GET",
 	});
 }

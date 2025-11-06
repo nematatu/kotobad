@@ -6,7 +6,8 @@ import type { client } from "./honoClient";
 
 export async function getMe() {
 	type resType = InferResponseType<typeof client.auth.me.$get>;
-	const res = await fetcher<resType>(getApiUrl("ME"), {
+	const url = await getApiUrl("ME");
+	const res = await fetcher<resType>(url, {
 		method: "GET",
 		credentials: "include",
 	});
@@ -17,7 +18,8 @@ export async function getMe() {
 
 export async function signup(values: AuthType.LoginSignupUserType) {
 	type resType = InferResponseType<typeof client.auth.signup.$post>;
-	return fetcher<resType>(getApiUrl("SIGN_UP"), {
+	const url = await getApiUrl("SIGN_UP");
+	return fetcher<resType>(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),
@@ -25,7 +27,8 @@ export async function signup(values: AuthType.LoginSignupUserType) {
 }
 export async function login(values: AuthType.LoginSignupUserType) {
 	type resType = InferResponseType<typeof client.auth.login.$post>;
-	return fetcher<resType>(getApiUrl("LOGIN"), {
+	const url = await getApiUrl("LOGIN");
+	return fetcher<resType>(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),
@@ -33,9 +36,10 @@ export async function login(values: AuthType.LoginSignupUserType) {
 	});
 }
 
-export function logout() {
+export async function logout() {
 	type resType = InferResponseType<typeof client.auth.logout.$delete>;
-	return fetcher<resType>(getApiUrl("LOGOUT"), {
+	const url = await getApiUrl("LOGOUT");
+	return fetcher<resType>(url, {
 		method: "DELETE",
 		credentials: "include",
 	});

@@ -13,7 +13,8 @@ export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
 	const threadId = renderedparams.id;
 
-	const targetUrl = new URL(String(threadId), getBffApiUrl("GET_THREAD_BY_ID"));
+	const baseUrl = await getBffApiUrl("GET_THREAD_BY_ID");
+	const targetUrl = new URL(String(threadId), baseUrl);
 	const res = await fetch(targetUrl);
 	if (res.status === 404) {
 		return notFound();
