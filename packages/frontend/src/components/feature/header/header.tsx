@@ -47,7 +47,7 @@ const Header = () => {
 		>
 			<div className="flex h-20 items-center px-4">
 				<Link href="/">
-					<div className="flex items-center space-x-2">
+					<div className="flex items-center space-x-4">
 						<LogoIcon className="w-12 h-12 ext-gray-800 dark:text-gray-200" />
 						<LogoMojiIcon className="w-35 h-35 text-gray-800 dark:text-gray-200" />
 					</div>

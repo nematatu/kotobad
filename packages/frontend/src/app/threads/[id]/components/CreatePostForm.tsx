@@ -31,7 +31,6 @@ export const CreatePostForm = ({
 	});
 
 	const handleSubmit = async (values: CreatePostType) => {
-		console.log("values", values);
 		try {
 			await createPost(values);
 			if (onSuccess) onSuccess();
@@ -96,51 +95,6 @@ export const CreatePostForm = ({
 						<p className="hidden sm:block text-neutral-400 font-sm">
 							Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
 						</p>
-
-						{/* 名前 */}
-						{/* <FormField */}
-						{/* 	control={form.control} */}
-						{/* 	name="author" */}
-						{/* 	render={({ field }) => ( */}
-						{/* 		<FormItem className="flex flex-col gap-2"> */}
-						{/* 			<FormLabel>名前</FormLabel> */}
-						{/* 			<FormControl> */}
-						{/* 				<Input */}
-						{/* 					{...field} */}
-						{/* 					{...form.register("author", { */}
-						{/* 						required: "名前は必須です", */}
-						{/* 					})} */}
-						{/* 					placeholder="例: 山田太郎" */}
-						{/* 					className="outline-2 focus:border-blue-600 placeholder-gray-500/50" */}
-						{/* 				/> */}
-						{/* 			</FormControl> */}
-						{/* 			<FormMessage /> */}
-						{/* 		</FormItem> */}
-						{/* 	)} */}
-						{/* /> */}
-
-						{/* 本文 */}
-						{/* <FormField */}
-						{/* 	control={form.control} */}
-						{/* 	name="content" */}
-						{/* 	render={({ field }) => ( */}
-						{/* 		<FormItem className="flex flex-col gap-2"> */}
-						{/* 			<FormLabel>本文</FormLabel> */}
-						{/* 			<FormControl> */}
-						{/* 				<Textarea */}
-						{/* 					{...field} */}
-						{/* 					{...form.register("content", { */}
-						{/* 						required: "本文は必須です", */}
-						{/* 					})} */}
-						{/* 					placeholder="ここに本文を入力してください" */}
-						{/* 					className="min-h-[120px] outline-2 focus:border-blue-600 placeholder-gray-500/50" */}
-						{/* 				/> */}
-						{/* 			</FormControl> */}
-						{/* 			<FormMessage /> */}
-						{/* 		</FormItem> */}
-						{/* 	)} */}
-						{/* /> */}
-
 						{error && <p className="text-red-500">{error}</p>}
 						<Button
 							className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
