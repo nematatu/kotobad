@@ -31,8 +31,10 @@ const getServerOrigin = async (): Promise<string | null> => {
 		// bun devではenvがdevelopmentなのでprotoがhttpになるから、正常に動く
 		// もしローカルプレビューをチェックしたいなら、一時的に${proto}をhttpにハードコードしてチェックできる
 		const targetUrl = `${proto}://${host}`;
-		console.log("targetUrl", targetUrl);
-		return ensureTrailingSlash(targetUrl);
+		return ensureTrailingSlash(
+			"https://e9b17f78-kotobad-frontend.amtt.workers.dev/",
+		);
+		// return ensureTrailingSlash(targetUrl);
 	} catch {
 		return null;
 	}
