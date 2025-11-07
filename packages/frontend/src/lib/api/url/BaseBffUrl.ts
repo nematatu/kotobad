@@ -34,10 +34,13 @@ const getServerOrigin = async (): Promise<string | null> => {
 		// なんか↑関係ない気がする
 		// 普通に環境ごとにプロトコル変更するか
 
-		console.log("process.env.NODE_ENV", process.env.NODE_ENV);
 		const proto = process.env.NODE_ENV === "development" ? "http" : "https";
-
-		return ensureTrailingSlash(`${proto}://${host}`);
+		console.log("process.env.NODE_ENV", process.env.NODE_ENV);
+		// ↑ローカルでプレビューするとNODE_ENVはproductionなのでhttpsになる
+		// それが原因でネットワークエラーになるから、プレビュー環境ではhttpにハードコードする
+		// const proto = "http";
+		const targetUrl = ensureTrailingSlash(`${proto}://${host}`);
+		return targetUrl;
 	} catch {
 		return null;
 	}
