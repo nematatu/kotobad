@@ -30,7 +30,7 @@ const getServerOrigin = async (): Promise<string | null> => {
 		// なので、http://locachost:3000/なのに、protoにhttpではなく、httpsになってしまう
 		// bun devではenvがdevelopmentなのでprotoがhttpになるから、正常に動く
 		// もしローカルプレビューをチェックしたいなら、一時的に${proto}をhttpにハードコードしてチェックできる
-		const targetUrl = `https://${host}`;
+		const targetUrl = `${proto}://${host}`;
 		console.log("targetUrl", targetUrl);
 		return ensureTrailingSlash(targetUrl);
 	} catch {
@@ -48,14 +48,18 @@ export const resolveBaseUrl = async (): Promise<string> => {
 		return origin;
 	}
 
+	console.log("origin", origin);
 	const raw = apiUrlMap[env];
+	console.log("raw", raw);
 	if (!raw) {
 		throw new Error(
 			"NEXT_PUBLIC_FRONTEND_URL (または NEXT_PUBLIC_FRONTEND_URL_PRODUCT) が設定されていません。",
 		);
 	}
 
+	console.log("2raw", raw);
 	const fallback = ensureTrailingSlash(raw);
+	console.log("fallback", fallback);
 	return fallback;
 };
 
