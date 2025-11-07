@@ -10,13 +10,6 @@ export type BffFetcherError = Error & {
 	body?: string;
 };
 
-const toUrlString = (input: fetchArgs[0]): string => {
-	if (typeof input === "string") return input;
-	if (input instanceof URL) return input.toString();
-	if (input instanceof Request) return input.url;
-	return String(input);
-};
-
 export async function BffFetcher<T>(
 	url: fetchArgs[0],
 	options: fetchArgs[1] = {},
