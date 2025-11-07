@@ -15,7 +15,6 @@ export default async function Page({ searchParams }: Props) {
 	const currentPage = Number(params?.page ?? "1");
 
 	const targetUrl = await getBffApiUrl("GET_ALL_THREADS");
-	console.log("targetUrl", targetUrl);
 	targetUrl.searchParams.set("page", String(currentPage));
 
 	const fetchthreadRes = await fetch(targetUrl);

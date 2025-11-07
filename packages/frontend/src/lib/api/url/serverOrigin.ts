@@ -1,11 +1,14 @@
+"use server";
 import { ensureTrailingSlash } from "../../../utils/url/ensureTrailingSlash";
 
 const { headers } = await import("next/headers");
 
 export const getServerOrigin = async (): Promise<string | null> => {
 	try {
+		console.log("getServerOrigin");
 		const hdrs = await headers();
 		const host = hdrs.get("host");
+		console.log("host", host);
 		if (!host) return null;
 		const forwardedProto = hdrs.get("x-forwarded-proto");
 		const proto =
@@ -16,12 +19,12 @@ export const getServerOrigin = async (): Promise<string | null> => {
 		// なので、http://locachost:3000/なのに、protoにhttpではなく、httpsになってしまう
 		// bun devではenvがdevelopmentなのでprotoがhttpになるから、正常に動く
 		// もしローカルプレビューをチェックしたいなら、一時的に${proto}をhttpにハードコードしてチェックできる
-		const targetUrl = `${proto}://${host}`;
-		// return ensureTrailingSlash(
-		// 	"https://e9b17f78-kotobad-frontend.amtt.workers.dev/",
-		// );
-		console.log("[server] targetUrl", targetUrl);
-		return ensureTrailingSlash(targetUrl);
+		// const targetUrl = `${proto}://${host}`;
+		return ensureTrailingSlash(
+			"https://e9b17f78-kotobad-frontend.amtt.workers.dev/",
+		);
+		// console.log("[server] targetUrl", targetUrl);
+		// return ensureTrailingSlash(targetUrl);
 	} catch {
 		return null;
 	}
