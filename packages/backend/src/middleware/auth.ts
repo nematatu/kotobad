@@ -1,6 +1,7 @@
 import { getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import type { AppEnvironment } from "../types";
+import { resolveCookieSecurity } from "../utils/cookies";
 import {
 	signAccessToken,
 	verifyAccessToken,
@@ -34,10 +35,11 @@ export const authMiddleware = createMiddleware<AppEnvironment>(
 					username: refreshPayload.username,
 				});
 
+				const { secure, sameSite } = resolveCookieSecurity(c.env.APP_ENV);
 				setCookie(c, "accessToken", newAccessToken, {
 					httpOnly: true,
-					secure: true,
-					sameSite: "none",
+					secure,
+					sameSite,
 				});
 
 				c.set("user", refreshPayload);
