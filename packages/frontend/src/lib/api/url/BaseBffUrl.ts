@@ -21,15 +21,22 @@ const getServerOrigin = async (): Promise<string | null> => {
 		const hdrs = await headers();
 		const host = hdrs.get("host");
 		if (!host) return null;
-		const forwardedProto = hdrs.get("x-forwarded-proto");
-		const proto =
-			forwardedProto ??
-			(/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host) ? "http" : "https");
+		// const forwardedProto = hdrs.get("x-forwarded-proto");
+		// const proto =
+		// 	forwardedProto ??
+		// 	(/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host) ? "http" : "https");
+
 		// bun run previewでローカルプレビューは出来ない！
 		// 多分preview環境だとenvがproductionになって、protoがhttpsになってしまう
 		// なので、http://locachost:3000/なのに、protoにhttpではなく、httpsになってしまう
 		// bun devではenvがdevelopmentなのでprotoがhttpになるから、正常に動く
 		// もしローカルプレビューをチェックしたいなら、一時的に${proto}をhttpにハードコードしてチェックできる
+		// なんか↑関係ない気がする
+		// 普通に環境ごとにプロトコル変更するか
+
+		console.log("process.env.NODE_ENV", process.env.NODE_ENV);
+		const proto = process.env.NODE_ENV === "development" ? "http" : "https";
+
 		return ensureTrailingSlash(`${proto}://${host}`);
 	} catch {
 		return null;
