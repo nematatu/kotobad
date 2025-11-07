@@ -21,11 +21,11 @@ export default async function RootLayout({
 	const token = cookieStore.get("accessToken")?.value ?? null;
 
 	let initialUser = null;
-	const jwtSecret = process.env.JWT_SECRET;
+	const accessSecret = process.env.ACCESS_SECRET;
 
-	if (token && jwtSecret) {
+	if (token && accessSecret) {
 		try {
-			const payload = await verifyJwtServer(token, jwtSecret);
+			const payload = await verifyJwtServer(token, accessSecret);
 			initialUser = { id: payload.id, username: payload.username };
 		} catch (_e) {
 			initialUser = null;

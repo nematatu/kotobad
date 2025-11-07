@@ -10,16 +10,16 @@ export type BffFetcherError = Error & {
 	body?: string;
 };
 
-export async function BffFetcher<T>(
+export async function BffFetcherRaw(
 	url: fetchArgs[0],
 	options: fetchArgs[1] = {},
-): Promise<T> {
+): Promise<Response> {
 	const { headers, cache, ...init } = options;
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.toString();
 
 	const mergeHeaders = toHeaders(headers);
-	if (cookieHeader) {
+	if (!mergeHeaders.has("cookie") && cookieHeader) {
 		mergeHeaders.set("cookie", cookieHeader);
 	}
 
@@ -44,6 +44,13 @@ export async function BffFetcher<T>(
 		error.body = body;
 		throw error;
 	}
+	return response;
+}
 
+export async function BffFetcher<T>(
+	url: fetchArgs[0],
+	options: fetchArgs[1] = {},
+): Promise<T> {
+	const response = await BffFetcherRaw(url, options);
 	return response.json() as Promise<T>;
 }

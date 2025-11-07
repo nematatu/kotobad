@@ -17,6 +17,6 @@ export const API_PATH = {
 export type ApiPathKey = keyof typeof API_PATH;
 
 export const getApiUrl = async (key: ApiPathKey): Promise<URL> => {
-	const baseUrl = await getApiBaseUrl();
+	const baseUrl = getApiBaseUrl();
 	return new URL(API_PATH[key], baseUrl);
 };

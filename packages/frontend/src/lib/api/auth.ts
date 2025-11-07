@@ -25,6 +25,7 @@ export async function signup(values: AuthType.LoginSignupUserType) {
 		body: JSON.stringify(values),
 	});
 }
+
 export async function login(values: AuthType.LoginSignupUserType) {
 	type resType = InferResponseType<typeof client.auth.login.$post>;
 	const url = await getApiUrl("LOGIN");

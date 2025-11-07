@@ -5,7 +5,6 @@ const { headers } = await import("next/headers");
 
 export const getServerOrigin = async (): Promise<string | null> => {
 	try {
-		console.log("getServerOrigin");
 		const hdrs = await headers();
 		const host = hdrs.get("host");
 		if (!host) return null;
@@ -19,10 +18,6 @@ export const getServerOrigin = async (): Promise<string | null> => {
 		// bun devではenvがdevelopmentなのでprotoがhttpになるから、正常に動く
 		// もしローカルプレビューをチェックしたいなら、一時的に${proto}をhttpにハードコードしてチェックできる
 		const targetUrl = `${proto}://${host}`;
-		// return ensureTrailingSlash(
-		// 	"https://e9b17f78-kotobad-frontend.amtt.workers.dev/",
-		// );
-		console.log("[server] targetUrl", targetUrl);
 		return ensureTrailingSlash(targetUrl);
 	} catch {
 		return null;

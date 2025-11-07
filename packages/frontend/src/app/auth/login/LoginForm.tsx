@@ -1,4 +1,5 @@
 "use client";
+import { UserJWTSchema } from "@kotobad/shared/src/schemas/auth";
 import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,7 +16,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { getMe, login } from "@/lib/api/auth";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
 export const LoginForm = () => {
 	const router = useRouter();
@@ -33,10 +34,19 @@ export const LoginForm = () => {
 
 	const handleSubmit = async (values: LoginSignupUserType) => {
 		setError(null);
+		const baseUrl = await getBffApiUrl("LOGIN");
 
 		try {
-			await login(values);
-			const me = await getMe();
+			const res = await fetch(baseUrl, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(values),
+				credentials: "include",
+			});
+
+			const body = await res.json();
+			const me = UserJWTSchema.parse(body);
+
 			if ("error" in me) {
 				const errorMsg =
 					typeof me.error === "string" ? me.error : String(me.error);
