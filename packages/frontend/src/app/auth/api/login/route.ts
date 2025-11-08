@@ -23,10 +23,7 @@ export async function POST(req: Request) {
 	const me = await getMe(cookieHeaders, cookieStore);
 	const res = NextResponse.json(me);
 	cookieHeaders.forEach((cookieStr) => {
-		// まずcookieのパースッて何？
-		const [nameValue] = cookieStr.split(";", 1);
-		const [name, value] = nameValue.split("=", 2);
-		res.cookies.set(name, value);
+		res.headers.append("set-cookie", cookieStr);
 	});
 	return res;
 }

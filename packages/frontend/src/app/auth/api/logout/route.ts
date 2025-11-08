@@ -12,13 +12,8 @@ export async function DELETE() {
 
 	const res = NextResponse.json({ message: "logout success" });
 	cookieHeaders.forEach((cookieStr) => {
-		// まずcookieのパースッて何？
-		const [nameValue] = cookieStr.split(";", 1);
-		const [name, value] = nameValue.split("=", 2);
-		res.cookies.set(name, value);
+		res.headers.append("set-cookie", cookieStr);
 	});
-	res.cookies.delete("accessToken");
-	res.cookies.delete("refreshToken");
 
 	return res;
 }
