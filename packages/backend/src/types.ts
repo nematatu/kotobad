@@ -12,6 +12,8 @@ export type Bindings = {
 	BETTER_AUTH_URL?: string;
 	APP_ENV?: "development" | "production";
 	ALLOWED_ORIGINS?: string;
+	ALLOW_CF_PAGES_PREVIEW?: string;
+	CF_PAGES_PREVIEW_SUFFIX?: string;
 };
 
 export type UserTokenPayload = {

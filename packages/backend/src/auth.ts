@@ -7,7 +7,42 @@ const parseOrigins = (value?: string) =>
 	value
 		?.split(",")
 		.map((origin) => origin.trim())
-		.filter(Boolean);
+		.filter(Boolean) ?? [];
+
+const buildPreviewOriginMatcher = (suffix: string) => {
+	const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	return new RegExp(`^[0-9a-f]+${escaped}$`);
+};
+
+const maybeAddPreviewOrigin = (
+	env: Bindings,
+	restRequest: Request | undefined,
+	allowList: string[] = [],
+) => {
+	const allowPreview = env.ALLOW_CF_PAGES_PREVIEW === "true";
+	if (!allowPreview || !restRequest) {
+		return allowList;
+	}
+	const origin = restRequest.headers.get("origin");
+	if (!origin) {
+		return allowList;
+	}
+	const suffix =
+		env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
+	try {
+		const url = new URL(origin);
+		if (url.protocol !== "https:") {
+			return allowList;
+		}
+		const matcher = buildPreviewOriginMatcher(suffix);
+		if (matcher.test(url.hostname)) {
+			return allowList.includes(origin) ? allowList : [...allowList, origin];
+		}
+		return allowList;
+	} catch {
+		return allowList;
+	}
+};
 
 const resolveBaseUrl = (env: Bindings, request?: Request) => {
 	if (env.BETTER_AUTH_URL) {
@@ -28,6 +63,11 @@ type CreateAuthOptions = {
 
 export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 	const trustedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
+	const effectiveOrigins = maybeAddPreviewOrigin(
+		env,
+		restRequest,
+		trustedOrigins,
+	);
 	const baseURL = resolveBaseUrl(env, restRequest);
 	const secret = env.BETTER_AUTH_SECRET;
 
@@ -39,7 +79,7 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		secret,
 		baseURL,
 		basePath: BETTER_AUTH_BASE_PATH,
-		trustedOrigins,
+		trustedOrigins: effectiveOrigins,
 		database: drizzleAdapter(createDb(env), {
 			provider: "sqlite",
 		}),
