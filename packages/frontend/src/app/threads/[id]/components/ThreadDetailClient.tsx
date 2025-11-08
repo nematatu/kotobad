@@ -1,10 +1,11 @@
 "use client";
 
+import { PostListSchema } from "@kotobad/shared/src/schemas/post";
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useEffect, useState } from "react";
 import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
-import { getPostByThreadId } from "@/lib/api/posts";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import BreadCrumb from "./BreadCrumbs";
 import { CreatePostForm } from "./CreatePostForm";
 import { PostList } from "./PostList";
@@ -44,12 +45,17 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 
 	const refreshPosts = async () => {
 		try {
-			const latestPosts = await getPostByThreadId(thread.id);
-			if (!Array.isArray(latestPosts)) {
-				console.error("レスポンス形式が不正です", latestPosts);
+			const getPostsBaseUrl = await getBffApiUrl("GET_POSTS_BY_THREADID");
+			const getPostsTargetUrl = new URL(String(thread.id), getPostsBaseUrl);
+			const getPostsRes = await fetch(getPostsTargetUrl);
+			const postsBody = await getPostsRes.json();
+			const targetPosts = PostListSchema.parse(postsBody);
+
+			if (!Array.isArray(targetPosts)) {
+				console.error("レスポンス形式が不正です", targetPosts);
 				return;
 			}
-			setPosts(sortByCreatedAt(latestPosts));
+			setPosts(sortByCreatedAt(targetPosts));
 		} catch (error) {
 			console.error("投稿の取得に失敗しました", error);
 		}
