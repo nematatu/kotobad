@@ -37,7 +37,6 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
 		try {
-			// const res = await createThread(values);
 			const endpoint = await getBffApiUrl("CREATE_THREAD");
 			const response = await fetch(endpoint, {
 				method: "POST",
