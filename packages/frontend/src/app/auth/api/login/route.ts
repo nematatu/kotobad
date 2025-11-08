@@ -1,34 +1,30 @@
-import { LoginSignupSchema } from "@kotobad/shared/src/schemas/auth";
-import type { AuthType } from "@kotobad/shared/src/types/";
-import type { InferResponseType } from "hono";
-import type { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { BffFetcher, BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
+import { z } from "zod";
+import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
+import { appendSetCookies, extractSetCookies, fetchSession } from "../shared";
+
+const loginSchema = z.object({
+	email: z.string().email(),
+	password: z.string().min(1),
+});
 
 export async function POST(req: Request) {
 	const json = await req.json();
-	const payload = LoginSignupSchema.parse(json);
+	const payload = loginSchema.parse(json);
 	const cookieStore = await cookies();
 
 	const loginRes = await login(payload);
+	const cookieHeaders = extractSetCookies(loginRes);
+	const session = await fetchSession(cookieHeaders, cookieStore);
 
-	const cookieHeaders =
-		loginRes.headers.getSetCookie() ??
-		loginRes.headers.get("set-cookie")?.split(/,(?=[^;]+=)/) ??
-		[];
-
-	const me = await getMe(cookieHeaders, cookieStore);
-	const res = NextResponse.json(me);
-	cookieHeaders.forEach((cookieStr) => {
-		res.headers.append("set-cookie", cookieStr);
-	});
+	const res = NextResponse.json(session);
+	appendSetCookies(res, cookieHeaders);
 	return res;
 }
 
-async function login(payload: AuthType.LoginSignupUserType) {
+async function login(payload: z.infer<typeof loginSchema>) {
 	const url = await getApiUrl("LOGIN");
 	return BffFetcherRaw(url, {
 		method: "POST",
@@ -36,31 +32,4 @@ async function login(payload: AuthType.LoginSignupUserType) {
 		body: JSON.stringify(payload),
 		credentials: "include",
 	});
-}
-
-async function getMe(
-	newCookies: string[],
-	//↓なにこれ
-	cookieStore: ReadonlyRequestCookies,
-) {
-	const mergedCookies = [
-		cookieStore.toString(),
-		//↓なにこれ split(";", 1)[0]
-		...newCookies.map((cookieStr) => cookieStr.split(";", 1)[0]),
-	]
-		.filter(Boolean)
-		//↓なにこれ
-		.join("; ");
-	type resType = InferResponseType<typeof client.auth.me.$get>;
-	const url = await getApiUrl("ME");
-	const res = await BffFetcher<resType>(url, {
-		method: "GET",
-		credentials: "include",
-		headers: {
-			cookie: mergedCookies,
-		},
-	});
-
-	if ("error" in res) throw new Error(String(res.error));
-	return res;
 }

@@ -17,10 +17,16 @@ export async function BffFetcherRaw(
 	const { headers, cache, ...init } = options;
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.toString();
+	const defaultOrigin =
+		process.env.NEXT_PUBLIC_FRONTEND_URL ?? "http://localhost:3000";
 
 	const mergeHeaders = toHeaders(headers);
 	if (!mergeHeaders.has("cookie") && cookieHeader) {
 		mergeHeaders.set("cookie", cookieHeader);
+	}
+
+	if (!mergeHeaders.has("origin")) {
+		mergeHeaders.set("origin", defaultOrigin);
 	}
 
 	let response: Response;

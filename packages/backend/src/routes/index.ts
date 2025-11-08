@@ -6,6 +6,7 @@ import { authMiddleware } from "../middleware/auth";
 import type { AppEnvironment } from "../types";
 import authRouter from "./auth";
 import bbsRouter from "./bbs";
+import { betterAuthHandler, betterAuthPath } from "./better-auth-handler";
 
 const rawOrigins = process.env.ALLOWED_ORIGIN || "";
 
@@ -66,6 +67,8 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 			credentials: true,
 		}),
 	)
+	.all(betterAuthPath, betterAuthHandler)
+	.all(`${betterAuthPath}/*`, betterAuthHandler)
 	.use("/auth/me", authMiddleware)
 	.route("/bbs", bbsRouter)
 	.route("/auth", authRouter);

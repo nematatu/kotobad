@@ -1,10 +1,10 @@
 import { getApiBaseUrl } from "../api/url/BaseUrl";
 
 export const API_PATH = {
-	SIGN_UP: "auth/signup",
-	LOGIN: "auth/login",
-	LOGOUT: "auth/logout",
-	ME: "auth/me",
+	SIGN_UP: "better-auth/sign-up/email",
+	LOGIN: "better-auth/sign-in/email",
+	LOGOUT: "better-auth/sign-out",
+	ME: "better-auth/get-session",
 	GET_ALL_THREADS: "bbs/threads",
 	GET_THREAD_BY_ID: "bbs/threads/",
 	CREATE_THREAD: "bbs/threads/create",

@@ -1,33 +1,36 @@
-import {
-	LoginSignupSchema,
-	UserJWTSchema,
-} from "@kotobad/shared/src/schemas/auth";
-import type { AuthType } from "@kotobad/shared/src/types/";
-import type { InferResponseType } from "hono";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
+import { z } from "zod";
+import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
+import { appendSetCookies, extractSetCookies, fetchSession } from "../shared";
+
+const signUpSchema = z.object({
+	email: z.string().email(),
+	password: z.string().min(8),
+	name: z.string().min(1),
+});
 
 export async function POST(req: Request) {
 	const json = await req.json();
-	// ↓ confirmも含まれていそうだからこのパースで落ちそう
-	// 落ちなかった。パスワード確認のバリデーション、フロントでしか行ってないから、バックエンドでのチェックも実装すべきかも
-	const payload = LoginSignupSchema.parse(json);
+	const payload = signUpSchema.parse(json);
+	const cookieStore = await cookies();
 
 	const signUpRes = await signup(payload);
-	const parsedSignUpRes = UserJWTSchema.parse(signUpRes);
+	const cookieHeaders = extractSetCookies(signUpRes);
+	const session = await fetchSession(cookieHeaders, cookieStore);
 
-	const res = NextResponse.json(parsedSignUpRes);
+	const res = NextResponse.json(session);
+	appendSetCookies(res, cookieHeaders);
 	return res;
 }
 
-async function signup(values: AuthType.LoginSignupUserType) {
-	type resType = InferResponseType<typeof client.auth.signup.$post>;
+async function signup(payload: z.infer<typeof signUpSchema>) {
 	const url = await getApiUrl("SIGN_UP");
-	return BffFetcher<resType>(url, {
+	return BffFetcherRaw(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(values),
+		body: JSON.stringify(payload),
+		credentials: "include",
 	});
 }

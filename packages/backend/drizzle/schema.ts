@@ -251,3 +251,5 @@ export const threadLabelRelations = relations(threadLabels, ({ one }) => ({
 		references: [worldTournaments.id],
 	}),
 }));
+
+export * from "./better-auth.schema"; 

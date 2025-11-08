@@ -1,8 +1,8 @@
 "use client";
-import type { UserJWTType } from "@kotobad/shared/src/types/auth";
 import { createContext, useContext, useState } from "react";
+import type { BetterAuthUser } from "@/lib/auth/betterAuthSession";
 
-export type User = UserJWTType | null;
+export type User = BetterAuthUser | null;
 
 type Ctx = {
 	user: User;

@@ -17,7 +17,7 @@ const Header = () => {
 		const baseUrl = await getBffApiUrl("LOGOUT");
 		try {
 			const res = await fetch(baseUrl, {
-				method: "DELETE",
+				method: "POST",
 				credentials: "include",
 			});
 
@@ -60,6 +60,11 @@ const Header = () => {
 					</div>
 				</Link>
 				<div className="flex flex-1 items-center justify-end space-x-2">
+					{user && (
+						<span className="text-sm text-muted-foreground">
+							{user.name ?? user.email}
+						</span>
+					)}
 					{user ? (
 						<Button
 							className="text-sm font-medium cursor-pointer transition-colors hover:text-primary"
