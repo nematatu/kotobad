@@ -10,7 +10,7 @@ export const BFF_API_PATH = {
 	CREATE_THREAD: "threads/api/threads/createThread",
 	GET_ALL_POSTS: "threads/api/posts/getAllPosts",
 	CREATE_POST: "threads/api/posts/createPost",
-	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId",
+	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId/",
 	GET_ALL_LABELS: "threads/api/getAllLabels",
 } as const;
 

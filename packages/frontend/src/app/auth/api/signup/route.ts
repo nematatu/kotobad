@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 	return res;
 }
 
-export async function signup(values: AuthType.LoginSignupUserType) {
+async function signup(values: AuthType.LoginSignupUserType) {
 	type resType = InferResponseType<typeof client.auth.signup.$post>;
 	const url = await getApiUrl("SIGN_UP");
 	return BffFetcher<resType>(url, {
