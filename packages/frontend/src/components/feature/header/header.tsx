@@ -6,7 +6,6 @@ import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/api/auth";
-import ThemeMenuToggle from "../darkMode/themeMenuToggle";
 import { useUser } from "../provider/UserProvider";
 
 const Header = () => {
@@ -53,7 +52,6 @@ const Header = () => {
 					</div>
 				</Link>
 				<div className="flex flex-1 items-center justify-end space-x-2">
-					<ThemeMenuToggle />
 					{user ? (
 						<Button
 							className="text-sm font-medium cursor-pointer transition-colors hover:text-primary"
