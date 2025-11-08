@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { apiUrlMap } from "../url/BaseBffUrl";
 
 type fetchArgs = Parameters<typeof fetch>;
 
@@ -17,8 +18,9 @@ export async function BffFetcherRaw(
 	const { headers, cache, ...init } = options;
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.toString();
-	const defaultOrigin =
-		process.env.NEXT_PUBLIC_FRONTEND_URL ?? "http://localhost:3000";
+	const frontendUrl = apiUrlMap[process.env.NODE_ENV];
+	const defaultOrigin = frontendUrl ?? "http://localhost:3000";
+	console.log("defaultOrigin", defaultOrigin);
 
 	const mergeHeaders = toHeaders(headers);
 	if (!mergeHeaders.has("cookie") && cookieHeader) {
