@@ -15,14 +15,14 @@ export async function POST(req: Request) {
 
 	const loginRes = await login(payload);
 
-	const setCookieHeaders =
+	const cookieHeaders =
 		loginRes.headers.getSetCookie() ??
 		loginRes.headers.get("set-cookie")?.split(/,(?=[^;]+=)/) ??
 		[];
 
-	const me = await getMe(setCookieHeaders, cookieStore);
+	const me = await getMe(cookieHeaders, cookieStore);
 	const res = NextResponse.json(me);
-	setCookieHeaders.forEach((cookieStr) => {
+	cookieHeaders.forEach((cookieStr) => {
 		// まずcookieのパースッて何？
 		const [nameValue] = cookieStr.split(";", 1);
 		const [name, value] = nameValue.split("=", 2);

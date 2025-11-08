@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Button } from "@/components/ui/button";
-import { logout } from "@/lib/api/auth";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { useUser } from "../provider/UserProvider";
 
 const Header = () => {
@@ -14,10 +14,19 @@ const Header = () => {
 	const [showHeader, setShowHeader] = useState(true);
 
 	const handleLogout = async () => {
+		const baseUrl = await getBffApiUrl("LOGOUT");
 		try {
-			await logout();
+			const res = await fetch(baseUrl, {
+				method: "DELETE",
+				credentials: "include",
+			});
+			console.log("res", res);
+
+			if (!res.ok) {
+				const error = await res.json();
+				throw new Error(String(error));
+			}
 			setUser(null);
-			console.log("logout finish");
 		} catch (error: unknown) {
 			const message =
 				error instanceof Error ? error.message : "ログアウトに失敗しました";
