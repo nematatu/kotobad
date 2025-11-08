@@ -1,3 +1,4 @@
+import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 // import { useUser } from "@/components/feature/provider/UserProvider";
-import { createThread } from "@/lib/api/threads";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
 type CreateThreadType = {
 	title: string;
@@ -36,14 +37,26 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
 		try {
-			const res = await createThread(values);
-			if ("id" in res) {
-				onCreated(res);
-				form.reset();
-			} else {
-				throw new Error(res.error);
+			const endpoint = await getBffApiUrl("CREATE_THREAD");
+			const response = await fetch(endpoint, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(values),
+			});
+
+			const body = await response.json();
+
+			if (!response.ok) {
+				const message =
+					typeof body === "object" && body && "error" in body
+						? String(body.error)
+						: "スレッド作成に失敗しました";
+				throw new Error(message);
 			}
-			console.log("新規スレッド作成", values);
+			const thread = ThreadSchema.parse(body);
+
+			onCreated(thread);
+			form.reset();
 		} catch (error: unknown) {
 			if (
 				typeof error === "object" &&

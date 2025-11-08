@@ -15,6 +15,8 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_API_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_API_URL_PRODUCT }}
+      NEXT_PUBLIC_FRONTEND_URL: ${{ secrets.NEXT_PUBLIC_FRONTEND_URL }}
+      NEXT_PUBLIC_FRONTEND_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_FRONTEND_URL_PRODUCT }}
       ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
 
     steps:
@@ -62,6 +64,8 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_API_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_API_URL_PRODUCT }}
+      NEXT_PUBLIC_FRONTEND_URL: ${{ secrets.NEXT_PUBLIC_FRONTEND_URL }}
+      NEXT_PUBLIC_FRONTEND_URL_PRODUCT: ${{ secrets.NEXT_PUBLIC_FRONTEND_URL_PRODUCT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

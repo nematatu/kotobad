@@ -1,8 +1,7 @@
-import type { PostListType } from "@kotobad/shared/src/types/post";
-import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { PostListSchema } from "@kotobad/shared/src/schemas/post";
+import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
 import { notFound } from "next/navigation";
-import { getPostByThreadId } from "@/lib/api/posts";
-import { getAllThreads } from "@/lib/api/threads";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 
 export type Props = {
@@ -10,32 +9,40 @@ export type Props = {
 };
 
 export default async function ThreadDetailPage({ params }: Props) {
-	const resolvedParams = await params;
-	const threadRes = await getAllThreads();
-	if ("error" in threadRes) {
-		return <div>{threadRes.error}</div>;
-	}
-	const threads: ThreadType[] = threadRes.threads;
+	const renderedparams = await params;
+	const threadId = renderedparams.id;
 
-	const id = resolvedParams.id;
-	const threadId = Number(id);
-	const targetThread = threads.find((t) => t.id === threadId);
-
-	if (!targetThread) {
+	const getThreadsBaseUrl = await getBffApiUrl("GET_THREAD_BY_ID");
+	const getThreadTargetUrl = new URL(String(threadId), getThreadsBaseUrl);
+	const getThreadsRes = await fetch(getThreadTargetUrl);
+	if (getThreadsRes.status === 404) {
 		return notFound();
 	}
-
-	const postsRes = await getPostByThreadId(threadId);
-	if ("error" in postsRes) {
-		return <div>{postsRes.error}</div>;
+	if (!getThreadsRes.ok) {
+		throw new Error(
+			`Failed to fetch thread detail: ${getThreadsRes.status} ${getThreadsRes.statusText}`,
+		);
 	}
+	const threadBody = await getThreadsRes.json();
+	const targetThread = ThreadSchema.parse(threadBody);
+
+	const getPostsBaseUrl = await getBffApiUrl("GET_POSTS_BY_THREADID");
+	const getPostsTargetUrl = new URL(String(threadId), getPostsBaseUrl);
+	const getPostsRes = await fetch(getPostsTargetUrl);
+	if (getPostsRes.status === 404) {
+		return notFound();
+	}
+	if (!getPostsRes.ok) {
+		throw new Error(
+			`Failed to fetch thread detail: ${getPostsRes.status} ${getPostsRes.statusText}`,
+		);
+	}
+	const postsBody = await getPostsRes.json();
+	const targetPosts = PostListSchema.parse(postsBody);
 
 	return (
 		<div className="p-1 sm:p-4">
-			<ThreadDetailClient
-				thread={targetThread}
-				initialPosts={postsRes as PostListType}
-			/>
+			<ThreadDetailClient thread={targetThread} initialPosts={targetPosts} />
 		</div>
 	);
 }

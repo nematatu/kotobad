@@ -1,10 +1,11 @@
 "use client";
 
+import { PostListSchema } from "@kotobad/shared/src/schemas/post";
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useEffect, useState } from "react";
 import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
-import { getPostByThreadId } from "@/lib/api/posts";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import BreadCrumb from "./BreadCrumbs";
 import { CreatePostForm } from "./CreatePostForm";
 import { PostList } from "./PostList";
@@ -28,28 +29,36 @@ type Props = {
 	initialPosts: PostListType;
 };
 
+const sortByCreatedAt = (list: PostListType) =>
+	[...list].sort(
+		(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+	);
+
 export default function ThreadDetailClient({ thread, initialPosts }: Props) {
+	const normalizedInitialPosts = Array.isArray(initialPosts)
+		? initialPosts
+		: [];
+
 	const [posts, setPosts] = useState<PostListType>(
-		[...initialPosts].sort(
-			(a, b) =>
-				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-		),
+		sortByCreatedAt(normalizedInitialPosts),
 	);
 
 	const refreshPosts = async () => {
-		const latestPosts = await getPostByThreadId(thread.id);
+		try {
+			const getPostsBaseUrl = await getBffApiUrl("GET_POSTS_BY_THREADID");
+			const getPostsTargetUrl = new URL(String(thread.id), getPostsBaseUrl);
+			const getPostsRes = await fetch(getPostsTargetUrl);
+			const postsBody = await getPostsRes.json();
+			const targetPosts = PostListSchema.parse(postsBody);
 
-		// エラー判定
-		if ("error" in latestPosts) {
-			console.error(latestPosts.error);
-			return;
+			if (!Array.isArray(targetPosts)) {
+				console.error("レスポンス形式が不正です", targetPosts);
+				return;
+			}
+			setPosts(sortByCreatedAt(targetPosts));
+		} catch (error) {
+			console.error("投稿の取得に失敗しました", error);
 		}
-		setPosts(
-			[...latestPosts].sort(
-				(a, b) =>
-					new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-			),
-		);
 	};
 
 	const [showScrollBotton, setShowScrollBotton] = useState(true);

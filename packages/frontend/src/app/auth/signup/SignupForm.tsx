@@ -1,4 +1,5 @@
 "use client";
+import { UserJWTSchema } from "@kotobad/shared/src/schemas/auth";
 import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
 import Link from "next/link";
 import { useState } from "react";
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/hooks/useModal";
-import { signup } from "@/lib/api/auth";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
 type SignupSchema = LoginSignupUserType & {
 	confirmPassword: string;
@@ -50,16 +51,24 @@ export const SignupForm = () => {
 
 	const handleSubmit = async (values: SignupSchema) => {
 		setError(null);
+		const baseUrl = await getBffApiUrl("SIGN_UP");
 
 		try {
-			const res = await signup(values);
+			const res = await fetch(baseUrl, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(values),
+			});
+
+			const body = await res.json();
+			const parsedRes = UserJWTSchema.parse(body);
 
 			if (res && typeof res === "object" && "error" in res) {
 				setError(typeof res.error === "string" ? res.error : "予期せぬエラー");
 				return;
 			}
 
-			setRegisterdUsername(res.username);
+			setRegisterdUsername(parsedRes.username);
 			setOpen();
 		} catch (error: unknown) {
 			const message =

@@ -8,9 +8,9 @@
 		"start": "next start",
 		"lint": "next lint",
 		"cf:build": "opennextjs-cloudflare build",
-                "deploy": "bun run cf:build && opennextjs-cloudflare deploy",
-                "deploy:preview": "bun run cf:build && opennextjs-cloudflare deploy --env preview",
-		"preview": "bun run cf:build && opennextjs-cloudflare preview --port 3000",
+    "deploy": "bun run cf:build && opennextjs-cloudflare deploy",
+    "deploy:preview": "bun run cf:build && opennextjs-cloudflare deploy --env preview",
+		"preview": "bun run cf:build && bun opennextjs-cloudflare preview --port 3000",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
 	},
 	"dependencies": {

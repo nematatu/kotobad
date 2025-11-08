@@ -3,8 +3,8 @@ import type {
 	ThreadListType,
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
-import { getAllThreads } from "@/lib/api/threads";
-import ThreadPageClient from "./components/threads/ThreadPageClient";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import ThreadPageClient from "./components/view/ThreadPageClient";
 
 export type Props = {
 	searchParams?: Promise<{ page?: string }>;
@@ -14,9 +14,11 @@ export default async function Page({ searchParams }: Props) {
 	const params = searchParams ? await searchParams : {};
 	const currentPage = Number(params?.page ?? "1");
 
-	const threadRes = await getAllThreads(currentPage);
+	const targetUrl = await getBffApiUrl("GET_ALL_THREADS");
+	targetUrl.searchParams.set("page", String(currentPage));
 
-	console.log("res", threadRes);
+	const fetchthreadRes = await fetch(targetUrl);
+	const threadRes = await fetchthreadRes.json();
 
 	const threadsResponse: ThreadListType = ThreadListSchema.parse(threadRes);
 	const threads: ThreadType[] = threadsResponse.threads;

@@ -6,6 +6,7 @@ import { setCookie } from "hono/cookie";
 import { users } from "../../../../drizzle/schema";
 import { OpenAPILoginSignupSchema } from "../../../models/auth";
 import type { AppEnvironment, UserTokenPayload } from "../../../types";
+import { resolveCookieSecurity } from "../../../utils/cookies";
 import { signAccessToken, signRefreshToken } from "../../../utils/jwt";
 
 export const loginRoute = createRoute({
@@ -104,19 +105,19 @@ export const loginRouter: RouteHandler<
 
 		const refreshToken = signRefreshToken(refreshTokenpayload);
 
-		const isProduction = c.env.APP_ENV === "production";
+		const { secure, sameSite } = resolveCookieSecurity(c.env.APP_ENV);
 
 		setCookie(c, "accessToken", accessToken, {
 			httpOnly: true,
-			secure: isProduction,
-			sameSite: "lax",
+			secure,
+			sameSite,
 			maxAge: 60 * 15,
 		});
 
 		setCookie(c, "refreshToken", refreshToken, {
 			httpOnly: true,
-			secure: isProduction,
-			sameSite: "lax",
+			secure,
+			sameSite,
 			maxAge: 60 * 60 * 24 * 30,
 		});
 
