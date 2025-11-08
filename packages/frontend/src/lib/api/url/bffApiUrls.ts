@@ -5,12 +5,12 @@ export const BFF_API_PATH = {
 	LOGIN: "auth/api/login",
 	LOGOUT: "auth/api/logout",
 	ME: "auth/api/me",
-	GET_ALL_THREADS: "threads/api/getAllThreads",
-	GET_THREAD_BY_ID: "threads/api/getThreadById/",
-	CREATE_THREAD: "threads/api/createThread",
-	GET_ALL_POSTS: "threads/api/getAllPosts",
-	CREATE_POST: "threads/api/createPost",
-	GET_POSTS_BY_THREADID: "threads/api/getPostByThreadId",
+	GET_ALL_THREADS: "threads/api/threads/getAllThreads",
+	GET_THREAD_BY_ID: "threads/api/threads/getThreadById/",
+	CREATE_THREAD: "threads/api/threads/createThread",
+	GET_ALL_POSTS: "threads/api/posts/getAllPosts",
+	CREATE_POST: "threads/api/posts/createPost",
+	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId",
 	GET_ALL_LABELS: "threads/api/getAllLabels",
 } as const;
 
