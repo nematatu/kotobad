@@ -3,12 +3,6 @@ import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
 import { getApiBaseUrl } from "@/lib/api/url/BaseUrl";
 import { appendSetCookies, extractSetCookies } from "../shared";
 
-type RouteContext = {
-	params: {
-		betterAuthPath: string[];
-	};
-};
-
 const ALLOWED_METHODS = [
 	"GET",
 	"POST",
@@ -19,12 +13,17 @@ const ALLOWED_METHODS = [
 	"HEAD",
 ];
 
-const handler = async (req: NextRequest, ctx: RouteContext) => {
+type BetterAuthContext = {
+	params: Promise<{ betterAuthPath: string[] }>;
+};
+
+const handler = async (req: NextRequest, context: BetterAuthContext) => {
 	if (!ALLOWED_METHODS.includes(req.method)) {
 		return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
 	}
 
-	const pathSegments = ctx.params.betterAuthPath ?? [];
+	const params = await context.params;
+	const pathSegments = params.betterAuthPath ?? [];
 	if (pathSegments.length === 0) {
 		return NextResponse.json({ error: "Not Found" }, { status: 404 });
 	}
@@ -82,12 +81,30 @@ const handler = async (req: NextRequest, ctx: RouteContext) => {
 	return nextResponse;
 };
 
-export {
-	handler as GET,
-	handler as POST,
-	handler as PUT,
-	handler as PATCH,
-	handler as DELETE,
-	handler as OPTIONS,
-	handler as HEAD,
-};
+export async function GET(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
+
+export async function POST(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
+
+export async function PUT(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
+
+export async function PATCH(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
+
+export async function DELETE(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
+
+export async function OPTIONS(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
+
+export async function HEAD(req: NextRequest, context: BetterAuthContext) {
+	return handler(req, context);
+}
