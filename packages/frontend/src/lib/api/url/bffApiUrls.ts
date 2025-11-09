@@ -1,10 +1,10 @@
 import { getApiBaseUrl } from "./BaseBffUrl";
 
 export const BFF_API_PATH = {
-	SIGN_UP: "auth/api/signup",
-	LOGIN: "auth/api/login",
-	LOGOUT: "auth/api/logout",
-	ME: "auth/api/me",
+	SIGN_UP: "auth/api/sign-up/email",
+	LOGIN: "auth/api/sign-in/email",
+	LOGOUT: "auth/api/sign-out",
+	ME: "auth/api/get-session",
 	GET_ALL_THREADS: "threads/api/threads/getAllThreads",
 	GET_THREAD_BY_ID: "threads/api/threads/getThreadById/",
 	CREATE_THREAD: "threads/api/threads/createThread",

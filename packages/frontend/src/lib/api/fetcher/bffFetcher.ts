@@ -14,13 +14,13 @@ export type BffFetcherError = Error & {
 export async function BffFetcherRaw(
 	url: fetchArgs[0],
 	options: fetchArgs[1] = {},
+	skipErrorThrow = false,
 ): Promise<Response> {
 	const { headers, cache, ...init } = options;
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.toString();
 	const frontendUrl = apiUrlMap[process.env.NODE_ENV];
 	const defaultOrigin = frontendUrl ?? "http://localhost:3000";
-	console.log("defaultOrigin", defaultOrigin);
 
 	const mergeHeaders = toHeaders(headers);
 	if (!mergeHeaders.has("cookie") && cookieHeader) {
@@ -31,19 +31,14 @@ export async function BffFetcherRaw(
 		mergeHeaders.set("origin", defaultOrigin);
 	}
 
-	let response: Response;
-	try {
-		response = await fetch(url, {
-			...init,
-			headers: mergeHeaders,
-			cache: cache ?? "no-cache",
-		});
-	} catch (error) {
-		throw error;
-	}
+	const response = await fetch(url, {
+		...init,
+		headers: mergeHeaders,
+		cache: cache ?? "no-cache",
+	});
 
 	//TODO RFCにAPIのエラー型出たらしいので試したい
-	if (!response.ok) {
+	if (!response.ok && !skipErrorThrow) {
 		const body = await response.text();
 		const error = new Error(
 			`Fetch Error: ${response.status} ${body}`,
