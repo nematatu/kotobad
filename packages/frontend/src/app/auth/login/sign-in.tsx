@@ -170,7 +170,7 @@ export default function SignIn() {
 								await signIn.social(
 									{
 										provider: "apple",
-										callbackURL: "/dashboard",
+										callbackURL: window.location.origin,
 									},
 									{
 										onRequest: (_ctx) => {
