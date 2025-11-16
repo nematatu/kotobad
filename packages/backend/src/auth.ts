@@ -86,6 +86,13 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		emailAndPassword: {
 			enabled: true,
 		},
+		advanced: {
+			crossSubDomainCookies: {
+				enabled: true,
+				domain: ".kotobad.com",
+			},
+			useSecureCookies: true,
+		},
 		socialProviders: {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID,
