@@ -30,7 +30,7 @@ export const PostList = ({ posts }: PostListProps) => {
 									{post.localId ?? post.id}
 								</span>
 								<div className="flex items-center gap-y-1 text-xs sm:text-sm whitespace-nowrap space-x-1">
-									<span className="text-gray-500">{post.author?.username}</span>
+									<span className="text-gray-500">{post.author?.name}</span>
 									<span className="text-gray-500">
 										{formatDate(post.createdAt)}
 									</span>
