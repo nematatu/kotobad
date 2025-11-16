@@ -22,6 +22,7 @@ export default function SignIn() {
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [rememberMe, setRememberMe] = useState(false);
+
 	const fieldId = useId();
 	const emailInputId = `email-${fieldId}`;
 	const passwordInputId = `password-${fieldId}`;
@@ -121,7 +122,7 @@ export default function SignIn() {
 								await signIn.social(
 									{
 										provider: "google",
-										callbackURL: "/dashboard",
+										callbackURL: window.location.origin,
 									},
 									{
 										onRequest: (_ctx) => {

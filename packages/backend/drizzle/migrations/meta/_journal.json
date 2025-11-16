@@ -22,6 +22,13 @@
       "when": 1762609289549,
       "tag": "0002_pretty_jazinda",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1763273402957,
+      "tag": "0003_first_lionheart",
+      "breakpoints": true
     }
   ]
 }

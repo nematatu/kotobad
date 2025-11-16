@@ -7,7 +7,7 @@ export const ThreadSchema = z.object({
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
 	postCount: z.number().int().nonnegative(),
-	authorId: z.number().int().positive(),
+	authorId: z.string(),
 	isPinned: z.boolean().optional(),
 	isClosed: z.boolean().optional(),
 	author: z.object({

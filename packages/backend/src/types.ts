@@ -14,6 +14,8 @@ export type Bindings = {
 	ALLOWED_ORIGINS?: string;
 	ALLOW_CF_PAGES_PREVIEW?: string;
 	CF_PAGES_PREVIEW_SUFFIX?: string;
+	GOOGLE_CLIENT_ID: string;
+	GOOGLE_CLIENT_SECRET: string;
 };
 
 export type UserTokenPayload = {
@@ -21,9 +23,15 @@ export type UserTokenPayload = {
 	username: string;
 };
 
+export type BetterAuthUserTokenPayload = {
+	id: string;
+	username: string;
+};
+
 export type Variables = {
 	db: DrizzleD1Database<typeof schema>;
 	user: UserTokenPayload;
+	betterAuthUser: BetterAuthUserTokenPayload;
 };
 
 type ValidatedData = z.infer<typeof OpenAPIPostSchema>;

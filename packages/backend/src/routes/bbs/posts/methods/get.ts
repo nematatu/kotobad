@@ -178,7 +178,7 @@ export const getPostByThreadIdRouter: RouteHandler<
 			with: {
 				author: {
 					columns: {
-						username: true,
+						name: true,
 					},
 				},
 			},
@@ -211,7 +211,7 @@ export const getAllPostRouter: RouteHandler<
 			with: {
 				author: {
 					columns: {
-						username: true,
+						name: true,
 					},
 				},
 			},
@@ -243,7 +243,7 @@ export const getPostByIdRouter: RouteHandler<
 			with: {
 				author: {
 					columns: {
-						username: true,
+						name: true,
 					},
 				},
 			},
@@ -279,7 +279,7 @@ export const searchPostRouter: RouteHandler<
 			with: {
 				author: {
 					columns: {
-						username: true,
+						name: true,
 					},
 				},
 			},

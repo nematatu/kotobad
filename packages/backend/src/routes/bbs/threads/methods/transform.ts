@@ -7,11 +7,11 @@ export type ThreadQueryResult = {
 	createdAt: Date;
 	updatedAt: Date | null;
 	postCount: number;
-	authorId: number;
+	authorId: string;
 	isPinned: boolean;
 	isClosed: boolean;
 	author?: {
-		username?: string | null;
+		name?: string | null;
 	};
 	threadLabels?: Array<{
 		threadId: number;
@@ -58,7 +58,7 @@ export const toThreadResponse = <T extends ThreadQueryResult>(
 		isPinned: thread.isPinned,
 		isClosed: thread.isClosed,
 		author: {
-			username: thread.author?.username ?? undefined,
+			username: thread.author?.name ?? undefined,
 		},
 		threadLabels,
 	};
