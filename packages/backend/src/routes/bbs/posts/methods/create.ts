@@ -65,7 +65,7 @@ export const createPostRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const user = c.get("user");
+		const user = c.get("betterAuthUser");
 
 		let validatedData: z.infer<typeof OpenAPICreatePostSchema>;
 		try {
@@ -150,8 +150,22 @@ export const createPostRouter: RouteHandler<
 			where: eq(posts.id, insertedId),
 			with: { author: true },
 		});
+		if (!newPostWithAuthor) {
+			return c.json(
+				{ error: "Failed to create post", message: "Post not found" },
+				500,
+			);
+		}
 
-		return c.json(newPostWithAuthor, 201);
+		return c.json(
+			{
+				...newPostWithAuthor,
+				author: {
+					name: newPostWithAuthor.author?.name ?? "",
+				},
+			},
+			201,
+		);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(

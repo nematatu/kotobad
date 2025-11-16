@@ -154,7 +154,7 @@ export const getAllThreadRouter: RouteHandler<
 				db.query.threads.findMany({
 					with: {
 						author: {
-							columns: { username: true },
+							columns: { name: true },
 						},
 						threadLabels: {
 							with: {
@@ -173,7 +173,7 @@ export const getAllThreadRouter: RouteHandler<
 			[threadsResult, totalCountResult] = await Promise.all([
 				db.query.threads.findMany({
 					with: {
-						author: { columns: { username: true } },
+						author: { columns: { name: true } },
 						threadLabels: {
 							with: {
 								labels: true,
@@ -216,7 +216,7 @@ export const getThreadByIdRouter: RouteHandler<
 			with: {
 				author: {
 					columns: {
-						username: true,
+						name: true,
 					},
 				},
 				threadLabels: {
@@ -261,7 +261,7 @@ export const searchThreadRouter: RouteHandler<
 				with: {
 					author: {
 						columns: {
-							username: true,
+							name: true,
 						},
 					},
 					threadLabels: {

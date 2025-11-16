@@ -66,7 +66,7 @@ export const deletePostRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const id = Number(c.req.param("id"));
-		const user = c.get("user");
+		const user = c.get("betterAuthUser");
 
 		const postResult = await db.select().from(posts).where(eq(posts.id, id));
 		const post = postResult[0];

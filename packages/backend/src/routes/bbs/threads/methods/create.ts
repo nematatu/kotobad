@@ -60,7 +60,7 @@ export const createThreadRouter: RouteHandler<
 	AppEnvironment
 > = async (c) => {
 	const db = c.get("db");
-	const user = c.get("user");
+	const user = c.get("betterAuthUser");
 
 	let validatedData: z.infer<typeof OpenAPICreateThreadSchema>;
 	try {
@@ -91,7 +91,7 @@ export const createThreadRouter: RouteHandler<
 			where: eq(threads.id, newThreadId),
 			with: {
 				author: {
-					columns: { username: true },
+					columns: { name: true },
 				},
 				threadLabels: {
 					with: {

@@ -7,13 +7,13 @@ import {
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import { user } from "./better-auth.schema";
 
 const timestamp = customType<{ data: Date; driverData: number }>({
 	dataType() {
 		return "integer";
 	},
-	fromDriver(value: number): Date {
-		return new Date(value * 1000);
+	fromDriver(value: number): Date { return new Date(value * 1000);
 	},
 	toDriver(value: Date): number {
 		return Math.floor(value.getTime() / 1000);
@@ -51,9 +51,9 @@ export const threads = sqliteTable("threads", {
 		() => sql`(strftime('%s', 'now'))`,
 	),
 	postCount: integer("postCount").notNull(),
-	authorId: integer("author_id")
+	authorId: text("author_id")
 		.notNull()
-		.references(() => users.id),
+		.references(() => user.id),
 	isPinned: boolean("isPinned").default(false).notNull(),
 	isClosed: boolean("isClosed").default(false).notNull(),
 });
@@ -67,9 +67,9 @@ export const posts = sqliteTable(
 		threadId: integer("thread_id")
 			.notNull()
 			.references(() => threads.id),
-		authorId: integer("author_id")
+		authorId: text("author_id")
 			.notNull()
-			.references(() => users.id),
+			.references(() => user.id),
 		createdAt: timestamp("created_at")
 			.default(sql`(strftime('%s', 'now'))`)
 			.notNull(),
@@ -191,9 +191,9 @@ export const careerRelations = relations(careers, ({ one }) => ({
 }));
 
 export const postsRelations = relations(posts, ({ one }) => ({
-	author: one(users, {
+	author: one(user, {
 		fields: [posts.authorId],
-		references: [users.id],
+		references: [user.id],
 	}),
 	threads: one(threads, {
 		fields: [posts.threadId],
@@ -202,15 +202,15 @@ export const postsRelations = relations(posts, ({ one }) => ({
 }));
 
 export const threadsRelations = relations(threads, ({ one, many }) => ({
-	author: one(users, {
+	author: one(user, {
 		fields: [threads.authorId],
-		references: [users.id],
+		references: [user.id],
 	}),
 	posts: many(posts),
 	threadLabels: many(threadLabels),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(user, ({ many }) => ({
 	posts: many(posts),
 	threads: many(threads),
 }));
@@ -251,3 +251,5 @@ export const threadLabelRelations = relations(threadLabels, ({ one }) => ({
 		references: [worldTournaments.id],
 	}),
 }));
+
+export * from "./better-auth.schema"; 

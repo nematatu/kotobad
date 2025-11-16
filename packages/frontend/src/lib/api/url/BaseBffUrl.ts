@@ -4,7 +4,7 @@ import { getServerOrigin } from "./serverOrigin";
 
 const env = process.env.NODE_ENV;
 
-const apiUrlMap: Record<
+export const apiUrlMap: Record<
 	"production" | "development" | "test",
 	string | undefined
 > = {

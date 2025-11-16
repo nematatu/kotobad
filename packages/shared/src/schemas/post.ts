@@ -4,12 +4,12 @@ export const PostSchema = z.object({
 	id: z.number().int().positive(),
 	localId: z.number().int().positive(),
 	post: z.string().min(1),
-	authorId: z.number().int().positive(),
+	authorId: z.string(),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
 	author: z
 		.object({
-			username: z.string(),
+			name: z.string(),
 		})
 		.optional(),
 });

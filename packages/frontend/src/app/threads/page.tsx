@@ -18,9 +18,15 @@ export default async function Page({ searchParams }: Props) {
 	targetUrl.searchParams.set("page", String(currentPage));
 
 	const fetchthreadRes = await fetch(targetUrl);
-	const threadRes = await fetchthreadRes.json();
 
-	const threadsResponse: ThreadListType = ThreadListSchema.parse(threadRes);
+	const raw: ThreadListType = await fetchthreadRes.json();
+
+	const safeResponse = {
+		threads: Array.isArray(raw?.threads) ? raw.threads : [],
+		totalCount: typeof raw?.totalCount === "number" ? raw.totalCount : 0,
+	};
+
+	const threadsResponse: ThreadListType = ThreadListSchema.parse(safeResponse);
 	const threads: ThreadType[] = threadsResponse.threads;
 
 	const totalCount: number = threadsResponse.totalCount;

@@ -3,35 +3,51 @@ import "./globals.css";
 import { cookies } from "next/headers";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
-import { verifyJwtServer } from "@/lib/token/jwt.server";
+import {
+	BetterAuthSessionResponseSchema,
+	type BetterAuthUser,
+} from "@/lib/auth/betterAuthSession";
+import { getApiUrl } from "@/lib/config/apiUrls";
 
 export const metadata: Metadata = {
 	title: "kototbad",
 	description: "badmitnon BBS",
 };
 
+async function resolveInitialUser(): Promise<BetterAuthUser | null> {
+	const cookieStore = await cookies();
+	const cookieHeader = cookieStore.toString();
+	if (!cookieHeader) {
+		return null;
+	}
+
+	try {
+		const url = await getApiUrl("ME");
+		const response = await fetch(url, {
+			method: "GET",
+			headers: { cookie: cookieHeader },
+			credentials: "include",
+			cache: "no-store",
+		});
+
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+		const session = BetterAuthSessionResponseSchema.parse(data);
+		return session.user;
+	} catch (_error) {
+		return null;
+	}
+}
+
 export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const cookieStore = await cookies();
-	const token = cookieStore.get("accessToken")?.value ?? null;
-
-	let initialUser = null;
-	const accessSecret = process.env.ACCESS_SECRET;
-
-	if (token && accessSecret) {
-		try {
-			const payload = await verifyJwtServer(token, accessSecret);
-			initialUser = { id: payload.id, username: payload.username };
-		} catch (_e) {
-			initialUser = null;
-		}
-	} else if (token) {
-		console.warn("JWT_SECRET is not set; skipping token verification.");
-		initialUser = null;
-	}
+	const initialUser = await resolveInitialUser();
 
 	return (
 		<html lang="ja">

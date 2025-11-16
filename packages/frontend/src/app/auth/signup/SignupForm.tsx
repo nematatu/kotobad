@@ -1,10 +1,11 @@
 "use client";
-import { UserJWTSchema } from "@kotobad/shared/src/schemas/auth";
-import type { LoginSignupUserType } from "@kotobad/shared/src/types/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { LuEye } from "react-icons/lu";
+import { z } from "zod";
+import { useUser } from "@/components/feature/provider/UserProvider";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -14,7 +15,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import {
 	Form,
@@ -26,11 +26,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/hooks/useModal";
+import { parseApiErrorMessage } from "@/lib/api/parseErrorMessage";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { BetterAuthSessionResponseSchema } from "@/lib/auth/betterAuthSession";
 
-type SignupSchema = LoginSignupUserType & {
-	confirmPassword: string;
-};
+const SignupFormSchema = z
+	.object({
+		name: z.string().min(1, "名前は必須です"),
+		email: z.string().email("メールアドレスの形式が正しくありません"),
+		password: z.string().min(8, "8文字以上のパスワードを設定してください"),
+		confirmPassword: z.string().min(8, "確認用パスワードを入力してください"),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "パスワードが一致しません",
+		path: ["confirmPassword"],
+	});
+
+type SignupFormValues = z.infer<typeof SignupFormSchema>;
 
 export const SignupForm = () => {
 	const [error, setError] = useState<string | null>(null);
@@ -38,18 +50,21 @@ export const SignupForm = () => {
 	const [showConfirmPassword, setShowConfirmPassword] =
 		useState<boolean>(false);
 	const { isOpen, setIsOpen, setOpen } = useModal();
-	const [registeredUsername, setRegisterdUsername] = useState<string>("");
+	const [registeredName, setRegisteredName] = useState<string>("");
+	const { setUser } = useUser();
 
-	const form = useForm<SignupSchema>({
+	const form = useForm<SignupFormValues>({
 		defaultValues: {
-			username: "",
+			name: "",
+			email: "",
 			password: "",
 			confirmPassword: "",
 		},
 		mode: "onBlur",
+		resolver: zodResolver(SignupFormSchema),
 	});
 
-	const handleSubmit = async (values: SignupSchema) => {
+	const handleSubmit = async (values: SignupFormValues) => {
 		setError(null);
 		const baseUrl = await getBffApiUrl("SIGN_UP");
 
@@ -57,18 +72,31 @@ export const SignupForm = () => {
 			const res = await fetch(baseUrl, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(values),
+				body: JSON.stringify({
+					name: values.name,
+					email: values.email,
+					password: values.password,
+				}),
+				credentials: "include",
 			});
 
-			const body = await res.json();
-			const parsedRes = UserJWTSchema.parse(body);
-
-			if (res && typeof res === "object" && "error" in res) {
-				setError(typeof res.error === "string" ? res.error : "予期せぬエラー");
+			if (!res.ok) {
+				const errorBody = await res.json().catch(() => null);
+				const message = parseApiErrorMessage(errorBody) ?? "登録に失敗しました";
+				setError(message);
 				return;
 			}
 
-			setRegisterdUsername(parsedRes.username);
+			const body = await res.json();
+			const session = BetterAuthSessionResponseSchema.nullable().parse(body);
+
+			if (!session) {
+				setError("登録に失敗しました");
+				return;
+			}
+
+			setUser(session.user);
+			setRegisteredName(session.user.name ?? session.user.email);
 			setOpen();
 		} catch (error: unknown) {
 			const message =
@@ -86,22 +114,35 @@ export const SignupForm = () => {
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 					<FormField
 						control={form.control}
-						name="username"
+						name="name"
 						render={({ field }) => (
 							<FormItem className="flex flex-col gap-2">
-								<FormLabel>ユーザーネーム</FormLabel>
+								<FormLabel>表示名</FormLabel>
 								<FormControl>
-									<div className="relative">
-										<Input
-											{...field}
-											{...form.register("username", {
-												required: "ユーザー名は必須です",
-											})}
-											type="text"
-											placeholder="ユーザーネーム"
-											className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
-										/>
-									</div>
+									<Input
+										{...field}
+										type="text"
+										placeholder="Kotobad 太郎"
+										className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem className="flex flex-col gap-2">
+								<FormLabel>メールアドレス</FormLabel>
+								<FormControl>
+									<Input
+										{...field}
+										type="email"
+										placeholder="example@example.com"
+										className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -117,10 +158,7 @@ export const SignupForm = () => {
 									<div className="relative">
 										<Input
 											{...field}
-											{...form.register("password", {
-												required: "パスワードは必須です",
-											})}
-											type={showPassword === false ? "password" : "text"}
+											type={showPassword ? "text" : "password"}
 											placeholder="パスワード"
 											className="outline-2 focus:border-blue-600 placeholder-gray-500/50"
 										/>
@@ -138,13 +176,9 @@ export const SignupForm = () => {
 					<FormField
 						control={form.control}
 						name="confirmPassword"
-						rules={{
-							required: "確認用パスワードは必須です",
-							validate: (value, context) =>
-								value === context.password || "パスワードが一致しません",
-						}}
 						render={({ field }) => (
 							<FormItem className="flex flex-col gap-2">
+								<FormLabel>確認用パスワード</FormLabel>
 								<FormControl>
 									<div className="relative">
 										<Input
@@ -167,7 +201,7 @@ export const SignupForm = () => {
 					{error && <p className="text-red-500">{error}</p>}
 					<Button
 						className="my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
-						variant={"secondary"}
+						variant="secondary"
 						type="submit"
 					>
 						登録
@@ -175,27 +209,16 @@ export const SignupForm = () => {
 				</form>
 			</Form>
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
-				<DialogTrigger asChild>
-					{/* <Button */}
-					{/*     className="cursor-pointer bg-red-500 hover:bg-red-600" */}
-					{/*     variant={"secondary"} */}
-					{/*     onClick={() => { */}
-					{/*         setOpen; */}
-					{/*     }} */}
-					{/* > */}
-					{/*     モーダルテスト */}
-					{/* </Button> */}
-				</DialogTrigger>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle className="text-xl text-center">
-							こんにちは、{registeredUsername}さん！
+							こんにちは、{registeredName}さん！
 						</DialogTitle>
 						<div>
 							<DialogDescription>会員登録が完了しました！</DialogDescription>
-							<Link href="login">
+							<Link href="/">
 								<p className="text-blue-800 underline underline-offset-7">
-									ログインページへ
+									トップページへ
 								</p>
 							</Link>
 						</div>

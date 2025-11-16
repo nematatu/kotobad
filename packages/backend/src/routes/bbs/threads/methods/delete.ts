@@ -66,7 +66,7 @@ export const deleteThreadRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const id = Number(c.req.param("id"));
-		const user = c.get("user");
+		const user = c.get("betterAuthUser");
 
 		const threadsResult = await db
 			.select()

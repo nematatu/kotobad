@@ -76,7 +76,7 @@ export const editThreadRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const id = Number(c.req.param("id"));
-		const user = c.get("user");
+		const user = c.get("betterAuthUser");
 
 		const { title } = c.req.valid("json");
 
@@ -106,7 +106,7 @@ export const editThreadRouter: RouteHandler<
 			where: eq(threads.id, newEdietedThreadId),
 			with: {
 				author: {
-					columns: { username: true },
+					columns: { name: true },
 				},
 				threadLabels: {
 					with: {
