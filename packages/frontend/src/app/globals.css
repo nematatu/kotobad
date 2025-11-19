@@ -136,7 +136,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
-    font-family:  "ヒラギノ角ゴ ProN","Hiragino Kaku Gothic ProN","メイリオ","Meiryo",sans-serif;
+	    @apply bg-background text-foreground font-sans;
   }
+
 }

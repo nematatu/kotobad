@@ -59,7 +59,10 @@ export default function SignIn() {
 				</svg>
 				<div className="relative flex w-full justify-center">
 					<p
-						className={cn("w-full text-center", loading && "text-transparent")}
+						className={cn(
+							"w-full text-center text-xs text-zinc-600 font-bold",
+							loading && "text-transparent",
+						)}
 					>
 						Google でログイン
 					</p>

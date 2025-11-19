@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Noto_Sans_JP } from "next/font/google";
 import { cookies } from "next/headers";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
@@ -8,6 +9,14 @@ import {
 	type BetterAuthUser,
 } from "@/lib/auth/betterAuthSession";
 import { getApiUrl } from "@/lib/config/apiUrls";
+import { cn } from "@/lib/utils";
+
+const notoSans = Noto_Sans_JP({
+	subsets: ["latin"],
+	weight: ["400", "500", "700"],
+	display: "swap",
+	variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
 	title: "kototbad",
@@ -51,7 +60,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja">
-			<body>
+			<body className={cn(notoSans.variable, "font-sans")}>
 				<UserProvider initialUser={initialUser}>
 					<Header />
 					<main className="mt-6">{children}</main>
