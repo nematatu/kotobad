@@ -41,9 +41,11 @@ export async function GET(_req: Request, { params }: Params) {
 }
 
 async function getThreadById(id: string) {
-	type resType = InferResponseType<(typeof client.bbs.threads)[":id"]["$get"]>;
+	type resType = InferResponseType<
+		(typeof client.bbs.threads.full)[":id"]["$get"]
+	>;
 
-	const baseUrl = await getApiUrl("GET_THREAD_BY_ID");
+	const baseUrl = await getApiUrl("GET_THREAD_WITH_POSTS");
 	const targetUrl = new URL(id, baseUrl);
 	return BffFetcher<resType>(targetUrl, {
 		method: "GET",

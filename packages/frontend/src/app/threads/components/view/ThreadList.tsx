@@ -3,7 +3,6 @@
 import type { LabelType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import ChatIcon from "@/assets/threads/chat.svg";
 import { formatDate } from "@/utils/date/formatDate";
 import { getRelativeDate } from "@/utils/date/getRelativeDate";
@@ -13,11 +12,7 @@ type ThreadListType = {
 };
 
 export const ThreadList = ({ threads }: ThreadListType) => {
-	const [threadList, setThreadList] = useState<ThreadType[]>(threads);
-
-	useEffect(() => {
-		setThreadList(threads);
-	}, [threads]);
+	const threadList: ThreadType[] = threads;
 
 	return (
 		<div className="radius-sm flex flex-col sm:p-5">

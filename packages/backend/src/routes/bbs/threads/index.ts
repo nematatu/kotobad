@@ -9,6 +9,8 @@ import {
 	getAllThreadRouter,
 	getThreadByIdRoute,
 	getThreadByIdRouter,
+	getThreadWithPostsRoute,
+	getThreadWithPostsRouter,
 	searchThreadRoute,
 	searchThreadRouter,
 } from "./methods/get";
@@ -16,6 +18,7 @@ import {
 const threadRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(getAllThreadRoute, getAllThreadRouter)
 	.openapi(getThreadByIdRoute, getThreadByIdRouter)
+	.openapi(getThreadWithPostsRoute, getThreadWithPostsRouter)
 	.openapi(searchThreadRoute, searchThreadRouter)
 	.openapi(createThreadRoute, createThreadRouter)
 	.openapi(deleteThreadRoute, deleteThreadRouter)

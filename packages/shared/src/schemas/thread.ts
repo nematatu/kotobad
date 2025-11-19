@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ThreadThreadLabelSchema } from "./label";
+import { PostListSchema } from "./post";
 
 export const ThreadSchema = z.object({
 	id: z.number().int().positive(),
@@ -24,4 +25,9 @@ export const EditThreadSchema = ThreadSchema.partial();
 export const ThreadListSchema = z.object({
 	threads: z.array(ThreadSchema),
 	totalCount: z.number(),
+});
+
+export const ThreadWithPostsSchema = z.object({
+	thread: ThreadSchema,
+	posts: PostListSchema,
 });

@@ -4,6 +4,7 @@ import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { count } from "drizzle-orm";
 import { threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
+import { OpenAPIPostListSchema } from "../../../../models/posts";
 import {
 	OpenAPIThreadListSchema,
 	OpenAPIThreadSchema,
@@ -65,6 +66,54 @@ export const getThreadByIdRoute = createRoute({
 			content: {
 				"application/json": {
 					schema: OpenAPIThreadSchema,
+				},
+			},
+		},
+		404: {
+			description: "スレッドが見つかりません",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		500: {
+			description: "サーバーエラー",
+			content: {
+				"application/json": {
+					schema: ErrorResponse,
+				},
+			},
+		},
+	},
+});
+
+const ThreadWithPostsResponseSchema = z.object({
+	thread: OpenAPIThreadSchema,
+	posts: OpenAPIPostListSchema,
+});
+
+export const getThreadWithPostsRoute = createRoute({
+	method: "get",
+	path: "/full/{id}",
+	description: "スレッド本体と投稿一覧を同時に取得",
+	request: {
+		params: z.object({
+			id: z.string().openapi({
+				param: {
+					name: "id",
+					in: "path",
+				},
+				example: "123",
+			}),
+		}),
+	},
+	responses: {
+		200: {
+			description: "スレッドと投稿一覧",
+			content: {
+				"application/json": {
+					schema: ThreadWithPostsResponseSchema,
 				},
 			},
 		},
@@ -241,6 +290,63 @@ export const getThreadByIdRouter: RouteHandler<
 	}
 };
 
+export const getThreadWithPostsRouter: RouteHandler<
+	typeof getThreadWithPostsRoute,
+	AppEnvironment
+> = async (c) => {
+	try {
+		const db = c.get("db");
+		const id = Number(c.req.param("id"));
+
+		const [thread, postsResult] = await Promise.all([
+			db.query.threads.findFirst({
+				where: (threads, { eq }) => eq(threads.id, id),
+				with: {
+					author: {
+						columns: {
+							name: true,
+						},
+					},
+					threadLabels: {
+						with: {
+							labels: true,
+						},
+					},
+				},
+			}),
+			db.query.posts.findMany({
+				where: (posts, { eq }) => eq(posts.threadId, id),
+				with: {
+					author: {
+						columns: {
+							name: true,
+						},
+					},
+				},
+				orderBy: (posts, { asc }) => [asc(posts.localId)],
+			}),
+		]);
+
+		if (!thread) {
+			return c.json({ error: "Thread not found" }, 404);
+		}
+
+		return c.json(
+			{
+				thread: toThreadResponse(thread),
+				posts: postsResult,
+			},
+			200,
+		);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to fetch thread", message: getErrorMessage(error) },
+			500,
+		);
+	}
+};
+
 export const searchThreadRouter: RouteHandler<
 	typeof searchThreadRoute,
 	AppEnvironment
@@ -301,3 +407,4 @@ export const searchThreadRouter: RouteHandler<
 export type GetAllThreadRouteType = typeof getAllThreadRoute;
 export type GetThreadByIdRouteType = typeof getThreadByIdRoute;
 export type SearchThreadRouteType = typeof searchThreadRouter;
+export type GetThreadWithPostsRouteType = typeof getThreadWithPostsRoute;

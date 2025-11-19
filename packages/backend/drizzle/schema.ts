@@ -159,9 +159,11 @@ export const threadLabels = sqliteTable("thread_label", {
 	),
 });
 
+export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);
 export const playerIdx = index("player_idx").on(players.id);
+export const threadLabelIdx = index("thread_label_idx").on(threadLabels.threadId);
 
 export const playersRelations = relations(players, ({ many }) => ({
 	achievements: many(achievements),
