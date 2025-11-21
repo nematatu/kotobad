@@ -11,7 +11,7 @@ export default function SignIn() {
 	const [loading, setLoading] = useState(false);
 
 	return (
-		<div className="grid gap-4">
+		<div className="grid">
 			<Button
 				variant="google"
 				className={cn("w-full")}
@@ -33,7 +33,7 @@ export default function SignIn() {
 					);
 				}}
 			>
-				<GoogleIcon className="w-6 h-6" />
+				<GoogleIcon className="w-10 h-10" />
 				<div className="relative flex w-full justify-center">
 					<p
 						className={cn(

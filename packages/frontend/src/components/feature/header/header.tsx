@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import SignIn from "@/app/auth/login/sign-in";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Button } from "@/components/ui/button";
@@ -50,16 +51,16 @@ const Header = () => {
 
 	return (
 		<div
-			className={`sticky top-0 z-50 w-full border-b bg-brand-50 transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
+			className={`sticky top-0 z-50 w-full bg-brand-50 transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
 		>
-			<div className="flex h-16 items-center px-4">
+			<div className="flex h-16 items-center justify-between max-w-7xl mx-auto px-5">
 				<Link href="/">
 					<div className="flex items-center space-x-4">
-						<LogoIcon className="w-10 ext-gray-800 dark:text-gray-200" />
+						<LogoIcon className="w-10 text-gray-800 dark:text-gray-200" />
 						<LogoMojiIcon className="w-24 text-gray-800 dark:text-gray-200" />
 					</div>
 				</Link>
-				<div className="flex flex-1 items-center justify-end space-x-2">
+				<div className="space-x-2">
 					{user && (
 						<span className="text-sm text-muted-foreground">
 							{user.name ?? user.email}
@@ -74,24 +75,7 @@ const Header = () => {
 							ログアウト
 						</Button>
 					) : (
-						<div className="space-x-2">
-							<Button className="cursor-pointer" variant="outline" asChild>
-								<Link
-									href="/auth/login"
-									className="text-sm font-medium  transition-colors hover:text-primary"
-								>
-									ログイン
-								</Link>
-							</Button>
-							<Button className="cursor-pointer" variant="outline" asChild>
-								<Link
-									href="/auth/signup"
-									className="text-sm font-medium  transition-colors hover:text-primary"
-								>
-									新規会員登録
-								</Link>
-							</Button>
-						</div>
+						<SignIn />
 					)}
 				</div>
 			</div>
