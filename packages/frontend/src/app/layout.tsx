@@ -51,7 +51,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja">
-			<body>
+			<body className="bg-surface-50">
 				<UserProvider initialUser={initialUser}>
 					<Header />
 					<main className="mt-6">{children}</main>

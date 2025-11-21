@@ -14,34 +14,6 @@ const config: Config = {
             fontFamily: {
               sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
             },
-	            colors: {
-	              brand: {
-                50: '#fff4f0', // User Palette Light
-                100: '#ffe1de',
-                200: '#ffc3bd',
-                300: '#bb8379', // User Palette Secondary
-                400: '#ff7b7b',
-                500: '#ff3131', // User Palette Primary
-                600: '#e62020',
-                700: '#b91c1c',
-                800: '#991b1b',
-                900: '#7f1d1d',
-              },
-	              surface: {
-	                50: '#fdfbfb', // Warmer off-white
-	                100: '#f1f5f9',
-	                200: '#e2e8f0',
-	                300: '#cbd5e1',
-	              },
-	              text: {
-	                label: '#b3bac8', // ボタンやラベル向けの淡いグレー
-	                body: '#334155', // text-slate-700 ベースの本文色
-	                emphasis: '#1f2933', // 強調テキスト
-	                display: '#0f172a', // 特大見出し
-	                muted: '#94a3b8', // キャプションやサブコピー
-	                DEFAULT: '#334155',
-	              }
-	            },
             boxShadow: {
               'soft': '0 4px 20px -2px rgba(255, 49, 49, 0.08)',
               'glow': '0 0 20px rgba(255, 49, 49, 0.2)',
