@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import defaultTheme from "tailwindcss/defaultTheme";
 
 const config: Config = {
 	content: [
@@ -11,12 +10,102 @@ const config: Config = {
 		"./src/**/*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
-		extend: {
-			fontFamily: {
-				sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
-			},
-		},
-	},
+          extend: {
+            fontFamily: {
+              sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+            },
+	            colors: {
+	              brand: {
+                50: '#fff4f0', // User Palette Light
+                100: '#ffe1de',
+                200: '#ffc3bd',
+                300: '#bb8379', // User Palette Secondary
+                400: '#ff7b7b',
+                500: '#ff3131', // User Palette Primary
+                600: '#e62020',
+                700: '#b91c1c',
+                800: '#991b1b',
+                900: '#7f1d1d',
+              },
+	              surface: {
+	                50: '#fdfbfb', // Warmer off-white
+	                100: '#f1f5f9',
+	                200: '#e2e8f0',
+	                300: '#cbd5e1',
+	              },
+	              text: {
+	                label: '#b3bac8', // ボタンやラベル向けの淡いグレー
+	                body: '#334155', // text-slate-700 ベースの本文色
+	                emphasis: '#1f2933', // 強調テキスト
+	                display: '#0f172a', // 特大見出し
+	                muted: '#94a3b8', // キャプションやサブコピー
+	                DEFAULT: '#334155',
+	              }
+	            },
+            boxShadow: {
+              'soft': '0 4px 20px -2px rgba(255, 49, 49, 0.08)',
+              'glow': '0 0 20px rgba(255, 49, 49, 0.2)',
+              'card': '0 2px 10px rgba(0,0,0,0.03)',
+              '3d': '20px 20px 60px rgba(0,0,0,0.1), -20px -20px 60px rgba(255,255,255,0.5)',
+              'float': '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.3s ease-out forwards',
+              'fade-in-fast': 'fadeIn 0.15s ease-out forwards',
+              'fade-in-up': 'fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'scale-up': 'scaleUp 0.2s ease-out both',
+              'scale-up-fast': 'scaleUp 0.15s ease-out both',
+              'slide-down': 'slideDown 0.2s ease-out both',
+              'slide-up': 'slideUp 0.2s ease-out both',
+              'float': 'float 6s ease-in-out infinite',
+              'float-delayed': 'float 6s ease-in-out 3s infinite',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'marquee': 'marquee 60s linear infinite',
+              'marquee-reverse': 'marqueeReverse 60s linear infinite',
+              'blob': 'blob 7s infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translate3d(0, 10px, 0)' },
+                '100%': { opacity: '1', transform: 'translate3d(0, 0, 0)' },
+              },
+              scaleUp: {
+                '0%': { transform: 'scale(0.95)', opacity: '0' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+              slideDown: {
+                '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(10px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-15px)' },
+              },
+              marquee: {
+                '0%': { transform: 'translate3d(0, 0, 0)' },
+                '100%': { transform: 'translate3d(-100%, 0, 0)' },
+              },
+              marqueeReverse: {
+                '0%': { transform: 'translate3d(-100%, 0, 0)' },
+                '100%': { transform: 'translate3d(0, 0, 0)' },
+              },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              }
+            }
+          }
+    }, 
 	plugins: [require("@tailwindcss/line-clamp")],
 };
 export default config;
