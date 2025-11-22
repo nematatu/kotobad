@@ -6,6 +6,7 @@ import type {
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import ThreadPageClient from "./components/view/ThreadPageClient";
 export const revalidate = 900;
+export const dynamic = "force-static";
 
 export type Props = {
 	searchParams?: Promise<{ page?: string }>;

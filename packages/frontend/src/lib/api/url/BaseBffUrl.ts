@@ -1,6 +1,5 @@
 import { ensureTrailingSlash } from "../../../utils/url/ensureTrailingSlash";
 import { getClientOrigin } from "./clientOrigin";
-import { getServerOrigin } from "./serverOrigin";
 
 const env = process.env.NODE_ENV;
 
@@ -16,11 +15,6 @@ export const apiUrlMap: Record<
 export const resolveBaseUrl = async (): Promise<string> => {
 	if (typeof window !== "undefined") {
 		return getClientOrigin();
-	}
-
-	const origin = await getServerOrigin();
-	if (origin) {
-		return origin;
 	}
 
 	const raw = apiUrlMap[env];
