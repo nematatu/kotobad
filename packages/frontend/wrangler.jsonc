@@ -7,22 +7,54 @@
 	"name": "kotobad-frontend",
 	"main": ".open-next/worker.js",
 	"compatibility_date": "2025-03-01",
-	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
 	},
-        "observability": {
-                "enabled": true
-        },
-        "env": {
-                "preview": {
-                        "name": "kotobad-frontend-preview"
-                },
-                "production": {
-                        "name": "kotobad-frontend"
-                }
-        }
+	"observability": {
+		"enabled": true
+	},
+	"env": {
+		"preview": {
+			"name": "kotobad-frontend-preview"
+		},
+		"production": {
+			"name": "kotobad-frontend"
+		}
+	},
+   "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "kotobad-next-cache"
+    }
+  ],
+ 
+  // DO Queue
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "kotobad-next-tag-cache",
+      "database_id": "85ac0eb4-3241-4303-9011-1a472e241caa"
+    }
+  ],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler"]
+    }
+  ],
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

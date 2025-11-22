@@ -3,30 +3,37 @@
 	"name": "kotobad-backend",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-08-22",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "b3s-db",
 			"database_id": "327f87b2-38c3-4232-a89d-6cb0c635e97e",
 			"migrations_dir": "drizzle/migrations"
+		},
+		{
+			"binding": "kotobad_next_tag_cache",
+			"database_name": "kotobad-next-tag-cache",
+			"database_id": "85ac0eb4-3241-4303-9011-1a472e241caa"
 		}
-	], 
-        "env": {
-                "preview": {
-                        "vars": {
-                                "APP_ENV": "preview"
-                        }
-                },
-                "production": {
-                        "vars": {
-                                "APP_ENV": "production"
-                        }
-                },
-                "dev-prod": {
-                        "vars": {
-                                "APP_ENV": "production"
-                        }
-                }
-        }
+	],
+	"env": {
+		"preview": {
+			"vars": {
+				"APP_ENV": "preview"
+			}
+		},
+		"production": {
+			"vars": {
+				"APP_ENV": "production"
+			}
+		},
+		"dev-prod": {
+			"vars": {
+				"APP_ENV": "production"
+			}
+		}
+	}
 }
