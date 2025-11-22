@@ -1,7 +1,8 @@
 import { ThreadWithPostsSchema } from "@kotobad/shared/src/schemas/thread";
 import { notFound } from "next/navigation";
-import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { getApiUrl } from "@/lib/config/apiUrls";
 import ThreadDetailClient from "./components/ThreadDetailClient";
+export const revalidate = 900;
 
 export type Props = {
 	params: Promise<{ id: string }>;
@@ -11,10 +12,16 @@ export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
 	const threadId = renderedparams.id;
 
-	const getThreadsBaseUrl = await getBffApiUrl("GET_THREAD_BY_ID");
+	const getThreadsBaseUrl = await getApiUrl("GET_THREAD_WITH_POSTS");
 	const getThreadTargetUrl = new URL(String(threadId), getThreadsBaseUrl);
 
-	const response = await fetch(getThreadTargetUrl);
+	const response = await fetch(getThreadTargetUrl, {
+		cache: "force-cache",
+		next: {
+			revalidate,
+			tags: ["threads", `thread:${threadId}`],
+		},
+	});
 
 	if (response.status === 404) {
 		return notFound();
