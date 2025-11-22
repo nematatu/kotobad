@@ -109,4 +109,5 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 			},
 		},
 	});
+	return cachedAuth;
 };
