@@ -48,6 +48,7 @@
       "service": "kotobad-frontend"
     }
   ],
+  "placement": { "mode": "smart" },
   "d1_databases": [
     {
       "binding": "NEXT_TAG_CACHE_D1",

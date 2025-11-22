@@ -8,7 +8,7 @@ import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import ThreadPageClient from "./components/view/ThreadPageClient";
-export const revalidate = 300;
+export const revalidate = 900;
 export const dynamic = "force-static";
 const cacheBust =
 	process.env.CF_PAGES_COMMIT_SHA ??
