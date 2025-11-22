@@ -61,13 +61,10 @@ type CreateAuthOptions = {
 	restRequest?: Request;
 };
 
+let cachedAuth: ReturnType<typeof betterAuth> | null = null;
+let cachedSecret: string | undefined;
+
 export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
-	const trustedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
-	const effectiveOrigins = maybeAddPreviewOrigin(
-		env,
-		restRequest,
-		trustedOrigins,
-	);
 	const baseURL = resolveBaseUrl(env, restRequest);
 	const secret = env.BETTER_AUTH_SECRET;
 
@@ -75,7 +72,19 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		throw new Error("BETTER_AUTH_SECRET is not configured.");
 	}
 
-	return betterAuth({
+	if (cachedAuth && cachedSecret === secret) {
+		return cachedAuth;
+	}
+	cachedSecret = secret;
+
+	const trustedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
+	const effectiveOrigins = maybeAddPreviewOrigin(
+		env,
+		restRequest,
+		trustedOrigins,
+	);
+
+	cachedAuth = betterAuth({
 		secret,
 		baseURL,
 		basePath: BETTER_AUTH_BASE_PATH,
@@ -86,13 +95,13 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		emailAndPassword: {
 			enabled: true,
 		},
-		advanced: {
-			crossSubDomainCookies: {
-				enabled: true,
-				domain: ".kotobad.com",
-			},
-			useSecureCookies: true,
-		},
+		// advanced: {
+		// 	crossSubDomainCookies: {
+		// 		enabled: true,
+		// 		domain: ".kotobad.com",
+		// 	},
+		// 	useSecureCookies: true,
+		// },
 		socialProviders: {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID,
