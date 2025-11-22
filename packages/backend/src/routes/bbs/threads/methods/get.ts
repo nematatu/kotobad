@@ -194,6 +194,12 @@ export const getAllThreadRouter: RouteHandler<
 		const page = pageParam ? Number(pageParam) : undefined;
 		const limit = PERPAGE;
 
+		// Edge キャッシュを効かせて初回以外の応答を高速化
+		c.header(
+			"Cache-Control",
+			"public, s-maxage=900, stale-while-revalidate=900",
+		);
+
 		let threadsResult: Awaited<ReturnType<typeof db.query.threads.findMany>>;
 		let totalCountResult: Array<{ value: number | null }>;
 
@@ -280,6 +286,10 @@ export const getThreadByIdRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
+		c.header(
+			"Cache-Control",
+			"public, s-maxage=900, stale-while-revalidate=900",
+		);
 		return c.json(toThreadResponse(thread), 200);
 	} catch (error: unknown) {
 		console.error(error);
@@ -331,6 +341,10 @@ export const getThreadWithPostsRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
+		c.header(
+			"Cache-Control",
+			"public, s-maxage=60, stale-while-revalidate=300",
+		);
 		return c.json(
 			{
 				thread: toThreadResponse(thread),

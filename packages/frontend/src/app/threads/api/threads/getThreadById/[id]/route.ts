@@ -4,6 +4,8 @@ import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
+export const revalidate = 900;
+
 type Params = {
 	params: Promise<{ id: string }>;
 };
@@ -14,7 +16,11 @@ export async function GET(_req: Request, { params }: Params) {
 
 	try {
 		const res = await getThreadById(id);
-		return NextResponse.json(res);
+		return NextResponse.json(res, {
+			headers: {
+				"Cache-Control": "public, s-maxage=900, stale-while-revalidate=900",
+			},
+		});
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;
 		if (fetchError.status === 404) {
@@ -49,5 +55,7 @@ async function getThreadById(id: string) {
 	const targetUrl = new URL(id, baseUrl);
 	return BffFetcher<resType>(targetUrl, {
 		method: "GET",
+		cache: "force-cache",
+		skipCookie: true,
 	});
 }
