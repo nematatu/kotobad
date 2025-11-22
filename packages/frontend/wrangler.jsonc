@@ -42,6 +42,12 @@
       }
     ]
   },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "kotobad-frontend"
+    }
+  ],
   "d1_databases": [
     {
       "binding": "NEXT_TAG_CACHE_D1",

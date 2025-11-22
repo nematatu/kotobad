@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import ThreadDetailClient from "./components/ThreadDetailClient";
-export const revalidate = 900;
+export const revalidate = 300;
 export const dynamic = "force-static";
+export const dynamicParams = true; // ビルド時に静的生成せず、初回アクセスでISR生成
 
 export type Props = {
 	params: Promise<{ id: string }>;

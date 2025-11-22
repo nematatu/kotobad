@@ -3,10 +3,19 @@ import type {
 	ThreadListType,
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
-import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { notFound } from "next/navigation";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
+import { getApiUrl } from "@/lib/config/apiUrls";
 import ThreadPageClient from "./components/view/ThreadPageClient";
-export const revalidate = 900;
+export const revalidate = 300;
 export const dynamic = "force-static";
+const cacheBust =
+	process.env.CF_PAGES_COMMIT_SHA ??
+	process.env.VERCEL_GIT_COMMIT_SHA ??
+	process.env.NEXT_PUBLIC_CACHE_BUST ??
+	process.env.NEXT_BUILD_ID ??
+	"";
 
 export type Props = {
 	searchParams?: Promise<{ page?: string }>;
@@ -16,21 +25,27 @@ export default async function Page({ searchParams }: Props) {
 	const params = searchParams ? await searchParams : {};
 	const currentPage = Number(params?.page ?? "1");
 
-	const targetUrl = await getBffApiUrl("GET_ALL_THREADS");
+	const targetUrl = await getApiUrl("GET_ALL_THREADS");
 	targetUrl.searchParams.set("page", String(currentPage));
-
-	const response = await fetch(targetUrl, {
-		cache: "force-cache",
-		next: { revalidate, tags: ["threads"] },
-	});
-
-	if (!response.ok) {
-		throw new Error(
-			`Failed to fetch threads: ${response.status} ${response.statusText}`,
-		);
+	if (cacheBust) {
+		targetUrl.searchParams.set("v", cacheBust);
 	}
-
-	const raw: ThreadListType = await response.json();
+	let raw: ThreadListType;
+	try {
+		raw = await BffFetcher<ThreadListType>(targetUrl, {
+			method: "GET",
+			cache: "force-cache",
+			next: { revalidate, tags: ["threads"] },
+			skipCookie: true,
+		});
+	} catch (error: unknown) {
+		const fetchError = error as BffFetcherError;
+		if (fetchError.status === 404) {
+			return notFound();
+		}
+		console.error("Failed to fetch threads", fetchError);
+		raw = { threads: [], totalCount: 0 };
+	}
 
 	const safeResponse = {
 		threads: Array.isArray(raw?.threads) ? raw.threads : [],
