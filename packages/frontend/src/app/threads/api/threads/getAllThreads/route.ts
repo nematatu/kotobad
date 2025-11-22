@@ -4,8 +4,7 @@ import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
-// API 応答自体も短期キャッシュして初回以外の負荷を下げる
-export const revalidate = 900;
+export const revalidate = 300;
 
 export async function GET(req: Request) {
 	const url = new URL(req.url);
@@ -15,7 +14,7 @@ export async function GET(req: Request) {
 		const res = await getAllThreads(Number(page));
 		return NextResponse.json(res, {
 			headers: {
-				"Cache-Control": "public, s-maxage=900, stale-while-revalidate=900",
+				"Cache-Control": `public, s-maxage=${revalidate}, stale-while-revalidate=${revalidate}`,
 			},
 		});
 	} catch (error: unknown) {
