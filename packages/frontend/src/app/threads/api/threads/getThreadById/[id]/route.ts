@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 
-export const revalidate = 300;
+export const revalidate = 900;
 
 type Params = {
 	params: Promise<{ id: string }>;
