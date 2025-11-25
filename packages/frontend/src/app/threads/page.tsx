@@ -17,6 +17,8 @@ const cacheBust =
 	process.env.NEXT_BUILD_ID ??
 	"";
 
+import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
+
 export type Props = {
 	searchParams?: Promise<{ page?: string }>;
 };
@@ -35,7 +37,7 @@ export default async function Page({ searchParams }: Props) {
 		raw = await BffFetcher<ThreadListType>(targetUrl, {
 			method: "GET",
 			cache: "force-cache",
-			next: { revalidate, tags: ["threads"] },
+			next: { revalidate: REVALIDATE_SECONDS, tags: ["threads"] },
 			skipCookie: true,
 		});
 	} catch (error: unknown) {
