@@ -29,9 +29,13 @@ export default async function Page({ searchParams }: Props) {
 
 	const targetUrl = await getApiUrl("GET_ALL_THREADS");
 	targetUrl.searchParams.set("page", String(currentPage));
+
+	// ビルド毎にISRの生成を行うコード
+	// URLが変更されることで再生成するらしい
 	if (cacheBust) {
 		targetUrl.searchParams.set("v", cacheBust);
 	}
+
 	let raw: ThreadListType;
 	try {
 		raw = await BffFetcher<ThreadListType>(targetUrl, {
