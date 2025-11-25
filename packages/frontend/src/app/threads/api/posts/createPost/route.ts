@@ -11,11 +11,11 @@ export async function POST(req: Request) {
 	const json = await req.json();
 	const value = CreatePostSchema.parse(json);
 	const raw = await createPost(value);
-	const thread = PostSchema.parse(raw);
+	const post = PostSchema.parse(raw);
 
 	revalidateTag("threads");
 	revalidateTag(`thread:${value.threadId}`);
-	return NextResponse.json(thread);
+	return NextResponse.json(post);
 }
 
 async function createPost(values: PostType.CreatePostType) {
