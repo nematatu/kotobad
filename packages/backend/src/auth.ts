@@ -61,8 +61,7 @@ type CreateAuthOptions = {
 	restRequest?: Request;
 };
 
-let cachedAuth: ReturnType<typeof betterAuth> | null = null;
-let cachedSecret: string | undefined;
+const authCache = new Map<string, ReturnType<typeof betterAuth>>();
 
 export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 	const baseURL = resolveBaseUrl(env, restRequest);
@@ -72,19 +71,24 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		throw new Error("BETTER_AUTH_SECRET is not configured.");
 	}
 
-	if (cachedAuth && cachedSecret === secret) {
-		return cachedAuth;
-	}
-	cachedSecret = secret;
-
 	const trustedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
 	const effectiveOrigins = maybeAddPreviewOrigin(
 		env,
 		restRequest,
 		trustedOrigins,
 	);
+	const cacheKey = [
+		secret,
+		baseURL ?? "",
+		effectiveOrigins.slice().sort().join(","),
+	].join("::");
 
-	cachedAuth = betterAuth({
+	const cached = authCache.get(cacheKey);
+	if (cached) {
+		return cached;
+	}
+
+	const authInstance = betterAuth({
 		secret,
 		baseURL,
 		basePath: BETTER_AUTH_BASE_PATH,
@@ -109,5 +113,6 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 			},
 		},
 	});
-	return cachedAuth;
+	authCache.set(cacheKey, authInstance);
+	return authInstance;
 };
