@@ -3,7 +3,7 @@
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CreateThread } from "../create/CreateThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
