@@ -2,8 +2,7 @@ import type { InferResponseType } from "hono";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
-
-const REVALIDATE_SECONDS = 900;
+import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
 
 export const getThreadWithPosts = async (id: string) => {
 	type ResType = InferResponseType<
