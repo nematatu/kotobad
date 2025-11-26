@@ -1,7 +1,11 @@
 import { ThreadWithPostsSchema } from "@kotobad/shared/src/schemas/thread";
 import { notFound } from "next/navigation";
-import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import ThreadDetailClient from "./components/ThreadDetailClient";
+export const revalidate = 900;
+export const dynamic = "force-static";
+export const dynamicParams = true; // ビルド時に静的生成せず、初回アクセスでISR生成
 
 export type Props = {
 	params: Promise<{ id: string }>;
@@ -11,23 +15,19 @@ export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
 	const threadId = renderedparams.id;
 
-	const getThreadsBaseUrl = await getBffApiUrl("GET_THREAD_BY_ID");
-	const getThreadTargetUrl = new URL(String(threadId), getThreadsBaseUrl);
-
-	const response = await fetch(getThreadTargetUrl);
-
-	if (response.status === 404) {
-		return notFound();
-	}
-	if (!response.ok) {
-		throw new Error(
-			`Failed to fetch thread detail: ${response.status} ${response.statusText}`,
-		);
+	let response;
+	try {
+		response = await getThreadWithPosts(threadId);
+	} catch (error: unknown) {
+		const fetchError = error as BffFetcherError;
+		if (fetchError.status === 404) {
+			return notFound();
+		}
+		throw error;
 	}
 
-	const combinedBody = await response.json();
 	const { thread: targetThread, posts: targetPosts } =
-		ThreadWithPostsSchema.parse(combinedBody);
+		ThreadWithPostsSchema.parse(response);
 
 	return (
 		<div className="p-1 sm:p-4">

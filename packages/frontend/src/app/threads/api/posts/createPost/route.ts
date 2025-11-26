@@ -1,6 +1,7 @@
 import { CreatePostSchema, PostSchema } from "@kotobad/shared/src/schemas/post";
 import type { PostType } from "@kotobad/shared/src/types";
 import type { InferResponseType } from "hono";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
@@ -10,8 +11,11 @@ export async function POST(req: Request) {
 	const json = await req.json();
 	const value = CreatePostSchema.parse(json);
 	const raw = await createPost(value);
-	const thread = PostSchema.parse(raw);
-	return NextResponse.json(thread);
+	const post = PostSchema.parse(raw);
+
+	revalidateTag("threads");
+	revalidateTag(`thread:${value.threadId}`);
+	return NextResponse.json(post);
 }
 
 async function createPost(values: PostType.CreatePostType) {

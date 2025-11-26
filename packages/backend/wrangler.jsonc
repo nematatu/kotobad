@@ -3,7 +3,9 @@
 	"name": "kotobad-backend",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-08-22",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -11,22 +13,22 @@
 			"database_id": "327f87b2-38c3-4232-a89d-6cb0c635e97e",
 			"migrations_dir": "drizzle/migrations"
 		}
-	], 
-        "env": {
-                "preview": {
-                        "vars": {
-                                "APP_ENV": "preview"
-                        }
-                },
-                "production": {
-                        "vars": {
-                                "APP_ENV": "production"
-                        }
-                },
-                "dev-prod": {
-                        "vars": {
-                                "APP_ENV": "production"
-                        }
-                }
-        }
+	],
+	"env": {
+		"preview": {
+			"vars": {
+				"APP_ENV": "preview"
+			}
+		},
+		"production": {
+			"vars": {
+				"APP_ENV": "production"
+			}
+		},
+		"dev-prod": {
+			"vars": {
+				"APP_ENV": "production"
+			}
+		}
+	}
 }

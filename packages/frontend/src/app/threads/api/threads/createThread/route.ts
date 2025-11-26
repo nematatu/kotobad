@@ -4,6 +4,7 @@ import {
 } from "@kotobad/shared/src/schemas/thread";
 import type { ThreadType } from "@kotobad/shared/src/types";
 import type { InferResponseType } from "hono";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
@@ -14,6 +15,9 @@ export async function POST(req: Request) {
 	const value = CreateThreadSchema.parse(json);
 	const raw = await createThread(value);
 	const thread = ThreadSchema.parse(raw);
+
+	revalidateTag("threads");
+	revalidateTag(`thread:${thread.id}`);
 	return NextResponse.json(thread);
 }
 

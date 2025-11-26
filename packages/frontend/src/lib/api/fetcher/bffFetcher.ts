@@ -11,20 +11,26 @@ export type BffFetcherError = Error & {
 	body?: string;
 };
 
+type BffFetcherOptions = fetchArgs[1] & { skipCookie?: boolean };
+
 export async function BffFetcherRaw(
 	url: fetchArgs[0],
-	options: fetchArgs[1] = {},
+	options: BffFetcherOptions = {},
 	skipErrorThrow = false,
 ): Promise<Response> {
-	const { headers, cache, ...init } = options;
-	const cookieStore = await cookies();
-	const cookieHeader = cookieStore.toString();
+	const { headers, cache, skipCookie, ...init } = options;
 	const frontendUrl = apiUrlMap[process.env.NODE_ENV];
 	const defaultOrigin = frontendUrl ?? "http://localhost:3000";
 
 	const mergeHeaders = toHeaders(headers);
-	if (!mergeHeaders.has("cookie") && cookieHeader) {
-		mergeHeaders.set("cookie", cookieHeader);
+
+	if (!skipCookie) {
+		// Cookie を付与する場合のみ cookies() を呼ぶ。静的化を阻害しないように分岐。
+		const cookieStore = await cookies();
+		const cookieHeader = cookieStore.toString();
+		if (!mergeHeaders.has("cookie") && cookieHeader) {
+			mergeHeaders.set("cookie", cookieHeader);
+		}
 	}
 
 	if (!mergeHeaders.has("origin")) {
@@ -52,7 +58,7 @@ export async function BffFetcherRaw(
 
 export async function BffFetcher<T>(
 	url: fetchArgs[0],
-	options: fetchArgs[1] = {},
+	options: BffFetcherOptions = {},
 ): Promise<T> {
 	const response = await BffFetcherRaw(url, options);
 	return response.json() as Promise<T>;

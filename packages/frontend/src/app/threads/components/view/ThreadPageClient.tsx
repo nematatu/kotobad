@@ -23,6 +23,29 @@ export default function ThreadPageClient({
 	const [threads, setThreads] = useState<ThreadType[]>([]);
 	const router = useRouter();
 
+	// // 初回表示後にアイドル時間で詳細データを先読みし、次の遷移を高速化
+	// useEffect(() => {
+	// 	const prefetchIds = initialThreads.slice(0, 3).map((t) => t.id);
+	// 	if (prefetchIds.length === 0) return;
+	//
+	// 	const prefetch = () => {
+	// 		prefetchIds.forEach((id) => {
+	// 			fetch(`/threads/api/threads/getThreadById/${id}`, {
+	// 				cache: "force-cache",
+	// 			})
+	// 				.catch(() => undefined);
+	// 		});
+	// 	};
+	//
+	// 	if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+	// 		window.requestIdleCallback(prefetch);
+	// 		return;
+	// 	}
+	//
+	// 	const timer = setTimeout(prefetch, 0);
+	// 	return () => clearTimeout(timer);
+	// }, [initialThreads]);
+	//
 	const handleCreated = (newThread: ThreadType) => {
 		if (currentPage === 1) {
 			setThreads((prev) => [newThread, ...prev]);

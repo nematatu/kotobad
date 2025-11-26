@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Page() {
 	return (
 		<div className="flex flex-col gap-y-4">
-			<Link href="/threads">
+			<Link href="/threads" prefetch>
 				<div className="text-blue-400 underline font-bold text-3xl">
 					スレッド一覧
 				</div>

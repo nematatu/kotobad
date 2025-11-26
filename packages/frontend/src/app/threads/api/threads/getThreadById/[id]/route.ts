@@ -1,8 +1,8 @@
-import type { InferResponseType } from "hono";
 import { NextResponse } from "next/server";
-import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
-import { getApiUrl } from "@/lib/config/apiUrls";
+import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+
+export const revalidate = 900;
 
 type Params = {
 	params: Promise<{ id: string }>;
@@ -13,8 +13,12 @@ export async function GET(_req: Request, { params }: Params) {
 	const { id } = renderedparams;
 
 	try {
-		const res = await getThreadById(id);
-		return NextResponse.json(res);
+		const res = await getThreadWithPosts(id);
+		return NextResponse.json(res, {
+			headers: {
+				"Cache-Control": `public, s-maxage=${revalidate}, stale-while-revalidate=${revalidate}`,
+			},
+		});
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;
 		if (fetchError.status === 404) {
@@ -38,16 +42,4 @@ export async function GET(_req: Request, { params }: Params) {
 			{ status: fetchError.status ?? 500 },
 		);
 	}
-}
-
-async function getThreadById(id: string) {
-	type resType = InferResponseType<
-		(typeof client.bbs.threads.full)[":id"]["$get"]
-	>;
-
-	const baseUrl = await getApiUrl("GET_THREAD_WITH_POSTS");
-	const targetUrl = new URL(id, baseUrl);
-	return BffFetcher<resType>(targetUrl, {
-		method: "GET",
-	});
 }
