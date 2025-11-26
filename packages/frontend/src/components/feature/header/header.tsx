@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import SignIn from "@/app/auth/login/sign-in";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
+import GoogleOAuth from "@/components/feature/auth/googleOAuth";
 import { Button } from "@/components/ui/button";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { useUser } from "../provider/UserProvider";
@@ -75,7 +75,7 @@ const Header = () => {
 							ログアウト
 						</Button>
 					) : (
-						<SignIn />
+						<GoogleOAuth />
 					)}
 				</div>
 			</div>

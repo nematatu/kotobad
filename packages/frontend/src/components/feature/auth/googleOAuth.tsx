@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth/auth-client";
 import { cn } from "@/lib/utils";
 
-export default function SignIn() {
+export default function GoogleOAuth() {
 	const [loading, setLoading] = useState(false);
 
 	return (
