@@ -10,8 +10,17 @@ import {
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export const metadata: Metadata = {
-	title: "kototbad",
-	description: "badmitnon BBS",
+	title: "コトバド",
+	description: "バドミントン掲示板",
+	openGraph: {
+		images: [
+			{
+				url: "/ogp/ogp.png",
+				width: 1200,
+				height: 630,
+			},
+		],
+	},
 };
 
 async function resolveInitialUser(): Promise<BetterAuthUser | null> {
