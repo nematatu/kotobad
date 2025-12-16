@@ -10,16 +10,25 @@ import {
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export const metadata: Metadata = {
-	title: "コトバド",
-	description: "バドミントン掲示板",
+	metadataBase: new URL("https://kotobad.com"),
 	openGraph: {
-		images: [
-			{
-				url: "/ogp/ogp.png",
-				width: 1200,
-				height: 630,
-			},
-		],
+		type: "website",
+		title: "コトバド",
+		description: "バドミントン掲示板",
+		url: "https://kotobad.com",
+		images: {
+			url: "/ogp/ogp.ong",
+			type: "image/png",
+		},
+	},
+	twitter: {
+		title: "コトバド",
+		description: "バドミントン掲示板",
+		images: {
+			url: "/ogp/ogp.ong",
+			type: "image/png",
+		},
+		card: "summary",
 	},
 };
 
