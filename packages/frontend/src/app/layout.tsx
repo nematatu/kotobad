@@ -16,19 +16,19 @@ export const metadata: Metadata = {
 		title: "コトバド",
 		description: "バドミントン掲示板",
 		url: "https://kotobad.com",
-		images: {
-			url: "/ogp/ogp.ong",
-			type: "image/png",
-		},
+		images: [
+			{
+				url: "/ogp/ogp.png",
+				width: 1200,
+				height: 630,
+			},
+		],
 	},
 	twitter: {
 		title: "コトバド",
 		description: "バドミントン掲示板",
-		images: {
-			url: "/ogp/ogp.ong",
-			type: "image/png",
-		},
-		card: "summary",
+		images: ["/ogp/ogp.png"],
+		card: "summary_large_image",
 	},
 };
 
