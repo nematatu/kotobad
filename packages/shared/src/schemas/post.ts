@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@hono/zod-openapi";
 
 export const PostSchema = z.object({
 	id: z.number().int().positive(),

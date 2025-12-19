@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@hono/zod-openapi";
 import { ThreadThreadLabelSchema } from "./label";
 import { PostListSchema } from "./post";
 
