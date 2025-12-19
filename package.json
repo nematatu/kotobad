@@ -5,13 +5,12 @@
 	"private": true,
 	"devDependencies": {
 		"@types/bun": "latest",
-		"daisyui": "^5.0.54",
 		"husky": "^9.1.7",
-		"lint-staged": "^16.2.4",
-		"wrangler": "^4.42.2"
+		"lint-staged": "^16.2.7",
+		"wrangler": "^4.55.0"
 	},
 	"peerDependencies": {
-		"typescript": "^5"
+		"typescript": "^5.9.3"
 	},
 	"workspaces": [
 		"packages/*"
@@ -30,12 +29,12 @@
 		"prepare": "husky"
 	},
 	"lint-staged": {
-		"packages/**/*.{ts,tsx,json}": [
+		"packages/**/src/**/*.{ts,tsx}": [
 			"bunx biome format --write",
 			"bunx biome check --write"
 		]
 	},
 	"dependencies": {
-		"@biomejs/biome": "^2.2.2"
+		"@biomejs/biome": "^2.3.10"
 	}
 }
