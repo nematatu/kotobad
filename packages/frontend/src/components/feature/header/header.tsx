@@ -7,7 +7,7 @@ import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import GoogleOAuth from "@/components/feature/auth/googleOAuth";
 import LogoutButton from "../auth/button/logoutButton";
 import { useUser } from "../provider/UserProvider";
-import { UserAvatar } from "./../user/avatar";
+import { UserAvatar } from "./../user/UserAvatar";
 
 const Header = () => {
 	const { user } = useUser();

@@ -112,6 +112,10 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID,
 				clientSecret: env.GOOGLE_CLIENT_SECRET,
+				overrideUserInfoOnSignIn: true,
+				mapProfileToUser: (profile) => ({
+					image: profile.picture,
+				}),
 			},
 		},
 	});
