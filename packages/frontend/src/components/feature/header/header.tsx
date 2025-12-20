@@ -7,6 +7,7 @@ import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import GoogleOAuth from "@/components/feature/auth/googleOAuth";
 import LogoutButton from "../auth/button/logoutButton";
 import { useUser } from "../provider/UserProvider";
+import { UserAvatar } from "./../user/avatar";
 
 const Header = () => {
 	const { user } = useUser();
@@ -39,11 +40,14 @@ const Header = () => {
 						<LogoIcon className="w-8" />
 					</div>
 				</Link>
-				<div className="space-x-2">
+				<div className="flex items-center space-x-2">
 					{user && (
-						<span className="text-sm text-muted-foreground">
-							{user.name ?? user.email}
-						</span>
+						<div className="flex items-center space-x-2">
+							<span className="text-sm text-muted-foreground">
+								{user.name ?? user.email}
+							</span>
+							<UserAvatar />
+						</div>
 					)}
 					{user ? <LogoutButton /> : <GoogleOAuth />}
 				</div>

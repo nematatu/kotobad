@@ -21,10 +21,10 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 						<Link
 							href={`/threads/${thread.id}`}
 							key={thread.id}
-							className="group flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition hover:border-gray-300"
+							className="group flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition hover:border-gray-300 hover:text-blue-600 visited:text-gray-500 visited:hover:text-blue-600"
 						>
 							<div className="min-w-0 flex-1">
-								<div className="text-base font-semibold leading-6 text-black group-hover:text-blue-600 sm:text-lg md:text-xl">
+								<div className="text-base font-semibold leading-6 group-hover:text-blue-600 sm:text-lg md:text-xl">
 									<span className="block text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
 										{thread.title}
 									</span>

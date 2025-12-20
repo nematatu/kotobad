@@ -18,7 +18,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 				<Link
 					href={`/threads/${thread.id}`}
 					key={thread.id}
-					className={`group dark:text-gray-300 p-4 min-h-14 flex items-center border cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}
+					className={`group text-black visited:text-gray-400 p-4 min-h-14 flex items-center border cursor-pointer hover:bg-gray-100 hover:text-blue-500 visited:hover:text-blue-500 dark:hover:bg-gray-800 ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}
 				>
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
 						{/* 左側：タイトル + 投稿日時 */}

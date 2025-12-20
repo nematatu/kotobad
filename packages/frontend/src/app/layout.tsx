@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cookies } from "next/headers";
+import { Toaster } from "sonner";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 import {
@@ -70,10 +71,11 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja">
-			<body className="bg-surface-50">
+			<body className={`${notoSerifJP.className}`}>
 				<UserProvider initialUser={initialUser}>
+					<Toaster richColors />
 					<Header />
-					<main className={`mt-6 ${notoSerifJP.className}`}>{children}</main>
+					<main>{children}</main>
 				</UserProvider>
 			</body>
 		</html>
