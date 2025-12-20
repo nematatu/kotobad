@@ -5,34 +5,13 @@ import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import GoogleOAuth from "@/components/feature/auth/googleOAuth";
-import { Button } from "@/components/ui/button";
-import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import LogoutButton from "../auth/button/logoutButton";
 import { useUser } from "../provider/UserProvider";
 
 const Header = () => {
-	const { user, setUser } = useUser();
+	const { user } = useUser();
 	const [lastScrollY, setLastScrollY] = useState(0);
 	const [showHeader, setShowHeader] = useState(true);
-
-	const handleLogout = async () => {
-		const baseUrl = await getBffApiUrl("LOGOUT");
-		try {
-			const res = await fetch(baseUrl, {
-				method: "POST",
-				credentials: "include",
-			});
-
-			if (!res.ok) {
-				const error = await res.json();
-				throw new Error(String(error));
-			}
-			setUser(null);
-		} catch (error: unknown) {
-			const message =
-				error instanceof Error ? error.message : "ログアウトに失敗しました";
-			console.error(message);
-		}
-	};
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -66,17 +45,7 @@ const Header = () => {
 							{user.name ?? user.email}
 						</span>
 					)}
-					{user ? (
-						<Button
-							className="text-sm font-medium cursor-pointer transition-colors hover:text-primary"
-							variant="outline"
-							onClick={handleLogout}
-						>
-							ログアウト
-						</Button>
-					) : (
-						<GoogleOAuth />
-					)}
+					{user ? <LogoutButton /> : <GoogleOAuth />}
 				</div>
 			</div>
 		</div>

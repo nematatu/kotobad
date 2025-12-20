@@ -12,7 +12,7 @@ const config: Config = {
 	theme: {
           extend: {
             fontFamily: {
-              sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
+              sans: ['sans-serif'],
             },
             boxShadow: {
               'soft': '0 4px 20px -2px rgba(255, 49, 49, 0.08)',

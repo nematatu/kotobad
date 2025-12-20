@@ -8,6 +8,7 @@ import {
 	type BetterAuthUser,
 } from "@/lib/auth/betterAuthSession";
 import { getApiUrl } from "@/lib/config/apiUrls";
+import { notoSerifJP } from "@/utils/fonts/font";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://kotobad.com"),
@@ -72,7 +73,7 @@ export default async function RootLayout({
 			<body className="bg-surface-50">
 				<UserProvider initialUser={initialUser}>
 					<Header />
-					<main className="mt-6">{children}</main>
+					<main className={`mt-6 ${notoSerifJP.className}`}>{children}</main>
 				</UserProvider>
 			</body>
 		</html>

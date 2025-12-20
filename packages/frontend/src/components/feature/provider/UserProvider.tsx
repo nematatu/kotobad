@@ -1,5 +1,7 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { useSession } from "@/lib/auth/auth-client";
 import type { BetterAuthUser } from "@/lib/auth/betterAuthSession";
 
 export type User = BetterAuthUser | null;
@@ -19,6 +21,16 @@ export function UserProvider({
 	initialUser: User;
 }) {
 	const [user, setUser] = useState<User>(initialUser);
+	const { data, isPending } = useSession();
+
+	useEffect(() => {
+		if (isPending) return;
+		if (data?.user) {
+			setUser(data.user);
+			return;
+		}
+		setUser(null);
+	}, [data, isPending]);
 	return (
 		<UserContext.Provider value={{ user, setUser }}>
 			{children}
