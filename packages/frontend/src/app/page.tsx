@@ -1,7 +1,13 @@
-export default function Page() {
+import { ThreadList } from "./threads/components/view/ThreadList";
+import { getThreads } from "./threads/lib/getThread";
+
+export default async function Page() {
+	const { threads } = await getThreads(1);
 	return (
-		<div className={`flex flex-col gap-y-4 `}>
-			人気のスレッド 最新のスレッド
+		<div className="flex flex-col gap-y-4 mx-40">
+			<h1>人気のスレッド</h1>
+			<h1>最新のスレッド</h1>
+			<ThreadList threads={threads} />
 		</div>
 	);
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import type { LabelType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import Link from "next/link";
