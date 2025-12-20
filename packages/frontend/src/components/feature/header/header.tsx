@@ -57,7 +57,7 @@ const Header = () => {
 				<Link href="/">
 					<div className="flex items-center space-x-2">
 						<LogoMojiIcon className="w-24 text-gray-800" />
-						<LogoIcon className="w-8 " />
+						<LogoIcon className="w-8" />
 					</div>
 				</Link>
 				<div className="space-x-2">

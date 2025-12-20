@@ -14,6 +14,8 @@ const buildPreviewOriginMatcher = (suffix: string) => {
 	return new RegExp(`^[0-9a-f]+${escaped}$`);
 };
 
+const isProd: boolean = process.env.APP_ENV === "production";
+
 const maybeAddPreviewOrigin = (
 	env: Bindings,
 	restRequest: Request | undefined,
@@ -101,7 +103,7 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		},
 		advanced: {
 			crossSubDomainCookies: {
-				enabled: true,
+				enabled: isProd,
 				domain: ".kotobad.com",
 			},
 			useSecureCookies: true,
