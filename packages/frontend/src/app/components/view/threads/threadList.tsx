@@ -13,34 +13,40 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
 
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-			{threadList.map((thread) => (
-				<Link
-					href={`/threads/${thread.id}`}
-					key={thread.id}
-					className={`group dark:text-gray-300 p-4 min-h-14 flex items-center border cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 `}
-				>
-					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
-						{/* 左側：タイトル + 投稿日時 */}
-						<div className="min-w-0 flex-1 pr-4">
-							<div className="flex space-x-4">
-								<span className="font-bold text-lg sm:text-xl group-hover:text-blue-500 block  text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
-									{thread.title}
-								</span>
-							</div>
-							<div className="flex items-center space-x-1 text-gray-500">
-								<ChatIcon width={15} />
-								<div className="text-sm">{thread.postCount}</div>
+		<div className="max-w-4xl mx-auto">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				{threadList.map((thread) => (
+					<Link
+						href={`/threads/${thread.id}`}
+						key={thread.id}
+						className={`flex items-cener group bg-blue-50 p-4 min-h-14 border cursor-pointer hover:bg-gray-100 rounded-md`}
+					>
+						<div className="flex-col sm:flex-row w-full text-sm sm:text-base">
+							<span className="border bg-white w-full p-3 font-bold text-md sm:text-2xl group-hover:text-blue-500 block text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words min-h-20 rounded-sm">
+								{thread.title}
+							</span>
+							<div className="px-4 space-y-2 mt-3">
+								<div className="flex items-center space-x-4 text-gray-500">
+									<div className="flex items-center space-x-1">
+										<ChatIcon width={17} />
+										<p className="text-md">{thread.postCount}</p>
+									</div>
 
-								{getRelativeDate(thread.createdAt).isDisplay ? (
-									<span className="text-sm">
-										{getRelativeDate(thread.createdAt).relativeDate}
-									</span>
-								) : (
-									<span>{formatDate(thread.createdAt)}</span>
-								)}
-							</div>
+									<p className="flex flex-col items-end gap-y-1 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
+										<span>{thread.author.username}</span>
+									</p>
+								</div>
 
+								<div className="text-sm text-gray-500">
+									{getRelativeDate(thread.createdAt).isDisplay ? (
+										<span className="text-sm">
+											{getRelativeDate(thread.createdAt).relativeDate}
+										</span>
+									) : (
+										<span>{formatDate(thread.createdAt)}</span>
+									)}
+								</div>
+							</div>
 							{thread.threadLabels?.map(
 								(tl: LabelType.ThreadThreadLabelType) => (
 									<span key={tl.labelId} className="">
@@ -49,13 +55,9 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								),
 							)}
 						</div>
-
-						<div className="flex flex-col items-end gap-y-1 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
-							<span>{thread.author.username}</span>
-						</div>
-					</div>
-				</Link>
-			))}
+					</Link>
+				))}
+			</div>
 		</div>
 	);
 };
