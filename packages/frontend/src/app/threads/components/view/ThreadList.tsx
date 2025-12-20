@@ -30,7 +30,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 							</div>
 							<div className="flex items-center space-x-1 text-gray-500">
 								<span className="text-sm">
-									{getRelativeDate(thread.createdAt)}
+									{getRelativeDate(thread.createdAt).relativeDate}
 								</span>
 								<ChatIcon className="mr-1" style={{ width: 12, height: 12 }} />
 								<div className="text-sm">{thread.postCount}</div>
