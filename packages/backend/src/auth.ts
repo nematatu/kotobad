@@ -75,6 +75,7 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 	const baseURL = resolveBaseUrl(env, restRequest);
 	const secret = env.BETTER_AUTH_SECRET;
 	const isProd: boolean = env.APP_ENV === "production";
+	console.log("isProd", isProd);
 
 	if (!secret) {
 		throw new Error("BETTER_AUTH_SECRET is not configured.");
