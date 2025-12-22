@@ -110,7 +110,7 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		},
 		advanced: {
 			crossSubDomainCookies: {
-				enabled: isProd,
+				enabled: true,
 				domain: ".kotobad.com",
 			},
 			useSecureCookies: true,
