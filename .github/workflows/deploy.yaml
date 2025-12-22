@@ -38,10 +38,11 @@ jobs:
       - name: Deploy backend (production)
         if: github.event_name == 'push'
         uses: cloudflare/wrangler-action@v3
+        env: OPEN_NEXT_DEPLOY: "true"
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: bun run deploy
+          command: deploy --config ./wrangler.jsonc --minify
           workingDirectory: packages/backend
 
       - name: Deploy backend preview version
