@@ -22,8 +22,6 @@ const buildPreviewOriginMatcher = (suffix: string) => {
 	return new RegExp(`^[0-9a-f]+${escaped}$`);
 };
 
-const isProd: boolean = process.env.APP_ENV === "production";
-
 const maybeAddPreviewOrigin = (
 	env: Bindings,
 	restRequest: Request | undefined,
@@ -76,6 +74,7 @@ const authCache = new Map<string, ReturnType<typeof betterAuth>>();
 export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 	const baseURL = resolveBaseUrl(env, restRequest);
 	const secret = env.BETTER_AUTH_SECRET;
+	const isProd: boolean = env.APP_ENV === "production";
 
 	if (!secret) {
 		throw new Error("BETTER_AUTH_SECRET is not configured.");
