@@ -1,5 +1,20 @@
-import { Button } from "@/components/ui/button";
+import { PencilLine } from "lucide-react";
+import type * as React from "react";
+import IconButton from "@/components/common/button/IconButton";
+import type { Button } from "@/components/ui/button";
 
-export default function CreateThreadButton() {
-	return <Button click>スレッド作成</Button>;
+export default function CreateThreadButton(
+	props: React.ComponentProps<typeof Button>,
+) {
+	return (
+		<IconButton
+			hover="brightness"
+			icon={<PencilLine />}
+			color="logo1"
+			{...props}
+			click
+		>
+			<span className="text-md">スレッド作成</span>
+		</IconButton>
+	);
 }

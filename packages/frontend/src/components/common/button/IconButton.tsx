@@ -11,7 +11,7 @@ function IconButton({ icon, className, children, ...props }: IconButtonProps) {
 		<div className={className}>
 			<Button {...props}>
 				{icon}
-				{children}
+				<span>{children}</span>
 			</Button>
 		</div>
 	);

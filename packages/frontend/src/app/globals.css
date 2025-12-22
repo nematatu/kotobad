@@ -6,18 +6,8 @@
 
 @theme inline {
   /* Brand palette for Tailwind v4 (@theme inline exposes tokens) */
-  --color-brand-50: #fff4f0;
-  --color-brand-100: #ffe1de;
-  --color-brand-200: #ffc3bd;
-  --color-brand-300: #bb8379;
-  --color-brand-400: #ff7b7b;
-  --color-brand-500: #ff3131;
-  --color-brand-600: #e62020;
-  --color-brand-700: #b91c1c;
-  --color-brand-800: #991b1b;
-  --color-brand-900: #7f1d1d;
-
-  --color-brand-accent: #00C0E8;
+  --color-logo-1: #5A86FF
+  --color-logo-2: #F1BAFF
 
   /* Surface / text helpers for optional use */
   --color-surface-50: #fdfbfb;

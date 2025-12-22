@@ -32,7 +32,7 @@ const Header = () => {
 
 	return (
 		<div
-			className={`sticky top-0 z-50 w-full bg-brand-50 transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
+			className={`sticky top-0 z-50 w-full transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
 		>
 			<div className="flex h-16 items-center justify-between max-w-4xl lg:max-w-6xl mx-auto px-5">
 				<Link href="/">
