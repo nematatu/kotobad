@@ -105,11 +105,11 @@ jobs:
         if: github.event_name == 'pull_request'
         id: frontend-preview
         uses: cloudflare/wrangler-action@v3
-        workingDirectory: packages/frontend
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: versions upload --config wrangler.jsonc --message "Preview ${{ github.head_ref || github.ref_name }}"
+          workingDirectory: packages/frontend
 
       - name: Store frontend preview url
         if: github.event_name == 'pull_request'
