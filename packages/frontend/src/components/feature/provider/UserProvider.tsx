@@ -4,11 +4,16 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "@/lib/auth/auth-client";
 import type { BetterAuthUser } from "@/lib/auth/betterAuthSession";
 
+// undefined: ローディング中
+// null: 未ログイン
+// BetterAuthUser: ログイン中
 export type User = BetterAuthUser | null;
+export type UserState = User | undefined;
 
 type Ctx = {
-	user: User;
+	user: UserState;
 	setUser: (u: User) => void;
+	isLoading: boolean;
 };
 
 const UserContext = createContext<Ctx | undefined>(undefined);
@@ -18,9 +23,9 @@ export function UserProvider({
 	initialUser,
 }: {
 	children: React.ReactNode;
-	initialUser: User;
+	initialUser?: UserState;
 }) {
-	const [user, setUser] = useState<User>(initialUser);
+	const [user, setUser] = useState<UserState>(initialUser);
 	const { data, isPending } = useSession();
 
 	useEffect(() => {
@@ -32,7 +37,7 @@ export function UserProvider({
 		setUser(null);
 	}, [data, isPending]);
 	return (
-		<UserContext.Provider value={{ user, setUser }}>
+		<UserContext.Provider value={{ user, setUser, isLoading: isPending }}>
 			{children}
 		</UserContext.Provider>
 	);

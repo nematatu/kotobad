@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { cookies } from "next/headers";
 import { Toaster } from "sonner";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
-import {
-	BetterAuthSessionResponseSchema,
-	type BetterAuthUser,
-} from "@/lib/auth/betterAuthSession";
-import { getApiUrl } from "@/lib/config/apiUrls";
 import { ZenKakuGothicNew } from "@/utils/fonts/font";
 
 export const metadata: Metadata = {
@@ -34,45 +28,15 @@ export const metadata: Metadata = {
 	},
 };
 
-async function resolveInitialUser(): Promise<BetterAuthUser | null> {
-	const cookieStore = await cookies();
-	const cookieHeader = cookieStore.toString();
-	if (!cookieHeader) {
-		return null;
-	}
-
-	try {
-		const url = await getApiUrl("ME");
-		const response = await fetch(url, {
-			method: "GET",
-			headers: { cookie: cookieHeader },
-			credentials: "include",
-			cache: "no-store",
-		});
-
-		if (!response.ok) {
-			return null;
-		}
-
-		const data = await response.json();
-		const session = BetterAuthSessionResponseSchema.parse(data);
-		return session.user;
-	} catch (_error) {
-		return null;
-	}
-}
-
-export default async function RootLayout({
+export default function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const initialUser = await resolveInitialUser();
-
 	return (
 		<html lang="ja">
 			<body className={`${ZenKakuGothicNew.className}`}>
-				<UserProvider initialUser={initialUser}>
+				<UserProvider>
 					<Toaster richColors />
 					<Header />
 					<main>{children}</main>

@@ -10,7 +10,7 @@ import { useUser } from "../provider/UserProvider";
 import { UserPopover } from "../user/popover/UserPopover";
 
 const Header = () => {
-	const { user } = useUser();
+	const { user, isLoading } = useUser();
 	const [lastScrollY, setLastScrollY] = useState(0);
 	const [showHeader, setShowHeader] = useState(true);
 
@@ -41,7 +41,12 @@ const Header = () => {
 					</div>
 				</Link>
 				<div className="flex items-center space-x-2">
-					{user ? (
+					{isLoading ? (
+						<div
+							className="h-8 w-24 rounded-md bg-gray-200 animate-pulse"
+							aria-hidden="true"
+						/>
+					) : user ? (
 						<div className="flex items-center space-x-4">
 							<UserPopover />
 							<CreateThreadButton />
