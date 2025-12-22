@@ -3,6 +3,14 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createDb } from "./database";
 import type { Bindings } from "./types";
 
+type GoogleUserInfo = {
+	id: string;
+	name?: string;
+	email?: string;
+	picture?: string;
+	verified_email?: boolean;
+};
+
 const parseOrigins = (value?: string) =>
 	value
 		?.split(",")
@@ -112,10 +120,32 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID,
 				clientSecret: env.GOOGLE_CLIENT_SECRET,
-				overrideUserInfoOnSignIn: true,
-				mapProfileToUser: (profile) => ({
-					image: profile.picture,
-				}),
+				getUserInfo: async (token) => {
+					const response = await fetch(
+						"https://www.googleapis.com/oauth2/v2/userinfo",
+						{
+							headers: {
+								Authorization: `Bearer ${token.accessToken}`,
+							},
+						},
+					);
+					if (!response.ok) {
+						throw new Error(
+							`Failed to fetch Google user info: ${response.status}`,
+						);
+					}
+					const profile = (await response.json()) as GoogleUserInfo;
+					return {
+						user: {
+							id: profile.id,
+							name: profile.name ?? undefined,
+							email: profile.email ?? null,
+							image: profile.picture,
+							emailVerified: Boolean(profile.verified_email),
+						},
+						data: profile,
+					};
+				},
 			},
 		},
 	});
