@@ -1,4 +1,4 @@
-import GoogleOAuth from "@/components/feature/auth/googleOAuth";
+import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 
 export default function app() {
 	return (
