@@ -6,7 +6,7 @@ export default function UserAvatar() {
 	const fallbackText =
 		user?.name?.trim().charAt(0) ?? user?.email?.trim().charAt(0) ?? "?";
 	return (
-		<Avatar className="h-10 w-10 bg-white border border-1 border-blue-400">
+		<Avatar className="h-10 w-10 bg-white border border-blue-400">
 			{user?.image && <AvatarImage src={user.image} alt={user?.name ?? ""} />}
 			<AvatarFallback className="bg-gray-400 text-[10px] font-bold text-white">
 				{fallbackText.toUpperCase()}
