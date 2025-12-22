@@ -53,7 +53,13 @@ jobs:
       - name: Store backend preview url
         if: github.event_name == 'pull_request'
         id: store_backend_preview
-        run: echo "preview_url=${{ steps.backend-preview.outputs.deployment-url }}" >> "$GITHUB_OUTPUT"
+        env:
+          CMD_OUTPUT: ${{ steps.backend-preview.outputs.command-output }}
+        run: |
+          set -euo pipefail
+          url="$(printf '%s\n' "$CMD_OUTPUT" | sed -n 's/^.*Version Preview URL: //p' | head -n 1 | tr -d '\r')"
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
+          echo "Extracted backend preview url: $url"
 
   deploy_frontend:
     name: Deploy frontend
@@ -114,7 +120,13 @@ jobs:
       - name: Store frontend preview url
         if: github.event_name == 'pull_request'
         id: store_frontend_preview
-        run: echo "preview_url=${{ steps.frontend-preview.outputs.deployment-url }}" >> "$GITHUB_OUTPUT"
+        env:
+          CMD_OUTPUT: ${{ steps.frontend-preview.outputs.command-output }}
+        run: |
+          set -euo pipefail
+          url="$(printf '%s\n' "$CMD_OUTPUT" | sed -n 's/^.*Version Preview URL: //p' | head -n 1 | tr -d '\r')"
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
+          echo "Extracted frontend preview url: $url"
 
   comment_preview_urls:
     name: Comment preview URLs

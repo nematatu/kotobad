@@ -5,6 +5,28 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Brand palette for Tailwind v4 (@theme inline exposes tokens) */
+  --color-logo-1: #5A86FF
+  --color-logo-2: #F1BAFF
+
+  /* Surface / text helpers for optional use */
+  --color-surface-50: #fdfbfb;
+  --color-surface-100: #f1f5f9;
+  --color-surface-200: #e2e8f0;
+  --color-surface-300: #cbd5e1;
+  --color-text-label: #b3bac8;
+  --color-text-body: #334155;
+  --color-text-emphasis: #1f2933;
+  --color-text-display: #0f172a;
+  --color-text-muted: #94a3b8;
+
+  /* Shadows */
+  --shadow-soft: 0 4px 20px -2px rgba(255, 49, 49, 0.08);
+  --shadow-glow: 0 0 20px rgba(255, 49, 49, 0.2);
+  --shadow-card: 0 2px 10px rgba(0,0,0,0.03);
+  --shadow-3d: 20px 20px 60px rgba(0,0,0,0.1), -20px -20px 60px rgba(255,255,255,0.5);
+  --shadow-float: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -87,6 +109,7 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --font-sans: "Inter", "Noto Sans JP", sans-serif;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -136,7 +159,84 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
-    font-family:  "ヒラギノ角ゴ ProN","Hiragino Kaku Gothic ProN","メイリオ","Meiryo",sans-serif;
+    @apply bg-background text-foreground font-sans;
   }
+
+}
+
+/* Custom keyframes (migrated from tailwind.config.ts) */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+
+@keyframes marqueeReverse {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+/* Utility classes re-created for Tailwind v4 */
+@layer utilities {
+  .font-sans { font-family: var(--font-sans); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-3d { box-shadow: var(--shadow-3d); }
+  .shadow-float { box-shadow: var(--shadow-float); }
+
+  .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+  .animate-fade-in-fast { animation: fadeIn 0.15s ease-out forwards; }
+  .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .animate-scale-up { animation: scaleUp 0.2s ease-out both; }
+  .animate-scale-up-fast { animation: scaleUp 0.15s ease-out both; }
+  .animate-slide-down { animation: slideDown 0.2s ease-out both; }
+  .animate-slide-up { animation: slideUp 0.2s ease-out both; }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-float-delayed { animation: float 6s ease-in-out 3s infinite; }
+  .animate-pulse-slow { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  .animate-marquee { animation: marquee 60s linear infinite; }
+  .animate-marquee-reverse { animation: marqueeReverse 60s linear infinite; }
+  .animate-blob { animation: blob 7s infinite; }
 }

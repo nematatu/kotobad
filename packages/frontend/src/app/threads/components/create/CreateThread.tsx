@@ -13,7 +13,6 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-// import { useUser } from "@/components/feature/provider/UserProvider";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
 type CreateThreadType = {
@@ -26,8 +25,6 @@ type CreateThreadFormProps = {
 
 export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
-	// const {user} = useUser()
-
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
@@ -116,51 +113,6 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 								</FormItem>
 							)}
 						/>
-
-						{/* 名前 */}
-						{/* <FormField */}
-						{/* 	control={form.control} */}
-						{/* 	name="author" */}
-						{/* 	render={({ field }) => ( */}
-						{/* 		<FormItem className="flex flex-col gap-2"> */}
-						{/* 			<FormLabel>名前</FormLabel> */}
-						{/* 			<FormControl> */}
-						{/* 				<Input */}
-						{/* 					{...field} */}
-						{/* 					{...form.register("author", { */}
-						{/* 						required: "名前は必須です", */}
-						{/* 					})} */}
-						{/* 					placeholder="例: 山田太郎" */}
-						{/* 					className="outline-2 focus:border-blue-600 placeholder-gray-500/50" */}
-						{/* 				/> */}
-						{/* 			</FormControl> */}
-						{/* 			<FormMessage /> */}
-						{/* 		</FormItem> */}
-						{/* 	)} */}
-						{/* /> */}
-
-						{/* 本文 */}
-						{/* <FormField */}
-						{/* 	control={form.control} */}
-						{/* 	name="content" */}
-						{/* 	render={({ field }) => ( */}
-						{/* 		<FormItem className="flex flex-col gap-2"> */}
-						{/* 			<FormLabel>本文</FormLabel> */}
-						{/* 			<FormControl> */}
-						{/* 				<Textarea */}
-						{/* 					{...field} */}
-						{/* 					{...form.register("content", { */}
-						{/* 						required: "本文は必須です", */}
-						{/* 					})} */}
-						{/* 					placeholder="ここに本文を入力してください" */}
-						{/* 					className="min-h-[120px] outline-2 focus:border-blue-600 placeholder-gray-500/50" */}
-						{/* 				/> */}
-						{/* 			</FormControl> */}
-						{/* 			<FormMessage /> */}
-						{/* 		</FormItem> */}
-						{/* 	)} */}
-						{/* /> */}
-
 						{error && <p className="text-red-500">{error}</p>}
 
 						<div className="space-y-2">

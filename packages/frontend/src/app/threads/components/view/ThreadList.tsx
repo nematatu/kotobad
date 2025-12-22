@@ -1,5 +1,3 @@
-"use client";
-
 import type { LabelType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import Link from "next/link";
@@ -20,7 +18,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 				<Link
 					href={`/threads/${thread.id}`}
 					key={thread.id}
-					className={`group dark:text-gray-300 p-4 min-h-14 flex items-center border cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}
+					className={`group text-black visited:text-gray-400 p-4 min-h-14 flex items-center border cursor-pointer hover:bg-gray-100 hover:text-blue-500 visited:hover:text-blue-500 dark:hover:bg-gray-800 ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}
 				>
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
 						{/* 左側：タイトル + 投稿日時 */}
@@ -32,7 +30,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 							</div>
 							<div className="flex items-center space-x-1 text-gray-500">
 								<span className="text-sm">
-									{getRelativeDate(thread.createdAt)}
+									{getRelativeDate(thread.createdAt).relativeDate}
 								</span>
 								<ChatIcon className="mr-1" style={{ width: 12, height: 12 }} />
 								<div className="text-sm">{thread.postCount}</div>

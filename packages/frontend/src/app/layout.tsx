@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cookies } from "next/headers";
+import { Toaster } from "sonner";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 import {
@@ -8,6 +9,7 @@ import {
 	type BetterAuthUser,
 } from "@/lib/auth/betterAuthSession";
 import { getApiUrl } from "@/lib/config/apiUrls";
+import { ZenKakuGothicNew } from "@/utils/fonts/font";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://kotobad.com"),
@@ -69,10 +71,11 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja">
-			<body>
+			<body className={`${ZenKakuGothicNew.className}`}>
 				<UserProvider initialUser={initialUser}>
+					<Toaster richColors />
 					<Header />
-					<main className="mt-6">{children}</main>
+					<main>{children}</main>
 				</UserProvider>
 			</body>
 		</html>

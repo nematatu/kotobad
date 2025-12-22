@@ -1,11 +1,9 @@
-// import { LoginForm } from "./LoginForm";
-import SignIn from "./sign-in";
+import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 
 export default function app() {
 	return (
 		<div className="flex flex-col items-center justify-center">
-			{/* <LoginForm /> */}
-			<SignIn />
+			<GoogleOAuth />
 		</div>
 	);
 }

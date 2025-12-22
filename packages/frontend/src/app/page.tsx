@@ -1,13 +1,14 @@
-import Link from "next/link";
+import { ThreadList } from "./components/view/threads/threadList";
+import { getThreads } from "./threads/lib/getThread";
 
-export default function Page() {
+export default async function Page() {
+	const { threads } = await getThreads(1);
 	return (
 		<div className="flex flex-col gap-y-4">
-			<Link href="/threads" prefetch>
-				<div className="text-blue-400 underline font-bold text-3xl">
-					スレッド一覧
-				</div>
-			</Link>
+			<h1 className="text-2xl md:text-4xl font-bold mx-40 my-10">
+				最新のスレッド
+			</h1>
+			<ThreadList threads={threads} />
 		</div>
 	);
 }

@@ -4,34 +4,15 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
-import { Button } from "@/components/ui/button";
-import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
+import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
+import { UserPopover } from "../user/popover/UserPopover";
 
 const Header = () => {
-	const { user, setUser } = useUser();
+	const { user } = useUser();
 	const [lastScrollY, setLastScrollY] = useState(0);
 	const [showHeader, setShowHeader] = useState(true);
-
-	const handleLogout = async () => {
-		const baseUrl = await getBffApiUrl("LOGOUT");
-		try {
-			const res = await fetch(baseUrl, {
-				method: "POST",
-				credentials: "include",
-			});
-
-			if (!res.ok) {
-				const error = await res.json();
-				throw new Error(String(error));
-			}
-			setUser(null);
-		} catch (error: unknown) {
-			const message =
-				error instanceof Error ? error.message : "ログアウトに失敗しました";
-			console.error(message);
-		}
-	};
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -50,48 +31,23 @@ const Header = () => {
 
 	return (
 		<div
-			className={`sticky top-0 z-50 w-full border-b bg-gray-200 dark:bg-gray-800 transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
+			className={`sticky top-0 z-50 w-full transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
 		>
-			<div className="flex h-13 items-center px-4">
+			<div className="flex h-16 items-center justify-between max-w-4xl lg:max-w-6xl mx-auto px-5">
 				<Link href="/">
 					<div className="flex items-center space-x-2">
-						<LogoMojiIcon className="w-24 text-gray-800 dark:text-gray-200" />
-						<LogoIcon className="w-8 h-8 ext-gray-800 dark:text-gray-200" />
+						<LogoMojiIcon className="w-24 text-gray-800" />
+						<LogoIcon className="w-8" />
 					</div>
 				</Link>
-				<div className="flex flex-1 items-center justify-end space-x-2">
-					{user && (
-						<span className="text-sm text-muted-foreground">
-							{user.name ?? user.email}
-						</span>
-					)}
+				<div className="flex items-center space-x-2">
 					{user ? (
-						<Button
-							className="text-sm font-medium cursor-pointer transition-colors hover:text-primary"
-							variant="outline"
-							onClick={handleLogout}
-						>
-							ログアウト
-						</Button>
-					) : (
-						<div className="space-x-2">
-							<Button className="cursor-pointer" variant="outline" asChild>
-								<Link
-									href="/auth/login"
-									className="text-sm font-medium  transition-colors hover:text-primary"
-								>
-									ログイン
-								</Link>
-							</Button>
-							<Button className="cursor-pointer" variant="outline" asChild>
-								<Link
-									href="/auth/signup"
-									className="text-sm font-medium  transition-colors hover:text-primary"
-								>
-									新規会員登録
-								</Link>
-							</Button>
+						<div className="flex items-center space-x-4">
+							<UserPopover />
+							<CreateThreadButton />
 						</div>
+					) : (
+						<GoogleOAuth />
 					)}
 				</div>
 			</div>
