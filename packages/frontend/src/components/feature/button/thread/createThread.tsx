@@ -12,7 +12,7 @@ export default function CreateThreadButton(
 			icon={<PencilLine />}
 			variant="logo1"
 			{...props}
-			click
+			enableClickAnimation
 		>
 			<span className="text-md">スレッド作成</span>
 		</IconButton>

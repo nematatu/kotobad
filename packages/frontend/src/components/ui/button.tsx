@@ -31,7 +31,7 @@ const buttonVariants = cva(
 				lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
 				icon: "size-9",
 			},
-			click: {
+			enableClickAnimation: {
 				true: "transition-transform active:scale-95 duration-50",
 				false: "",
 			},
@@ -53,7 +53,7 @@ function Button({
 	size,
 	hover = "none",
 	asChild = false,
-	click = false,
+	enableClickAnimation = false,
 	...props
 }: React.ComponentProps<"button"> &
 	VariantProps<typeof buttonVariants> & {
@@ -64,7 +64,15 @@ function Button({
 	return (
 		<Comp
 			data-slot="button"
-			className={cn(buttonVariants({ variant, size, hover, click, className }))}
+			className={cn(
+				buttonVariants({
+					variant,
+					size,
+					hover,
+					enableClickAnimation,
+					className,
+				}),
+			)}
 			{...props}
 		/>
 	);

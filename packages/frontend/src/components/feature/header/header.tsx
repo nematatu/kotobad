@@ -8,7 +8,6 @@ import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
 import { UserPopover } from "../user/popover/UserPopover";
-import UserAvatar from "./../user/UserAvatar";
 
 const Header = () => {
 	const { user } = useUser();
