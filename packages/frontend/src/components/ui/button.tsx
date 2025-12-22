@@ -23,6 +23,7 @@ const buttonVariants = cva(
 
 				google:
 					"bg-white text-slate-700 border border-slate-300 hover:bg-surface-100 text-sm",
+				...buttonColor,
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -38,7 +39,6 @@ const buttonVariants = cva(
 				none: "",
 				brightness: "hover:brightness-110",
 			},
-			color: buttonColor,
 		},
 		defaultVariants: {
 			variant: "default",
@@ -54,7 +54,6 @@ function Button({
 	hover = "none",
 	asChild = false,
 	click = false,
-	color,
 	...props
 }: React.ComponentProps<"button"> &
 	VariantProps<typeof buttonVariants> & {
@@ -65,9 +64,7 @@ function Button({
 	return (
 		<Comp
 			data-slot="button"
-			className={cn(
-				buttonVariants({ variant, size, color, hover, click, className }),
-			)}
+			className={cn(buttonVariants({ variant, size, hover, click, className }))}
 			{...props}
 		/>
 	);

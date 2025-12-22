@@ -10,7 +10,7 @@ export default function CreateThreadButton(
 		<IconButton
 			hover="brightness"
 			icon={<PencilLine />}
-			color="logo1"
+			variant="logo1"
 			{...props}
 			click
 		>
