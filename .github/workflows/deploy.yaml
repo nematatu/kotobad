@@ -32,6 +32,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name : check wrangler.jsonc
+        working-directory: packages/backend
         run: cat ./wrangler.jsonc
 
       - name: Deploy backend (production)
