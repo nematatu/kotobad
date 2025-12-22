@@ -37,8 +37,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config ./wrangler.jsonc --minify
           workingDirectory: packages/backend
-        run: bun run deploy
 
       - name: Deploy backend preview version
         if: github.event_name == 'pull_request'
