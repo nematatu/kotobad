@@ -15,17 +15,7 @@
 		}
 	],
 	"env": {
-		"preview": {
-			"vars": {
-				"APP_ENV": "preview"
-			}
-		},
 		"production": {
-			"vars": {
-				"APP_ENV": "production"
-			}
-		},
-		"dev-prod": {
 			"vars": {
 				"APP_ENV": "production"
 			}
