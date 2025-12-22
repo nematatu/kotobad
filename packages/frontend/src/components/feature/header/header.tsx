@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
-import GoogleOAuth from "@/components/feature/auth/googleOAuth";
-import LogoutButton from "../auth/button/logoutButton";
+import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
+import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
-import { UserAvatar } from "./../user/UserAvatar";
+import { UserPopover } from "../user/popover/UserPopover";
+import UserAvatar from "./../user/UserAvatar";
 
 const Header = () => {
 	const { user } = useUser();
@@ -41,15 +42,14 @@ const Header = () => {
 					</div>
 				</Link>
 				<div className="flex items-center space-x-2">
-					{user && (
-						<div className="flex items-center space-x-2">
-							<span className="text-sm text-muted-foreground">
-								{user.name ?? user.email}
-							</span>
-							<UserAvatar />
+					{user ? (
+						<div className="flex items-center space-x-4">
+							<UserPopover />
+							<CreateThreadButton />
 						</div>
+					) : (
+						<GoogleOAuth />
 					)}
-					{user ? <LogoutButton /> : <GoogleOAuth />}
 				</div>
 			</div>
 		</div>

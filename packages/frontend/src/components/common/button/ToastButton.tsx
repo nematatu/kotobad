@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 type ToastType = "default" | "success" | "info" | "warning" | "error";
 
-type SonnerButtonProps = {
+type ToastButtonProps = {
 	toastTitle: string;
 	description?: string;
 	action?: {
@@ -34,7 +34,7 @@ export default function ToastButton({
 	children,
 	variant = "outline",
 	...buttonProps
-}: SonnerButtonProps) {
+}: ToastButtonProps) {
 	const showToast = () => {
 		if (promise) {
 			toast.promise(promise.promise(), {
