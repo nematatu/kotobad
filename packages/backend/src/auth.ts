@@ -110,7 +110,7 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 		},
 		advanced: {
 			crossSubDomainCookies: {
-				enabled: true,
+				enabled: isProd,
 				domain: ".kotobad.com",
 			},
 			useSecureCookies: true,
@@ -119,6 +119,7 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID,
 				clientSecret: env.GOOGLE_CLIENT_SECRET,
+				overrideUserInfoOnSignIn: true,
 				getUserInfo: async (token) => {
 					const response = await fetch(
 						"https://www.googleapis.com/oauth2/v2/userinfo",
