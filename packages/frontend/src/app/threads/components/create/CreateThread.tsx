@@ -12,12 +12,31 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { CategoryColorMap } from "@/lib/config/color/labelColor";
+import { cn } from "@/lib/utils";
 
 type CreateThreadType = {
 	title: string;
 };
+
+type TagOption = {
+	id: number;
+	name: string;
+};
+
+const initialTags: TagOption[] = [
+	{ id: 1, name: "初心者" },
+	{ id: 2, name: "試合" },
+	{ id: 3, name: "ギア" },
+	{ id: 4, name: "練習" },
+	{ id: 5, name: "雑談" },
+];
+
+const getLabelClass = (labelId: number) =>
+	CategoryColorMap[labelId % CategoryColorMap.length];
 
 type CreateThreadFormProps = {
 	onCreated: (newThread: ThreadType) => void;
@@ -25,11 +44,40 @@ type CreateThreadFormProps = {
 
 export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
+	const [tags, setTags] = useState<TagOption[]>(initialTags);
+	const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+	const [newTagName, setNewTagName] = useState("");
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
 		},
 	});
+
+	const toggleTag = (id: number) => {
+		setSelectedTagIds((prev) =>
+			prev.includes(id) ? prev.filter((tagId) => tagId !== id) : [...prev, id],
+		);
+	};
+
+	const addTag = () => {
+		const trimmed = newTagName.trim();
+		if (!trimmed) return;
+		const existing = tags.find(
+			(tag) => tag.name.toLowerCase() === trimmed.toLowerCase(),
+		);
+		if (existing) {
+			setSelectedTagIds((prev) =>
+				prev.includes(existing.id) ? prev : [...prev, existing.id],
+			);
+			setNewTagName("");
+			return;
+		}
+		const nextId = tags.length ? Math.max(...tags.map((tag) => tag.id)) + 1 : 1;
+		const nextTag = { id: nextId, name: trimmed };
+		setTags((prev) => [...prev, nextTag]);
+		setSelectedTagIds((prev) => [...prev, nextId]);
+		setNewTagName("");
+	};
 
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
@@ -51,9 +99,22 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 				throw new Error(message);
 			}
 			const thread = ThreadSchema.parse(body);
+			const selectedTags = tags.filter((tag) =>
+				selectedTagIds.includes(tag.id),
+			);
+			const threadWithTags = {
+				...thread,
+				threadLabels: selectedTags.map((tag) => ({
+					threadId: thread.id,
+					labelId: tag.id,
+					labels: { id: tag.id, name: tag.name },
+				})),
+			};
 
-			onCreated(thread);
+			onCreated(threadWithTags);
 			form.reset();
+			setSelectedTagIds([]);
+			setNewTagName("");
 		} catch (error: unknown) {
 			if (
 				typeof error === "object" &&
@@ -116,7 +177,44 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 						{error && <p className="text-red-500">{error}</p>}
 
 						<div className="space-y-2">
-							<div className="font-bold">ラベル</div>
+							<div className="font-bold">タグ</div>
+							<div className="flex flex-wrap gap-2">
+								{tags.map((tag) => {
+									const isSelected = selectedTagIds.includes(tag.id);
+									return (
+										<button
+											key={tag.id}
+											type="button"
+											onClick={() => toggleTag(tag.id)}
+											className={cn(
+												"rounded-full px-3 py-1 text-xs font-medium text-gray-800 transition",
+												getLabelClass(tag.id),
+												isSelected
+													? "ring-2 ring-blue-500 ring-offset-1"
+													: "opacity-70 hover:opacity-100",
+											)}
+										>
+											{tag.name}
+										</button>
+									);
+								})}
+							</div>
+							<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+								<Input
+									value={newTagName}
+									onChange={(event) => setNewTagName(event.target.value)}
+									placeholder="タグを追加"
+									className="sm:w-64"
+								/>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={addTag}
+									disabled={!newTagName.trim()}
+								>
+									追加
+								</Button>
+							</div>
 						</div>
 
 						<Button

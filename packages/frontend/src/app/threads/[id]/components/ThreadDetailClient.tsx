@@ -6,6 +6,8 @@ import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useEffect, useState } from "react";
 import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { CategoryColorMap } from "@/lib/config/color/labelColor";
+import { cn } from "@/lib/utils";
 import BreadCrumb from "./BreadCrumbs";
 import { CreatePostForm } from "./CreatePostForm";
 import { PostList } from "./PostList";
@@ -38,6 +40,8 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 	const normalizedInitialPosts = Array.isArray(initialPosts)
 		? initialPosts
 		: [];
+	const getLabelClass = (labelId: number) =>
+		CategoryColorMap[labelId % CategoryColorMap.length];
 
 	const [posts, setPosts] = useState<PostListType>(
 		sortByCreatedAt(normalizedInitialPosts),
@@ -84,6 +88,19 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 				<div className="flex flex-col w-full items-center p-4 sm:py-7">
 					<div className="text-xl sm:text-3xl font-bold break-words">
 						{thread.title}
+					</div>
+					<div className="mt-2 flex flex-wrap justify-center gap-2">
+						{thread.threadLabels?.map((label) => (
+							<span
+								key={label.labelId}
+								className={cn(
+									"rounded-full px-2 py-0.5 text-xs font-medium text-gray-800",
+									getLabelClass(label.labelId),
+								)}
+							>
+								{label.labels.name}
+							</span>
+						))}
 					</div>
 					<p className="text-gray-400">{formatDateTime(thread.createdAt)}</p>
 				</div>

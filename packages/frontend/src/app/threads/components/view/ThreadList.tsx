@@ -2,6 +2,8 @@ import type { LabelType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
+import { CategoryColorMap } from "@/lib/config/color/labelColor";
+import { cn } from "@/lib/utils";
 import { formatDate } from "@/utils/date/formatDate";
 import { getRelativeDate } from "@/utils/date/getRelativeDate";
 
@@ -11,6 +13,8 @@ type ThreadListType = {
 
 export const ThreadList = ({ threads }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
+	const getLabelClass = (labelId: number) =>
+		CategoryColorMap[labelId % CategoryColorMap.length];
 
 	return (
 		<div className="radius-sm flex flex-col sm:p-5">
@@ -36,13 +40,21 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								<div className="text-sm">{thread.postCount}</div>
 							</div>
 
-							{thread.threadLabels?.map(
-								(tl: LabelType.ThreadThreadLabelType) => (
-									<span key={tl.labelId} className="">
-										{tl.labels.name}
-									</span>
-								),
-							)}
+							<div className="mt-2 flex flex-wrap gap-2">
+								{thread.threadLabels?.map(
+									(tl: LabelType.ThreadThreadLabelType) => (
+										<span
+											key={tl.labelId}
+											className={cn(
+												"rounded-full px-2 py-0.5 text-xs font-medium text-gray-800",
+												getLabelClass(tl.labelId),
+											)}
+										>
+											{tl.labels.name}
+										</span>
+									),
+								)}
+							</div>
 						</div>
 						{/* 右側：作成者 + 日付 */}
 						<div className="flex flex-col items-end gap-y-1 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
