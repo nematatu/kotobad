@@ -1,20 +1,20 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute } from "@hono/zod-openapi";
 import { ErrorResponse } from "../../../../models/error";
-import { OpenAPILabelListSchema } from "../../../../models/labels";
+import { OpenAPITagListSchema } from "../../../../models/tags";
 import type { AppEnvironment } from "../../../../types";
 import { getErrorMessage } from "../../../../utils/errors";
 
-export const getAllLabelRoute = createRoute({
+export const getAllTagRoute = createRoute({
 	method: "get",
 	path: "/",
-	description: "すべてのラベルをリストで取得します",
+	description: "すべてのタグをリストで取得します",
 	responses: {
 		200: {
-			description: "ラベルのリスト",
+			description: "タグのリスト",
 			content: {
 				"application/json": {
-					schema: OpenAPILabelListSchema,
+					schema: OpenAPITagListSchema,
 				},
 			},
 		},
@@ -29,16 +29,16 @@ export const getAllLabelRoute = createRoute({
 	},
 });
 
-export const getAllLabelRouter: RouteHandler<
-	typeof getAllLabelRoute,
+export const getAllTagRouter: RouteHandler<
+	typeof getAllTagRoute,
 	AppEnvironment
 > = async (c) => {
 	try {
 		const db = c.get("db");
 
-		const labelsResult = await db.query.labels.findMany({});
+		const tagsResult = await db.query.tags.findMany({});
 
-		return c.json(labelsResult, 200);
+		return c.json(tagsResult, 200);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(
@@ -51,4 +51,4 @@ export const getAllLabelRouter: RouteHandler<
 	}
 };
 
-export type GetAllThreadRouteType = typeof getAllLabelRoute;
+export type GetAllThreadRouteType = typeof getAllTagRoute;

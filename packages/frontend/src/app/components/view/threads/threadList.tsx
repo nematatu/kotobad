@@ -41,15 +41,15 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 									</div>
 									<span>{thread.author.username}</span>
 								</div>
-								{thread.threadLabels?.length ? (
+								{thread.threadTags?.length ? (
 									<div className="mt-2 flex flex-wrap gap-1.5">
-										{thread.threadLabels?.map(
-											(tl: LabelType.ThreadThreadLabelType) => (
+										{thread.threadTags?.map(
+											(tl: LabelType.ThreadThreadTagType) => (
 												<span
-													key={tl.labelId}
+													key={tl.tagId}
 													className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-600"
 												>
-													{tl.labels.name}
+													{tl.tags.name}
 												</span>
 											),
 										)}

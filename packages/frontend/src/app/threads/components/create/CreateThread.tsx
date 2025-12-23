@@ -106,8 +106,8 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 				...thread,
 				threadLabels: selectedTags.map((tag) => ({
 					threadId: thread.id,
-					labelId: tag.id,
-					labels: { id: tag.id, name: tag.name },
+					tagId: tag.id,
+					tags: { id: tag.id, name: tag.name },
 				})),
 			};
 
@@ -149,14 +149,6 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 										スレッドタイトル
 									</FormLabel>
 									<FormControl>
-										{/* <Input */}
-										{/* 	{...field} */}
-										{/* 	{...form.register("title", { */}
-										{/* 		required: "タイトルは必須です", */}
-										{/* 	})} */}
-										{/* 	placeholder="例: 〇〇の試合について" */}
-										{/* 	className="w-full sm:h-14 sm:w-1/3 outline-2 focus:border-blue-600 placeholder-gray-500/50" */}
-										{/* /> */}
 										<Textarea
 											{...field}
 											{...form.register("title", {

@@ -12,7 +12,7 @@ export const API_PATH = {
 	GET_ALL_POSTS: "bbs/posts",
 	CREATE_POST: "bbs/posts/create",
 	GET_POSTS_BY_THREADID: "bbs/posts/byThreadId/",
-	GET_ALL_LABELS: "bbs/labels",
+	GET_ALL_TAGS: "bbs/labels",
 } as const;
 
 export type ApiPathKey = keyof typeof API_PATH;

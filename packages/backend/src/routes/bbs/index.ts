@@ -4,8 +4,8 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 // import { authMiddleware } from "../../middleware/auth";
 import { betterAuthMiddleware } from "../../middleware/better-auth";
 import type { AppEnvironment } from "../../types";
-import labelRouter from "./labels";
 import postRouter from "./posts";
+import labelRouter from "./tags";
 import threadRouter from "./threads";
 
 // better auth用のミドルウェアを適用

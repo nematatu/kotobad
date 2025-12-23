@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
-import { ThreadThreadLabelSchema } from "./label";
 import { PostListSchema } from "./post";
+import { ThreadThreadTagSchema } from "./tag";
 
 export const ThreadSchema = z.object({
 	id: z.number().int().positive(),
@@ -14,7 +14,7 @@ export const ThreadSchema = z.object({
 	author: z.object({
 		username: z.string().optional(),
 	}),
-	threadLabels: z.array(ThreadThreadLabelSchema),
+	threadTags: z.array(ThreadThreadTagSchema),
 });
 
 export const CreateThreadSchema = ThreadSchema.pick({

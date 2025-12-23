@@ -41,19 +41,17 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 							</div>
 
 							<div className="mt-2 flex flex-wrap gap-2">
-								{thread.threadLabels?.map(
-									(tl: LabelType.ThreadThreadLabelType) => (
-										<span
-											key={tl.labelId}
-											className={cn(
-												"rounded-full px-2 py-0.5 text-xs font-medium text-gray-800",
-												getLabelClass(tl.labelId),
-											)}
-										>
-											{tl.labels.name}
-										</span>
-									),
-								)}
+								{thread.threadTags?.map((tl: LabelType.ThreadThreadTagType) => (
+									<span
+										key={tl.tagId}
+										className={cn(
+											"rounded-full px-2 py-0.5 text-xs font-medium text-gray-800",
+											getLabelClass(tl.tagId),
+										)}
+									>
+										{tl.tags.name}
+									</span>
+								))}
 							</div>
 						</div>
 						{/* 右側：作成者 + 日付 */}
