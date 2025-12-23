@@ -85,22 +85,6 @@ export const posts = sqliteTable(
 	}),
 );
 
-export const japanTournaments = sqliteTable("japanTournaments", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	name: text("name").notNull(),
-	category: text("category"),
-	startDate: timestamp("start_date"),
-	endDate: timestamp("end_date"),
-});
-
-export const worldTournaments = sqliteTable("worldTournaments", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	name: text("name").notNull(),
-	category: text("category"),
-	startDate: timestamp("start_date"),
-	endDate: timestamp("end_date"),
-});
-
 export const players = sqliteTable("players", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	firstName: text("first_name").notNull(),
@@ -129,12 +113,6 @@ export const achievements = sqliteTable("achievements", {
 	playerId: integer("player_id")
 		.notNull()
 		.references(() => players.id, { onDelete: "cascade" }),
-	japanTournamentId: integer("japan_tournament_id").references(
-		() => japanTournaments.id,
-	),
-	worldTournamentId: integer("world_tournament_id").references(
-		() => worldTournaments.id,
-	),
 	year: integer("year").notNull(),
 	result: text("result").notNull(),
 });
@@ -151,12 +129,6 @@ export const threadLabels = sqliteTable("thread_label", {
 	labelId: integer("label_id")
 		.notNull()
 		.references(() => labels.id),
-	japanTournamentId: integer("japanTournament_id").references(
-		() => japanTournaments.id,
-	),
-	worldTournamentId: integer("worldTournament_id").references(
-		() => worldTournaments.id,
-	),
 });
 
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
@@ -174,14 +146,6 @@ export const achievementsRelations = relations(achievements, ({ one }) => ({
 	player: one(players, {
 		fields: [achievements.playerId],
 		references: [players.id],
-	}),
-	japanTournament: one(japanTournaments, {
-		fields: [achievements.japanTournamentId],
-		references: [japanTournaments.id],
-	}),
-	worldTournament: one(worldTournaments, {
-		fields: [achievements.worldTournamentId],
-		references: [worldTournaments.id],
 	}),
 }));
 
@@ -217,19 +181,6 @@ export const usersRelations = relations(user, ({ many }) => ({
 	threads: many(threads),
 }));
 
-export const japanTournamentsRelations = relations(
-	japanTournaments,
-	({ many }) => ({
-		threadLabels: many(threadLabels),
-	}),
-);
-
-export const worldTournamentsRelations = relations(
-	worldTournaments,
-	({ many }) => ({
-		threadLabels: many(threadLabels),
-	}),
-);
 
 export const labelRelations = relations(labels, ({ many }) => ({
 	threadLabels: many(threadLabels),
@@ -243,14 +194,6 @@ export const threadLabelRelations = relations(threadLabels, ({ one }) => ({
 	labels: one(labels, {
 		fields: [threadLabels.labelId],
 		references: [labels.id],
-	}),
-	japanTournaments: one(japanTournaments, {
-		fields: [threadLabels.labelId],
-		references: [japanTournaments.id],
-	}),
-	worldTournaments: one(worldTournaments, {
-		fields: [threadLabels.labelId],
-		references: [worldTournaments.id],
 	}),
 }));
 
