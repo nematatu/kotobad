@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
-import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher.server";
 
 export const revalidate = 900;
 

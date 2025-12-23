@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
+import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher.server";
 import { getApiBaseUrl } from "@/lib/api/url/BaseUrl";
 import { appendSetCookies, extractSetCookies } from "../shared";
 

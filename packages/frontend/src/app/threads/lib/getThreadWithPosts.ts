@@ -1,6 +1,6 @@
 import { ThreadWithPostsSchema } from "@kotobad/shared/src/schemas/thread";
 import type { InferResponseType } from "hono";
-import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
+import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.server";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { apiUrlMap } from "../url/BaseBffUrl";
 
-type fetchArgs = Parameters<typeof fetch>;
+type FetchArgs = Parameters<typeof fetch>;
 
 const toHeaders = (value: HeadersInit | undefined) =>
 	value instanceof Headers ? value : new Headers(value);
@@ -11,10 +11,10 @@ export type BffFetcherError = Error & {
 	body?: string;
 };
 
-type BffFetcherOptions = fetchArgs[1] & { skipCookie?: boolean };
+type BffFetcherOptions = FetchArgs[1] & { skipCookie?: boolean };
 
 export async function BffFetcherRaw(
-	url: fetchArgs[0],
+	url: FetchArgs[0],
 	options: BffFetcherOptions = {},
 	skipErrorThrow = false,
 ): Promise<Response> {
@@ -57,7 +57,7 @@ export async function BffFetcherRaw(
 }
 
 export async function BffFetcher<T>(
-	url: fetchArgs[0],
+	url: FetchArgs[0],
 	options: BffFetcherOptions = {},
 ): Promise<T> {
 	const response = await BffFetcherRaw(url, options);

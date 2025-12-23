@@ -1,6 +1,9 @@
 import type { InferResponseType } from "hono";
 import { NextResponse } from "next/server";
-import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import {
+	BffFetcher,
+	type BffFetcherError,
+} from "@/lib/api/fetcher/bffFetcher.server";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 

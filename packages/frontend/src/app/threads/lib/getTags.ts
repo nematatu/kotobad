@@ -1,10 +1,10 @@
 import { TagListSchema } from "@kotobad/shared/src/schemas/tag";
 import type { TagListType } from "@kotobad/shared/src/types/tag";
-import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
-import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher.client";
+import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
-export async function getTags(): Promise<TagListType> {
+export async function getAllTags(): Promise<TagListType> {
 	const targetUrl = await getBffApiUrl("GET_ALL_TAGS");
 
 	let raw: TagListType = [];

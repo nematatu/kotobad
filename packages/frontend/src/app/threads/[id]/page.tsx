@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
-import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher.server";
 import ThreadDetailClient from "./components/ThreadDetailClient";
 export const revalidate = 900;
 export const dynamic = "force-static";

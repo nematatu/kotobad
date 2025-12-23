@@ -1,6 +1,7 @@
+import { TagListSchema } from "@kotobad/shared/src/schemas/tag";
 import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+	BffFetcher,
+	type BffFetcherError,
+} from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
@@ -27,7 +32,7 @@ type TagOption = {
 	name: string;
 };
 
-const initialTags: TagOption[] = [
+const fallbackTags: TagOption[] = [
 	{ id: 1, name: "初心者" },
 	{ id: 2, name: "試合" },
 	{ id: 3, name: "ギア" },
@@ -44,7 +49,7 @@ type CreateThreadFormProps = {
 
 export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
-	const [tags, setTags] = useState<TagOption[]>(initialTags);
+	const [tags, setTags] = useState<TagOption[]>(fallbackTags);
 	const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 	const [newTagName, setNewTagName] = useState("");
 	const form = useForm<CreateThreadType>({
@@ -52,6 +57,32 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 			title: "",
 		},
 	});
+
+	useEffect(() => {
+		let isMounted = true;
+
+		const loadTags = async () => {
+			try {
+				const targetUrl = await getBffApiUrl("GET_ALL_TAGS");
+				const data = await BffFetcher<TagOption[]>(targetUrl, {
+					method: "GET",
+					cache: "no-store",
+				});
+				const parsed = TagListSchema.safeParse(data);
+				if (parsed.success && isMounted) {
+					setTags(parsed.data);
+				}
+			} catch (error) {
+				console.error("Failed to fetch tags", error);
+			}
+		};
+
+		loadTags();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	const toggleTag = (id: number) => {
 		setSelectedTagIds((prev) =>
@@ -83,21 +114,11 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 		setError(null);
 		try {
 			const endpoint = await getBffApiUrl("CREATE_THREAD");
-			const response = await fetch(endpoint, {
+			const body = await BffFetcher<ThreadType>(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(values),
 			});
-
-			const body = await response.json();
-
-			if (!response.ok) {
-				const message =
-					typeof body === "object" && body && "error" in body
-						? String(body.error)
-						: "スレッド作成に失敗しました";
-				throw new Error(message);
-			}
 			const thread = ThreadSchema.parse(body);
 			const selectedTags = tags.filter((tag) =>
 				selectedTagIds.includes(tag.id),
@@ -116,13 +137,8 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 			setSelectedTagIds([]);
 			setNewTagName("");
 		} catch (error: unknown) {
-			if (
-				typeof error === "object" &&
-				error !== null &&
-				"status" in error &&
-				typeof (error as { status?: unknown }).status === "number" &&
-				(error as { status: number }).status === 401
-			) {
+			const fetchError = error as BffFetcherError;
+			if (fetchError.status === 401) {
 				setError("ログインが必要です");
 			} else {
 				const message =
