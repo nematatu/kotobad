@@ -1,4 +1,4 @@
-import type { LabelType } from "@kotobad/shared/src/types";
+import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
@@ -44,7 +44,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								{thread.threadTags?.length ? (
 									<div className="mt-2 flex flex-wrap gap-1.5">
 										{thread.threadTags?.map(
-											(tl: LabelType.ThreadThreadTagType) => (
+											(tl: TagType.ThreadThreadTagType) => (
 												<span
 													key={tl.tagId}
 													className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-600"

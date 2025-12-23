@@ -9,7 +9,8 @@
 		"generate": "drizzle-kit generate",
 		"local:migration": "bun x wrangler d1 migrations apply b3s-db --local",
 		"remote:migration": "wrangler d1 migrations apply b3s-db --remote",
-		"tables": "wrangler d1 execute b3s-db --local --command \"SELECT sql FROM sqlite_master WHERE type='table';\""
+		"local:tables": "wrangler d1 execute b3s-db --local --command \"SELECT sql FROM sqlite_master WHERE type='table';\"",
+		"remote:tables": "wrangler d1 execute b3s-db --remote --command \"SELECT sql FROM sqlite_master WHERE type='table';\""
 	},
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.11.1",

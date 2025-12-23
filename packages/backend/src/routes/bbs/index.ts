@@ -5,7 +5,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { betterAuthMiddleware } from "../../middleware/better-auth";
 import type { AppEnvironment } from "../../types";
 import postRouter from "./posts";
-import labelRouter from "./tags";
+import tagRouter from "./tags";
 import threadRouter from "./threads";
 
 // better auth用のミドルウェアを適用
@@ -14,7 +14,7 @@ const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/posts/create", betterAuthMiddleware)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter)
-	.route("/labels", labelRouter);
+	.route("/labels", tagRouter);
 
 export type BbsType = typeof bbsRouter;
 export default bbsRouter;
