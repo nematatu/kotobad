@@ -5,7 +5,7 @@ export default async function Page() {
 	const { threads } = await getThreads(1);
 	return (
 		<div className="flex flex-col gap-y-4">
-			<h1 className="text-2xl md:text-4xl font-bold mx-40 my-10">
+			<h1 className="text-2xl md:text-4xl font-bold m-5 md:mx-40 md:my-10">
 				最新のスレッド
 			</h1>
 			<ThreadList threads={threads} />
