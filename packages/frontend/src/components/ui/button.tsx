@@ -1,7 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
-import { buttonColor } from "@/lib/color/buttonColor";
+import { buttonColor } from "@/lib/config/color/buttonColor";
 
 import { cn } from "@/lib/utils";
 
