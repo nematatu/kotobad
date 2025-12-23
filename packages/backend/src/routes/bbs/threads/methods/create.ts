@@ -93,9 +93,9 @@ export const createThreadRouter: RouteHandler<
 				author: {
 					columns: { name: true },
 				},
-				threadLabels: {
+				threadTags: {
 					with: {
-						labels: true,
+						tags: true,
 					},
 				},
 			},

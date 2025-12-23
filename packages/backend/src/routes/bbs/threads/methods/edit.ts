@@ -108,9 +108,9 @@ export const editThreadRouter: RouteHandler<
 				author: {
 					columns: { name: true },
 				},
-				threadLabels: {
+				threadTags: {
 					with: {
-						labels: true,
+						tags: true,
 					},
 				},
 			},

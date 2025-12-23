@@ -211,9 +211,9 @@ export const getAllThreadRouter: RouteHandler<
 						author: {
 							columns: { name: true },
 						},
-						threadLabels: {
+						threadTags: {
 							with: {
-								labels: true,
+								tags: true,
 							},
 						},
 					},
@@ -229,9 +229,9 @@ export const getAllThreadRouter: RouteHandler<
 				db.query.threads.findMany({
 					with: {
 						author: { columns: { name: true } },
-						threadLabels: {
+						threadTags: {
 							with: {
-								labels: true,
+								tags: true,
 							},
 						},
 					},
@@ -274,9 +274,9 @@ export const getThreadByIdRouter: RouteHandler<
 						name: true,
 					},
 				},
-				threadLabels: {
+				threadTags: {
 					with: {
-						labels: true,
+						tags: true,
 					},
 				},
 			},
@@ -317,9 +317,9 @@ export const getThreadWithPostsRouter: RouteHandler<
 							name: true,
 						},
 					},
-					threadLabels: {
+					threadTags: {
 						with: {
-							labels: true,
+							tags: true,
 						},
 					},
 				},
@@ -384,9 +384,9 @@ export const searchThreadRouter: RouteHandler<
 							name: true,
 						},
 					},
-					threadLabels: {
+					threadTags: {
 						with: {
-							labels: true,
+							tags: true,
 						},
 					},
 				},
