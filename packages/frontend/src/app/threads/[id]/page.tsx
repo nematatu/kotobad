@@ -26,8 +26,49 @@ export default async function ThreadDetailPage({ params }: Props) {
 		throw error;
 	}
 
+	const normalizeThreadTags = (
+		thread: Record<string, unknown>,
+	): Record<string, unknown> => {
+		if (Array.isArray(thread.threadTags)) {
+			return thread;
+		}
+		if (Array.isArray(thread.threadLabels)) {
+			const threadTags = thread.threadLabels
+				.filter(
+					(
+						label,
+					): label is {
+						threadId: number;
+						labelId: number;
+						labels: { id: number; name: string };
+					} =>
+						typeof label === "object" &&
+						label !== null &&
+						"labels" in label &&
+						"labelId" in label,
+				)
+				.map((label) => ({
+					threadId: label.threadId,
+					tagId: label.labelId,
+					tags: label.labels,
+				}));
+			return { ...thread, threadTags };
+		}
+		return { ...thread, threadTags: [] };
+	};
+
+	const normalizedResponse =
+		typeof response === "object" && response !== null && "thread" in response
+			? {
+					...response,
+					thread: normalizeThreadTags(
+						(response as { thread: Record<string, unknown> }).thread ?? {},
+					),
+				}
+			: response;
+
 	const { thread: targetThread, posts: targetPosts } =
-		ThreadWithPostsSchema.parse(response);
+		ThreadWithPostsSchema.parse(normalizedResponse);
 
 	return (
 		<div className="p-1 sm:p-4">

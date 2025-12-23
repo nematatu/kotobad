@@ -13,38 +13,38 @@ export type ThreadQueryResult = {
 	author?: {
 		name?: string | null;
 	};
-	threadLabels?: Array<{
+	threadTags?: Array<{
 		threadId: number;
-		labelId: number;
-		labels?: {
+		tagId: number;
+		tags?: {
 			id: number;
 			name: string;
 		} | null;
 	}>;
 };
 
-type ThreadLabelQueryResult = NonNullable<
-	ThreadQueryResult["threadLabels"]
+type ThreadTagQueryResult = NonNullable<
+	ThreadQueryResult["threadTags"]
 >[number];
 
 export const toThreadResponse = <T extends ThreadQueryResult>(
 	thread: T,
 ): z.infer<typeof OpenAPIThreadSchema> => {
-	const threadLabels =
-		thread.threadLabels
+	const threadTags =
+		thread.threadTags
 			?.filter(
 				(
-					label,
-				): label is ThreadLabelQueryResult & {
-					labels: { id: number; name: string };
-				} => Boolean(label.labels),
+					tag,
+				): tag is ThreadTagQueryResult & {
+					tags: { id: number; name: string };
+				} => Boolean(tag),
 			)
-			.map((label) => ({
-				threadId: label.threadId,
-				labelId: label.labelId,
-				labels: {
-					id: label.labels.id,
-					name: label.labels.name,
+			.map((tag) => ({
+				threadId: tag.threadId,
+				tagId: tag.tagId,
+				tags: {
+					id: tag.tags.id,
+					name: tag.tags.name,
 				},
 			})) ?? [];
 
@@ -60,6 +60,6 @@ export const toThreadResponse = <T extends ThreadQueryResult>(
 		author: {
 			username: thread.author?.name ?? undefined,
 		},
-		threadLabels,
+		threadTags,
 	};
 };

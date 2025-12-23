@@ -104,7 +104,7 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 			);
 			const threadWithTags = {
 				...thread,
-				threadLabels: selectedTags.map((tag) => ({
+				threadTags: selectedTags.map((tag) => ({
 					threadId: thread.id,
 					tagId: tag.id,
 					tags: { id: tag.id, name: tag.name },

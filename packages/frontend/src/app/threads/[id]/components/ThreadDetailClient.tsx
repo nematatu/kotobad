@@ -40,8 +40,8 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 	const normalizedInitialPosts = Array.isArray(initialPosts)
 		? initialPosts
 		: [];
-	const getLabelClass = (labelId: number) =>
-		CategoryColorMap[labelId % CategoryColorMap.length];
+	const getLabelClass = (tagId: number) =>
+		CategoryColorMap[tagId % CategoryColorMap.length];
 
 	const [posts, setPosts] = useState<PostListType>(
 		sortByCreatedAt(normalizedInitialPosts),
@@ -90,15 +90,15 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 						{thread.title}
 					</div>
 					<div className="mt-2 flex flex-wrap justify-center gap-2">
-						{thread.threadLabels?.map((label) => (
+						{thread.threadTags?.map((tag) => (
 							<span
-								key={label.labelId}
+								key={tag.tagId}
 								className={cn(
 									"rounded-full px-2 py-0.5 text-xs font-medium text-gray-800",
-									getLabelClass(label.labelId),
+									getLabelClass(tag.tagId),
 								)}
 							>
-								{label.labels.name}
+								{tag.tags.name}
 							</span>
 						))}
 					</div>
