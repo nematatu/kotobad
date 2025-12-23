@@ -14,7 +14,7 @@ export default function CreateThreadButton(
 			{...props}
 			enableClickAnimation
 		>
-			<span className="text-md">スレッド作成</span>
+			<span className="text-md">投稿する</span>
 		</IconButton>
 	);
 }
