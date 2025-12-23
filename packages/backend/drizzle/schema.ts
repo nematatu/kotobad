@@ -117,25 +117,25 @@ export const achievements = sqliteTable("achievements", {
 	result: text("result").notNull(),
 });
 
-export const labels = sqliteTable("labels", {
+export const tags = sqliteTable("tags", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
 });
 
-export const threadLabels = sqliteTable("thread_label", {
+export const threadTags = sqliteTable("thread_tag", {
 	threadId: integer("thread_id")
 		.notNull()
 		.references(() => threads.id),
-	labelId: integer("label_id")
+	tagId: integer("tag_id")
 		.notNull()
-		.references(() => labels.id),
+		.references(() => tags.id),
 });
 
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);
 export const playerIdx = index("player_idx").on(players.id);
-export const threadLabelIdx = index("thread_label_idx").on(threadLabels.threadId);
+export const threadTagIdx = index("thread_tag_idx").on(threadTags.threadId);
 
 export const playersRelations = relations(players, ({ many }) => ({
 	achievements: many(achievements),
@@ -173,7 +173,7 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 		references: [user.id],
 	}),
 	posts: many(posts),
-	threadLabels: many(threadLabels),
+	threadTags: many(threadTags),
 }));
 
 export const usersRelations = relations(user, ({ many }) => ({
@@ -182,18 +182,18 @@ export const usersRelations = relations(user, ({ many }) => ({
 }));
 
 
-export const labelRelations = relations(labels, ({ many }) => ({
-	threadLabels: many(threadLabels),
+export const tagRelations = relations(tags, ({ many }) => ({
+	threadTags: many(threadTags),
 }));
 
-export const threadLabelRelations = relations(threadLabels, ({ one }) => ({
+export const threadTagRelations = relations(threadTags, ({ one }) => ({
 	thread: one(threads, {
-		fields: [threadLabels.threadId],
+		fields: [threadTags.threadId],
 		references: [threads.id],
 	}),
-	labels: one(labels, {
-		fields: [threadLabels.labelId],
-		references: [labels.id],
+	tags: one(tags, {
+		fields: [threadTags.tagId],
+		references: [tags.id],
 	}),
 }));
 
