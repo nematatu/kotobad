@@ -1,6 +1,7 @@
 "use client";
 
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
+import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -11,12 +12,14 @@ import { ThreadPagination } from "./ThreadPageNation";
 
 type Props = {
 	initialThreads: ThreadType[];
+	initialTags?: TagListType;
 	currentPage: number;
 	totalCount: number;
 };
 
 export default function ThreadPageClient({
 	initialThreads,
+	initialTags,
 	currentPage,
 	totalCount,
 }: Props) {
@@ -39,7 +42,7 @@ export default function ThreadPageClient({
 					<div className="text-xl sm:text-2xl sm:text-3xl font-bold pb-1 sm:py-4">
 						スレッド一覧
 					</div>
-					<CreateThread onCreated={handleCreated} />
+					<CreateThread onCreated={handleCreated} initialTags={initialTags} />
 					<div className="flex items-center my-2">
 						<ThreadDisplayCount
 							currentPage={currentPage}

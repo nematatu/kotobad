@@ -1,7 +1,7 @@
-import { TagListSchema } from "@kotobad/shared/src/schemas/tag";
 import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
+import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -45,11 +45,15 @@ const getLabelClass = (labelId: number) =>
 
 type CreateThreadFormProps = {
 	onCreated: (newThread: ThreadType) => void;
+	initialTags?: TagOption[];
 };
 
-export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
+export const CreateThreadForm = ({
+	onCreated,
+	initialTags,
+}: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
-	const [tags, setTags] = useState<TagOption[]>(fallbackTags);
+	const [tags, setTags] = useState<TagOption[]>(initialTags ?? fallbackTags);
 	const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 	const [newTagName, setNewTagName] = useState("");
 	const form = useForm<CreateThreadType>({
@@ -57,32 +61,6 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 			title: "",
 		},
 	});
-
-	useEffect(() => {
-		let isMounted = true;
-
-		const loadTags = async () => {
-			try {
-				const targetUrl = await getBffApiUrl("GET_ALL_TAGS");
-				const data = await BffFetcher<TagOption[]>(targetUrl, {
-					method: "GET",
-					cache: "no-store",
-				});
-				const parsed = TagListSchema.safeParse(data);
-				if (parsed.success && isMounted) {
-					setTags(parsed.data);
-				}
-			} catch (error) {
-				console.error("Failed to fetch tags", error);
-			}
-		};
-
-		loadTags();
-
-		return () => {
-			isMounted = false;
-		};
-	}, []);
 
 	const toggleTag = (id: number) => {
 		setSelectedTagIds((prev) =>
@@ -240,9 +218,10 @@ export const CreateThreadForm = ({ onCreated }: CreateThreadFormProps) => {
 
 type CreateThreadProps = {
 	onCreated: (newThread: ThreadType) => void;
+	initialTags?: TagListType;
 };
 
-export const CreateThread = ({ onCreated }: CreateThreadProps) => {
+export const CreateThread = ({ onCreated, initialTags }: CreateThreadProps) => {
 	const [isOpenForm, setIsOpenForm] = useState(false);
 	const handleToggleForm = () => {
 		setIsOpenForm((prev) => !prev);
@@ -258,7 +237,9 @@ export const CreateThread = ({ onCreated }: CreateThreadProps) => {
 				{isOpenForm ? "▲" : "▼"} スレッド作成
 			</Button>
 
-			{isOpenForm && <CreateThreadForm onCreated={onCreated} />}
+			{isOpenForm && (
+				<CreateThreadForm onCreated={onCreated} initialTags={initialTags} />
+			)}
 		</div>
 	);
 };
