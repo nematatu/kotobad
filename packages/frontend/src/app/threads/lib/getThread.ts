@@ -6,6 +6,8 @@ import { getApiUrl } from "@/lib/config/apiUrls";
 import normalizeThreadTags from "./normalizeThreadTags";
 export const dynamic = "force-static";
 
+import type { InferResponseType } from "hono";
+import type { client } from "@/lib/api/honoClient";
 import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
 
 const cacheBust =
@@ -16,6 +18,7 @@ const cacheBust =
 	"";
 
 export async function getThreads(page: number): Promise<ThreadListType> {
+	type ResType = InferResponseType<typeof client.bbs.threads.$get>;
 	const targetUrl = await getApiUrl("GET_ALL_THREADS");
 	targetUrl.searchParams.set("page", String(page));
 
@@ -27,7 +30,7 @@ export async function getThreads(page: number): Promise<ThreadListType> {
 
 	let raw: unknown;
 	try {
-		raw = await BffFetcher<unknown>(targetUrl, {
+		raw = await BffFetcher<ResType>(targetUrl, {
 			method: "GET",
 			cache: "force-cache",
 			next: { revalidate: REVALIDATE_SECONDS, tags: ["threads"] },

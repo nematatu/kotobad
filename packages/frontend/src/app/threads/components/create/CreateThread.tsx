@@ -20,8 +20,7 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
-import { CategoryColorMap } from "@/lib/config/color/labelColor";
-import { cn } from "@/lib/utils";
+import { TagList } from "../view/tag/tagList";
 
 type CreateThreadType = {
 	title: string;
@@ -39,9 +38,6 @@ const fallbackTags: TagOption[] = [
 	{ id: 4, name: "練習" },
 	{ id: 5, name: "雑談" },
 ];
-
-const getLabelClass = (labelId: number) =>
-	CategoryColorMap[labelId % CategoryColorMap.length];
 
 type CreateThreadFormProps = {
 	onCreated: (newThread: ThreadType) => void;
@@ -164,27 +160,11 @@ export const CreateThreadForm = ({
 
 						<div className="space-y-2">
 							<div className="font-bold">タグ</div>
-							<div className="flex flex-wrap gap-2">
-								{tags.map((tag) => {
-									const isSelected = selectedTagIds.includes(tag.id);
-									return (
-										<button
-											key={tag.id}
-											type="button"
-											onClick={() => toggleTag(tag.id)}
-											className={cn(
-												"rounded-full px-3 py-1 text-xs font-medium text-gray-800 transition",
-												getLabelClass(tag.id),
-												isSelected
-													? "ring-2 ring-blue-500 ring-offset-1"
-													: "opacity-70 hover:opacity-100",
-											)}
-										>
-											{tag.name}
-										</button>
-									);
-								})}
-							</div>
+							<TagList
+								tags={tags}
+								selectedTagIds={selectedTagIds}
+								onToggle={toggleTag}
+							/>
 							<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
 								<Input
 									value={newTagName}
