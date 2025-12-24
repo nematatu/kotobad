@@ -23,12 +23,12 @@ export default function ThreadPageClient({
 	currentPage,
 	totalCount,
 }: Props) {
-	const [threads, setThreads] = useState<ThreadType[]>([]);
+	const [threads, _] = useState<ThreadType[]>([]);
 	const router = useRouter();
 
-	const handleCreated = (newThread: ThreadType) => {
+	const handleCreated = () => {
 		if (currentPage === 1) {
-			setThreads((prev) => [newThread, ...prev]);
+			router.refresh();
 		} else {
 			router.push("/threads?page=1");
 		}

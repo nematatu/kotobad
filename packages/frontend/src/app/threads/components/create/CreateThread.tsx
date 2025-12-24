@@ -1,5 +1,4 @@
-import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
-import type { TagListType } from "@kotobad/shared/src/types/tag";
+import type { TagListType, TagType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,14 +25,9 @@ type CreateThreadType = {
 	title: string;
 };
 
-type TagOption = {
-	id: number;
-	name: string;
-};
-
 type CreateThreadFormProps = {
-	onCreated: (newThread: ThreadType) => void;
-	initialTags?: TagOption[];
+	onCreated: () => void;
+	initialTags?: TagType[];
 };
 
 export const CreateThreadForm = ({
@@ -54,25 +48,13 @@ export const CreateThreadForm = ({
 		setError(null);
 		try {
 			const endpoint = await getBffApiUrl("CREATE_THREAD");
-			const body = await BffFetcher<ThreadType>(endpoint, {
+			await BffFetcher<ThreadType>(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(values),
 			});
-			const thread = ThreadSchema.parse(body);
-			const selectedTags = tags.filter((tag) =>
-				selectedTagIds.includes(tag.id),
-			);
-			const threadWithTags = {
-				...thread,
-				threadTags: selectedTags.map((tag) => ({
-					threadId: thread.id,
-					tagId: tag.id,
-					tags: { id: tag.id, name: tag.name },
-				})),
-			};
 
-			onCreated(threadWithTags);
+			onCreated();
 			form.reset();
 			resetTagSelection();
 		} catch (error: unknown) {
@@ -146,7 +128,7 @@ export const CreateThreadForm = ({
 };
 
 type CreateThreadProps = {
-	onCreated: (newThread: ThreadType) => void;
+	onCreated: () => void;
 	initialTags?: TagListType;
 };
 

@@ -1,16 +1,12 @@
+import type { TagType } from "@kotobad/shared/src/types/tag";
 import { useState } from "react";
 
-type TagOption = {
-	id: number;
-	name: string;
-};
-
 type Options = {
-	initialTags?: TagOption[];
+	initialTags?: TagType[];
 };
 
 export const useTagSelection = ({ initialTags }: Options) => {
-	const tags: TagOption[] = initialTags ?? [];
+	const tags: TagType[] = initialTags ?? [];
 	const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
 	const toggleTag = (id: number) => {
