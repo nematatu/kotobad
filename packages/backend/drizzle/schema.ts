@@ -52,7 +52,7 @@ export const threads = sqliteTable("threads", {
 	updatedAt: timestamp("updated_at").$onUpdate(
 		() => sql`(strftime('%s', 'now'))`,
 	),
-	postCount: integer("postCount").notNull(),
+	postCount: integer("postCount").notNull().default(0),
 	authorId: text("author_id")
 		.notNull()
 		.references(() => user.id),

@@ -81,7 +81,6 @@ export const createThreadRouter: RouteHandler<
 			.values({
 				title: title,
 				authorId: user.id,
-				postCount: 0,
 			})
 			.returning({ id: threads.id });
 
