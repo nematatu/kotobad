@@ -52,7 +52,7 @@ export const threads = sqliteTable("threads", {
 	updatedAt: timestamp("updated_at").$onUpdate(
 		() => sql`(strftime('%s', 'now'))`,
 	),
-	postCount: integer("postCount").notNull().default(0),
+	postCount: integer("post_count").notNull().default(0),
 	authorId: text("author_id")
 		.notNull()
 		.references(() => user.id),
@@ -158,7 +158,6 @@ export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);
 export const playerIdx = index("player_idx").on(players.id);
-export const threadTagIdx = index("thread_tag_idx").on(threadTags.threadId);
 
 export const playersRelations = relations(players, ({ many }) => ({
 	achievements: many(achievements),

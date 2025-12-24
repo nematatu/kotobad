@@ -57,6 +57,13 @@
       "when": 1766450215119,
       "tag": "0007_spicy_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1766574573959,
+      "tag": "0008_dark_redwing",
+      "breakpoints": true
     }
   ]
 }

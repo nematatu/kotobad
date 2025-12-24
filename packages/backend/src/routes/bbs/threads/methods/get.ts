@@ -200,7 +200,7 @@ export const getAllThreadRouter: RouteHandler<
 			"public, s-maxage=900, stale-while-revalidate=900",
 		);
 
-		let threadsResult: Awaited<ReturnType<typeof db.query.threads.findMany>>;
+		let threadsResult;
 		let totalCountResult: Array<{ value: number | null }>;
 
 		if (page) {
