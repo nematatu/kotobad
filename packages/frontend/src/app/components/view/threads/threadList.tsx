@@ -39,7 +39,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 										<ChatIcon width={16} />
 										<span>{thread.postCount}</span>
 									</div>
-									<span>{thread.author.username}</span>
+									<span>{thread.author.name}</span>
 								</div>
 								{thread.threadTags?.length ? (
 									<div className="mt-2 flex flex-wrap gap-1.5">

@@ -12,7 +12,7 @@ export const ThreadSchema = z.object({
 	isPinned: z.boolean().optional(),
 	isClosed: z.boolean().optional(),
 	author: z.object({
-		username: z.string().optional(),
+		name: z.string(),
 	}),
 	threadTags: z.array(ThreadThreadTagSchema),
 });
@@ -22,6 +22,7 @@ export const CreateThreadSchema = ThreadSchema.pick({
 });
 
 export const EditThreadSchema = ThreadSchema.partial();
+
 export const ThreadListSchema = z.object({
 	threads: z.array(ThreadSchema),
 	totalCount: z.number(),

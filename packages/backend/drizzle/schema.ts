@@ -6,7 +6,9 @@ import {
 	sqliteTable,
 	text,
 	uniqueIndex,
+  check
 } from "drizzle-orm/sqlite-core";
+import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import { user } from "./better-auth.schema";
 
 const timestamp = customType<{ data: Date; driverData: number }>({
@@ -120,16 +122,37 @@ export const achievements = sqliteTable("achievements", {
 export const tags = sqliteTable("tags", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
-});
+  iconType: text("icon_type").notNull().default("none").$type<TagIconKindType>(),
+  iconValue: text("icon_value").notNull().default(""),
+}, (t) => [
+        check(
+            "tags_icon_type_check", 
+            sql`${t.iconType} IN ('emoji', 'image', 'text', 'none')`, 
+        ), 
+        check(
+            "tags_icon_value_check", 
+            sql`
+                (${t.iconType} != 'none' AND length(trim(${t.iconValue})) > 0 )
+                OR
+                (${t.iconType} = 'none' AND length(trim(${t.iconValue})) = 0)
+                `
+        )
+    ]
+)
 
 export const threadTags = sqliteTable("thread_tag", {
 	threadId: integer("thread_id")
 		.notNull()
-		.references(() => threads.id),
+		.references(() => threads.id, {onDelete: "cascade"}),
 	tagId: integer("tag_id")
 		.notNull()
-		.references(() => tags.id),
-});
+		.references(() => tags.id, {onDelete: "cascade"}),
+}, (t) => ({
+        ThreadTagUnique: uniqueIndex("thread_tag_unique").on(t.threadId, t.tagId),
+        threadIdIdx: index("thread_tag_idx").on(t.threadId),
+        tagIdIdx: index("tag_idx").on(t.tagId),
+    })
+)
 
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
