@@ -1,12 +1,27 @@
-type TagProps = {
-	label: string;
-};
+import type { TagType } from "@kotobad/shared/src/types/tag";
+import Image from "next/image";
+import IconButton from "@/components/common/button/IconButton";
+import getTagAssetsUrl from "@/lib/config/tag/getTagAssetsUrl";
 
-export default function Tag({ label }: TagProps) {
+export default function Tag({ tag }: { tag: TagType }) {
+	const { name, iconType, iconValue } = tag;
+	const icon =
+		iconType === "image" ? (
+			<Image
+				src={getTagAssetsUrl(iconValue)}
+				alt={name}
+				width={20}
+				height={20}
+			/>
+		) : iconType === "emoji" ? (
+			<span className="text-lg leading-none">{iconValue}</span>
+		) : iconType === "text" ? (
+			<span className="text-xs leading-none">{iconValue}</span>
+		) : null;
+
 	return (
-		<span className="inline-flex items-center rounded-md bg-gray-400/10 px-2 py-1 text-xs font-medium text-gray-400 inset-ring inset-ring-gray-400/20">
-			<div className="mr-1 h-2 w-2 rounded-full bg-white" />
-			<span>{label}</span>
-		</span>
+		<IconButton enableClickAnimation variant="outline" icon={icon}>
+			{name}
+		</IconButton>
 	);
 }

@@ -1,13 +1,10 @@
+import type { TagType } from "@kotobad/shared/src/types/tag";
+import Tag from "@/components/common/tag/tag";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
 
-type TagOption = {
-	id: number;
-	name: string;
-};
-
 type Props = {
-	tags: TagOption[];
+	tags: TagType[];
 	selectedTagIds?: number[];
 	onToggle?: (id: number) => void;
 };
@@ -22,7 +19,7 @@ export const TagList = ({ tags, selectedTagIds, onToggle }: Props) => {
 			{tags.map((tag) => {
 				const isSelected = selected.includes(tag.id);
 				const classes = cn(
-					"rounded-full px-3 py-1 text-xs font-medium text-gray-800 transition",
+					"rounded-full px-3 py-1 text-xs font-medium text-gray-800 transition cursor-pointer",
 					getLabelClass(tag.id),
 					onToggle
 						? isSelected
@@ -40,14 +37,17 @@ export const TagList = ({ tags, selectedTagIds, onToggle }: Props) => {
 				}
 
 				return (
-					<button
-						key={tag.id}
-						type="button"
-						onClick={() => onToggle(tag.id)}
-						className={classes}
-					>
-						{tag.name}
-					</button>
+					<>
+						<button
+							key={tag.id}
+							type="button"
+							onClick={() => onToggle(tag.id)}
+							className={classes}
+						>
+							{tag.name}
+						</button>
+						<Tag tag={tag} />
+					</>
 				);
 			})}
 		</div>

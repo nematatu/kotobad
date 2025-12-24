@@ -22,6 +22,15 @@ const nextConfig = {
       },
     },
   },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https", 
+                hostname: "assets.kotobad.com", 
+                pathname: "/tags/**"
+            }
+        ]
+    }
 };
 
 module.exports = nextConfig;
