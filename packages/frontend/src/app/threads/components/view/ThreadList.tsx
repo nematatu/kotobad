@@ -1,11 +1,11 @@
 import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
+import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
-import { formatDate } from "@/utils/date/formatDate";
-import { getRelativeDate } from "@/utils/date/getRelativeDate";
 
 type ThreadListType = {
 	threads: ThreadType[];

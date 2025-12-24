@@ -1,9 +1,9 @@
-import type { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
-import type { NextResponse } from "next/server";
 import {
 	type BetterAuthSessionResponse,
 	BetterAuthSessionResponseSchema,
-} from "@/lib/auth/betterAuthSession";
+} from "@kotobad/shared/src/auth/betterAuthSession";
+import type { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
+import type { NextResponse } from "next/server";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export function extractSetCookies(response: Response) {

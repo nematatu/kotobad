@@ -1,5 +1,5 @@
 "use server";
-import { ensureTrailingSlash } from "../../../utils/url/ensureTrailingSlash";
+import { ensureTrailingSlash } from "@kotobad/shared/src/utils/url/ensureTrailingSlash";
 
 const { headers } = await import("next/headers");
 

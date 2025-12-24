@@ -1,9 +1,9 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute } from "@hono/zod-openapi";
+import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { ErrorResponse } from "../../../../models/error";
 import { OpenAPITagListSchema } from "../../../../models/tags";
 import type { AppEnvironment } from "../../../../types";
-import { getErrorMessage } from "../../../../utils/errors";
 
 export const getAllTagRoute = createRoute({
 	method: "get",

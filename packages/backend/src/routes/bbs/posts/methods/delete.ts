@@ -1,10 +1,10 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq } from "drizzle-orm";
 import { posts } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import type { AppEnvironment } from "../../../../types";
-import { getErrorMessage } from "../../../../utils/errors";
 
 export const deletePostRoute = createRoute({
 	method: "delete",

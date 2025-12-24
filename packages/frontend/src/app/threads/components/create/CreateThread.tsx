@@ -13,7 +13,6 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	BffFetcher,
@@ -21,6 +20,7 @@ import {
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { TagList } from "../view/tag/tagList";
+import { useTagSelection } from "../view/tag/useTagSelection";
 
 type CreateThreadType = {
 	title: string;
@@ -30,14 +30,6 @@ type TagOption = {
 	id: number;
 	name: string;
 };
-
-const fallbackTags: TagOption[] = [
-	{ id: 1, name: "初心者" },
-	{ id: 2, name: "試合" },
-	{ id: 3, name: "ギア" },
-	{ id: 4, name: "練習" },
-	{ id: 5, name: "雑談" },
-];
 
 type CreateThreadFormProps = {
 	onCreated: (newThread: ThreadType) => void;
@@ -49,40 +41,14 @@ export const CreateThreadForm = ({
 	initialTags,
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
-	const [tags, setTags] = useState<TagOption[]>(initialTags ?? fallbackTags);
-	const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-	const [newTagName, setNewTagName] = useState("");
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
 		},
 	});
 
-	const toggleTag = (id: number) => {
-		setSelectedTagIds((prev) =>
-			prev.includes(id) ? prev.filter((tagId) => tagId !== id) : [...prev, id],
-		);
-	};
-
-	const addTag = () => {
-		const trimmed = newTagName.trim();
-		if (!trimmed) return;
-		const existing = tags.find(
-			(tag) => tag.name.toLowerCase() === trimmed.toLowerCase(),
-		);
-		if (existing) {
-			setSelectedTagIds((prev) =>
-				prev.includes(existing.id) ? prev : [...prev, existing.id],
-			);
-			setNewTagName("");
-			return;
-		}
-		const nextId = tags.length ? Math.max(...tags.map((tag) => tag.id)) + 1 : 1;
-		const nextTag = { id: nextId, name: trimmed };
-		setTags((prev) => [...prev, nextTag]);
-		setSelectedTagIds((prev) => [...prev, nextId]);
-		setNewTagName("");
-	};
+	const { tags, selectedTagIds, toggleTag, resetTagSelection } =
+		useTagSelection({ initialTags });
 
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
@@ -108,8 +74,7 @@ export const CreateThreadForm = ({
 
 			onCreated(threadWithTags);
 			form.reset();
-			setSelectedTagIds([]);
-			setNewTagName("");
+			resetTagSelection();
 		} catch (error: unknown) {
 			const fetchError = error as BffFetcherError;
 			if (fetchError.status === 401) {
@@ -165,22 +130,6 @@ export const CreateThreadForm = ({
 								selectedTagIds={selectedTagIds}
 								onToggle={toggleTag}
 							/>
-							<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-								<Input
-									value={newTagName}
-									onChange={(event) => setNewTagName(event.target.value)}
-									placeholder="タグを追加"
-									className="sm:w-64"
-								/>
-								<Button
-									type="button"
-									variant="outline"
-									onClick={addTag}
-									disabled={!newTagName.trim()}
-								>
-									追加
-								</Button>
-							</div>
 						</div>
 
 						<Button

@@ -1,9 +1,9 @@
 "use client";
 
 import type { PostListType } from "@kotobad/shared/src/types/post";
+import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
+import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { useEffect, useState } from "react";
-import { formatDate } from "@/utils/date/formatDate";
-import { getRelativeDate } from "@/utils/date/getRelativeDate";
 
 type PostListProps = {
 	posts: PostListType;

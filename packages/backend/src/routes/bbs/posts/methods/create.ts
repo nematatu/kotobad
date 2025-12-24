@@ -1,5 +1,6 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq, sql } from "drizzle-orm";
 import { posts, threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
@@ -8,7 +9,6 @@ import {
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
-import { getErrorMessage } from "../../../../utils/errors";
 
 export const createPostRoute = createRoute({
 	method: "post",

@@ -1,6 +1,7 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
+import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { count } from "drizzle-orm";
 import { threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
@@ -10,7 +11,6 @@ import {
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
 import type { AppEnvironment } from "../../../../types";
-import { getErrorMessage } from "../../../../utils/errors";
 import { toThreadResponse } from "./transform";
 
 export const getAllThreadRoute = createRoute({
