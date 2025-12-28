@@ -1,7 +1,9 @@
 import type { TagListType, TagType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { SmilePlus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import IconButton from "@/components/common/button/IconButton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -12,6 +14,11 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	BffFetcher,
@@ -19,6 +26,7 @@ import {
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { TagList } from "../view/tag/tagList";
+import { TagPicker } from "../view/tag/tagPicker";
 import { useTagSelection } from "../view/tag/useTagSelection";
 
 type CreateThreadType = {
@@ -35,6 +43,7 @@ export const CreateThreadForm = ({
 	initialTags,
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
+	const [isTagPopoverOpen, setIsTagPopoverOpen] = useState(false);
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
@@ -43,6 +52,13 @@ export const CreateThreadForm = ({
 
 	const { tags, selectedTagIds, toggleTag, resetTagSelection } =
 		useTagSelection({ initialTags });
+	const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
+	const handleSelectTag = (id: number, isSelected: boolean) => {
+		toggleTag(id);
+		if (!isSelected) {
+			setIsTagPopoverOpen(false);
+		}
+	};
 
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
@@ -106,12 +122,46 @@ export const CreateThreadForm = ({
 						{error && <p className="text-red-500">{error}</p>}
 
 						<div className="space-y-2">
-							<div className="font-bold">タグ</div>
-							<TagList
-								tags={tags}
-								selectedTagIds={selectedTagIds}
-								onToggle={toggleTag}
-							/>
+							<div className="flex items-center gap-2">
+								<TagList tags={selectedTags} onToggle={toggleTag} />
+								<Popover
+									open={isTagPopoverOpen}
+									onOpenChange={setIsTagPopoverOpen}
+								>
+									<PopoverTrigger asChild>
+										<IconButton
+											enableClickAnimation
+											type="button"
+											size="icon"
+											variant="outline"
+											icon={<SmilePlus />}
+										/>
+									</PopoverTrigger>
+									<PopoverContent
+										align="start"
+										className="w-[360px] p-3"
+										side="right"
+									>
+										<div className="flex items-center justify-between">
+											<div className="text-sm font-semibold">タグを選択</div>
+											<span className="text-xs text-slate-400">
+												{selectedTagIds.length} 件選択中
+											</span>
+										</div>
+										<p className="mt-1 text-xs text-gray-500">
+											クリックで追加/解除できます
+										</p>
+										<div className="mt-3">
+											<TagPicker
+												tags={tags}
+												selectedTagIds={selectedTagIds}
+												onSelect={handleSelectTag}
+												isOpen={isTagPopoverOpen}
+											/>
+										</div>
+									</PopoverContent>
+								</Popover>
+							</div>
 						</div>
 
 						<Button

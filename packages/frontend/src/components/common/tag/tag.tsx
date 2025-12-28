@@ -1,27 +1,36 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import Image from "next/image";
+import type * as React from "react";
 import IconButton from "@/components/common/button/IconButton";
-import getTagAssetsUrl from "@/lib/config/tag/getTagAssetsUrl";
+import TagIcon from "@/components/common/tag/TagIcon";
 
-export default function Tag({ tag }: { tag: TagType }) {
-	const { name, iconType, iconValue } = tag;
-	const icon =
-		iconType === "image" ? (
-			<Image
-				src={getTagAssetsUrl(iconValue)}
-				alt={name}
-				width={20}
-				height={20}
-			/>
-		) : iconType === "emoji" ? (
-			<span className="text-lg leading-none">{iconValue}</span>
-		) : iconType === "text" ? (
-			<span className="text-xs leading-none">{iconValue}</span>
-		) : null;
+type TagProps = {
+	tag: TagType;
+	isViewLabel?: boolean;
+} & Omit<React.ComponentProps<typeof IconButton>, "icon" | "children">;
+
+export default function Tag({
+	tag,
+	isViewLabel = true,
+	...buttonProps
+}: TagProps) {
+	const { name } = tag;
+	const icon = <TagIcon tag={tag} />;
+
+	const iconNode = isViewLabel ? (
+		icon
+	) : (
+		<span className="flex h-9 w-9 items-center justify-center">{icon}</span>
+	);
 
 	return (
-		<IconButton enableClickAnimation variant="outline" icon={icon}>
-			{name}
+		<IconButton
+			enableClickAnimation
+			variant="outline"
+			icon={iconNode}
+			size="icon"
+			{...buttonProps}
+		>
+			{isViewLabel && <span>{name}</span>}
 		</IconButton>
 	);
 }

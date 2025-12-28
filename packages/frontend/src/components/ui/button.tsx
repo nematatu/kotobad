@@ -20,9 +20,10 @@ const buttonVariants = cva(
 				ghost:
 					"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
 				link: "text-primary underline-offset-4 hover:underline",
-
 				google:
 					"bg-white text-slate-700 border border-slate-300 hover:bg-surface-100 text-sm",
+				tag: "rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 transition border-blue-300 bg-blue-100/50 text-blue-700 hover:bg-secondary/10",
+
 				...buttonColor,
 			},
 			size: {

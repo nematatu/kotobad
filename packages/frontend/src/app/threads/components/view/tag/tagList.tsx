@@ -1,53 +1,24 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import Tag from "@/components/common/tag/tag";
-import { CategoryColorMap } from "@/lib/config/color/labelColor";
-import { cn } from "@/lib/utils";
+import Tag from "@/components/common/tag/Tag";
 
 type Props = {
 	tags: TagType[];
-	selectedTagIds?: number[];
 	onToggle?: (id: number) => void;
 };
 
-const getLabelClass = (labelId: number) =>
-	CategoryColorMap[labelId % CategoryColorMap.length];
-
-export const TagList = ({ tags, selectedTagIds, onToggle }: Props) => {
-	const selected = selectedTagIds ?? [];
+export const TagList = ({ tags, onToggle }: Props) => {
 	return (
 		<div className="flex flex-wrap gap-2">
 			{tags.map((tag) => {
-				const isSelected = selected.includes(tag.id);
-				const classes = cn(
-					"rounded-full px-3 py-1 text-xs font-medium text-gray-800 transition cursor-pointer",
-					getLabelClass(tag.id),
-					onToggle
-						? isSelected
-							? "ring-2 ring-blue-500 ring-offset-1"
-							: "opacity-70 hover:opacity-100"
-						: undefined,
-				);
-
-				if (!onToggle) {
-					return (
-						<span key={tag.id} className={classes}>
-							{tag.name}
-						</span>
-					);
-				}
-
 				return (
-					<>
-						<button
-							key={tag.id}
-							type="button"
-							onClick={() => onToggle(tag.id)}
-							className={classes}
-						>
-							{tag.name}
-						</button>
-						<Tag tag={tag} />
-					</>
+					<Tag
+						key={tag.id}
+						tag={tag}
+						variant="tag"
+						size="sm"
+						onClick={onToggle ? () => onToggle(tag.id) : undefined}
+						className={onToggle ? "cursor-pointer" : undefined}
+					/>
 				);
 			})}
 		</div>

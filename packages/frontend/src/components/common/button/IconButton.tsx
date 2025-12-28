@@ -6,14 +6,18 @@ type IconButtonProps = React.ComponentProps<typeof Button> & {
 	icon: React.ReactNode;
 };
 
-function IconButton({ icon, className, children, ...props }: IconButtonProps) {
+function IconButton({
+	icon,
+	className,
+	children,
+	ref,
+	...props
+}: IconButtonProps) {
 	return (
-		<div className={className}>
-			<Button {...props}>
-				{icon}
-				<span>{children}</span>
-			</Button>
-		</div>
+		<Button ref={ref} className={className} {...props}>
+			{icon}
+			{children}
+		</Button>
 	);
 }
 
