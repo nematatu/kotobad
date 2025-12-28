@@ -122,8 +122,7 @@ export const CreateThreadForm = ({
 						{error && <p className="text-red-500">{error}</p>}
 
 						<div className="space-y-2">
-							<div className="flex items-center gap-2">
-								<TagList tags={selectedTags} onToggle={toggleTag} />
+							<div className="flex items-start gap-2 w-full">
 								<Popover
 									open={isTagPopoverOpen}
 									onOpenChange={setIsTagPopoverOpen}
@@ -134,7 +133,10 @@ export const CreateThreadForm = ({
 											type="button"
 											size="icon"
 											variant="outline"
-											icon={<SmilePlus />}
+											className="group"
+											icon={
+												<SmilePlus className="text-slate-600 fill-transparent transition-colors group-hover:fill-yellow-300" />
+											}
 										/>
 									</PopoverTrigger>
 									<PopoverContent
@@ -161,6 +163,9 @@ export const CreateThreadForm = ({
 										</div>
 									</PopoverContent>
 								</Popover>
+								<div className="flex-1 min-w-0">
+									<TagList tags={selectedTags} onToggle={toggleTag} />
+								</div>
 							</div>
 						</div>
 
