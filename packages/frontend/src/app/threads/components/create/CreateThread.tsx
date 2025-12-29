@@ -1,6 +1,6 @@
 import type { TagListType, TagType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
-import { SmilePlus } from "lucide-react";
+import { SmilePlus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import IconButton from "@/components/common/button/IconButton";
@@ -20,6 +20,12 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
 	BffFetcher,
 	type BffFetcherError,
@@ -53,11 +59,8 @@ export const CreateThreadForm = ({
 	const { tags, selectedTagIds, toggleTag, resetTagSelection } =
 		useTagSelection({ initialTags });
 	const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
-	const handleSelectTag = (id: number, isSelected: boolean) => {
+	const handleSelectTag = (id: number) => {
 		toggleTag(id);
-		if (!isSelected) {
-			setIsTagPopoverOpen(false);
-		}
 	};
 
 	const handleSubmit = async (values: CreateThreadType) => {
@@ -127,28 +130,45 @@ export const CreateThreadForm = ({
 									open={isTagPopoverOpen}
 									onOpenChange={setIsTagPopoverOpen}
 								>
-									<PopoverTrigger asChild>
-										<IconButton
-											enableClickAnimation
-											type="button"
-											size="icon"
-											variant="outline"
-											className="group"
-											icon={
-												<SmilePlus className="text-slate-600 fill-transparent transition-colors group-hover:fill-yellow-300" />
-											}
-										/>
-									</PopoverTrigger>
+									<TooltipProvider delayDuration={3}>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<PopoverTrigger asChild>
+													<IconButton
+														enableClickAnimation
+														type="button"
+														size="icon"
+														variant="outline"
+														className="group"
+														icon={
+															<SmilePlus className="text-slate-600 fill-transparent transition-colors group-hover:fill-yellow-300" />
+														}
+													/>
+												</PopoverTrigger>
+											</TooltipTrigger>
+											<TooltipContent>タグを追加</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
 									<PopoverContent
 										align="start"
 										className="w-[360px] p-3"
-										side="right"
+										side="bottom"
+										sideOffset={5}
 									>
 										<div className="flex items-center justify-between">
 											<div className="text-sm font-semibold">タグを選択</div>
-											<span className="text-xs text-slate-400">
-												{selectedTagIds.length} 件選択中
-											</span>
+											<div className="flex items-center gap-2">
+												<span className="text-xs text-slate-400">
+													{selectedTagIds.length} 件選択中
+												</span>
+												<IconButton
+													enableClickAnimation
+													icon={<X className="h-6 w-6 text-slate-600" />}
+													onClick={() => setIsTagPopoverOpen(false)}
+													className="h-8 w-8 bg-transparent border hover:bg-slate-100"
+													aria-label="タグ選択を閉じる"
+												/>
+											</div>
 										</div>
 										<p className="mt-1 text-xs text-gray-500">
 											クリックで追加/解除できます

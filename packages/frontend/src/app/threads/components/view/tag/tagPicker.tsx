@@ -102,9 +102,9 @@ export const TagPicker = ({
 												}
 												className={cn(
 													"group m-0 flex h-auto flex-col items-center rounded-xl border border-transparent p-0 text-slate-600 transition",
-													"hover:border-slate-200 hover:bg-yellow-200",
-													isSelected &&
-														"border-blue-300 bg-blue-50 text-blue-700",
+													isSelected
+														? "border-blue-300 bg-blue-50 text-blue-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+														: "hover:border-slate-200 hover:bg-yellow-200",
 												)}
 											/>
 										</TooltipTrigger>
