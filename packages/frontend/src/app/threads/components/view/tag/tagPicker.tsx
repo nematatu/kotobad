@@ -63,7 +63,7 @@ export const TagPicker = ({
 					value={query}
 					onChange={(event) => setQuery(event.target.value)}
 					placeholder="タグを検索"
-					className="h-8 text-xs"
+					className="h-8 text-xs flex-1"
 				/>
 				<span className="text-[10px] text-slate-500">
 					{filteredTags.length}件
@@ -114,10 +114,10 @@ export const TagPicker = ({
 							})}
 						</div>
 					</ScrollArea>
-					<div className="h-12 flex items-center rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 overflow-hidden">
+					<div className="h-12 flex items-center rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-600 overflow-hidden">
 						{hoveredTag && (
-							<div className="flex gap-1.5 font-medium">
-								<span className="flex h-10 w-10 items-center justify-center shadow-xs ring-1 ring-slate-200/70">
+							<div className="flex items-center gap-1.5 font-medium">
+								<span className="flex h-10 w-10 items-center justify-center shadow-xs">
 									{hoveredTagIcon}
 								</span>
 								<span className="truncate text-md">{hoveredTag.name}</span>
