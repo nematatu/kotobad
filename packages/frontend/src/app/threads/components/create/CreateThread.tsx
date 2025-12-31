@@ -1,5 +1,8 @@
 import type { TagListType, TagType } from "@kotobad/shared/src/types/tag";
-import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import type {
+	CreateThreadType,
+	ThreadType,
+} from "@kotobad/shared/src/types/thread";
 import { SmilePlus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,10 +38,6 @@ import { TagList } from "../view/tag/tagList";
 import { TagPicker } from "../view/tag/tagPicker";
 import { useTagSelection } from "../view/tag/useTagSelection";
 
-type CreateThreadType = {
-	title: string;
-};
-
 type CreateThreadFormProps = {
 	onCreated: () => void;
 	initialTags?: TagType[];
@@ -50,17 +49,25 @@ export const CreateThreadForm = ({
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [isTagPopoverOpen, setIsTagPopoverOpen] = useState(false);
+
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
+			tagIds: [],
 		},
 	});
 
 	const { tags, selectedTagIds, toggleTag, resetTagSelection } =
 		useTagSelection({ initialTags });
 	const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
-	const handleSelectTag = (id: number) => {
-		toggleTag(id);
+
+	const handleSelectTag = (id: number, isSelected: boolean) => {
+		const next = isSelected
+			? selectedTagIds.filter((t) => t !== id)
+			: [...selectedTagIds, id];
+
+		toggleTag(id); // UIの状態更新
+		form.setValue("tagIds", next, { shouldDirty: true });
 	};
 
 	const handleSubmit = async (values: CreateThreadType) => {
@@ -74,7 +81,7 @@ export const CreateThreadForm = ({
 			});
 
 			onCreated();
-			form.reset();
+			form.reset({ title: "", tagIds: [] });
 			resetTagSelection();
 		} catch (error: unknown) {
 			const fetchError = error as BffFetcherError;

@@ -19,6 +19,8 @@ export const ThreadSchema = z.object({
 
 export const CreateThreadSchema = ThreadSchema.pick({
 	title: true,
+}).extend({
+	tagIds: z.array(z.number().int().positive()).default([]),
 });
 
 export const EditThreadSchema = ThreadSchema.partial();
