@@ -3,7 +3,7 @@ import type { ThreadListType } from "@kotobad/shared/src/types/thread";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
-import normalizeThreadTags from "./normalizeThreadTags";
+import normalizeThread from "./normalizeThread";
 export const dynamic = "force-static";
 
 import type { InferResponseType } from "hono";
@@ -49,7 +49,7 @@ export async function getThreads(page: number): Promise<ThreadListType> {
 
 	const safeResponse = {
 		threads: Array.isArray(rawObject.threads)
-			? rawObject.threads.map(normalizeThreadTags)
+			? rawObject.threads.map(normalizeThread)
 			: [],
 		totalCount:
 			typeof rawObject.totalCount === "number" ? rawObject.totalCount : 0,

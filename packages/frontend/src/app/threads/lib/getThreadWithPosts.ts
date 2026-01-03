@@ -4,7 +4,7 @@ import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
-import normalizeThreadTags from "./normalizeThreadTags";
+import normalizeThread from "./normalizeThread";
 
 export const getThreadWithPosts = async (id: string) => {
 	type ResType = InferResponseType<
@@ -28,7 +28,7 @@ export const getThreadWithPosts = async (id: string) => {
 		typeof response === "object" && response !== null && "thread" in response
 			? {
 					...response,
-					thread: normalizeThreadTags(
+					thread: normalizeThread(
 						(response as { thread: Record<string, unknown> }).thread ?? {},
 					),
 				}
