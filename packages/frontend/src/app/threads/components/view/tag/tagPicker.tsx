@@ -1,7 +1,7 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { useEffect, useMemo, useState } from "react";
-import Tag from "@/components/common/tag/Tag";
 import TagIcon from "@/components/common/tag/TagIcon";
+import Tag from "@/components/common/tag/tag";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {

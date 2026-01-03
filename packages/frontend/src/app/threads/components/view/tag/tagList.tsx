@@ -1,5 +1,5 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import Tag from "@/components/common/tag/Tag";
+import Tag from "@/components/common/tag/tag";
 
 type Props = {
 	tags: TagType[];
