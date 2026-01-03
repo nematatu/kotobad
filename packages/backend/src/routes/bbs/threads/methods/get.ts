@@ -2,8 +2,8 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
-import { count } from "drizzle-orm";
-import { threads } from "../../../../../drizzle/schema";
+import { count, inArray } from "drizzle-orm";
+import { threads, users } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { OpenAPIPostListSchema } from "../../../../models/posts";
 import {
@@ -12,6 +12,58 @@ import {
 } from "../../../../models/threads";
 import type { AppEnvironment } from "../../../../types";
 import { toThreadResponse } from "./transform";
+
+type ThreadWithOptionalAuthor = {
+	id: number;
+	authorId: string;
+	author?: { name?: string | null } | null;
+};
+
+const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
+	db: AppEnvironment["Variables"]["db"],
+	threads: T[],
+): Promise<T[]> => {
+	const missingThreads = threads.filter((thread) => !thread.author?.name);
+	if (missingThreads.length === 0) {
+		return threads;
+	}
+
+	const missingAuthorIds = missingThreads
+		.map((thread) => Number(thread.authorId))
+		.filter((authorId) => Number.isInteger(authorId));
+
+	if (missingAuthorIds.length === 0) {
+		throw new Error(
+			`Missing author name for threads: ${missingThreads
+				.map((thread) => thread.id)
+				.join(", ")}`,
+		);
+	}
+
+	const uniqueAuthorIds = Array.from(new Set(missingAuthorIds));
+	const legacyUsers = await db.query.users.findMany({
+		where: inArray(users.id, uniqueAuthorIds),
+		columns: { id: true, username: true },
+	});
+
+	const legacyUserMap = new Map(
+		legacyUsers.map((legacyUser) => [
+			String(legacyUser.id),
+			legacyUser.username,
+		]),
+	);
+
+	return threads.map((thread) => {
+		if (thread.author?.name) {
+			return thread;
+		}
+		const legacyName = legacyUserMap.get(String(thread.authorId));
+		if (!legacyName) {
+			throw new Error(`Missing author name for thread ${thread.id}`);
+		}
+		return { ...thread, author: { name: legacyName } };
+	});
+};
 
 export const getAllThreadRoute = createRoute({
 	method: "get",
@@ -242,7 +294,8 @@ export const getAllThreadRouter: RouteHandler<
 		}
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
-		const threadsResponse = threadsResult.map((thread) =>
+		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
+		const threadsResponse = resolvedThreads.map((thread) =>
 			toThreadResponse(thread),
 		);
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
@@ -290,7 +343,8 @@ export const getThreadByIdRouter: RouteHandler<
 			"Cache-Control",
 			"public, s-maxage=900, stale-while-revalidate=900",
 		);
-		return c.json(toThreadResponse(thread), 200);
+		const [resolvedThread] = await fillLegacyAuthorNames(db, [thread]);
+		return c.json(toThreadResponse(resolvedThread), 200);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(
@@ -345,9 +399,10 @@ export const getThreadWithPostsRouter: RouteHandler<
 			"Cache-Control",
 			"public, s-maxage=60, stale-while-revalidate=300",
 		);
+		const [resolvedThread] = await fillLegacyAuthorNames(db, [thread]);
 		return c.json(
 			{
-				thread: toThreadResponse(thread),
+				thread: toThreadResponse(resolvedThread),
 				posts: postsResult,
 			},
 			200,
@@ -402,7 +457,8 @@ export const searchThreadRouter: RouteHandler<
 			return c.json({ error: "threads not found" }, 404);
 		}
 
-		const threadsResponse = threadsResult.map((thread) =>
+		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
+		const threadsResponse = resolvedThreads.map((thread) =>
 			toThreadResponse(thread),
 		);
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
