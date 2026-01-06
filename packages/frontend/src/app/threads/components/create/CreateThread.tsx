@@ -70,6 +70,11 @@ export const CreateThreadForm = ({
 		form.setValue("tagIds", next, { shouldDirty: true });
 	};
 
+	const handleToggleTagFromList = (id: number) => {
+		const isSelected = selectedTagIds.includes(id);
+		handleSelectTag(id, isSelected);
+	};
+
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
 		try {
@@ -191,7 +196,10 @@ export const CreateThreadForm = ({
 									</PopoverContent>
 								</Popover>
 								<div className="flex-1 min-w-0">
-									<TagList tags={selectedTags} onToggle={toggleTag} />
+									<TagList
+										tags={selectedTags}
+										onToggle={handleToggleTagFromList}
+									/>
 								</div>
 							</div>
 						</div>
