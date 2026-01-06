@@ -16,6 +16,8 @@ export default async function Page({ searchParams }: Props) {
 		getThreads(currentPage),
 		getTags(),
 	]);
+
+	console.log("tags", tags);
 	return (
 		<div className="px-2 sm:px-5">
 			<ThreadPageClient
