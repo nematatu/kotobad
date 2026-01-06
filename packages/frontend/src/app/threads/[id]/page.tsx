@@ -18,9 +18,9 @@ export default async function ThreadDetailPage({ params }: Props) {
 	let targetPosts;
 
 	try {
-		const resposnse = await getThreadWithPosts(threadId);
-		targetThread = resposnse.thread;
-		targetPosts = resposnse.posts;
+		const response = await getThreadWithPosts(threadId);
+		targetThread = response.thread;
+		targetPosts = response.posts;
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;
 		if (fetchError.status === 404) {
