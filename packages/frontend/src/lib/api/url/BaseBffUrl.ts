@@ -1,4 +1,4 @@
-import { ensureTrailingSlash } from "../../../utils/url/ensureTrailingSlash";
+import { ensureTrailingSlash } from "@kotobad/shared/src/utils/url/ensureTrailingSlash";
 import { getClientOrigin } from "./clientOrigin";
 
 const env = process.env.NODE_ENV;

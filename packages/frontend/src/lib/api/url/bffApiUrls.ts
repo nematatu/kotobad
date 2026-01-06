@@ -11,7 +11,7 @@ export const BFF_API_PATH = {
 	GET_ALL_POSTS: "threads/api/posts/getAllPosts",
 	CREATE_POST: "threads/api/posts/createPost",
 	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId/",
-	GET_ALL_LABELS: "threads/api/getAllLabels",
+	GET_ALL_TAGS: "threads/api/tags/getAllTags",
 } as const;
 
 export type BffApiPathKey = keyof typeof BFF_API_PATH;

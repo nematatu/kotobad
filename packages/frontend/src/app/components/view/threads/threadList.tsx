@@ -1,9 +1,9 @@
-import type { LabelType } from "@kotobad/shared/src/types";
+import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
+import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
-import { formatDate } from "@/utils/date/formatDate";
-import { getRelativeDate } from "@/utils/date/getRelativeDate";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -39,17 +39,17 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 										<ChatIcon width={16} />
 										<span>{thread.postCount}</span>
 									</div>
-									<span>{thread.author.username}</span>
+									<span>{thread.author.name}</span>
 								</div>
-								{thread.threadLabels?.length ? (
+								{thread.threadTags?.length ? (
 									<div className="mt-2 flex flex-wrap gap-1.5">
-										{thread.threadLabels?.map(
-											(tl: LabelType.ThreadThreadLabelType) => (
+										{thread.threadTags?.map(
+											(tl: TagType.ThreadThreadTagType) => (
 												<span
-													key={tl.labelId}
+													key={tl.tagId}
 													className="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-600"
 												>
-													{tl.labels.name}
+													{tl.tags.name}
 												</span>
 											),
 										)}

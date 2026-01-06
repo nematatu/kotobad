@@ -1,8 +1,8 @@
 "use client";
 
+import type { BetterAuthUser } from "@kotobad/shared/src/auth/betterAuthSession";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "@/lib/auth/auth-client";
-import type { BetterAuthUser } from "@/lib/auth/betterAuthSession";
 
 // undefined: ローディング中
 // null: 未ログイン

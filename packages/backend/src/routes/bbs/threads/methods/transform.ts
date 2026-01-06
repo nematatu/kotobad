@@ -1,65 +1,16 @@
-import type { z } from "@hono/zod-openapi";
-import type { OpenAPIThreadSchema } from "../../../../models/threads";
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
 
-export type ThreadQueryResult = {
-	id: number;
-	title: string;
+export type ThreadQueryResult = Omit<ThreadType, "createdAt" | "updatedAt"> & {
 	createdAt: Date;
 	updatedAt: Date | null;
-	postCount: number;
-	authorId: string;
-	isPinned: boolean;
-	isClosed: boolean;
-	author?: {
-		name?: string | null;
-	};
-	threadLabels?: Array<{
-		threadId: number;
-		labelId: number;
-		labels?: {
-			id: number;
-			name: string;
-		} | null;
-	}>;
 };
-
-type ThreadLabelQueryResult = NonNullable<
-	ThreadQueryResult["threadLabels"]
->[number];
-
-export const toThreadResponse = <T extends ThreadQueryResult>(
-	thread: T,
-): z.infer<typeof OpenAPIThreadSchema> => {
-	const threadLabels =
-		thread.threadLabels
-			?.filter(
-				(
-					label,
-				): label is ThreadLabelQueryResult & {
-					labels: { id: number; name: string };
-				} => Boolean(label.labels),
-			)
-			.map((label) => ({
-				threadId: label.threadId,
-				labelId: label.labelId,
-				labels: {
-					id: label.labels.id,
-					name: label.labels.name,
-				},
-			})) ?? [];
+export const toThreadResponse = (thread: ThreadQueryResult): ThreadType => {
+	const threadTags = thread.threadTags ?? [];
 
 	return {
-		id: thread.id,
-		title: thread.title,
+		...thread,
 		createdAt: thread.createdAt.toISOString(),
 		updatedAt: thread.updatedAt ? thread.updatedAt.toISOString() : null,
-		postCount: thread.postCount,
-		authorId: thread.authorId,
-		isPinned: thread.isPinned,
-		isClosed: thread.isClosed,
-		author: {
-			username: thread.author?.name ?? undefined,
-		},
-		threadLabels,
+		threadTags,
 	};
 };

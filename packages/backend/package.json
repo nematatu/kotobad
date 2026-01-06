@@ -4,12 +4,13 @@
 	"scripts": {
 		"dev": "wrangler dev --ip 0.0.0.0 --port 8787",
 		"dev:prod": "wrangler dev --ip 0.0.0.0 --port 8787 -e dev-prod",
-		"deploy": "wrangler deploy --minify",
+		"deploy": "OPEN_NEXT_DEPLOY=true wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
 		"generate": "drizzle-kit generate",
 		"local:migration": "bun x wrangler d1 migrations apply b3s-db --local",
 		"remote:migration": "wrangler d1 migrations apply b3s-db --remote",
-		"tables": "wrangler d1 execute b3s-db --local --command \"SELECT sql FROM sqlite_master WHERE type='table';\""
+		"local:tables": "wrangler d1 execute b3s-db --local --command \"SELECT sql FROM sqlite_master WHERE type='table';\"",
+		"remote:tables": "wrangler d1 execute b3s-db --remote --command \"SELECT sql FROM sqlite_master WHERE type='table';\""
 	},
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.11.1",

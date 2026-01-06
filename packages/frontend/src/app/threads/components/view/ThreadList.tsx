@@ -1,9 +1,11 @@
-import type { LabelType } from "@kotobad/shared/src/types";
+import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
+import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
-import { formatDate } from "@/utils/date/formatDate";
-import { getRelativeDate } from "@/utils/date/getRelativeDate";
+import { CategoryColorMap } from "@/lib/config/color/labelColor";
+import { cn } from "@/lib/utils";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -11,6 +13,8 @@ type ThreadListType = {
 
 export const ThreadList = ({ threads }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
+	const getLabelClass = (labelId: number) =>
+		CategoryColorMap[labelId % CategoryColorMap.length];
 
 	return (
 		<div className="radius-sm flex flex-col sm:p-5">
@@ -36,17 +40,23 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								<div className="text-sm">{thread.postCount}</div>
 							</div>
 
-							{thread.threadLabels?.map(
-								(tl: LabelType.ThreadThreadLabelType) => (
-									<span key={tl.labelId} className="">
-										{tl.labels.name}
+							<div className="mt-2 flex flex-wrap gap-2">
+								{thread.threadTags?.map((tl: TagType.ThreadThreadTagType) => (
+									<span
+										key={tl.tagId}
+										className={cn(
+											"rounded-full px-2 py-0.5 text-xs font-medium text-gray-800",
+											getLabelClass(tl.tagId),
+										)}
+									>
+										{tl.tags.name}
 									</span>
-								),
-							)}
+								))}
+							</div>
 						</div>
 						{/* 右側：作成者 + 日付 */}
 						<div className="flex flex-col items-end gap-y-1 text-gray-500 text-xs sm:text-sm whitespace-nowrap">
-							<span>作成者: {thread.author.username}</span>
+							<span>作成者: {thread.author.name}</span>
 							<span>{formatDate(thread.createdAt)}</span>
 						</div>
 					</div>

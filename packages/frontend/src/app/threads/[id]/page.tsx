@@ -1,4 +1,3 @@
-import { ThreadWithPostsSchema } from "@kotobad/shared/src/schemas/thread";
 import { notFound } from "next/navigation";
 import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
@@ -15,9 +14,13 @@ export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
 	const threadId = renderedparams.id;
 
-	let response;
+	let targetThread;
+	let targetPosts;
+
 	try {
-		response = await getThreadWithPosts(threadId);
+		const response = await getThreadWithPosts(threadId);
+		targetThread = response.thread;
+		targetPosts = response.posts;
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;
 		if (fetchError.status === 404) {
@@ -25,9 +28,6 @@ export default async function ThreadDetailPage({ params }: Props) {
 		}
 		throw error;
 	}
-
-	const { thread: targetThread, posts: targetPosts } =
-		ThreadWithPostsSchema.parse(response);
 
 	return (
 		<div className="p-1 sm:p-4">

@@ -1,12 +1,12 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIPostListSchema,
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
-import { getErrorMessage } from "../../../../utils/errors";
 
 export const getPostByThreadIdRoute = createRoute({
 	method: "get",

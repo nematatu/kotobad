@@ -4,8 +4,8 @@ import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { authMiddleware } from "../middleware/auth";
 import type { AppEnvironment } from "../types";
-import authRouter from "./auth";
 import bbsRouter from "./bbs";
+import tagRouter from "./bbs/tags";
 import { betterAuthHandler, betterAuthPath } from "./better-auth-handler";
 
 const rawOrigins = process.env.ALLOWED_ORIGIN || "";
@@ -71,7 +71,7 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 	.all(`${betterAuthPath}/*`, betterAuthHandler)
 	.use("/auth/me", authMiddleware)
 	.route("/bbs", bbsRouter)
-	.route("/auth", authRouter);
+	.route("/tags", tagRouter);
 
 mainRouter.use("/doc/*", async (c, next) => {
 	const auth = basicAuth({

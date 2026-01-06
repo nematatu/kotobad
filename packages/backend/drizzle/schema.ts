@@ -6,7 +6,9 @@ import {
 	sqliteTable,
 	text,
 	uniqueIndex,
+  check
 } from "drizzle-orm/sqlite-core";
+import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import { user } from "./better-auth.schema";
 
 const timestamp = customType<{ data: Date; driverData: number }>({
@@ -50,7 +52,7 @@ export const threads = sqliteTable("threads", {
 	updatedAt: timestamp("updated_at").$onUpdate(
 		() => sql`(strftime('%s', 'now'))`,
 	),
-	postCount: integer("postCount").notNull(),
+	postCount: integer("post_count").notNull().default(0),
 	authorId: text("author_id")
 		.notNull()
 		.references(() => user.id),
@@ -85,22 +87,6 @@ export const posts = sqliteTable(
 	}),
 );
 
-export const japanTournaments = sqliteTable("japanTournaments", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	name: text("name").notNull(),
-	category: text("category"),
-	startDate: timestamp("start_date"),
-	endDate: timestamp("end_date"),
-});
-
-export const worldTournaments = sqliteTable("worldTournaments", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	name: text("name").notNull(),
-	category: text("category"),
-	startDate: timestamp("start_date"),
-	endDate: timestamp("end_date"),
-});
-
 export const players = sqliteTable("players", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	firstName: text("first_name").notNull(),
@@ -129,41 +115,49 @@ export const achievements = sqliteTable("achievements", {
 	playerId: integer("player_id")
 		.notNull()
 		.references(() => players.id, { onDelete: "cascade" }),
-	japanTournamentId: integer("japan_tournament_id").references(
-		() => japanTournaments.id,
-	),
-	worldTournamentId: integer("world_tournament_id").references(
-		() => worldTournaments.id,
-	),
 	year: integer("year").notNull(),
 	result: text("result").notNull(),
 });
 
-export const labels = sqliteTable("labels", {
+export const tags = sqliteTable("tags", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
-});
+  iconType: text("icon_type").notNull().default("none").$type<TagIconKindType>(),
+  iconValue: text("icon_value").notNull().default(""),
+}, (t) => [
+        check(
+            "tags_icon_type_check", 
+            sql`${t.iconType} IN ('emoji', 'image', 'text', 'none')`, 
+        ), 
+        check(
+            "tags_icon_value_check", 
+            sql`
+                (${t.iconType} != 'none' AND length(trim(${t.iconValue})) > 0 )
+                OR
+                (${t.iconType} = 'none' AND length(trim(${t.iconValue})) = 0)
+                `
+        )
+    ]
+)
 
-export const threadLabels = sqliteTable("thread_label", {
+export const threadTags = sqliteTable("thread_tag", {
 	threadId: integer("thread_id")
 		.notNull()
-		.references(() => threads.id),
-	labelId: integer("label_id")
+		.references(() => threads.id, {onDelete: "cascade"}),
+	tagId: integer("tag_id")
 		.notNull()
-		.references(() => labels.id),
-	japanTournamentId: integer("japanTournament_id").references(
-		() => japanTournaments.id,
-	),
-	worldTournamentId: integer("worldTournament_id").references(
-		() => worldTournaments.id,
-	),
-});
+		.references(() => tags.id, {onDelete: "cascade"}),
+}, (t) => ({
+        ThreadTagUnique: uniqueIndex("thread_tag_unique").on(t.threadId, t.tagId),
+        threadIdIdx: index("thread_tag_idx").on(t.threadId),
+        tagIdIdx: index("tag_idx").on(t.tagId),
+    })
+)
 
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);
 export const playerIdx = index("player_idx").on(players.id);
-export const threadLabelIdx = index("thread_label_idx").on(threadLabels.threadId);
 
 export const playersRelations = relations(players, ({ many }) => ({
 	achievements: many(achievements),
@@ -174,14 +168,6 @@ export const achievementsRelations = relations(achievements, ({ one }) => ({
 	player: one(players, {
 		fields: [achievements.playerId],
 		references: [players.id],
-	}),
-	japanTournament: one(japanTournaments, {
-		fields: [achievements.japanTournamentId],
-		references: [japanTournaments.id],
-	}),
-	worldTournament: one(worldTournaments, {
-		fields: [achievements.worldTournamentId],
-		references: [worldTournaments.id],
 	}),
 }));
 
@@ -209,7 +195,7 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 		references: [user.id],
 	}),
 	posts: many(posts),
-	threadLabels: many(threadLabels),
+	threadTags: many(threadTags),
 }));
 
 export const usersRelations = relations(user, ({ many }) => ({
@@ -217,40 +203,19 @@ export const usersRelations = relations(user, ({ many }) => ({
 	threads: many(threads),
 }));
 
-export const japanTournamentsRelations = relations(
-	japanTournaments,
-	({ many }) => ({
-		threadLabels: many(threadLabels),
-	}),
-);
 
-export const worldTournamentsRelations = relations(
-	worldTournaments,
-	({ many }) => ({
-		threadLabels: many(threadLabels),
-	}),
-);
-
-export const labelRelations = relations(labels, ({ many }) => ({
-	threadLabels: many(threadLabels),
+export const tagRelations = relations(tags, ({ many }) => ({
+	threadTags: many(threadTags),
 }));
 
-export const threadLabelRelations = relations(threadLabels, ({ one }) => ({
+export const threadTagRelations = relations(threadTags, ({ one }) => ({
 	thread: one(threads, {
-		fields: [threadLabels.threadId],
+		fields: [threadTags.threadId],
 		references: [threads.id],
 	}),
-	labels: one(labels, {
-		fields: [threadLabels.labelId],
-		references: [labels.id],
-	}),
-	japanTournaments: one(japanTournaments, {
-		fields: [threadLabels.labelId],
-		references: [japanTournaments.id],
-	}),
-	worldTournaments: one(worldTournaments, {
-		fields: [threadLabels.labelId],
-		references: [worldTournaments.id],
+	tags: one(tags, {
+		fields: [threadTags.tagId],
+		references: [tags.id],
 	}),
 }));
 

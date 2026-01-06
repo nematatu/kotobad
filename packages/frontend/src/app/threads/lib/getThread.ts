@@ -3,8 +3,11 @@ import type { ThreadListType } from "@kotobad/shared/src/types/thread";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
+import normalizeThread from "./normalizeThread";
 export const dynamic = "force-static";
 
+import type { InferResponseType } from "hono";
+import type { client } from "@/lib/api/honoClient";
 import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
 
 const cacheBust =
@@ -15,6 +18,7 @@ const cacheBust =
 	"";
 
 export async function getThreads(page: number): Promise<ThreadListType> {
+	type ResType = InferResponseType<typeof client.bbs.threads.$get>;
 	const targetUrl = await getApiUrl("GET_ALL_THREADS");
 	targetUrl.searchParams.set("page", String(page));
 
@@ -24,9 +28,9 @@ export async function getThreads(page: number): Promise<ThreadListType> {
 		targetUrl.searchParams.set("v", cacheBust);
 	}
 
-	let raw: ThreadListType;
+	let raw: unknown;
 	try {
-		raw = await BffFetcher<ThreadListType>(targetUrl, {
+		raw = await BffFetcher<ResType>(targetUrl, {
 			method: "GET",
 			cache: "force-cache",
 			next: { revalidate: REVALIDATE_SECONDS, tags: ["threads"] },
@@ -38,9 +42,17 @@ export async function getThreads(page: number): Promise<ThreadListType> {
 		raw = { threads: [], totalCount: 0 };
 	}
 
+	const rawObject =
+		typeof raw === "object" && raw !== null
+			? (raw as Record<string, unknown>)
+			: {};
+
 	const safeResponse = {
-		threads: Array.isArray(raw?.threads) ? raw.threads : [],
-		totalCount: typeof raw?.totalCount === "number" ? raw.totalCount : 0,
+		threads: Array.isArray(rawObject.threads)
+			? rawObject.threads.map(normalizeThread)
+			: [],
+		totalCount:
+			typeof rawObject.totalCount === "number" ? rawObject.totalCount : 0,
 	};
 
 	const threadsResponse: ThreadListType = ThreadListSchema.parse(safeResponse);
