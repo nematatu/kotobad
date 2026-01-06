@@ -24,7 +24,6 @@
         "@hono/swagger-ui": "^0.5.2",
         "@hono/zod-openapi": "^1.1.5",
         "@hono/zod-validator": "^0.7.5",
-        "@kotobad/frontend": "workspace:*",
         "@kotobad/shared": "workspace:*",
         "@libsql/client": "^0.15.15",
         "bcryptjs": "^3.0.3",
