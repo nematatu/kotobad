@@ -1,12 +1,12 @@
 import type { z } from "zod";
 import type {
-	TagIconKindScema,
+	TagIconKindSchema,
 	TagListSchema,
 	ThreadTagSchema,
 	ThreadThreadTagSchema,
 } from "../schemas/tag";
 
-export type TagIconKindType = z.infer<typeof TagIconKindScema>;
+export type TagIconKindType = z.infer<typeof TagIconKindSchema>;
 
 export type TagType = z.infer<typeof ThreadTagSchema>;
 

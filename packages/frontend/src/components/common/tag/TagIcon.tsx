@@ -51,7 +51,7 @@ export default function TagIcon({
 
 	if (tag.iconType === "emoji") {
 		return (
-			<span className={cn(classes, className)} style={fitStyle}>
+			<span className={cn(classes.emoji, className)} style={fitStyle}>
 				{tag.iconValue}
 			</span>
 		);
@@ -59,7 +59,7 @@ export default function TagIcon({
 
 	if (tag.iconType === "text") {
 		return (
-			<span className={cn(classes, className)} style={fitStyle}>
+			<span className={cn(classes.text, className)} style={fitStyle}>
 				{tag.iconValue}
 			</span>
 		);
