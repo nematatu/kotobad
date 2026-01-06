@@ -4,7 +4,6 @@ import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { CreateThread } from "../create/CreateThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
@@ -23,7 +22,6 @@ export default function ThreadPageClient({
 	currentPage,
 	totalCount,
 }: Props) {
-	const [threads, _] = useState<ThreadType[]>([]);
 	const router = useRouter();
 
 	const handleCreated = () => {
@@ -34,7 +32,7 @@ export default function ThreadPageClient({
 		}
 	};
 
-	const currentThreads = [...threads, ...initialThreads].slice(0, PERPAGE);
+	const currentThreads = [...initialThreads].slice(0, PERPAGE);
 	return (
 		<div className="flex flex-col items-center">
 			<div className="w-full sm:max-w-[50%]">
