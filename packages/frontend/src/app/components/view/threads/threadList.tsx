@@ -13,7 +13,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
 
 	return (
-		<div className="max-w-4xl mx-auto">
+		<div className="">
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 				{threadList.map((thread) => {
 					const relative = getRelativeDate(thread.createdAt);

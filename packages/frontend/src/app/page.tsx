@@ -4,8 +4,8 @@ import { getThreads } from "./threads/lib/getThread";
 export default async function Page() {
 	const { threads } = await getThreads(1);
 	return (
-		<div className="flex flex-col gap-y-4">
-			<h1 className="text-2xl md:text-4xl font-bold m-5 md:mx-40 md:my-10">
+		<div className="flex flex-col gap-y-4 max-w-4xl mx-auto">
+			<h1 className="text-2xl md:text-4xl font-bold md:my-10">
 				最新のスレッド
 			</h1>
 			<ThreadList threads={threads} />
