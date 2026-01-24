@@ -1,5 +1,4 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import ThreadDetailLoadingShell from "./components/ThreadDetailLoadingShell";
 
 const POST_PLACEHOLDER_ITEMS = Array.from({ length: 6 }, (_, index) => ({
 	id: `post-skeleton-${index}`,
@@ -8,8 +7,22 @@ const POST_PLACEHOLDER_ITEMS = Array.from({ length: 6 }, (_, index) => ({
 export default function Loading() {
 	return (
 		<div className="p-1 sm:p-4 pb-40">
-			<ThreadDetailLoadingShell>
-				<div className="space-y-2">
+			<div className="pl-3">
+				<Skeleton className="h-4 w-28" />
+			</div>
+
+			<div className="flex flex-col items-center justify-center">
+				<div className="flex flex-col w-full items-center p-4 sm:py-7 space-y-3">
+					<Skeleton className="h-7 w-2/3 sm:h-9 sm:w-1/2" />
+					<div className="mt-2 flex flex-wrap justify-center gap-2">
+						<Skeleton className="h-5 w-12 rounded-full" />
+						<Skeleton className="h-5 w-16 rounded-full" />
+						<Skeleton className="h-5 w-10 rounded-full" />
+					</div>
+					<Skeleton className="h-4 w-32" />
+				</div>
+
+				<div className="w-full sm:w-1/2 space-y-2">
 					{POST_PLACEHOLDER_ITEMS.map((item, index) => (
 						<div
 							key={item.id}
@@ -32,7 +45,7 @@ export default function Loading() {
 						</div>
 					))}
 				</div>
-			</ThreadDetailLoadingShell>
+			</div>
 
 			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">
 				<div className="max-w-2xl mx-auto">
