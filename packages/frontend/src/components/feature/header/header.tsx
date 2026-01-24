@@ -8,7 +8,12 @@ import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
 import { UserPopover } from "../user/popover/UserPopover";
@@ -46,22 +51,24 @@ const Header = ({ tags }: Props) => {
 									<CreateThreadButton />
 								</DialogTrigger>
 								<DialogContent>
-									<header className="flex items-center gap-3">
-										<span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white ">
-											<PencilLine className="h-5 w-5" />
-										</span>
-										<div>
-											<h2
-												id="create-thread-title"
-												className="text-base font-semibold text-slate-900"
-											>
-												新規スレッドを作成
-											</h2>
-											<p className="text-xs text-slate-500">
-												今の気持ちや話題をシェアしましょう
-											</p>
-										</div>
-									</header>
+									<DialogTitle>
+										<header className="flex items-center gap-3">
+											<span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white ">
+												<PencilLine className="h-5 w-5" />
+											</span>
+											<div>
+												<h2
+													id="create-thread-title"
+													className="text-base font-semibold text-slate-900"
+												>
+													新規スレッドを作成
+												</h2>
+												<p className="text-xs text-slate-500">
+													今の気持ちや話題をシェアしましょう
+												</p>
+											</div>
+										</header>
+									</DialogTitle>
 									<CreateThreadForm
 										onCreated={() => {
 											router.refresh();
