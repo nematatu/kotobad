@@ -1,6 +1,7 @@
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -33,13 +34,12 @@ export const CreatePostForm = ({
 	const handleSubmit = async (values: CreatePostType) => {
 		try {
 			const endpoint = await getBffApiUrl("CREATE_POST");
-			const response = await fetch(endpoint, {
+			await fetch(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(values),
 			});
 
-			const body = await response.json();
 			if (onSuccess) onSuccess();
 
 			form.reset();
@@ -74,35 +74,41 @@ export const CreatePostForm = ({
 							control={form.control}
 							name="post"
 							render={({ field }) => (
-								<FormItem className="flex flex-col gap-2">
-									<FormControl>
-										<Textarea
-											{...field}
-											{...form.register("post", {
-												required: "空文字は送信できません",
-												maxLength: {
-													value: 80,
-													message: "80文字以内で入力してください",
-												},
-											})}
-											placeholder="内容"
-											className="w-full sm:h-14 sm:w-1/3 outline-2 focus:border-blue-600 placeholder-gray-500/50"
-											onKeyDown={(e) => {
-												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-													e.preventDefault();
-													form.handleSubmit(handleSubmit)();
-												}
-											}}
-										/>
-									</FormControl>
-									<FormMessage />
+								<FormItem className="flex gap-2">
+									<UserAvatar />
+									<div className="flex flex-col space-y-2">
+										<FormControl>
+											<div>
+												<Textarea
+													{...field}
+													{...form.register("post", {
+														required: "空文字は送信できません",
+														maxLength: {
+															value: 80,
+															message: "80文字以内で入力してください",
+														},
+													})}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+															e.preventDefault();
+															form.handleSubmit(handleSubmit)();
+														}
+													}}
+													placeholder="内容"
+													className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
+												/>
+
+												<p className="hidden sm:block text-neutral-400 text-xs">
+													Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
+												</p>
+											</div>
+										</FormControl>
+										<FormMessage />
+										{error && <p className="text-red-500 text-sm">{error}</p>}
+									</div>
 								</FormItem>
 							)}
 						/>
-						<p className="hidden sm:block text-neutral-400 text-sm">
-							Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-						</p>
-						{error && <p className="text-red-500">{error}</p>}
 						<Button
 							className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
 							type="submit"

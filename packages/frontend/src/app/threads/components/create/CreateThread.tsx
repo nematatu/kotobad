@@ -105,38 +105,40 @@ export const CreateThreadForm = ({
 							render={({ field }) => (
 								<FormItem className="flex gap-2">
 									<UserAvatar />
-									<FormControl>
-										<div>
-											<Textarea
-												id="thread-title"
-												{...field}
-												{...form.register("title", {
-													required: "タイトルは必須です",
-													maxLength: {
-														value: 80,
-														message: "タイトルは80文字以内で入力してください",
-													},
-												})}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-														e.preventDefault();
-														form.handleSubmit(handleSubmit)();
-													}
-												}}
-												placeholder="例: 〇〇の試合について"
-												className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
-											/>
+									<div className="flex flex-col space-y-2">
+										<FormControl>
+											<div>
+												<Textarea
+													id="thread-title"
+													{...field}
+													{...form.register("title", {
+														required: "空文字は送信出来ません",
+														maxLength: {
+															value: 80,
+															message: "80文字以内で入力してください",
+														},
+													})}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+															e.preventDefault();
+															form.handleSubmit(handleSubmit)();
+														}
+													}}
+													placeholder="例: 〇〇の試合について"
+													className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
+												/>
 
-											<p className="hidden sm:block px-2 text-neutral-400 text-xs">
-												Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-											</p>
-										</div>
-									</FormControl>
-									<FormMessage />
+												<p className="hidden sm:block text-neutral-400 text-xs">
+													Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
+												</p>
+											</div>
+										</FormControl>
+										<FormMessage />
+										{error && <p className="text-red-500">{error}</p>}
+									</div>
 								</FormItem>
 							)}
 						/>
-						{error && <p className="text-red-500">{error}</p>}
 
 						<div className="space-y-3">
 							<div className="h-px w-full bg-slate-200/70" aria-hidden="true" />
