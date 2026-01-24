@@ -1,37 +1,33 @@
 "use client";
 
+import type { TagType } from "@kotobad/shared/src/types/tag";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
 import { UserPopover } from "../user/popover/UserPopover";
 
-const Header = () => {
+type Props = {
+	tags: TagType[];
+};
+
+const Header = ({ tags }: Props) => {
 	const { user, isLoading } = useUser();
-	const [lastScrollY, setLastScrollY] = useState(0);
-	const [showHeader, setShowHeader] = useState(true);
-
-	useEffect(() => {
-		const handleScroll = () => {
-			const currentScrollY = window.scrollY;
-			if (currentScrollY >= lastScrollY && currentScrollY > 50) {
-				setShowHeader(false);
-			} else {
-				setShowHeader(true);
-			}
-			setLastScrollY(currentScrollY);
-		};
-
-		window.addEventListener("scroll", handleScroll);
-		return () => removeEventListener("scroll", handleScroll);
-	}, [lastScrollY]);
+	const router = useRouter();
 
 	return (
 		<div
-			className={`sticky top-0 z-50 w-full transition-transform duration-200 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}
+			className={`sticky top-0 z-50 w-full transition-transform duration-200`}
 		>
 			<div className="flex h-16 items-center justify-between max-w-4xl lg:max-w-6xl mx-auto px-5">
 				<Link href="/">
@@ -49,7 +45,20 @@ const Header = () => {
 					) : user ? (
 						<div className="flex items-center space-x-4">
 							<UserPopover />
-							<CreateThreadButton />
+							<Dialog>
+								<DialogTrigger asChild>
+									<CreateThreadButton />
+								</DialogTrigger>
+								<DialogContent>
+									<DialogTitle>スレッド作成</DialogTitle>
+									<CreateThreadForm
+										onCreated={() => {
+											router.refresh();
+										}}
+										initialTags={tags}
+									/>
+								</DialogContent>
+							</Dialog>
 						</div>
 					) : (
 						<GoogleOAuth />

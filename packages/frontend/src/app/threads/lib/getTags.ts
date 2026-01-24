@@ -8,7 +8,7 @@ import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
 
-export async function getTags(): Promise<TagListType | undefined> {
+export async function getTags(): Promise<TagListType> {
 	const targetUrl = await getApiUrl("GET_ALL_TAGS");
 	type ResType = InferResponseType<typeof client.tags.$get>;
 	let raw: unknown;
@@ -26,12 +26,12 @@ export async function getTags(): Promise<TagListType | undefined> {
 	}
 
 	if (!Array.isArray(raw)) {
-		return undefined;
+		return [];
 	}
 
 	const parsed = TagListSchema.safeParse(raw);
 	if (!parsed.success) {
-		return undefined;
+		return [];
 	}
 	return parsed.data;
 }
