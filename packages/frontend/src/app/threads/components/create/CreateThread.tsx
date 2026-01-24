@@ -116,6 +116,12 @@ export const CreateThreadForm = ({
 													message: "タイトルは80文字以内で入力してください",
 												},
 											})}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+													e.preventDefault();
+													form.handleSubmit(handleSubmit)();
+												}
+											}}
 											placeholder="例: 〇〇の試合について"
 											className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
 										/>
