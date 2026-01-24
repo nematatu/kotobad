@@ -3,6 +3,7 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
@@ -24,6 +25,7 @@ type Props = {
 const Header = ({ tags }: Props) => {
 	const { user, isLoading } = useUser();
 	const router = useRouter();
+	const [isCreateOpen, setIsCreateOpen] = useState(false);
 
 	return (
 		<div className="sticky top-0 z-50 w-full bg-gray-200">
@@ -43,7 +45,7 @@ const Header = ({ tags }: Props) => {
 					) : user ? (
 						<div className="flex items-center space-x-4">
 							<UserPopover />
-							<Dialog>
+							<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 								<DialogTrigger asChild>
 									<CreateThreadButton />
 								</DialogTrigger>
@@ -68,6 +70,7 @@ const Header = ({ tags }: Props) => {
 									<CreateThreadForm
 										onCreated={() => {
 											router.refresh();
+											setIsCreateOpen(false);
 										}}
 										initialTags={tags}
 									/>

@@ -1,6 +1,7 @@
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -43,6 +44,7 @@ export const CreatePostForm = ({
 			if (onSuccess) onSuccess();
 
 			form.reset();
+			toast.success("投稿しました!");
 			setTimeout(() => form.setFocus("post"), 1);
 		} catch (error: unknown) {
 			if (
@@ -53,10 +55,12 @@ export const CreatePostForm = ({
 				(error as { status: number }).status === 401
 			) {
 				setError("ログインが必要です");
+				toast.error("ログインが必要です");
 			} else {
 				const message =
 					error instanceof Error ? error.message : "不明なエラーが発生しました";
 				setError(message);
+				toast.error(message);
 			}
 		}
 	};

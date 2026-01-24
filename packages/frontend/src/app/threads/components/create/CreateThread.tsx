@@ -6,6 +6,7 @@ import type {
 import { PencilLine } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import {
@@ -76,14 +77,17 @@ export const CreateThreadForm = ({
 			onCreated();
 			form.reset({ title: "", tagIds: [] });
 			resetTagSelection();
+			toast.success("投稿しました!");
 		} catch (error: unknown) {
 			const fetchError = error as BffFetcherError;
 			if (fetchError.status === 401) {
 				setError("ログインが必要です");
+				toast.error("ログインが必要です");
 			} else {
 				const message =
 					error instanceof Error ? error.message : "不明なエラーが発生しました";
 				setError(message);
+				toast.error(message);
 			}
 		}
 	};
@@ -105,7 +109,7 @@ export const CreateThreadForm = ({
 							render={({ field }) => (
 								<FormItem className="flex gap-2">
 									<UserAvatar />
-									<div className="flex flex-col space-y-2">
+									<div className="flex min-w-0 flex-1 flex-col space-y-2">
 										<FormControl>
 											<div>
 												<Textarea
