@@ -162,6 +162,7 @@ export const createPostRouter: RouteHandler<
 				...newPostWithAuthor,
 				author: {
 					name: newPostWithAuthor.author?.name ?? "",
+					image: newPostWithAuthor.author?.image ?? "",
 				},
 			},
 			201,

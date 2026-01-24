@@ -7,11 +7,10 @@ export const PostSchema = z.object({
 	authorId: z.string(),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
-	author: z
-		.object({
-			name: z.string(),
-		})
-		.optional(),
+	author: z.object({
+		name: z.string(),
+		image: z.string().optional().nullable(),
+	}),
 });
 
 export const CreatePostSchema = PostSchema.pick({

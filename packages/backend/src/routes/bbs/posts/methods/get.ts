@@ -179,6 +179,7 @@ export const getPostByThreadIdRouter: RouteHandler<
 				author: {
 					columns: {
 						name: true,
+						image: true,
 					},
 				},
 			},
@@ -212,6 +213,7 @@ export const getAllPostRouter: RouteHandler<
 				author: {
 					columns: {
 						name: true,
+						image: true,
 					},
 				},
 			},
@@ -244,6 +246,7 @@ export const getPostByIdRouter: RouteHandler<
 				author: {
 					columns: {
 						name: true,
+						image: true,
 					},
 				},
 			},
@@ -280,6 +283,7 @@ export const searchPostRouter: RouteHandler<
 				author: {
 					columns: {
 						name: true,
+						image: true,
 					},
 				},
 			},

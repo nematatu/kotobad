@@ -1,19 +1,19 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-type ThreadAuthorAvatarProps = {
+type AuthorAvatarProps = {
 	name: string | null;
 	image: string | null | undefined;
-	className: string;
+	className?: string;
 	fallbackClassName?: string;
 };
 
-export default function ThreadAuthorAvatar({
+export default function AuthorAvatar({
 	name,
 	image,
 	className,
 	fallbackClassName,
-}: ThreadAuthorAvatarProps) {
+}: AuthorAvatarProps) {
 	const resolvedName = name ?? null;
 	const resolvedImage = image ?? null;
 

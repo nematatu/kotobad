@@ -6,7 +6,7 @@ import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
-import ThreadAuthorAvatar from "@/components/feature/user/ThreadAuthorAvatar";
+import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -43,7 +43,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 										<span>{thread.postCount}</span>
 									</div>
 									<div className="flex items-center">
-										<ThreadAuthorAvatar
+										<AuthorAvatar
 											name={thread.author.name}
 											image={thread.author.image}
 											className="h-6 w-6 border-gray-300"

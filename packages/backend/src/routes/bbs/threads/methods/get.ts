@@ -389,6 +389,7 @@ export const getThreadWithPostsRouter: RouteHandler<
 					author: {
 						columns: {
 							name: true,
+							image: true,
 						},
 					},
 				},
