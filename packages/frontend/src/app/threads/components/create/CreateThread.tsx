@@ -3,15 +3,16 @@ import type {
 	CreateThreadType,
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
+import { PencilLine } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import IconButton from "@/components/common/button/IconButton";
+import UserAvatar from "@/components/feature/user/UserAvatar";
 import {
 	Form,
 	FormControl,
 	FormField,
 	FormItem,
-	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
@@ -90,9 +91,9 @@ export const CreateThreadForm = ({
 	return (
 		<section
 			aria-labelledby="create-thread-title"
-			className="mx-auto mt-6 w-full max-w-2xl px-4 sm:px-0"
+			className="mx-auto w-full max-w-2xl p-4"
 		>
-			<div className="rounded-2xl bg-white/90 p-5">
+			<div className="rounded-2xl bg-white/90">
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(handleSubmit)}
@@ -102,10 +103,8 @@ export const CreateThreadForm = ({
 							control={form.control}
 							name="title"
 							render={({ field }) => (
-								<FormItem className="flex flex-col gap-2">
-									<FormLabel className="text-sm font-medium text-slate-600">
-										スレッドタイトル
-									</FormLabel>
+								<FormItem className="flex gap-2">
+									<UserAvatar />
 									<FormControl>
 										<Textarea
 											id="thread-title"
@@ -118,7 +117,7 @@ export const CreateThreadForm = ({
 												},
 											})}
 											placeholder="例: 〇〇の試合について"
-											className="w-full border-none resize-none rounded-xl px-4 py-3 text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
+											className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -130,27 +129,32 @@ export const CreateThreadForm = ({
 						<div className="space-y-3">
 							<div className="h-px w-full bg-slate-200/70" aria-hidden="true" />
 							<div className="flex flex-wrap items-start gap-3">
-								<div className="min-w-0 flex-1">
+								<div className="min-w-0 flex-1 space-y-3">
 									<TagList
 										tags={selectedTags}
 										onToggle={handleToggleTagFromList}
 									/>
-									<TagPickerTooltip
-										onSelect={handleSelectTag}
-										tags={tags}
-										selectedTagIds={selectedTagIds}
-									/>
+									<div className="flex justify-between">
+										<TagPickerTooltip
+											onSelect={handleSelectTag}
+											tags={tags}
+											selectedTagIds={selectedTagIds}
+										/>
+
+										<IconButton
+											hover="brightness"
+											icon={<PencilLine />}
+											variant="logo1"
+											enableClickAnimation
+											type="submit"
+											disabled={isSubmitDisabled || form.formState.isSubmitting}
+										>
+											<span className="text-md">投稿</span>
+										</IconButton>
+									</div>
 								</div>
 							</div>
 						</div>
-
-						<Button
-							className="w-full rounded-full bg-slate-900 text-white transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
-							type="submit"
-							disabled={isSubmitDisabled || form.formState.isSubmitting}
-						>
-							作成
-						</Button>
 					</form>
 				</Form>
 			</div>

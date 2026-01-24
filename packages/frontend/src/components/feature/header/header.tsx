@@ -1,7 +1,6 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import { PencilLine } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
@@ -50,25 +49,24 @@ const Header = ({ tags }: Props) => {
 								<DialogTrigger asChild>
 									<CreateThreadButton />
 								</DialogTrigger>
-								<DialogContent>
-									<DialogTitle>
-										<header className="flex items-center gap-3">
-											<span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white ">
-												<PencilLine className="h-5 w-5" />
-											</span>
-											<div>
-												<h2
-													id="create-thread-title"
-													className="text-base font-semibold text-slate-900"
-												>
-													新規スレッドを作成
-												</h2>
-												<p className="text-xs text-slate-500">
-													今の気持ちや話題をシェアしましょう
-												</p>
-											</div>
-										</header>
-									</DialogTitle>
+								<DialogContent className="" position={"tc"} size={"xl"}>
+									<div className="p-4 pb-0">
+										<DialogTitle>
+											<header className="flex items-center gap-3">
+												<div>
+													<h2
+														id="create-thread-title"
+														className="text-base font-semibold text-slate-900"
+													>
+														新規スレッドを作成
+													</h2>
+													<p className="text-xs text-slate-500">
+														今の気持ちや話題をシェアしましょう
+													</p>
+												</div>
+											</header>
+										</DialogTitle>
+									</div>
 									<CreateThreadForm
 										onCreated={() => {
 											router.refresh();

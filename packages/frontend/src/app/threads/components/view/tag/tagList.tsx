@@ -8,7 +8,7 @@ type Props = {
 
 export const TagList = ({ tags, onToggle }: Props) => {
 	return (
-		<div className="flex flex-wrap gap-2">
+		<div className="flex flex-wrap gap-1">
 			{tags.map((tag) => {
 				return (
 					<Tag
