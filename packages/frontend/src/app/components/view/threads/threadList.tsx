@@ -1,9 +1,12 @@
+"use client";
+
 import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
+import ThreadAuthorAvatar from "@/components/feature/user/ThreadAuthorAvatar";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -39,7 +42,15 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 										<ChatIcon width={16} />
 										<span>{thread.postCount}</span>
 									</div>
-									<span>{thread.author.name}</span>
+									<div className="flex items-center">
+										<ThreadAuthorAvatar
+											name={thread.author.name}
+											image={thread.author.image}
+											className="h-6 w-6 border-gray-300"
+											fallbackClassName="text-[8px]"
+										/>
+										<span className="sr-only">{thread.author.name}</span>
+									</div>
 								</div>
 								{thread.threadTags?.length ? (
 									<div className="mt-2 flex flex-wrap gap-1.5">

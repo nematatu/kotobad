@@ -13,6 +13,7 @@ export const ThreadSchema = z.object({
 	isClosed: z.boolean().optional(),
 	author: z.object({
 		name: z.string(),
+		image: z.string().optional().nullable(),
 	}),
 	threadTags: z.array(ThreadThreadTagSchema),
 });

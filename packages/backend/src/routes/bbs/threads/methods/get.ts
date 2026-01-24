@@ -16,7 +16,7 @@ import { toThreadResponse } from "./transform";
 type ThreadWithOptionalAuthor = {
 	id: number;
 	authorId: string;
-	author?: { name?: string | null } | null;
+	author?: { name?: string | null; image?: string | null } | null;
 };
 
 const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
@@ -61,7 +61,10 @@ const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
 		if (!legacyName) {
 			throw new Error(`Missing author name for thread ${thread.id}`);
 		}
-		return { ...thread, author: { name: legacyName } };
+		return {
+			...thread,
+			author: { name: legacyName, image: thread.author?.image ?? null },
+		};
 	});
 };
 
@@ -261,7 +264,7 @@ export const getAllThreadRouter: RouteHandler<
 				db.query.threads.findMany({
 					with: {
 						author: {
-							columns: { name: true },
+							columns: { name: true, image: true },
 						},
 						threadTags: {
 							with: {
@@ -280,7 +283,7 @@ export const getAllThreadRouter: RouteHandler<
 			[threadsResult, totalCountResult] = await Promise.all([
 				db.query.threads.findMany({
 					with: {
-						author: { columns: { name: true } },
+						author: { columns: { name: true, image: true } },
 						threadTags: {
 							with: {
 								tags: true,
@@ -325,6 +328,7 @@ export const getThreadByIdRouter: RouteHandler<
 				author: {
 					columns: {
 						name: true,
+						image: true,
 					},
 				},
 				threadTags: {
@@ -369,6 +373,7 @@ export const getThreadWithPostsRouter: RouteHandler<
 					author: {
 						columns: {
 							name: true,
+							image: true,
 						},
 					},
 					threadTags: {
@@ -437,6 +442,7 @@ export const searchThreadRouter: RouteHandler<
 					author: {
 						columns: {
 							name: true,
+							image: true,
 						},
 					},
 					threadTags: {
