@@ -7,7 +7,7 @@
 		"@types/bun": "latest",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
-		"wrangler": "^4.55.0"
+		"wrangler": "^4.60.0"
 	},
 	"peerDependencies": {
 		"typescript": "^5.9.3"
@@ -16,9 +16,9 @@
 		"packages/*"
 	],
 	"scripts": {
-		"dev": "bun --filter '*' dev",
-		"dev:frontend": "bun --filter 'frontend' dev",
-		"dev:backend": "bun --filter 'backend' dev",
+		"dev": "bun --filter '@kotobad/backend' dev & bun --filter '@kotobad/frontend' dev",
+		"dev:frontend": "bun --filter '@kotobad/frontend' dev",
+		"dev:backend": "bun --filter '@kotobad/backend' dev",
 		"build:frontend": "bun --filter '@kotobad/frontend' build",
 		"build:backend": "bun --filter '@kotobad/backend' build",
 		"deploy:frontend": "bun --filter '@kotobad/frontend' deploy",
@@ -35,6 +35,6 @@
 		]
 	},
 	"dependencies": {
-		"@biomejs/biome": "^2.3.10"
+		"@biomejs/biome": "^2.3.12"
 	}
 }
