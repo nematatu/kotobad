@@ -1,4 +1,4 @@
-import type { TagListType, TagType } from "@kotobad/shared/src/types/tag";
+import type { TagType } from "@kotobad/shared/src/types/tag";
 import type {
 	CreateThreadType,
 	ThreadType,
@@ -214,33 +214,5 @@ export const CreateThreadForm = ({
 				</Form>
 			</div>
 		</Card>
-	);
-};
-
-type CreateThreadProps = {
-	onCreated: () => void;
-	initialTags?: TagListType;
-};
-
-export const CreateThread = ({ onCreated, initialTags }: CreateThreadProps) => {
-	const [isOpenForm, setIsOpenForm] = useState(false);
-	const handleToggleForm = () => {
-		setIsOpenForm((prev) => !prev);
-	};
-
-	return (
-		<div>
-			<Button
-				className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
-				type="button"
-				onClick={handleToggleForm}
-			>
-				{isOpenForm ? "▲" : "▼"} スレッド作成
-			</Button>
-
-			{isOpenForm && (
-				<CreateThreadForm onCreated={onCreated} initialTags={initialTags} />
-			)}
-		</div>
 	);
 };

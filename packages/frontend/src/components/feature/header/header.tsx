@@ -50,7 +50,9 @@ const Header = ({ tags }: Props) => {
 									<CreateThreadButton />
 								</DialogTrigger>
 								<DialogContent>
-									<DialogTitle>スレッド作成</DialogTitle>
+									<div className="hidden">
+										<DialogTitle>スレッド作成</DialogTitle>
+									</div>
 									<CreateThreadForm
 										onCreated={() => {
 											router.refresh();
