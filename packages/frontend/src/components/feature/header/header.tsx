@@ -26,9 +26,7 @@ const Header = ({ tags }: Props) => {
 	const router = useRouter();
 
 	return (
-		<div
-			className={`sticky top-0 z-50 w-full transition-transform duration-200`}
-		>
+		<div className="sticky top-0 z-50 w-full bg-gray-200">
 			<div className="flex h-16 items-center justify-between max-w-4xl lg:max-w-6xl mx-auto px-5">
 				<Link href="/">
 					<div className="flex items-center space-x-2">
