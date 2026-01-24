@@ -62,7 +62,7 @@ export const CreatePostForm = ({
 	};
 
 	return (
-		<Card className="my-4 w-full sm:w-1/2">
+		<Card className="w-full">
 			<div className="p-4">
 				<h1 className="mb-4 text-md sm:text-xl font-bold mb-6">書き込み</h1>
 				<Form {...form}>
@@ -76,7 +76,7 @@ export const CreatePostForm = ({
 							render={({ field }) => (
 								<FormItem className="flex gap-2">
 									<UserAvatar />
-									<div className="flex flex-col space-y-2">
+									<div className="flex min-w-0 flex-1 flex-col space-y-2">
 										<FormControl>
 											<div>
 												<Textarea

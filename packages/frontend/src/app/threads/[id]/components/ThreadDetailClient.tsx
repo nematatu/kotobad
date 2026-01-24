@@ -125,8 +125,10 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 					<BottomArrowIcon className="text-gray-600 w-20 h-20 p-4 cursor-pointer" />
 				</button>
 			</div>
-			<div className="flex justify-center">
-				<CreatePostForm threadId={thread.id} onSuccess={refreshPosts} />
+			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">
+				<div className="max-w-2xl mx-auto">
+					<CreatePostForm threadId={thread.id} onSuccess={refreshPosts} />
+				</div>
 			</div>
 		</div>
 	);

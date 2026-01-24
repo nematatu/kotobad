@@ -26,10 +26,6 @@ export default function BreadCrumb({
 		<Breadcrumb>
 			<BreadcrumbList className={`${sizeClasses.sm} sm:${sizeClasses[size]}`}>
 				<BreadcrumbItem>
-					<BreadcrumbLink href="/">ホーム</BreadcrumbLink>
-				</BreadcrumbItem>
-				<BreadcrumbSeparator />
-				<BreadcrumbItem>
 					<BreadcrumbLink href="/threads">スレッド一覧</BreadcrumbLink>
 				</BreadcrumbItem>
 				<BreadcrumbSeparator />
