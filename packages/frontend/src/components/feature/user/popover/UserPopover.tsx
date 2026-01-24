@@ -28,7 +28,7 @@ export function UserPopover() {
 						</div>
 					</div>
 				</Link>
-				<div className="py-3 justify-items-center">
+				<div className="flex py-4 items-center justify-center">
 					<LogoutButton />
 				</div>
 			</PopoverContent>
