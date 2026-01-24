@@ -7,6 +7,7 @@ import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate"
 import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import { setThreadPreview } from "@/lib/cache/threadPreview";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -24,6 +25,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 						<Link
 							href={`/threads/${thread.id}`}
 							key={thread.id}
+							onClick={() => setThreadPreview(thread)}
 							className="group flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition hover:border-gray-300 hover:text-blue-600 visited:text-gray-500 visited:hover:text-blue-600"
 						>
 							<div className="min-w-0 flex-1">
