@@ -99,7 +99,7 @@ export const CreatePostForm = ({
 								</FormItem>
 							)}
 						/>
-						<p className="hidden sm:block text-neutral-400 font-sm">
+						<p className="hidden sm:block text-neutral-400 text-sm">
 							Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
 						</p>
 						{error && <p className="text-red-500">{error}</p>}
