@@ -1,5 +1,3 @@
-"use client";
-
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 
 type Props = {

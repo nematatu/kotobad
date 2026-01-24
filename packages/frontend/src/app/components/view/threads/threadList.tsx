@@ -1,12 +1,8 @@
-"use client";
-
 import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useRef } from "react";
 import ChatIcon from "@/assets/threads/chat.svg";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
@@ -16,16 +12,6 @@ type ThreadListType = {
 
 export const ThreadList = ({ threads }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
-	const router = useRouter();
-	const prefetched = useRef(new Set<string>());
-
-	const handlePrefetch = (href: string) => {
-		if (typeof window === "undefined") return;
-		if (!window.matchMedia("(hover: hover)").matches) return;
-		if (prefetched.current.has(href)) return;
-		prefetched.current.add(href);
-		router.prefetch(href);
-	};
 
 	return (
 		<div className="">
@@ -38,7 +24,6 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 							href={href}
 							key={thread.id}
 							prefetch={false}
-							onMouseEnter={() => handlePrefetch(href)}
 							className="group flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition hover:border-gray-300 hover:text-blue-600 visited:text-gray-500 visited:hover:text-blue-600"
 						>
 							<div className="min-w-0 flex-1">

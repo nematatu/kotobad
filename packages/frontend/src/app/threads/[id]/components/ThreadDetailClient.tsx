@@ -1,17 +1,12 @@
-"use client";
-
-import { PostListSchema } from "@kotobad/shared/src/schemas/post";
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
-import { useEffect, useState } from "react";
-import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
-import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
 import BreadCrumb from "./BreadCrumbs";
 import { CreatePostForm } from "./CreatePostForm";
 import { PostList } from "./PostList";
+import ScrollToBottomButton from "./ScrollToBottomButton";
 
 type Props = {
 	thread: ThreadType;
@@ -30,41 +25,7 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 	const getLabelClass = (tagId: number) =>
 		CategoryColorMap[tagId % CategoryColorMap.length];
 
-	const [posts, setPosts] = useState<PostListType>(
-		sortByCreatedAt(normalizedInitialPosts),
-	);
-
-	const refreshPosts = async () => {
-		try {
-			const getPostsBaseUrl = await getBffApiUrl("GET_POSTS_BY_THREADID");
-			const getPostsTargetUrl = new URL(String(thread.id), getPostsBaseUrl);
-			const getPostsRes = await fetch(getPostsTargetUrl);
-			const postsBody = await getPostsRes.json();
-			const targetPosts = PostListSchema.parse(postsBody);
-
-			if (!Array.isArray(targetPosts)) {
-				console.error("レスポンス形式が不正です", targetPosts);
-				return;
-			}
-			setPosts(sortByCreatedAt(targetPosts));
-		} catch (error) {
-			console.error("投稿の取得に失敗しました", error);
-		}
-	};
-
-	const [showScrollBotton, setShowScrollBotton] = useState(true);
-
-	useEffect(() => {
-		const handleScroll = () => {
-			const scrolledToBottom =
-				window.innerHeight + window.scrollY >= document.body.scrollHeight - 20;
-			setShowScrollBotton(!scrolledToBottom);
-		};
-
-		window.addEventListener("scroll", handleScroll);
-		handleScroll();
-		return () => window.removeEventListener("scroll", handleScroll);
-	});
+	const posts = sortByCreatedAt(normalizedInitialPosts);
 
 	return (
 		<div>
@@ -95,26 +56,10 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 					<PostList posts={posts} />
 				</div>
 			</div>
-			<div
-				className={`fixed sm:bottom-10 sm:right-10 bottom-3 right-3 transition-opacity duration-100
-                ${showScrollBotton ? "opacity-100" : " opacity-0 pointer-events-none"}
-                `}
-			>
-				<button
-					type="button"
-					onClick={() =>
-						window.scrollTo({
-							top: document.body.scrollHeight,
-							behavior: "smooth",
-						})
-					}
-				>
-					<BottomArrowIcon className="text-gray-600 w-20 h-20 p-4 cursor-pointer" />
-				</button>
-			</div>
+			<ScrollToBottomButton />
 			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">
 				<div className="max-w-2xl mx-auto">
-					<CreatePostForm threadId={thread.id} onSuccess={refreshPosts} />
+					<CreatePostForm threadId={thread.id} />
 				</div>
 			</div>
 		</div>

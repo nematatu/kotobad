@@ -1,5 +1,3 @@
-"use client";
-
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";

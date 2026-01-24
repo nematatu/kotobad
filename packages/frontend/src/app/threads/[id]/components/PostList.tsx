@@ -1,9 +1,6 @@
-"use client";
-
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { useEffect, useState } from "react";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
 type PostListProps = {
@@ -11,15 +8,9 @@ type PostListProps = {
 };
 
 export const PostList = ({ posts }: PostListProps) => {
-	const [postList, setPostList] = useState<PostListType>(posts);
-
-	useEffect(() => {
-		setPostList(posts);
-	}, [posts]);
-
 	return (
 		<div className="radius-sm flex flex-col">
-			{postList.map((post, i) => (
+			{posts.map((post, i) => (
 				<div
 					key={post.id}
 					className={`p-4 min-h-14 flex items-center border ${i % 2 === 0 ? "bg-gray-100 dark:bg-gray-950" : ""}`}

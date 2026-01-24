@@ -1,5 +1,8 @@
+"use client";
+
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
 import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -30,6 +33,7 @@ export const CreatePostForm = ({
 	const [isMinimized, setIsMinimized] = useState(false);
 	const contentRef = useRef<HTMLDivElement>(null);
 	const [contentHeight, setContentHeight] = useState<number | null>(null);
+	const router = useRouter();
 	const form = useForm<CreatePostType>({
 		defaultValues: {
 			post: "",
@@ -47,6 +51,7 @@ export const CreatePostForm = ({
 			});
 
 			if (onSuccess) onSuccess();
+			router.refresh();
 
 			form.reset();
 			toast.success("投稿しました!");
