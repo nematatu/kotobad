@@ -3,6 +3,7 @@
 import { PostListSchema } from "@kotobad/shared/src/schemas/post";
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { useEffect, useState } from "react";
 import BottomArrowIcon from "@/assets/threads/bottom_arrow.svg";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
@@ -11,20 +12,6 @@ import { cn } from "@/lib/utils";
 import BreadCrumb from "./BreadCrumbs";
 import { CreatePostForm } from "./CreatePostForm";
 import { PostList } from "./PostList";
-
-const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
-	year: "numeric",
-	month: "2-digit",
-	day: "2-digit",
-	hour: "2-digit",
-	minute: "2-digit",
-	second: "2-digit",
-	hour12: false,
-	timeZone: "Asia/Tokyo",
-});
-
-const formatDateTime = (value: string | number | Date) =>
-	dateFormatter.format(new Date(value));
 
 type Props = {
 	thread: ThreadType;
@@ -102,7 +89,7 @@ export default function ThreadDetailClient({ thread, initialPosts }: Props) {
 							</span>
 						))}
 					</div>
-					<p className="text-gray-400">{formatDateTime(thread.createdAt)}</p>
+					<p className="text-gray-400">{formatDate(thread.createdAt)}</p>
 				</div>
 				<div className="w-full sm:w-1/2">
 					<PostList posts={posts} />

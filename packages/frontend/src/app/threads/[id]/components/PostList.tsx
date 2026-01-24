@@ -26,11 +26,11 @@ export const PostList = ({ posts }: PostListProps) => {
 				>
 					<div className="flex-col flex sm:flex-row justify-between text-sm sm:text-base w-full">
 						<div className="flex-col">
-							<div className="flex">
+							<div className="flex items-center">
 								<span className="text-gray-500 mr-2 text-sm">
 									{post.localId ?? post.id}
 								</span>
-								<div className="flex items-center gap-y-1 text-xs sm:text-sm whitespace-nowrap space-x-1">
+								<div className="flex items-center justify-center gap-y-1 text-xs sm:text-sm whitespace-nowrap space-x-1">
 									<AuthorAvatar
 										name={post.author.name}
 										image={post.author.image}
