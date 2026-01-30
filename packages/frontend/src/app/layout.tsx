@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
-import { ZenKakuGothicNew } from "@/utils/fonts/font";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://kotobad.com"),
@@ -39,7 +38,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja">
-			<body className={`${ZenKakuGothicNew.className}`}>
+			<body>
 				<UserProvider>
 					<Toaster richColors />
 					<Header tags={tags} />
