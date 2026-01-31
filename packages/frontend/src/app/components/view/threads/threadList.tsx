@@ -16,14 +16,14 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 	return (
 		<div className="">
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-				{threadList.map((thread) => {
+				{threadList.map((thread, i) => {
 					const relative = getRelativeDate(thread.createdAt);
 					const href = `/threads/${thread.id}`;
 					return (
 						<Link
 							href={href}
 							key={thread.id}
-							prefetch={false}
+							prefetch={i < 4}
 							className="group flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition hover:border-gray-300 hover:text-blue-600 visited:text-gray-500 visited:hover:text-blue-600"
 						>
 							<div className="min-w-0 flex-1">
