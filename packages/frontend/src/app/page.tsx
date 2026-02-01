@@ -1,4 +1,4 @@
-import { ThreadList } from "./components/view/threads/threadList";
+import { ThreadList } from "./threads/components/view/ThreadList";
 import { getThreads } from "./threads/lib/getThread";
 
 export default async function Page() {
