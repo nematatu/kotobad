@@ -5,8 +5,10 @@
 	"private": true,
 	"devDependencies": {
 		"@types/bun": "latest",
+		"docsify-cli": "^4.4.4",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
+		"scaffdog": "^4.1.0",
 		"wrangler": "^4.60.0"
 	},
 	"peerDependencies": {
@@ -26,7 +28,9 @@
 		"format": "biome format --write",
 		"lint": "biome lint --write",
 		"check": "biome check --write",
-		"prepare": "husky"
+		"prepare": "husky", 
+		"docs": "scaffdog generate",
+		"docs:serve": "bun scripts/docsify-generate-sidebar.ts && docsify serve ./docs"
 	},
 	"lint-staged": {
 		"packages/**/src/**/*.{ts,tsx}": [
