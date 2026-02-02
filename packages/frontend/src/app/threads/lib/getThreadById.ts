@@ -10,7 +10,7 @@ export const getThreadById = async (id: string) => {
 	type ResType = InferResponseType<(typeof client.bbs.threads)[":id"]["$get"]>;
 
 	const baseUrl = await getApiUrl("GET_THREAD_BY_ID");
-	const targetUrl = new URL(id, baseUrl);
+	const targetUrl = new URL(encodeURIComponent(id), baseUrl);
 
 	const response = await BffFetcher<ResType>(targetUrl, {
 		method: "GET",
