@@ -25,9 +25,9 @@ export const ThreadPostsStream = ({ threadId }: Props) => {
 		},
 	);
 
-	if (error) return <div>failed to load</div>;
+	if (error) return <div>投稿の読み込みに失敗しました。</div>;
 	if (isLoading) return <ThreadPostsFallback />;
-	if (!data) return <div>no data</div>;
+	if (!data) return <div>投稿がありません。</div>;
 
 	const posts: PostListType = data;
 
