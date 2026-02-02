@@ -18,13 +18,7 @@ export default async function ThreadDetailPage({ params }: Props) {
 	let targetPosts;
 
 	try {
-		const t0 = performance.now();
-
 		const response = await getThreadWithPosts(threadId);
-
-		const t1 = performance.now();
-		console.log(`getThreadWithPosts: ${t1 - t0} ms`);
-
 		targetThread = response.thread;
 		targetPosts = response.posts;
 	} catch (error: unknown) {
