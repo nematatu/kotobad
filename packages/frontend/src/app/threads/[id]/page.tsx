@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
 export const revalidate = 900;
@@ -11,6 +12,10 @@ export type Props = {
 export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
 	const threadId = Number(renderedparams.id);
+
+	if (!Number.isFinite(threadId)) {
+		return notFound();
+	}
 
 	return (
 		<div className="p-1 sm:p-4">
