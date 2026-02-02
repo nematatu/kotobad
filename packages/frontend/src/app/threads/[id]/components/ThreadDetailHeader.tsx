@@ -23,7 +23,7 @@ export const ThreadDetailHeader = async ({ threadId }: props) => {
 		if (err.status === 404) {
 			return notFound();
 		}
-		throw new Error("Thread not found");
+		throw e;
 	}
 	return (
 		<div>
