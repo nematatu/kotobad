@@ -7,7 +7,7 @@ import { getThreadById } from "../../lib/getThreadById";
 import BreadCrumb from "./BreadCrumbs";
 
 type Props = {
-	threadId: string;
+	threadId: number;
 };
 
 export const ThreadDetailHeader = async ({ threadId }: Props) => {
@@ -15,9 +15,10 @@ export const ThreadDetailHeader = async ({ threadId }: Props) => {
 		CategoryColorMap[tagId % CategoryColorMap.length];
 
 	let threadHeaderData: ThreadType;
+	const threadIdString = threadId.toString();
 
 	try {
-		threadHeaderData = await getThreadById(threadId);
+		threadHeaderData = await getThreadById(threadIdString);
 	} catch (e) {
 		const err = e as { status?: number };
 		if (err.status === 404) {

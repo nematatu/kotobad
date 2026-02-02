@@ -10,13 +10,12 @@ export type Props = {
 
 export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
-	const threadId = renderedparams.id;
-	const threadIdNumber = Number(threadId);
+	const threadId = Number(renderedparams.id);
 
 	return (
 		<div className="p-1 sm:p-4">
 			<ThreadDetailHeader threadId={threadId} />
-			<ThreadPostsStream threadId={threadIdNumber} />
+			<ThreadPostsStream threadId={threadId} />
 		</div>
 	);
 }
