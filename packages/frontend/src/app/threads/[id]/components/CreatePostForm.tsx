@@ -2,10 +2,10 @@
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
 import { ChevronDown } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,16 +22,13 @@ import { cn } from "@/lib/utils";
 
 type CreatePostFormProps = {
 	threadId: number;
-	onSuccess?: () => void;
 };
 
-export const CreatePostForm = ({
-	threadId,
-	onSuccess,
-}: CreatePostFormProps) => {
+export const CreatePostForm = ({ threadId }: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [isMinimized, setIsMinimized] = useState(false);
-	const router = useRouter();
+	const { mutate } = useSWRConfig();
+
 	const form = useForm<CreatePostType>({
 		defaultValues: {
 			post: "",
@@ -48,9 +45,7 @@ export const CreatePostForm = ({
 				body: JSON.stringify(values),
 			});
 
-			if (onSuccess) onSuccess();
-			router.refresh();
-
+			mutate(["GET_POSTS_BY_THREADID", threadId]);
 			form.reset();
 			toast.success("投稿しました!");
 			setTimeout(() => form.setFocus("post"), 1);
