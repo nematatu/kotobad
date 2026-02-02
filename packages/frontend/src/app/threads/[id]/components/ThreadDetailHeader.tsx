@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 import { getThreadById } from "../../lib/getThreadById";
 import BreadCrumb from "./BreadCrumbs";
 
-type props = {
+type Props = {
 	threadId: string;
 };
 
-export const ThreadDetailHeader = async ({ threadId }: props) => {
+export const ThreadDetailHeader = async ({ threadId }: Props) => {
 	const getLabelClass = (tagId: number) =>
 		CategoryColorMap[tagId % CategoryColorMap.length];
 
