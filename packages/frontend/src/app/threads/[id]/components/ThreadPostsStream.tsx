@@ -1,31 +1,40 @@
 "use client";
 
 import type { PostListType } from "@kotobad/shared/src/types/post";
-import { use } from "react";
+import useSWR from "swr";
+import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { CreatePostForm } from "./CreatePostForm";
+import { ThreadPostsFallback } from "./fallback/ThreadPostsFallback";
 import { PostList } from "./PostList";
 import ScrollToBottomButton from "./ScrollToBottomButton";
 
 type Props = {
-	posts: Promise<PostListType>;
 	threadId: number;
 };
 
-const sortByCreatedAt = (list: PostListType) =>
-	[...list].sort(
-		(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+export const ThreadPostsStream = ({ threadId }: Props) => {
+	const { data, error, isLoading } = useSWR<PostListType>(
+		["GET_POSTS_BY_THREADID", threadId],
+		async ([key, id]) => {
+			const baseUrl = await getBffApiUrl(key);
+			const targetUrl = new URL(String(id), baseUrl);
+			return BffFetcher<PostListType>(targetUrl, {
+				method: "GET",
+			});
+		},
 	);
 
-export const ThreadPostsStream = ({ posts, threadId }: Props) => {
-	const resolvedPosts = use(posts);
-	const sortedPosts = sortByCreatedAt(
-		Array.isArray(resolvedPosts) ? resolvedPosts : [],
-	);
+	if (error) return <div>failed to load</div>;
+	if (isLoading) return <ThreadPostsFallback />;
+	if (!data) return <div>no data</div>;
+
+	const posts: PostListType = data;
 
 	return (
 		<div className="flex flex-col items-center justify-center">
 			<div className="w-full sm:w-1/2">
-				<PostList posts={sortedPosts} />
+				<PostList posts={posts} />
 			</div>
 			<ScrollToBottomButton />
 			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">

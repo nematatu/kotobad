@@ -28,7 +28,7 @@
 		"format": "biome format --write",
 		"lint": "biome lint --write",
 		"check": "biome check --write",
-		"prepare": "husky", 
+		"prepare": "husky",
 		"docs": "scaffdog generate",
 		"docs:serve": "bun scripts/docsify-generate-sidebar.ts && docsify serve ./docs"
 	},
