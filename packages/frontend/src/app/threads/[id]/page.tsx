@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
-import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
-import ThreadDetailClient from "./components/ThreadDetailClient";
+import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
+import { ThreadPostsStream } from "./components/ThreadPostsStream";
 export const revalidate = 900;
 export const dynamic = "force-static";
 export const dynamicParams = true; // ビルド時に静的生成せず、初回アクセスでISR生成
@@ -12,26 +11,16 @@ export type Props = {
 
 export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
-	const threadId = renderedparams.id;
+	const threadId = Number(renderedparams.id);
 
-	let targetThread;
-	let targetPosts;
-
-	try {
-		const response = await getThreadWithPosts(threadId);
-		targetThread = response.thread;
-		targetPosts = response.posts;
-	} catch (error: unknown) {
-		const fetchError = error as BffFetcherError;
-		if (fetchError.status === 404) {
-			return notFound();
-		}
-		throw error;
+	if (!Number.isFinite(threadId)) {
+		return notFound();
 	}
 
 	return (
 		<div className="p-1 sm:p-4">
-			<ThreadDetailClient thread={targetThread} initialPosts={targetPosts} />
+			<ThreadDetailHeader threadId={threadId} />
+			<ThreadPostsStream threadId={threadId} />
 		</div>
 	);
 }
