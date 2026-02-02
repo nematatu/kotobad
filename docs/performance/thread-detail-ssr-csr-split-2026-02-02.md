@@ -49,3 +49,21 @@ date: "2026-02-02T15:20:00.000Z"
 CSRで実行すると、クライアントによって(PC, モバイルなど)環境によって処理時間が異なる可能性がある。
 ### 次やること
 - `ThreadDetail` を「ヘッダーSSR / 投稿CSR」に分割して実装する
+
+---
+
+## 実装メモ（2026-02-02）
+### IDの型とバリデーション
+- `threadId` は **number** に統一する（共有型・DB・CreatePost が number 前提のため）
+- `page.tsx` で `Number.isFinite(Number(id))` を検証し、不正なら `notFound()`
+- CSR 側は保険で SWR の key を `null` にしてフェッチ停止も可
+
+### URL組み立ての安全性
+- `new URL(id, baseUrl)` は **外部URL注入**の危険がある
+- `encodeURIComponent(String(id))` を **パスセグメントとして連結**する方式に変更
+
+### SWR / mutate の方針
+- `CreatePostForm` は **関数propsを持てない**（`"use client"` の export コンポーネントの制約）
+- 投稿成功時は `useSWRConfig().mutate(["GET_POSTS_BY_THREADID", threadId])` で再取得
+- `getBffApiUrl` は **固定文字列で呼ぶ**（`getBffApiUrl("GET_POSTS_BY_THREADID")`）
+- SWR key は `["GET_POSTS_BY_THREADID", threadId] as const` で型を固定
