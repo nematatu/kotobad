@@ -15,9 +15,9 @@ type Props = {
 
 export const ThreadPostsStream = ({ threadId }: Props) => {
 	const { data, error, isLoading } = useSWR<PostListType>(
-		["GET_POSTS_BY_THREADID", threadId],
-		async ([key, id]) => {
-			const baseUrl = await getBffApiUrl(key);
+		["GET_POSTS_BY_THREADID", threadId] as const,
+		async ([_, id]) => {
+			const baseUrl = await getBffApiUrl("GET_POSTS_BY_THREADID");
 			const targetUrl = new URL(String(id), baseUrl);
 			return BffFetcher<PostListType>(targetUrl, {
 				method: "GET",
