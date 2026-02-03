@@ -24,18 +24,23 @@ export function ThreadPagination({
 
 	if (totalCount === 0) return;
 
+	const justifyClass =
+		position === "start"
+			? "justify-start"
+			: position === "end"
+				? "justify-end"
+				: "justify-center";
+
 	return (
-		<Pagination className={`flex justify-${position}`}>
+		<Pagination className={justifyClass}>
 			<PaginationContent>
 				{/* 前へ */}
-				{currentPage > 1 && (
-					<PaginationItem>
-						<PaginationPrevious
-							href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
-							className={currentPage === 1 ? "hidden pointer-events-none" : ""}
-						/>
-					</PaginationItem>
-				)}
+				<PaginationItem className={currentPage === 1 ? "invisible" : ""}>
+					<PaginationPrevious
+						href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
+						className={currentPage === 1 ? "pointer-events-none" : ""}
+					/>
+				</PaginationItem>
 				{/* ページ番号 */}
 				{[...Array(totalPages)].map((_, i) => {
 					const page = i + 1;
@@ -52,10 +57,12 @@ export function ThreadPagination({
 				})}
 
 				{/* 次へ */}
-				<PaginationItem>
+				<PaginationItem
+					className={currentPage === totalPages ? "invisible" : ""}
+				>
 					<PaginationNext
 						href={`?page=${currentPage + 1}`}
-						className={currentPage === totalPages ? "invisible" : ""}
+						className={currentPage === totalPages ? "pointer-events-none" : ""}
 					/>
 				</PaginationItem>
 			</PaginationContent>

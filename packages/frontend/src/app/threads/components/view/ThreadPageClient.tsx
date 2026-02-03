@@ -22,19 +22,8 @@ export default function ThreadPageClient({
 		<div className="flex flex-col items-center">
 			<div className="w-full sm:max-w-[50%]">
 				<div className="p-2">
-					<div className="text-xl sm:text-2xl md:text-3xl font-bold my-4">
+					<div className="text-xl sm:text-2xl md:text-3xl font-bold my-2">
 						スレッド一覧
-					</div>
-					<div className="flex items-center my-2">
-						<ThreadDisplayCount
-							currentPage={currentPage}
-							totalCount={totalCount}
-						/>
-						<ThreadPagination
-							currentPage={currentPage}
-							totalCount={totalCount}
-							position="end"
-						/>
 					</div>
 				</div>
 				{totalCount === 0 ? (
@@ -44,8 +33,12 @@ export default function ThreadPageClient({
 				) : (
 					<ThreadList threads={currentThreads} />
 				)}
-				<div className="flex justify-end">
+				<div className="flex flex-col items-center my-3 space-y-3">
 					<ThreadPagination currentPage={currentPage} totalCount={totalCount} />
+					<ThreadDisplayCount
+						currentPage={currentPage}
+						totalCount={totalCount}
+					/>
 				</div>
 			</div>
 		</div>
