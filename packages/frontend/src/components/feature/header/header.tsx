@@ -1,22 +1,12 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Link } from "@/components/common/Link";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
-import {
-	Dialog,
-	DialogContent,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
-import { UserPopover } from "../user/popover/UserPopover";
+import CreateThreadDialog from "./component/compoicreateThreadDialog";
 import { headerNavLinks } from "./headerNavLinks";
 
 type Props = {
@@ -25,8 +15,6 @@ type Props = {
 
 const Header = ({ tags }: Props) => {
 	const { user, isLoading } = useUser();
-	const router = useRouter();
-	const [isCreateOpen, setIsCreateOpen] = useState(false);
 
 	return (
 		<div className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -54,40 +42,7 @@ const Header = ({ tags }: Props) => {
 							aria-hidden="true"
 						/>
 					) : user ? (
-						<div className="flex items-center space-x-4">
-							<UserPopover />
-							<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-								<DialogTrigger asChild>
-									<CreateThreadButton />
-								</DialogTrigger>
-								<DialogContent className="" position={"tc"} size={"xl"}>
-									<div className="p-4 pb-0">
-										<DialogTitle>
-											<header className="flex items-center gap-3">
-												<div>
-													<h2
-														id="create-thread-title"
-														className="text-base font-semibold text-slate-900"
-													>
-														新規スレッドを作成
-													</h2>
-													<p className="text-xs text-slate-500">
-														今の気持ちや話題をシェアしましょう
-													</p>
-												</div>
-											</header>
-										</DialogTitle>
-									</div>
-									<CreateThreadForm
-										onCreated={() => {
-											router.refresh();
-											setIsCreateOpen(false);
-										}}
-										initialTags={tags}
-									/>
-								</DialogContent>
-							</Dialog>
-						</div>
+						<CreateThreadDialog tags={tags} />
 					) : (
 						<GoogleOAuth />
 					)}
