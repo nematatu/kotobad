@@ -118,6 +118,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --tracking-body: 0.02em;
 }
 
 .dark {
@@ -161,10 +162,10 @@
   body {
     @apply bg-background text-foreground font-sans;
     overflow-y: scroll;   
+    letter-spacing: var(--tracking-body);
   }
 
 }
-
 
 /* Custom keyframes (migrated from tailwind.config.ts) */
 @keyframes fadeIn {

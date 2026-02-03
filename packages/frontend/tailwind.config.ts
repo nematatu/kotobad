@@ -11,9 +11,6 @@ const config: Config = {
 	],
 	theme: {
           extend: {
-            fontFamily: {
-              sans: ['sans-serif'],
-            },
             boxShadow: {
               'soft': '0 4px 20px -2px rgba(255, 49, 49, 0.08)',
               'glow': '0 0 20px rgba(255, 49, 49, 0.2)',

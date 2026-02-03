@@ -19,13 +19,14 @@ export default function ThreadPageClient({
 }: Props) {
 	const currentThreads = [...initialThreads].slice(0, PERPAGE);
 	return (
-		<div className="flex flex-col items-center">
-			<div className="w-full sm:max-w-[50%]">
-				<div className="p-2">
-					<div className="text-xl sm:text-2xl md:text-3xl font-bold my-2">
-						スレッド一覧
-					</div>
-				</div>
+		<div className="flex flex-col items-center w-full lg:max-w-[50%]">
+			<div className="w-full px-3 pt-5 pb-2 space-y-2">
+				<div className="text-xl font-bold">スレッド一覧</div>
+				<p className="text-slate-500 text-xs">
+					バドミントンの熱い議論に参加しましょう。
+				</p>
+			</div>
+			<div className="">
 				{totalCount === 0 ? (
 					<div className="flex justify-center text-2xl">
 						スレッドがありません...
