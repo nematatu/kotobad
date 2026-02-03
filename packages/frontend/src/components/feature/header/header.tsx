@@ -19,8 +19,13 @@ const Header = ({ tags }: Props) => {
 	return (
 		<div className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
 			<div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5">
-				<Link href="/" className="flex items-center gap-2 shrink-0">
-					<LogoIcon className="w-8" />
+				<Link
+					href="/"
+					className="group flex items-center justify-center gap-2 shrink-0 px-4 py-3"
+				>
+					<span className="inline-flex transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110 motion-reduce:group-hover:[animation:none]">
+						<LogoIcon className="w-8" />
+					</span>
 					<LogoMojiIcon className="w-24 text-gray-800" />
 				</Link>
 				<nav className="hidden flex-1 items-center justify-end md:gap-4 text-xs md:text-sm font-semibold text-slate-600 md:flex">
