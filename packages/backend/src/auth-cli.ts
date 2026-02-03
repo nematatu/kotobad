@@ -38,7 +38,7 @@ if (!process.env.BETTER_AUTH_SECRET) {
 	ensureEnvFromDevVars();
 }
 
-const secret = process.env.BETTER_AUTH_SECRET ?? "better-auth-secret-123456789";
+const secret = process.env.BETTER_AUTH_SECRET!;
 
 const cliDb = drizzle(new Database(":memory:"), { schema });
 
