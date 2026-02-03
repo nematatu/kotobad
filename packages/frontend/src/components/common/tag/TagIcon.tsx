@@ -3,15 +3,6 @@ import Image from "next/image";
 import getTagAssetsUrl from "@/lib/config/tag/getTagAssetsUrl";
 import { cn } from "@/lib/utils";
 
-type TagIconProps = {
-	tag: TagType;
-	size?: number;
-	variant?: "default" | "picker";
-	fallback?: boolean;
-	className?: string;
-	fit?: boolean;
-};
-
 const variantClasses = {
 	default: {
 		emoji: "text-lg leading-none",
@@ -23,6 +14,15 @@ const variantClasses = {
 		text: "text-xs font-semibold",
 		fallback: "text-xs text-slate-400",
 	},
+} as const;
+
+type TagIconProps = {
+	tag: TagType;
+	size?: number;
+	variant?: keyof typeof variantClasses;
+	fallback?: boolean;
+	className?: string;
+	fit?: boolean;
 };
 
 export default function TagIcon({

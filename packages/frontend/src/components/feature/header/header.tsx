@@ -17,6 +17,7 @@ import {
 import CreateThreadButton from "../button/thread/createThread";
 import { useUser } from "../provider/UserProvider";
 import { UserPopover } from "../user/popover/UserPopover";
+import { headerNavLinks } from "./headerNavLinks";
 
 type Props = {
 	tags: TagType[];
@@ -28,15 +29,25 @@ const Header = ({ tags }: Props) => {
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 
 	return (
-		<div className="sticky top-0 z-50 w-full bg-gray-200">
-			<div className="flex h-16 items-center justify-between max-w-4xl lg:max-w-6xl mx-auto px-5">
-				<Link href="/">
-					<div className="flex items-center space-x-2">
-						<LogoMojiIcon className="w-24 text-gray-800" />
-						<LogoIcon className="w-8" />
-					</div>
+		<div className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
+			<div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5">
+				<Link href="/" className="flex items-center gap-2 shrink-0">
+					<LogoIcon className="w-8" />
+					<LogoMojiIcon className="w-24 text-gray-800" />
 				</Link>
-				<div className="flex items-center space-x-2">
+				<nav className="hidden flex-1 items-center justify-end gap-6 text-xs md:text-sm font-semibold text-slate-600 md:flex">
+					{headerNavLinks.map((item) => (
+						<Link
+							key={item.name}
+							href={item.link}
+							className="flex items-center gap-2 transition hover:text-slate-900"
+						>
+							<span>{item.name}</span>
+							{item.label ?? null}
+						</Link>
+					))}
+				</nav>
+				<div className="ml-auto flex items-center space-x-2">
 					{isLoading ? (
 						<div
 							className="h-8 w-24 rounded-md bg-gray-200 animate-pulse"
