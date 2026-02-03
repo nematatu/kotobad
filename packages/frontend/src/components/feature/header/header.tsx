@@ -5,8 +5,9 @@ import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Link } from "@/components/common/Link";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
+import { UserPopover } from "@/components/feature/user/popover/UserPopover";
 import { useUser } from "../provider/UserProvider";
-import CreateThreadDialog from "./component/compoicreateThreadDialog";
+import CreateThreadDialog from "./component/createThreadDialog";
 import { headerNavLinks } from "./headerNavLinks";
 
 type Props = {
@@ -47,7 +48,14 @@ const Header = ({ tags }: Props) => {
 							aria-hidden="true"
 						/>
 					) : user ? (
-						<CreateThreadDialog tags={tags} />
+						<>
+							<div className="hidden md:flex">
+								<CreateThreadDialog tags={tags} />
+							</div>
+							<div className="flex md:hidden">
+								<UserPopover />
+							</div>
+						</>
 					) : (
 						<GoogleOAuth />
 					)}

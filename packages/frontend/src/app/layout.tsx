@@ -3,6 +3,7 @@ import "./globals.css";
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
+import FloatingCreateThread from "@/components/feature/button/thread/FloatingCreateThread";
 import Header from "@/components/feature/header/header";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 
@@ -20,6 +21,7 @@ export default async function RootLayout({
 					<Toaster richColors />
 					<Header tags={tags} />
 					<main className="bg-surface-100">{children}</main>
+					<FloatingCreateThread tags={tags} />
 				</UserProvider>
 			</body>
 		</html>

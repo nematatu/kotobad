@@ -1,5 +1,6 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { useRouter } from "next/navigation";
+import type * as React from "react";
 import { useState } from "react";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import {
@@ -8,21 +9,31 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import CreateThreadButton from "../../button/thread/createThread";
 import { UserPopover } from "../../user/popover/UserPopover";
 
 type Props = {
 	tags: TagType[];
+	trigger?: React.ReactElement;
+	showUserPopover?: boolean;
+	className?: string;
 };
-export default function CreateThreadDialog({ tags }: Props) {
+
+export default function CreateThreadDialog({
+	tags,
+	trigger,
+	showUserPopover = true,
+	className,
+}: Props) {
 	const router = useRouter();
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	return (
-		<div className="flex items-center space-x-4">
-			<UserPopover />
+		<div className={cn("flex items-center space-x-4", className)}>
+			{showUserPopover ? <UserPopover /> : null}
 			<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 				<DialogTrigger asChild>
-					<CreateThreadButton />
+					{trigger ?? <CreateThreadButton />}
 				</DialogTrigger>
 				<DialogContent className="" position={"tc"} size={"xl"}>
 					<div className="p-4 pb-0">
