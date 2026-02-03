@@ -4,7 +4,6 @@ import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
 import Header from "@/components/feature/header/header";
-import NavigationTransition from "@/components/feature/navigation/NavigationTransition";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 
 export const metadata: Metadata = {
@@ -43,7 +42,6 @@ export default async function RootLayout({
 				<UserProvider>
 					<Toaster richColors />
 					<Header tags={tags} />
-					<NavigationTransition />
 					<main>{children}</main>
 				</UserProvider>
 			</body>

@@ -1,12 +1,12 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
+import { Link } from "@/components/common/Link";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 import {
 	Dialog,

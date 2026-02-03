@@ -2,8 +2,8 @@ import type { TagType } from "@kotobad/shared/src/types";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import Link from "next/link";
 import ChatIcon from "@/assets/threads/chat.svg";
+import { Link } from "@/components/common/Link";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
 
