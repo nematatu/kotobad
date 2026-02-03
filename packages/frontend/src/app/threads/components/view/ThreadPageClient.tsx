@@ -22,7 +22,7 @@ export default function ThreadPageClient({
 		<div className="flex flex-col items-center">
 			<div className="w-full sm:max-w-[50%]">
 				<div className="p-2">
-					<div className="text-xl sm:text-2xl sm:text-3xl font-bold pb-1 sm:py-4">
+					<div className="text-xl sm:text-2xl md:text-3xl font-bold my-4">
 						スレッド一覧
 					</div>
 					<div className="flex items-center my-2">
