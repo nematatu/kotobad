@@ -23,12 +23,12 @@ const Header = ({ tags }: Props) => {
 					<LogoIcon className="w-8" />
 					<LogoMojiIcon className="w-24 text-gray-800" />
 				</Link>
-				<nav className="hidden flex-1 items-center justify-end gap-6 text-xs md:text-sm font-semibold text-slate-600 md:flex">
+				<nav className="hidden flex-1 items-center justify-end md:gap-4 text-xs md:text-sm font-semibold text-slate-600 md:flex">
 					{headerNavLinks.map((item) => (
 						<Link
 							key={item.name}
 							href={item.link}
-							className="flex items-center gap-2 transition hover:text-slate-900"
+							className="flex items-center rounded-lg gap-2 px-3 py-2 transition hover:bg-gray-100"
 						>
 							<span>{item.name}</span>
 							{item.label ?? null}
