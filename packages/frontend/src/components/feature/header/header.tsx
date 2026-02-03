@@ -31,7 +31,7 @@ const Header = ({ tags }: Props) => {
 	return (
 		<div className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
 			<div className="mx-auto flex max-w-6xl flex-col px-5">
-				<div className="grid h-16 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 [@media(min-width:496px)]:flex [@media(min-width:496px)]:gap-6">
+				<div className="grid h-13 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 [@media(min-width:496px)]:flex [@media(min-width:496px)]:gap-6">
 					<div className="flex items-center justify-self-start [@media(min-width:496px)]:hidden">
 						<Sheet>
 							<SheetTrigger asChild>
@@ -64,12 +64,12 @@ const Header = ({ tags }: Props) => {
 					</div>
 					<Link
 						href="/"
-						className="group col-start-2 flex items-center justify-center gap-2 justify-self-center px-4 py-3 shrink-0 [@media(min-width:496px)]:col-auto [@media(min-width:496px)]:justify-self-auto"
+						className="group col-start-2 flex h-full items-center justify-center gap-2 justify-self-center px-4 shrink-0 [@media(min-width:496px)]:col-auto [@media(min-width:496px)]:justify-self-auto"
 					>
 						<span className="inline-flex transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110 motion-reduce:group-hover:[animation:none]">
-							<LogoIcon className="w-8" />
+							<LogoIcon className="w-6 sm:w-8" />
 						</span>
-						<LogoMojiIcon className="w-24 text-gray-800" />
+						<LogoMojiIcon className="w-[76px] sm:w-24 text-gray-800" />
 					</Link>
 					<nav className="hidden flex-1 items-center justify-end gap-4 text-xs font-semibold text-slate-600 [@media(min-width:496px)]:flex md:text-sm">
 						{headerNavLinks.map((item) => (

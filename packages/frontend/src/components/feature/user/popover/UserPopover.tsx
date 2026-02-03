@@ -15,7 +15,10 @@ export function UserPopover() {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button enableClickAnimation className="relative h-8 w-8">
+				<Button
+					enableClickAnimation
+					className="relative bg-transparent h-6 w-6"
+				>
 					<UserAvatar />
 				</Button>
 			</PopoverTrigger>
