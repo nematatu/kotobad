@@ -1,7 +1,6 @@
 import ThreadPageClient from "./components/view/ThreadPageClient";
 import { getThreads } from "./lib/getThread";
-export const revalidate = 900;
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export type Props = {
 	searchParams?: Promise<{ page?: string }>;

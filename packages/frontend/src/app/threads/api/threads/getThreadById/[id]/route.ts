@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getThreadWithPosts } from "@/app/threads/lib/getThreadWithPosts";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 
-export const revalidate = 900;
+export const dynamic = "force-dynamic";
 
 type Params = {
 	params: Promise<{ id: string }>;
@@ -16,7 +16,7 @@ export async function GET(_req: Request, { params }: Params) {
 		const res = await getThreadWithPosts(id);
 		return NextResponse.json(res, {
 			headers: {
-				"Cache-Control": `public, s-maxage=${revalidate}, stale-while-revalidate=${revalidate}`,
+				"Cache-Control": "no-store",
 			},
 		});
 	} catch (error: unknown) {

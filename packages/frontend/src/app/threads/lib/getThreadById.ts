@@ -3,7 +3,6 @@ import type { InferResponseType } from "hono";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
-import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
 import normalizeThread from "./normalizeThread";
 
 export const getThreadById = async (id: string) => {
@@ -14,11 +13,7 @@ export const getThreadById = async (id: string) => {
 
 	const response = await BffFetcher<ResType>(targetUrl, {
 		method: "GET",
-		cache: "force-cache",
-		next: {
-			revalidate: REVALIDATE_SECONDS,
-			tags: ["threads", `thread:${id}`],
-		},
+		cache: "no-store",
 		skipCookie: true,
 	});
 

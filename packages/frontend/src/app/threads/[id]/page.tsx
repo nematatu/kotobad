@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
-export const revalidate = 900;
-export const dynamic = "force-static";
-export const dynamicParams = true; // ビルド時に静的生成せず、初回アクセスでISR生成
+export const dynamic = "force-dynamic";
 
 export type Props = {
 	params: Promise<{ id: string }>;

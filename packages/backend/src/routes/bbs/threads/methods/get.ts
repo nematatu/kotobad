@@ -249,11 +249,8 @@ export const getAllThreadRouter: RouteHandler<
 		const page = pageParam ? Number(pageParam) : undefined;
 		const limit = PERPAGE;
 
-		// Edge キャッシュを効かせて初回以外の応答を高速化
-		c.header(
-			"Cache-Control",
-			"public, s-maxage=900, stale-while-revalidate=900",
-		);
+		// キャッシュは一旦無効化
+		c.header("Cache-Control", "no-store");
 
 		let threadsResult;
 		let totalCountResult: Array<{ value: number | null }>;
@@ -343,10 +340,7 @@ export const getThreadByIdRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
-		c.header(
-			"Cache-Control",
-			"public, s-maxage=900, stale-while-revalidate=900",
-		);
+		c.header("Cache-Control", "no-store");
 		const [resolvedThread] = await fillLegacyAuthorNames(db, [thread]);
 		return c.json(toThreadResponse(resolvedThread), 200);
 	} catch (error: unknown) {
@@ -401,10 +395,7 @@ export const getThreadWithPostsRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
-		c.header(
-			"Cache-Control",
-			"public, s-maxage=60, stale-while-revalidate=300",
-		);
+		c.header("Cache-Control", "no-store");
 		const [resolvedThread] = await fillLegacyAuthorNames(db, [thread]);
 		return c.json(
 			{

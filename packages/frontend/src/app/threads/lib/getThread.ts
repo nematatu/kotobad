@@ -1,39 +1,22 @@
 import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
 import type { ThreadListType } from "@kotobad/shared/src/types/thread";
+import type { InferResponseType } from "hono";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
+import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import normalizeThread from "./normalizeThread";
-export const dynamic = "force-static";
-
-import type { InferResponseType } from "hono";
-import type { client } from "@/lib/api/honoClient";
-import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
-
-const cacheBust =
-	process.env.CF_PAGES_COMMIT_SHA ??
-	process.env.VERCEL_GIT_COMMIT_SHA ??
-	process.env.NEXT_PUBLIC_CACHE_BUST ??
-	process.env.NEXT_BUILD_ID ??
-	"";
 
 export async function getThreads(page: number): Promise<ThreadListType> {
 	type ResType = InferResponseType<typeof client.bbs.threads.$get>;
 	const targetUrl = await getApiUrl("GET_ALL_THREADS");
 	targetUrl.searchParams.set("page", String(page));
 
-	// ビルド毎にISRの生成を行うコード
-	// URLが変更されることで再生成するらしい
-	if (cacheBust) {
-		targetUrl.searchParams.set("v", cacheBust);
-	}
-
 	let raw: unknown;
 	try {
 		raw = await BffFetcher<ResType>(targetUrl, {
 			method: "GET",
-			cache: "force-cache",
-			next: { revalidate: REVALIDATE_SECONDS, tags: ["threads"] },
+			cache: "no-store",
 			skipCookie: true,
 		});
 	} catch (error: unknown) {

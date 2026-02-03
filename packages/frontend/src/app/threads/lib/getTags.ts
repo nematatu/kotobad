@@ -6,7 +6,6 @@ import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
-import { REVALIDATE_SECONDS } from "@/lib/const/revalidate-time";
 
 export async function getTags(): Promise<TagListType> {
 	const targetUrl = await getApiUrl("GET_ALL_TAGS");
@@ -16,8 +15,7 @@ export async function getTags(): Promise<TagListType> {
 	try {
 		raw = await BffFetcher<ResType>(targetUrl, {
 			method: "GET",
-			cache: "force-cache",
-			next: { revalidate: REVALIDATE_SECONDS, tags: ["tags"] },
+			cache: "no-store",
 			skipCookie: true,
 		});
 	} catch (error: unknown) {

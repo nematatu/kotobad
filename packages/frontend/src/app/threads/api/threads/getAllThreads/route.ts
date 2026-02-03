@@ -4,7 +4,7 @@ import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
 	const url = new URL(req.url);
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 		const res = await getAllThreads(Number(page));
 		return NextResponse.json(res, {
 			headers: {
-				"Cache-Control": `public, s-maxage=${revalidate}, stale-while-revalidate=${revalidate}`,
+				"Cache-Control": "no-store",
 			},
 		});
 	} catch (error: unknown) {
@@ -48,7 +48,7 @@ async function getAllThreads(page: number) {
 	url.searchParams.set("page", String(page));
 	return BffFetcher<resType>(url, {
 		method: "GET",
-		cache: "force-cache",
+		cache: "no-store",
 		skipCookie: true,
 	});
 }
