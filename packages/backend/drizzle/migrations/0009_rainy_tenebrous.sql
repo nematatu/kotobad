@@ -1,0 +1,1 @@
+CREATE INDEX `threads_title_idx` ON `threads` (`title`);

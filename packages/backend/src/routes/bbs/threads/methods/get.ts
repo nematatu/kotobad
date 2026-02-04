@@ -2,7 +2,7 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
-import { count, inArray } from "drizzle-orm";
+import { and, count, inArray, like } from "drizzle-orm";
 import { threads, users } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { OpenAPIPostListSchema } from "../../../../models/posts";
@@ -201,6 +201,14 @@ export const searchThreadRoute = createRoute({
 				description: "検索キーワード",
 				example: "hono",
 			}),
+			page: z.string().optional().openapi({
+				description: "ページ番号",
+				example: "1",
+			}),
+			limit: z.string().optional().openapi({
+				description: "1ページあたりの件数",
+				example: "20",
+			}),
 		}),
 	},
 	responses: {
@@ -252,7 +260,7 @@ export const getAllThreadRouter: RouteHandler<
 		// キャッシュは一旦無効化
 		c.header("Cache-Control", "no-store");
 
-		let threadsResult;
+		let threadsResult: Awaited<ReturnType<typeof db.query.threads.findMany>>;
 		let totalCountResult: Array<{ value: number | null }>;
 
 		if (page) {
@@ -419,17 +427,35 @@ export const searchThreadRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const query = c.req.query("q");
-		const page = Number(c.req.query("page") || "1");
-		const limit = 3;
+		const rawQuery = (c.req.query("q") ?? "").trim();
+		const page = Math.max(Number(c.req.query("page") || "1"), 1);
+		const limitParam = Number(c.req.query("limit") || "20");
+		const limit = Math.min(Math.max(limitParam, 1), 50);
+		const offset = (page - 1) * limit;
 
-		if (!query) {
+		c.header("Cache-Control", "no-store");
+
+		if (!rawQuery || rawQuery.length < 2) {
 			return c.json({ error: "Query parameter 'q' is required" }, 400);
 		}
 
+		const tokens = rawQuery
+			.split(/\s+/)
+			.map((token) => token.replace(/["'`*]/g, ""))
+			.filter((token) => token.length > 0);
+
+		if (tokens.length === 0) {
+			return c.json({ error: "Query parameter 'q' is required" }, 400);
+		}
+
+		const conditions = tokens.map((token) => like(threads.title, `%${token}%`));
+
+		const whereClause =
+			conditions.length === 1 ? conditions[0] : and(...conditions);
+
 		const [threadsResult, totalCountResult] = await Promise.all([
 			db.query.threads.findMany({
-				where: (threads, { or, like }) => or(like(threads.title, `%${query}%`)),
+				where: whereClause,
 				with: {
 					author: {
 						columns: {
@@ -444,22 +470,19 @@ export const searchThreadRouter: RouteHandler<
 					},
 				},
 				limit: limit,
-				offset: (page - 1) * limit,
-				orderBy: (threads, { desc }) => [desc(threads.createdAt)],
+				offset: offset,
+				orderBy: (threads, { desc }) => [desc(threads.id)],
 			}),
-			db.select({ value: count() }).from(threads),
+			db.select({ value: count() }).from(threads).where(whereClause),
 		]);
-
-		const totalCount = totalCountResult[0]?.value ?? 0;
-		if (!threadsResult || totalCount === 0) {
-			return c.json({ error: "threads not found" }, 404);
-		}
 
 		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
 		const threadsResponse = resolvedThreads.map((thread) =>
 			toThreadResponse(thread),
 		);
-		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
+		const totalCount = totalCountResult[0]?.value ?? 0;
+
+		return c.json({ threads: threadsResponse, totalCount }, 200);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(
@@ -472,7 +495,5 @@ export const searchThreadRouter: RouteHandler<
 	}
 };
 
-export type GetAllThreadRouteType = typeof getAllThreadRoute;
-export type GetThreadByIdRouteType = typeof getThreadByIdRoute;
 export type SearchThreadRouteType = typeof searchThreadRouter;
 export type GetThreadWithPostsRouteType = typeof getThreadWithPostsRoute;

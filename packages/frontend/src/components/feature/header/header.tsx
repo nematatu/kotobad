@@ -90,14 +90,12 @@ const Header = ({ tags }: Props) => {
 								aria-hidden="true"
 							/>
 						) : user ? (
-							<>
+							<div className="flex items-center sm:space-x-7">
+								<UserPopover />
 								<div className="hidden md:flex">
 									<CreateThreadDialog tags={tags} />
 								</div>
-								<div className="flex md:hidden">
-									<UserPopover />
-								</div>
-							</>
+							</div>
 						) : (
 							<GoogleOAuth />
 						)}

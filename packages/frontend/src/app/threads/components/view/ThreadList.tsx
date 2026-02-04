@@ -17,7 +17,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 		CategoryColorMap[labelId % CategoryColorMap.length];
 
 	return (
-		<div className="radius-sm flex flex-col sm:p-5">
+		<div className="radius-sm flex flex-col">
 			{threadList.map((thread, i) => {
 				const href = `/threads/${thread.id}`;
 				return (

@@ -19,7 +19,6 @@ export default function FloatingCreateThread({ tags }: Props) {
 	return (
 		<CreateThreadDialog
 			tags={tags}
-			showUserPopover={false}
 			trigger={<CreateThreadFabButton />}
 			className="md:hidden"
 		/>

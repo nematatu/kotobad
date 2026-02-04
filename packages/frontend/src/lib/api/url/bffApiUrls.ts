@@ -6,6 +6,7 @@ export const BFF_API_PATH = {
 	LOGOUT: "auth/api/sign-out",
 	ME: "auth/api/get-session",
 	GET_ALL_THREADS: "threads/api/threads/getAllThreads",
+	SEARCH_THREADS: "threads/api/threads/search",
 	GET_THREAD_BY_ID: "threads/api/threads/getThreadById/",
 	CREATE_THREAD: "threads/api/threads/createThread",
 	GET_ALL_POSTS: "threads/api/posts/getAllPosts",

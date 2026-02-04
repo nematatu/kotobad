@@ -6,6 +6,7 @@ export const API_PATH = {
 	LOGOUT: "better-auth/sign-out",
 	ME: "better-auth/get-session",
 	GET_ALL_THREADS: "bbs/threads",
+	SEARCH_THREADS: "bbs/threads/search",
 	GET_THREAD_BY_ID: "bbs/threads/",
 	GET_THREAD_WITH_POSTS: "bbs/threads/full/",
 	CREATE_THREAD: "bbs/threads/create",

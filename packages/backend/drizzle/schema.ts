@@ -43,22 +43,28 @@ export const users = sqliteTable("users", {
 		.notNull(),
 });
 
-export const threads = sqliteTable("threads", {
-	id: integer("id").primaryKey({ autoIncrement: true }),
-	title: text("title").notNull(),
-	createdAt: timestamp("created_at")
-		.default(sql`(strftime('%s', 'now'))`)
-		.notNull(),
-	updatedAt: timestamp("updated_at").$onUpdate(
-		() => sql`(strftime('%s', 'now'))`,
-	),
-	postCount: integer("post_count").notNull().default(0),
-	authorId: text("author_id")
-		.notNull()
-		.references(() => user.id),
-	isPinned: boolean("isPinned").default(false).notNull(),
-	isClosed: boolean("isClosed").default(false).notNull(),
-});
+export const threads = sqliteTable(
+	"threads",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		title: text("title").notNull(),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+		updatedAt: timestamp("updated_at").$onUpdate(
+			() => sql`(strftime('%s', 'now'))`,
+		),
+		postCount: integer("post_count").notNull().default(0),
+		authorId: text("author_id")
+			.notNull()
+			.references(() => user.id),
+		isPinned: boolean("isPinned").default(false).notNull(),
+		isClosed: boolean("isClosed").default(false).notNull(),
+	},
+	(table) => ({
+		threadsTitleIdx: index("threads_title_idx").on(table.title),
+	}),
+);
 
 export const posts = sqliteTable(
 	"posts",
