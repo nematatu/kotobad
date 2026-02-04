@@ -254,52 +254,29 @@ export const getAllThreadRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const pageParam = c.req.query("page");
-		const page = pageParam ? Number(pageParam) : undefined;
+		const page = pageParam ? Number(pageParam) : 1;
 		const limit = PERPAGE;
 
-		// キャッシュは一旦無効化
 		c.header("Cache-Control", "no-store");
 
-		let threadsResult: Awaited<ReturnType<typeof db.query.threads.findMany>>;
-		let totalCountResult: Array<{ value: number | null }>;
-
-		if (page) {
-			// ページ指定あり → ページネーション
-			[threadsResult, totalCountResult] = await Promise.all([
-				db.query.threads.findMany({
-					with: {
-						author: {
-							columns: { name: true, image: true },
-						},
-						threadTags: {
-							with: {
-								tags: true,
-							},
+		const [threadsResult, totalCountResult] = await Promise.all([
+			db.query.threads.findMany({
+				with: {
+					author: {
+						columns: { name: true, image: true },
+					},
+					threadTags: {
+						with: {
+							tags: true,
 						},
 					},
-					limit: limit,
-					offset: (page - 1) * limit,
-					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
-				}),
-				db.select({ value: count() }).from(threads),
-			]);
-		} else {
-			// ページ指定なし → 全件取得
-			[threadsResult, totalCountResult] = await Promise.all([
-				db.query.threads.findMany({
-					with: {
-						author: { columns: { name: true, image: true } },
-						threadTags: {
-							with: {
-								tags: true,
-							},
-						},
-					},
-					orderBy: (threads, { desc }) => [desc(threads.createdAt)],
-				}),
-				db.select({ value: count() }).from(threads),
-			]);
-		}
+				},
+				limit: limit,
+				offset: (page - 1) * limit,
+				orderBy: (threads, { desc }) => [desc(threads.createdAt)],
+			}),
+			db.select({ value: count() }).from(threads),
+		]);
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
 		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
