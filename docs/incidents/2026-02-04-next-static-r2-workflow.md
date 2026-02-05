@@ -19,20 +19,18 @@
    - 次回の比較用にR2へ保存
 
 ## 使うスクリプト
-- `scripts/check-next-static-assets.ts`
-  - `check` : R2のスナップショットと比較
-  - `--save`: 今回の参照一覧をR2に保存
+- `scripts/check-save-next-static-assets.ts`
+  - 1回の実行で **比較 + R2保存** まで行う
 
-## 実際の流れ（deployに自動組み込み）
+## 実際の流れ（ビルド後に実行）
 ```
 cf:build
-→ check (R2から取得して比較)
-→ deploy
-→ save (R2へ保存)
+→ check+save（R2から取得して比較 → OKならR2保存）
+→ deploy（必要な場合のみ）
 ```
 
 ## 注意
-- 初回だけ `--save` が必要（スナップショットが無いとcheckは失敗）
+- 初回はR2キーが存在しなくても、**自動でベースラインを作成してアップロード**される
 - 参照範囲は **CSS + JS（標準）**
 
 ## 参照先

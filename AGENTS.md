@@ -1,87 +1,38 @@
 # Repository Guidelines
 
-## プロジェクト構成とモジュール配置
-このリポジトリは Bun のワークスペースとして構成され、基幹モジュールは3つです。`packages/frontend` は Next.js アプリと UI コンポーネント、公開アセット（`public/`）を管理します。`packages/backend` は Hono を用いた Cloudflare Worker で、DB スキーマは `drizzle/`、Wrangler 設定は `wrangler.jsonc` にまとまっています。共通の型やバリデーションは `packages/shared/src` を唯一のソースとし、フロント・バック両方から参照してください。
+## Project Structure & Module Organization
+- Monorepo with Bun workspaces under `packages/`.
+- `packages/frontend/`: Next.js 15 app, Tailwind, OpenNext Cloudflare output.
+- `packages/backend/`: Hono + Cloudflare Workers API, Drizzle ORM, D1 database.
+- `packages/shared/`: Shared types, schemas, and utilities.
+- `docs/`: documentation (Docsify). `scripts/`: repo tooling scripts.
+- Database migrations live under `packages/backend/drizzle/`.
 
-## ビルド・テスト・開発コマンド
-- `bun install`：ワークスペース全体の依存関係をインストールします。
-- `bun dev`：フロントエンドとバックエンドをフィルタ付きで同時起動します。
-- `bun dev:frontend` / `bun dev:backend`：個別サービスをホットリロード付きで起動します（バックエンドは `localhost:8787`）。
-- `bun --filter '@kotobad/frontend' build`：Next.js の本番ビルドを生成し、必要に応じて `preview` で Cloudflare Pages をドライランします。
-- `bun --filter '@kotobad/backend' generate`：Drizzle の SQL アーティファクトを更新し、続けて `local:migration` または `remote:migration` で D1 を適用します。
-- `bun run format`：Biome による整形と推奨リンティングを一括実行します。
+## Build, Test, and Development Commands
+- `bun install`: install workspace dependencies.
+- `bun run dev`: run frontend + backend in parallel.
+- `bun run dev:frontend` / `bun run dev:backend`: run one side only.
+- `bun run build:frontend` / `bun run build:backend`: build each package.
+- `bun run deploy:frontend` / `bun run deploy:backend`: deploy via Wrangler/OpenNext.
+- `bun run format` / `bun run lint` / `bun run check`: Biome format/lint/check.
+- Backend DB:
+  - `bun --filter '@kotobad/backend' generate` (Drizzle schema gen)
+  - `bun --filter '@kotobad/backend' local:migration` or `remote:migration`
 
-## コーディングスタイルと命名規約
-`biome.json` に従い、TypeScript/TSX はタブインデントとダブルクォートを使用してください。React コンポーネントや公開モジュールは `PascalCase`、ユーティリティ関数は `camelCase`、共有スキーマは `{Domain}Schema`（例：`UserProfileSchema`）の形式を推奨します。スタイルやフックはコンポーネント近傍に配置し、再利用するユーティリティは `index.ts` で再エクスポートしてインポートパスを浅く保ちます。
+## Coding Style & Naming Conventions
+- Indentation: tabs (Biome formatter). Quotes: double (Biome).
+- TypeScript throughout; prefer explicit types over implicit any.
+- Use Drizzle ORM for DB access; avoid raw SQL unless required.
+- Keep files organized by feature under `packages/*/src/...`.
 
-## テストガイドライン
-自動テストは未整備のため、新機能を追加する際は `packages/<module>/src/__tests__` に `bun test` 用のスイートを新設してください。ファイル名は `<unit>.test.ts` とし、外部サービスはスタブ化します。認証や D1 マイグレーションなど重要なフローを変更した場合は、PR に手動検証手順や `wrangler d1 execute ... --local` の結果を記録して共有します。
+## Testing Guidelines
+- No automated test framework detected. If adding tests, document how to run them and keep naming consistent (e.g., `*.test.ts`).
 
-## コミットとプルリクエスト
-コミット履歴は Conventional Commits（`feat:`, `fix:`, `chore:` など）に沿っています。件名は 72 文字以内で変更内容を明示してください。PR には目的、主な変更点、検証結果（スクリーンショットや `curl` 例）、関連 Issue（`closes #123`）を記載し、影響するモジュールのメンテナにレビューを依頼します。提出前に `bun run format` と該当サービスの起動確認を済ませてください。
+## Commit & Pull Request Guidelines
+- Commit messages follow Conventional Commits (seen in history: `feat:`, `fix:`).
+- Keep commits scoped and descriptive.
+- For PRs: include a short summary, affected packages, and any deploy/test steps.
 
-## 環境設定とデプロイの注意点
-Cloudflare のシークレットは `wrangler secret put` で投入し、`.dev.vars` 等はコミットしません。新しい環境変数を追加した場合は README や Workflow も更新してください。フロントエンドのデプロイは `bun deploy:frontend`、Worker は `bun deploy:backend` を使用し、事前に DB マイグレーション適用と `packages/frontend/public` のアセット更新を確認してから順次実行するのが安全です。
-
-## レビューに関して
-丁寧かつ簡潔に日本語でレビューしてください
-レビューする際には、以下のprefix(接頭辞)を付けましょう。
-<!-- for GitHub Copilot review rule -->
-[must] → かならず変更してね  
-[imo] → 自分の意見だとこうだけど修正必須ではないよ(in my opinion)  
-[nits] → ささいな指摘(nitpick) 
-[ask] → 質問  
-[fyi] → 参考情報
-<!-- for GitHub Copilot review rule-->
-
-## PRのルール
-- まずはDraftでPRを作成する。
-- レビューに出せる状態になったらOpenにする。（レビュワーがランダムにアサインされます）
-- レビューなしでのmainブランチへのマージは原則禁止
-
- **【レビュー依頼の場合】**
-
-  このプルリクエスト（PR）をレビューし、GitHub のレビュー機能を使ってフィードバックをしてください。作業は次の手順に沿って進めてください：
-  1.  **レビューを開始する:** `mcp__github__create_pending_pull_request_review` を使って、保留中のレビューを開始します。
-  2.  **変更内容を確認する:** `mcp__github__get_pull_request_diff` を使って、コードの変更点や行番号を把握します。
-  3.  **インラインコメントを追加する:** 改善点や懸念事項があるコードの行には `mcp__github__add_pull_request_review_comment_to_pending_review` を使ってコメントを追加してください。修正方針が明確な場合には積極的にsuggestionを利用してください。
-  4.  **レビューを提出する:** `mcp__github__submit_pending_pull_request_review` を使って、イベントタイプを「COMMENT」に設定し、全体のまとめコメントと共にレビューを提出してください（※「REQUEST_CHANGES」は使わないでください）。
-
-  **コメントの書き方に関する重要事項**
-
-  * **インラインコメントの構成:**
-      * **結論を先に:** 各インラインコメントの冒頭で、指摘内容の要点を一行で簡潔に述べてください。
-      * **理由と提案:** 結論の後に、そのように判断した理由や背景、具体的な修正案を詳しく説明してください。
-      * **指摘中心に:** インラインコメントは、修正提案、バグの可能性、可読性の問題など、具体的な改善点に焦点を当ててください。
-
-  * **ポジティブなフィードバックについて:**
-      * **インラインでは控えめに:** インラインで言及するのは、特に優れた設計や他の開発者の参考になるような独創的な実装など、特筆すべき点に限定します。
-      * **まとめコメントで言及:** 全体的に良かった点や、PR全体に対するポジティブな感想は、レビュー提出時の「まとめコメント」に集約して記述してください。
-
-  **レビューの観点**
-
-  レビューでは以下の点に注目してください：
-  * AGENTS.mdのガイドラインに従っているか
-  * コードの品質やベストプラクティスに沿っているか
-  * バグやセキュリティリスクがないか
-  * パフォーマンス上の懸念がないか
-  * 保守性や可読性は十分か
-  * 設計やアーキテクチャに妥当性があるか
-
-  **その他**
-
-  * 日本語でのフィードバックをお願いします。
-  * 具体的で実行可能なフィードバックをお願いします。
-  * **重要:** レビューの提出は必ず「COMMENT」タイプで行い、PR をブロックしないようにしてください。
-
-  **【Issue解決の場合】**
-
-  この Issue で挙げた課題について、修正対応をお願いします。対応の際は、以下のフローに沿ってプルリクエスト（PR）を作成してください：
-  1.  AGENTS.md に記載されたコーディングガイドラインに従って修正を行ってください。
-  2.  内容に応じて適切なテストや確認を実施してください（ユニットテスト・動作確認など）。
-  3.  修正が完了したら、新しいブランチを切り、PR を作成してください。
-  4.  PR のタイトルや説明欄には、この Issue 番号を明記し、何をどう修正したかを簡潔に記述してください。
-
-  修正内容が Issue の趣旨から外れている場合や、より良い対応方針があれば、PR 上で相談してください。
-  コードの品質を保つためにも、丁寧な対応をお願いします。
-日本語でレビューを行ってください
+## Security & Configuration Tips
+- Cloudflare config lives in `packages/*/wrangler.jsonc` and `packages/frontend/open-next.config.ts`.
+- Avoid committing secrets; use Wrangler/Cloudflare bindings and env vars.

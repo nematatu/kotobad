@@ -24,27 +24,20 @@
    - `/_next/static/*` は消さない
 
 ## 仕組み (スクリプト)
-- `scripts/check-next-static-assets.ts`
-  - `--save` で「今のビルド成果物が参照するstatic一覧」を保存
-  - 通常実行で「保存済みの一覧」をチェック
+- `scripts/check-save-next-static-assets.ts`
+  - 1回の実行で「R2から取得 → 比較 → ローカル更新 → R2保存」まで行う
   - 旧参照先が削除されていれば失敗
 
 ### R2前提の運用
 ```
-# デプロイ前 (R2から取得してチェック)
-R2_BUCKET=kotobad-next-cache R2_KEY=ops/next-static-assets-snapshot.json \
+# ビルド後（R2から取得して比較 → OKならR2保存）
+R2_SNAPSHOT_BUCKET=kotobad-assets-snapshot R2_KEY=ops/next-static-assets-snapshot.json \
 WRANGLER_CONFIG=packages/frontend/wrangler.jsonc \
-bun scripts/check-next-static-assets.ts
-
-# デプロイ後 (R2へ保存)
-R2_BUCKET=kotobad-next-cache R2_KEY=ops/next-static-assets-snapshot.json \
-WRANGLER_CONFIG=packages/frontend/wrangler.jsonc \
-bun scripts/check-next-static-assets.ts --save
+bun scripts/check-save-next-static-assets.ts
 ```
 
 ## 注意
-- スナップショットが無い状態での`check`は失敗する
-- 最初の一回だけ `--save` を作る必要がある
+- 初回はR2キーが存在しなくても、**自動でベースラインを作成してアップロード**される
 
 ## 運用メモ
 - フォント/デザイン変更時は「旧static保持」が最重要
