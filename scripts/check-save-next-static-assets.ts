@@ -1,16 +1,20 @@
-import { readdir, readFile, stat, mkdir } from "node:fs/promises";
+import { readdir, readFile, stat, mkdir, rm } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
+import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
 
 const DEFAULT_ASSETS_DIR =
 	".open-next/assets/_next/static";
-const DEFAULT_SNAPSHOT =
-	"docs/incidents/next-static-assets-snapshot.json";
+const DEFAULT_SNAPSHOT = join(
+	tmpdir(),
+	`next-static-assets-snapshot-${process.pid}-${Date.now()}.json`,
+);
 const DEFAULT_WRANGLER_CONFIG = "wrangler.jsonc";
 const DEFAULT_WRANGLER_BIN = "wrangler";
 
 const assetsDir = process.env.ASSETS_DIR ?? DEFAULT_ASSETS_DIR;
 const snapshotFile = process.env.SNAPSHOT_FILE ?? DEFAULT_SNAPSHOT;
+const shouldCleanupSnapshot = !process.env.SNAPSHOT_FILE;
 
 const r2SnapshotBucket = process.env.R2_SNAPSHOT_BUCKET;
 const r2Key = process.env.R2_KEY;
@@ -95,6 +99,12 @@ const saveSnapshot = async (refs: string[]) => {
 	console.log(`Saved snapshot: ${snapshotFile}`);
 };
 
+const cleanupSnapshot = async () => {
+	if (!shouldCleanupSnapshot) return;
+	await rm(snapshotFile, { force: true });
+};
+
+
 const toDiskPath = (ref: string) =>
 	join(assetsDir, ref.replace("/_next/static/", ""));
 
@@ -175,9 +185,10 @@ const saveSnapshotToR2 = async () => {
 };
 
 const main = async () => {
-	const currentRefs = await collectRefs();
+	try {
+		const currentRefs = await collectRefs();
 
-	await fetchSnapshotFromR2();
+		await fetchSnapshotFromR2();
 	const snapshot = await loadSnapshot();
 	if (!snapshot) {
 		console.warn(
@@ -214,12 +225,15 @@ const main = async () => {
 		for (const ref of missing) {
 			console.error(`- ${ref} -> ${relative(process.cwd(), toDiskPath(ref))}`);
 		}
-		process.exit(1);
+		throw new Error("Missing assets detected");
 	}
 
-	await saveSnapshot(currentRefs);
-	await saveSnapshotToR2();
-	console.log(`OK: ${refsToCheck.length} refs checked`);
+		await saveSnapshot(currentRefs);
+		await saveSnapshotToR2();
+		console.log(`OK: ${refsToCheck.length} refs checked`);
+	} finally {
+		await cleanupSnapshot();
+	}
 };
 
 main().catch((error) => {

@@ -122,6 +122,7 @@
 - `toHistoryKey` で `ops/xxx.json` → `ops/xxx-UNIX.json`
 
 ### 6-2. 環境変数
+- ローカルのスナップショットは一時ファイルに保存し、実行終了後に自動削除（`SNAPSHOT_FILE` を指定した場合のみ残る）
 - `R2_SNAPSHOT_BUCKET` **必須**（例: `kotobad-assets-snapshot`）
 - `R2_KEY` **必須**（例: `ops/next-static-assets-snapshot.json`）
 - `WRANGLER_CONFIG` 任意（default: `wrangler.jsonc`）

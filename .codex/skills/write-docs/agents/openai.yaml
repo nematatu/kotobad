@@ -1,0 +1,4 @@
+interface:
+  display_name: "ドキュメント作成"
+  short_description: "引き継ぎログ、仕様書、作業ログをAI向けに作成する"
+  default_prompt: "Use $write-docs to作業内容の引き継ぎログを日本語で整形してください。"
