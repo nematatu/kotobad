@@ -19,9 +19,7 @@ export default function AuthorAvatar({
 
 	const fallbackText = resolvedName?.trim().charAt(0) ?? "?";
 	return (
-		<Avatar
-			className={cn("h-10 w-10 bg-white border border-blue-400", className)}
-		>
+		<Avatar className={cn("h-10 w-10 bg-white", className)}>
 			{resolvedImage && (
 				<AvatarImage src={resolvedImage} alt={resolvedName ?? ""} />
 			)}

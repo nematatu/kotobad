@@ -39,7 +39,7 @@ export const PostList = ({ posts }: PostListProps) => {
 								</span>
 							</div>
 							<span className="text-gray-500 text-sm">
-								{getRelativeDate(post.createdAt).relativeDate}
+								{getRelativeDate(post.createdAt)}
 							</span>
 						</div>
 					</div>
