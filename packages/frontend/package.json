@@ -11,7 +11,8 @@
 		"deploy": "bun run cf:build && opennextjs-cloudflare deploy",
 		"deploy:preview": "bun run cf:build && opennextjs-cloudflare deploy --env preview",
 		"preview": "bun run cf:build && bun opennextjs-cloudflare preview --port 3000",
-		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
+		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
+		"build:check-and-save-assets": "bun run cf:build && bun ../../scripts/check-save-next-static-assets.ts"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.2.2",
