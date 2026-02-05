@@ -148,34 +148,13 @@ const fetchSnapshotFromR2 = async () => {
 	);
 };
 
-const toHistoryKey = (key: string, unix: number) => {
-	const slashIndex = key.lastIndexOf("/");
-	const dotIndex = key.lastIndexOf(".");
-	if (dotIndex > slashIndex) {
-		return `${key.slice(0, dotIndex)}-${unix}${key.slice(dotIndex)}`;
-	}
-	return `${key}-${unix}`;
-};
 
 const saveSnapshotToR2 = async () => {
-	const unix = Math.floor(Date.now() / 1000);
-	const historyKey = toHistoryKey(r2Key, unix);
 	await runWrangler([
 		"r2",
 		"object",
 		"put",
 		`${r2SnapshotBucket}/${r2Key}`,
-		"--remote",
-		"--file",
-		snapshotFile,
-		"--config",
-		wranglerConfig,
-	]);
-	await runWrangler([
-		"r2",
-		"object",
-		"put",
-		`${r2SnapshotBucket}/${historyKey}`,
 		"--remote",
 		"--file",
 		snapshotFile,
