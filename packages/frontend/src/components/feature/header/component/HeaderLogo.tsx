@@ -6,10 +6,7 @@ import { Link } from "@/components/common/Link";
 
 const HeaderLogo = () => {
 	return (
-		<Link
-			href="/"
-			className="group hidden items-center gap-2 px-2 [@media(min-width:496px)]:flex"
-		>
+		<Link href="/" className="group hidden items-center gap-2 px-2 md:flex">
 			<span className="inline-flex transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110 motion-reduce:group-hover:[animation:none]">
 				<LogoIcon className="w-6 sm:w-8" />
 			</span>

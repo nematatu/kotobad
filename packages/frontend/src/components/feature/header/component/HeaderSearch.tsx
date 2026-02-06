@@ -26,8 +26,7 @@ const HeaderSearch = (_props: Props) => {
 
 	const shouldShowSuggest =
 		trimmedValue.length >= HEADER_SEARCH_CONFIG.MIN_QUERY_CHARS;
-	const shouldShowHistory =
-		trimmedValue.length === 0 && history.items.length > 0;
+	const shouldShowHistory = trimmedValue.length === 0;
 
 	useEffect(() => {
 		setQuery(queryParam);

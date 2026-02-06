@@ -29,6 +29,7 @@ const HistoryPanel = ({
 				<span>検索履歴</span>
 				<button
 					type="button"
+					onMouseDown={(event) => event.preventDefault()}
 					onClick={onClear}
 					className="text-slate-500 hover:text-slate-700"
 				>
@@ -36,27 +37,34 @@ const HistoryPanel = ({
 				</button>
 			</div>
 			<div className="flex max-h-[50vh] flex-col overflow-y-auto">
-				{items.map((item) => (
-					<div
-						key={`${item.query}-${item.at}`}
-						className="flex items-center gap-2 border-t border-slate-200 px-3 py-2 first:border-t-0"
-					>
-						<Link
-							href={`/threads?q=${encodeURIComponent(item.query)}`}
-							className="min-w-0 flex-1 text-sm text-slate-900 truncate hover:underline"
-							onClick={() => onSelect(item.query)}
-						>
-							{item.query}
-						</Link>
-						<button
-							type="button"
-							onClick={() => onRemove(item.query)}
-							className="text-xs text-slate-400 hover:text-slate-600"
-						>
-							削除
-						</button>
+				{items.length === 0 ? (
+					<div className="px-3 py-3 text-xs text-slate-500">
+						履歴がありません
 					</div>
-				))}
+				) : (
+					items.map((item) => (
+						<div
+							key={`${item.query}-${item.at}`}
+							className="flex items-center gap-2 border-t border-slate-200 px-3 py-2 first:border-t-0"
+						>
+							<Link
+								href={`/threads?q=${encodeURIComponent(item.query)}`}
+								className="min-w-0 flex-1 text-sm text-slate-900 truncate hover:underline"
+								onClick={() => onSelect(item.query)}
+							>
+								{item.query}
+							</Link>
+							<button
+								type="button"
+								onMouseDown={(event) => event.preventDefault()}
+								onClick={() => onRemove(item.query)}
+								className="text-xs text-slate-400 hover:text-slate-600"
+							>
+								削除
+							</button>
+						</div>
+					))
+				)}
 			</div>
 		</div>
 	);

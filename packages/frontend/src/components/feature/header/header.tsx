@@ -1,6 +1,7 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
+import { Suspense } from "react";
 import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
@@ -23,7 +24,9 @@ const Header = ({ tags }: Props) => {
 					<HeaderMobileMenu links={headerNavLinks} />
 					<HeaderLogo />
 				</div>
-				<HeaderSearch />
+				<Suspense fallback={<div className="flex-1 min-w-0" />}>
+					<HeaderSearch />
+				</Suspense>
 				<HeaderNav links={headerNavLinks} />
 				<div className="flex items-center gap-2 shrink-0">
 					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
