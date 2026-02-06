@@ -1,7 +1,40 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+
+export const viewport: Viewport = {
+	themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://kotobad.com"),
+	applicationName: "コトバド",
+	description: "バドミントン掲示板",
+	manifest: "/manifest.webmanifest",
+	icons: {
+		icon: [
+			{
+				url: "/pwa-192x192.png",
+				sizes: "192x192",
+				type: "image/png",
+			},
+			{
+				url: "/pwa-512x512.png",
+				sizes: "512x512",
+				type: "image/png",
+			},
+		],
+		apple: [
+			{
+				url: "/pwa-192x192.png",
+				sizes: "192x192",
+				type: "image/png",
+			},
+		],
+	},
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "default",
+		title: "コトバド",
+	},
 	openGraph: {
 		type: "website",
 		title: "コトバド",

@@ -1,8 +1,9 @@
-export { metadata } from "@/lib/config/metadata/metadata";
+export { metadata, viewport } from "@/lib/config/metadata/metadata";
 import "./globals.css";
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
+import PwaRegister from "@/components/common/PwaRegister";
 import Footer from "@/components/feature/footer/Footer";
 import Header from "@/components/feature/header/header";
 import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
@@ -19,6 +20,7 @@ export default async function RootLayout({
 		<html lang="ja">
 			<body className="min-h-screen bg-surface-100">
 				<UserProvider>
+					<PwaRegister />
 					<div className="min-h-screen flex flex-col">
 						<Toaster richColors />
 						<Header tags={tags} />
