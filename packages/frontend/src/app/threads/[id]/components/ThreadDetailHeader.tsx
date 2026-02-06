@@ -46,7 +46,7 @@ export const ThreadDetailHeader = async ({ threadId }: Props) => {
 						))}
 					</div>
 					<p className="text-gray-400">
-						{formatDate(threadHeaderData.createdAt)}
+						{formatDate(threadHeaderData.createdAt, { withTime: false })}
 					</p>
 				</div>
 			</div>

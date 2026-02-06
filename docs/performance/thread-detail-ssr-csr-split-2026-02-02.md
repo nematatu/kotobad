@@ -20,7 +20,7 @@ date: "2026-02-02T15:20:00.000Z"
 ?>(`loading.tsx`も一応使っているが、投稿高速表示のほうが何杯も大事だろう。)
 
 ### 方針
-- **SSR**: タイトル/作成者/タグ/作成日時
+- **SSR**: タイトル/作成者/タグ/作成日（時刻は表示しない）
 - **CSR**: 投稿一覧
 
 ### 理由
@@ -67,3 +67,6 @@ CSRで実行すると、クライアントによって(PC, モバイルなど)�
 - 投稿成功時は `useSWRConfig().mutate(["GET_POSTS_BY_THREADID", threadId])` で再取得
 - `getBffApiUrl` は **固定文字列で呼ぶ**（`getBffApiUrl("GET_POSTS_BY_THREADID")`）
 - SWR key は `["GET_POSTS_BY_THREADID", threadId] as const` で型を固定
+
+### UIメモ（2026-02-06）
+- `ThreadDetailHeader` の作成日テキストは表示し、時刻は表示しない。

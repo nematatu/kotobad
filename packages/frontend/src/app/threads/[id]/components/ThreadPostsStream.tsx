@@ -1,6 +1,7 @@
 "use client";
 
 import type { PostListType } from "@kotobad/shared/src/types/post";
+import Image from "next/image";
 import useSWR from "swr";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
@@ -36,8 +37,18 @@ export const ThreadPostsStream = ({ threadId }: Props) => {
 				{hasPosts ? (
 					<PostList posts={posts} />
 				) : (
-					<div className="flex min-h-[45vh] items-center justify-center text-sm text-slate-500">
-						投稿がありません。
+					<div className="flex flex-col items-center justify-center min-h-[45vh] overflow-hidden space-y-5">
+						<Image
+							src="/file.svg"
+							alt=""
+							aria-hidden="true"
+							width={300}
+							height={300}
+							className="w-[40%] object-contain opacity-20"
+						/>
+						<p className="text-md text-slate-500 font-semibold">
+							投稿してみましょう !
+						</p>
 					</div>
 				)}
 			</div>
