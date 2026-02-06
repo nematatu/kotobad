@@ -1,10 +1,6 @@
-export type HeaderNavLink = {
-	name: string;
-	link: string;
-	label?: React.ReactNode;
-};
+import type { ActionLinkItem } from "@/components/common/button/ActionLink";
 
-export const headerNavLinks: HeaderNavLink[] = [
-	{ name: "スレッド一覧", link: "/threads" },
-	{ name: "コトバドとは", link: "/#about" },
+export const headerNavLinks: ActionLinkItem[] = [
+	{ label: "スレッド一覧", href: "/threads" },
+	{ label: "コトバドとは", href: "/#about" },
 ];

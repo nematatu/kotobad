@@ -11,30 +11,30 @@
 		"remote:migration": "wrangler d1 migrations apply b3s-db --remote",
 		"local:tables": "wrangler d1 execute b3s-db --local --command \"SELECT sql FROM sqlite_master WHERE type='table';\"",
 		"remote:tables": "wrangler d1 execute b3s-db --remote --command \"SELECT sql FROM sqlite_master WHERE type='table';\"",
-    "studio": "bunx drizzle-kit studio"
+		"studio": "bunx drizzle-kit studio"
 	},
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.11.1",
-		"@better-auth/cli": "^1.4.7",
-		"@hono/swagger-ui": "^0.5.2",
-		"@hono/zod-openapi": "^1.1.5",
-		"@hono/zod-validator": "^0.7.5",
+		"@better-auth/cli": "^1.4.18",
+		"@hono/swagger-ui": "^0.5.3",
+		"@hono/zod-openapi": "^1.2.1",
+		"@hono/zod-validator": "^0.7.6",
 		"@kotobad/shared": "workspace:*",
 		"@libsql/client": "^0.15.15",
 		"bcryptjs": "^3.0.3",
-		"better-auth": "^1.4.7",
+		"better-auth": "^1.4.18",
 		"drizzle-orm": "^0.44.7",
-		"hono": "^4.11.1",
+		"hono": "^4.11.8",
 		"jsonwebtoken": "^9.0.3",
 		"next-svgr": "^0.0.2",
-		"zod": "^4.2.1"
+		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20251217.0",
+		"@cloudflare/workers-types": "^4.20260206.0",
 		"@svgr/webpack": "^8.1.0",
 		"@types/bcryptjs": "^3.0.0",
 		"@types/jsonwebtoken": "^9.0.10",
 		"drizzle-kit": "^0.31.8",
-		"wrangler": "^4.55.0"
+		"wrangler": "^4.63.0"
 	}
 }
