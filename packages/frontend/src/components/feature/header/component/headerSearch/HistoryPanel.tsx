@@ -21,7 +21,7 @@ const HistoryPanel = ({
 	return (
 		<div
 			className={cn(
-				"absolute left-0 right-0 top-full mt-2 rounded-sm border border-slate-200 bg-white text-slate-900 shadow-lg animate-fade-in-up z-[70]",
+				"absolute left-0 right-0 top-full mt-2 min-h-[160px] rounded-sm border border-slate-200 bg-white text-slate-900 shadow-lg animate-fade-in-up z-[70] flex flex-col",
 				className,
 			)}
 		>
@@ -36,7 +36,7 @@ const HistoryPanel = ({
 					全削除
 				</button>
 			</div>
-			<div className="flex max-h-[50vh] flex-col overflow-y-auto">
+			<div className="flex min-h-[120px] flex-1 max-h-[50vh] flex-col overflow-y-auto">
 				{items.length === 0 ? (
 					<div className="px-3 py-3 text-xs text-slate-500">
 						履歴がありません
