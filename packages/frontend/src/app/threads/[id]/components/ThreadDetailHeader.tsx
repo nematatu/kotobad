@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
 import { getThreadById } from "../../lib/getThreadById";
-import BreadCrumb from "./BreadCrumbs";
 
 type Props = {
 	threadId: number;
@@ -28,9 +27,6 @@ export const ThreadDetailHeader = async ({ threadId }: Props) => {
 	}
 	return (
 		<div>
-			<div className="pl-3">
-				<BreadCrumb currentThreadTitle={threadHeaderData.title} />
-			</div>
 			<div className="flex flex-col items-center justify-center">
 				<div className="flex flex-col w-full items-center p-4 sm:py-7">
 					<div className="text-xl sm:text-3xl font-bold break-words">

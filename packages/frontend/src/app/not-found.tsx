@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowLeft } from "lucide-react";
 import ActionLink from "@/components/common/button/ActionLink";
 

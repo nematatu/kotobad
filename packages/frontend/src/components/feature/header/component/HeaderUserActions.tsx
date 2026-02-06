@@ -10,9 +10,17 @@ type Props = {
 	isLoading: boolean;
 	user: UserState;
 	tags: TagType[];
+	showCreate?: boolean;
+	showUserPopover?: boolean;
 };
 
-const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
+const HeaderUserActions = ({
+	isLoading,
+	user,
+	tags,
+	showCreate = true,
+	showUserPopover = true,
+}: Props) => {
 	if (isLoading) {
 		return (
 			<div
@@ -23,12 +31,19 @@ const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
 	}
 
 	if (user) {
+		const hasActions = showCreate || showUserPopover;
+		if (!hasActions) {
+			return null;
+		}
+
 		return (
 			<div className="flex items-center gap-2 sm:gap-7">
-				<UserPopover />
-				<div className="hidden md:flex">
-					<CreateThreadDialog tags={tags} />
-				</div>
+				{showUserPopover ? <UserPopover /> : null}
+				{showCreate ? (
+					<div className="flex">
+						<CreateThreadDialog tags={tags} />
+					</div>
+				) : null}
 			</div>
 		);
 	}

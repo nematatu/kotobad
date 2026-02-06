@@ -9,7 +9,7 @@ type Props = {
 
 const HeaderNav = ({ links }: Props) => {
 	return (
-		<nav className="hidden items-center gap-4 text-xs font-semibold text-slate-600 [@media(min-width:496px)]:flex md:text-sm">
+		<nav className="hidden items-center gap-4 text-xs font-semibold text-slate-600 md:flex md:text-sm">
 			{links.map((item) => (
 				<ActionLink key={item.href} item={item} />
 			))}

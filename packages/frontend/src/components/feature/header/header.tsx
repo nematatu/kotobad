@@ -5,7 +5,6 @@ import { Suspense, useEffect, useRef } from "react";
 import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
-import HeaderMobileSearch from "./component/HeaderMobileSearch";
 import HeaderNav from "./component/HeaderNav";
 import HeaderSearch from "./component/HeaderSearch";
 import HeaderUserActions from "./component/HeaderUserActions";
@@ -49,7 +48,7 @@ const Header = ({ tags }: Props) => {
 			ref={headerRef}
 			className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur"
 		>
-			<div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-2">
+			<div className="mx-auto flex items-center gap-3 px-5 py-2">
 				<div className="flex items-center gap-2 shrink-0">
 					<HeaderLogo />
 				</div>
@@ -62,9 +61,23 @@ const Header = ({ tags }: Props) => {
 				</Suspense>
 				<HeaderNav links={headerNavLinks} />
 				<div className="ml-auto flex items-center gap-2 shrink-0">
-					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
-					<HeaderMobileSearch />
-					<HeaderMobileMenu links={headerNavLinks} />
+					<div className="hidden [@media(min-width:496px)_and_(max-width:767px)]:block">
+						<HeaderUserActions
+							isLoading={isLoading}
+							user={user}
+							tags={tags}
+							showUserPopover={false}
+						/>
+					</div>
+					<div className="hidden md:block">
+						<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
+					</div>
+					<HeaderMobileMenu
+						links={headerNavLinks}
+						tags={tags}
+						user={user}
+						isLoading={isLoading}
+					/>
 				</div>
 			</div>
 		</div>
