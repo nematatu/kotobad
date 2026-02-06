@@ -142,13 +142,11 @@ export default function ThreadPageClient({
 		? `${MIN_QUERY_CHARS}文字以上で検索してください`
 		: state.error
 			? state.error
-			: isFiltering
-				? `「${state.activeQuery}」の検索結果 ${state.count}件${
-						state.count > SEARCH_LIMIT
-							? `（上位${threadsToShow.length}件を表示）`
-							: ""
-					}`
-				: "";
+			: `${
+					state.count > SEARCH_LIMIT
+						? `（上位${threadsToShow.length}件を表示）`
+						: ""
+				}`;
 	const statusClass = state.error
 		? "text-xs text-red-500"
 		: "text-xs text-slate-500";
@@ -156,7 +154,9 @@ export default function ThreadPageClient({
 	return (
 		<div className="w-full max-w-5xl mx-auto flex flex-col space-y-3">
 			<div className="w-full px-3 md:px-0 pt-5">
-				<div className="text-xl font-bold">スレッド一覧</div>
+				<div className="text-xl font-bold">
+					{isFiltering ? `「${state.activeQuery}」の検索結果` : "スレッド一覧"}
+				</div>
 			</div>
 			<div className="w-full px-3 md:px-0">
 				<div className="min-h-4">
