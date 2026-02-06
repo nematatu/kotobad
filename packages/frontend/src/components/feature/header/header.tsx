@@ -1,7 +1,7 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
@@ -17,9 +17,38 @@ type Props = {
 
 const Header = ({ tags }: Props) => {
 	const { user, isLoading } = useUser();
+	const headerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const root = document.documentElement;
+		const headerElement = headerRef.current;
+		if (!headerElement) {
+			return;
+		}
+
+		const setHeaderHeight = () => {
+			const headerHeight = Math.ceil(
+				headerElement.getBoundingClientRect().height,
+			);
+			root.style.setProperty("--header-height", `${headerHeight}px`);
+		};
+
+		setHeaderHeight();
+
+		const resizeObserver = new ResizeObserver(setHeaderHeight);
+		resizeObserver.observe(headerElement);
+
+		return () => {
+			resizeObserver.disconnect();
+			root.style.removeProperty("--header-height");
+		};
+	}, []);
 
 	return (
-		<div className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
+		<div
+			ref={headerRef}
+			className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur"
+		>
 			<div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-2">
 				<div className="flex items-center gap-2 shrink-0">
 					<HeaderLogo />

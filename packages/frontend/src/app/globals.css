@@ -237,9 +237,9 @@
   .font-sans { font-family: var(--font-sans); }
   .link-progress {
     position: fixed;
-    top: 0;
+    top: var(--header-height, 56px);
     left: 0;
-    z-index: 60;
+    z-index: 49;
     height: 3px;
     width: 0;
     background: linear-gradient(90deg, #5A86FF, #7AA6FF, #F1BAFF);
