@@ -3,7 +3,7 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type MouseEvent, useEffect, useState } from "react";
+import { type AnimationEvent, type MouseEvent, useRef, useState } from "react";
 import type { ActionLinkItem } from "@/components/common/button/ActionLink";
 import ActionLink from "@/components/common/button/ActionLink";
 import type { UserState } from "@/components/feature/provider/UserProvider";
@@ -25,37 +25,43 @@ type Props = {
 	isLoading: boolean;
 };
 
-const CLOSE_TO_NAV_DELAY_MS = 60;
-
 const HeaderMobileMenu = ({ links, tags, user, isLoading }: Props) => {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
-	const [nextHref, setNextHref] = useState<string | null>(null);
+	const pendingHrefRef = useRef<string | null>(null);
 
 	const handleMenuLinkClick =
 		(href: string) => (event: MouseEvent<HTMLAnchorElement>) => {
 			event.preventDefault();
 			router.prefetch(href);
-			setNextHref(href);
+			pendingHrefRef.current = href;
 			setOpen(false);
 		};
 
-	useEffect(() => {
-		if (open || !nextHref) {
+	const handleContentAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
+		if (open || event.target !== event.currentTarget) {
 			return;
 		}
 
-		const timer = window.setTimeout(() => {
-			router.push(nextHref);
-			setNextHref(null);
-		}, CLOSE_TO_NAV_DELAY_MS);
+		const nextHref = pendingHrefRef.current;
+		if (!nextHref) {
+			return;
+		}
 
-		return () => window.clearTimeout(timer);
-	}, [open, nextHref, router]);
+		pendingHrefRef.current = null;
+		router.push(nextHref);
+	};
+
+	const handleOpenChange = (nextOpen: boolean) => {
+		setOpen(nextOpen);
+		if (nextOpen) {
+			pendingHrefRef.current = null;
+		}
+	};
 
 	return (
 		<div className="md:hidden">
-			<Sheet open={open} onOpenChange={setOpen}>
+			<Sheet open={open} onOpenChange={handleOpenChange}>
 				<SheetTrigger asChild>
 					<Button variant="ghost" size="icon">
 						<Menu />
@@ -64,6 +70,7 @@ const HeaderMobileMenu = ({ links, tags, user, isLoading }: Props) => {
 				<SheetContent
 					side="right"
 					className="w-72 data-[state=closed]:duration-75"
+					onAnimationEnd={handleContentAnimationEnd}
 				>
 					<SheetHeader>
 						<SheetTitle>メニュー</SheetTitle>
