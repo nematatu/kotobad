@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
+import HeaderMobileSearch from "./component/HeaderMobileSearch";
 import HeaderNav from "./component/HeaderNav";
 import HeaderSearch from "./component/HeaderSearch";
 import HeaderUserActions from "./component/HeaderUserActions";
@@ -21,15 +22,20 @@ const Header = ({ tags }: Props) => {
 		<div className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
 			<div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-2">
 				<div className="flex items-center gap-2 shrink-0">
-					<HeaderMobileMenu links={headerNavLinks} />
 					<HeaderLogo />
 				</div>
-				<Suspense fallback={<div className="flex-1 min-w-0" />}>
+				<Suspense
+					fallback={
+						<div className="hidden flex-1 min-w-0 [@media(min-width:496px)]:block" />
+					}
+				>
 					<HeaderSearch />
 				</Suspense>
 				<HeaderNav links={headerNavLinks} />
-				<div className="flex items-center gap-2 shrink-0">
+				<div className="ml-auto flex items-center gap-2 shrink-0">
 					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
+					<HeaderMobileSearch />
+					<HeaderMobileMenu links={headerNavLinks} />
 				</div>
 			</div>
 		</div>

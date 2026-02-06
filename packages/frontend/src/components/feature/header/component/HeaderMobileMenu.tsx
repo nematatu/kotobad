@@ -27,7 +27,7 @@ const HeaderMobileMenu = ({ links }: Props) => {
 						<Menu />
 					</Button>
 				</SheetTrigger>
-				<SheetContent side="left" className="w-72">
+				<SheetContent side="right" className="w-72">
 					<SheetHeader>
 						<SheetTitle>メニュー</SheetTitle>
 						<SheetDescription className="sr-only">

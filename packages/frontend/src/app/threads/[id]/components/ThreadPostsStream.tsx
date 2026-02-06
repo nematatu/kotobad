@@ -27,16 +27,21 @@ export const ThreadPostsStream = ({ threadId }: Props) => {
 
 	if (error) return <div>投稿の読み込みに失敗しました。</div>;
 	if (isLoading) return <ThreadPostsFallback />;
-	if (!data) return <div>投稿がありません。</div>;
-
-	const posts: PostListType = data;
+	const posts: PostListType = data ?? [];
+	const hasPosts = posts.length > 0;
 
 	return (
-		<div className="flex flex-col items-center justify-center">
+		<div className="flex flex-col items-center justify-center pb-24 sm:pb-28">
 			<div className="w-full sm:w-1/2">
-				<PostList posts={posts} />
+				{hasPosts ? (
+					<PostList posts={posts} />
+				) : (
+					<div className="flex min-h-[45vh] items-center justify-center text-sm text-slate-500">
+						投稿がありません。
+					</div>
+				)}
 			</div>
-			<ScrollToBottomButton />
+			{hasPosts ? <ScrollToBottomButton /> : null}
 			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">
 				<div className="max-w-2xl mx-auto">
 					<CreatePostForm threadId={threadId} />

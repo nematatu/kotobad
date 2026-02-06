@@ -9,19 +9,25 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import CreateThreadButton from "../../button/thread/createThread";
 
 type Props = {
 	tags: TagType[];
 	trigger?: React.ReactElement;
+	className?: string;
 	showUserPopover?: boolean;
 };
 
-export default function CreateThreadDialog({ tags, trigger }: Props) {
+export default function CreateThreadDialog({
+	tags,
+	trigger,
+	className,
+}: Props) {
 	const router = useRouter();
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	return (
-		<div className="flex items-center">
+		<div className={cn("flex items-center", className)}>
 			<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 				<DialogTrigger asChild>
 					{trigger ?? <CreateThreadButton />}

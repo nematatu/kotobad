@@ -41,7 +41,7 @@ const HeaderSearch = (_props: Props) => {
 				const input = event.currentTarget.querySelector("input");
 				if (input instanceof HTMLInputElement) input.blur();
 			}}
-			className="flex-1 min-w-0 flex items-center gap-2"
+			className="hidden flex-1 min-w-0 items-center gap-2 [@media(min-width:496px)]:flex"
 			aria-label="スレッド検索"
 		>
 			<div className="group relative w-full min-w-0 flex-1">

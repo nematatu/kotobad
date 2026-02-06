@@ -3,9 +3,9 @@ import "./globals.css";
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
-import FloatingCreateThread from "@/components/feature/button/thread/FloatingCreateThread";
 import Footer from "@/components/feature/footer/Footer";
 import Header from "@/components/feature/header/header";
+import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 
 export default async function RootLayout({
@@ -22,9 +22,11 @@ export default async function RootLayout({
 					<div className="min-h-screen flex flex-col">
 						<Toaster richColors />
 						<Header tags={tags} />
-						<main className="flex-1 bg-surface-100">{children}</main>
+						<main className="flex-1 min-h-screen bg-surface-100 pb-16 mb-8 [@media(min-width:496px)]:pb-0">
+							{children}
+						</main>
 						<Footer />
-						<FloatingCreateThread tags={tags} />
+						<MobileBottomNav tags={tags} />
 					</div>
 				</UserProvider>
 			</body>
