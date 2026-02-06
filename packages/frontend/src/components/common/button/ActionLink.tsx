@@ -15,7 +15,10 @@ type Props = {
 	item: ActionLinkItem;
 	variant?: Variant;
 	className?: string;
-};
+} & Omit<
+	React.ComponentPropsWithoutRef<typeof Link>,
+	"href" | "children" | "className"
+>;
 
 const variantClasses: Record<Variant, string> = {
 	header:
@@ -28,12 +31,19 @@ const toneClasses = {
 	accent: "text-slate-900",
 };
 
-const ActionLink = ({ item, variant = "header", className }: Props) => {
+const ActionLink = ({
+	item,
+	variant = "header",
+	className,
+	...linkProps
+}: Props) => {
 	const Icon = item.icon;
 
 	return (
 		<Link
 			href={item.href}
+			{...linkProps}
+			showIndicator={variant !== "menu"}
 			className={cn(
 				variantClasses[variant],
 				toneClasses[item.tone ?? "default"],

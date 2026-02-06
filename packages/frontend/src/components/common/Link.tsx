@@ -10,6 +10,7 @@ type LinkProps = NextLinkProps &
 	React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 		children: React.ReactNode;
 		className?: string;
+		showIndicator?: boolean;
 	};
 
 function LinkIndicator() {
@@ -17,11 +18,16 @@ function LinkIndicator() {
 	return pending ? <span className="link-progress" aria-hidden="true" /> : null;
 }
 
-export function Link({ children, className, ...props }: LinkProps) {
+export function Link({
+	children,
+	className,
+	showIndicator = true,
+	...props
+}: LinkProps) {
 	return (
 		<NextLink {...props} className={className}>
 			{children}
-			<LinkIndicator />
+			{showIndicator ? <LinkIndicator /> : null}
 		</NextLink>
 	);
 }
