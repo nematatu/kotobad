@@ -4,10 +4,8 @@ import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
 import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
-import { Search } from "lucide-react";
-import type { FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
 import { ThreadPagination } from "./ThreadPageNation";
@@ -15,6 +13,8 @@ import { ThreadPagination } from "./ThreadPageNation";
 type Props = {
 	initialThreads: ThreadType[];
 	initialTags?: TagListType;
+	initialQuery?: string;
+	initialSearchCount?: number;
 	currentPage: number;
 	totalCount: number;
 };
@@ -43,14 +43,25 @@ const initialState: SearchState = {
 
 export default function ThreadPageClient({
 	initialThreads,
+	initialQuery,
+	initialSearchCount,
 	currentPage,
 	totalCount,
 }: Props) {
-	const [state, setState] = useState<SearchState>(initialState);
+	const normalizedInitialQuery = (initialQuery ?? "").trim();
+	const initialIsSearch = normalizedInitialQuery.length >= MIN_QUERY_CHARS;
+	const [state, setState] = useState<SearchState>(() => ({
+		...initialState,
+		inputValue: initialIsSearch ? normalizedInitialQuery : "",
+		activeQuery: initialIsSearch ? normalizedInitialQuery : "",
+		threads: initialIsSearch ? initialThreads : [],
+		count: initialIsSearch ? (initialSearchCount ?? initialThreads.length) : 0,
+	}));
 	const set = useCallback((patch: Partial<SearchState>) => {
 		setState((prev) => ({ ...prev, ...patch }));
 	}, []);
 	const [showMinCharsHint, setShowMinCharsHint] = useState(false);
+	const searchParams = useSearchParams();
 
 	const trimmedInput = state.inputValue.trim();
 	const isFiltering = state.activeQuery.length >= MIN_QUERY_CHARS;
@@ -86,17 +97,14 @@ export default function ThreadPageClient({
 		[set],
 	);
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (trimmedInput.length < MIN_QUERY_CHARS) {
-			setShowMinCharsHint(trimmedInput.length > 0);
-			set({ activeQuery: "", threads: [], count: 0, error: null });
-			return;
-		}
-		setShowMinCharsHint(false);
-		set({ activeQuery: trimmedInput });
-		runSearch(trimmedInput);
-	};
+	useEffect(() => {
+		const queryParam = (searchParams.get("q") ?? "").trim();
+		setShowMinCharsHint(
+			queryParam.length > 0 && queryParam.length < MIN_QUERY_CHARS,
+		);
+		if (queryParam === state.inputValue) return;
+		set({ inputValue: queryParam });
+	}, [searchParams, set, state.inputValue]);
 
 	useEffect(() => {
 		if (trimmedInput.length < MIN_QUERY_CHARS) {
@@ -126,7 +134,7 @@ export default function ThreadPageClient({
 		? state.threads
 		: [...initialThreads].slice(0, PERPAGE);
 
-	const showEmptyAll = totalCount === 0;
+	const showEmptyAll = !isFiltering && totalCount === 0;
 	const showEmptySearch =
 		isFiltering && !state.loading && !state.error && state.count === 0;
 
@@ -146,38 +154,16 @@ export default function ThreadPageClient({
 		: "text-xs text-slate-500";
 
 	return (
-		<div className="w-full max-w-5xl mx-auto flex flex-col">
-			<div
-				id="header-and-form"
-				className="w-full px-3 md:px-0 pt-5 pb-3 space-y-3"
-			>
-				<div className="w-full text-left">
-					<div className="text-xl font-bold">スレッド一覧</div>
-				</div>
-				<form
-					onSubmit={handleSubmit}
-					className="w-full flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-start"
-					aria-label="スレッド検索"
-				>
-					<div className="group relative max-w-xl">
-						<Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500" />
-						<Input
-							type="search"
-							value={state.inputValue}
-							onChange={(event) => {
-								setShowMinCharsHint(false);
-								set({ inputValue: event.target.value });
-							}}
-							placeholder="スレッドを検索..."
-							className="pl-9"
-						/>
-					</div>
-				</form>
+		<div className="w-full max-w-5xl mx-auto flex flex-col space-y-3">
+			<div className="w-full px-3 md:px-0 pt-5">
+				<div className="text-xl font-bold">スレッド一覧</div>
+			</div>
+			<div className="w-full px-3 md:px-0">
 				<div className="min-h-4">
 					{statusText ? <p className={statusClass}>{statusText}</p> : null}
 				</div>
 			</div>
-			<div className="">
+			<div>
 				{showEmptyAll ? (
 					<div className="flex justify-center text-2xl">
 						スレッドがありません...

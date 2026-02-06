@@ -1,0 +1,5 @@
+export const HEADER_SEARCH_CONFIG = {
+	MIN_QUERY_CHARS: 2,
+	SUGGEST_LIMIT: 6,
+	DEBOUNCE_MS: 250,
+} as const;

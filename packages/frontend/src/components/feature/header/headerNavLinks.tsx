@@ -1,4 +1,4 @@
-type HeaderNavLink = {
+export type HeaderNavLink = {
 	name: string;
 	link: string;
 	label?: React.ReactNode;
