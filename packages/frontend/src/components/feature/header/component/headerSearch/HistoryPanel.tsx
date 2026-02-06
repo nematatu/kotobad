@@ -51,7 +51,12 @@ const HistoryPanel = ({
 								href={`/threads?q=${encodeURIComponent(item.query)}`}
 								className="min-w-0 flex-1 text-sm text-slate-900 truncate hover:underline"
 								onPointerDown={(event) => event.preventDefault()}
-								onClick={() => onSelect(item.query)}
+								onClick={(event) => {
+									onSelect(item.query);
+									const form = event.currentTarget.closest("form");
+									const input = form?.querySelector("input");
+									if (input instanceof HTMLInputElement) input.blur();
+								}}
 							>
 								{item.query}
 							</Link>
