@@ -9,9 +9,10 @@ type Props = {
 	query: string;
 	state: SuggestState;
 	className?: string;
+	onSelect?: () => void;
 };
 
-const SuggestPanel = ({ open, query, state, className }: Props) => {
+const SuggestPanel = ({ open, query, state, className, onSelect }: Props) => {
 	if (!open) return null;
 
 	const showCount = state.totalCount !== null && query.length > 0;
@@ -35,7 +36,7 @@ const SuggestPanel = ({ open, query, state, className }: Props) => {
 					該当するスレッドがありません
 				</div>
 			) : (
-				<SuggestList items={state.items} query={query} />
+				<SuggestList items={state.items} query={query} onSelect={onSelect} />
 			)}
 		</div>
 	);

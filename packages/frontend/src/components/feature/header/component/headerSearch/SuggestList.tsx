@@ -10,9 +10,10 @@ import { highlightText } from "./highlightText";
 type Props = {
 	items: ThreadType[];
 	query: string;
+	onSelect?: () => void;
 };
 
-const SuggestList = ({ items, query }: Props) => {
+const SuggestList = ({ items, query, onSelect }: Props) => {
 	return (
 		<div className="flex max-h-[50vh] flex-col overflow-y-auto">
 			{items.map((thread) => (
@@ -20,6 +21,8 @@ const SuggestList = ({ items, query }: Props) => {
 					key={thread.id}
 					href={`/threads/${thread.id}`}
 					className="flex gap-3 px-3 py-3 text-sm text-slate-900 hover:bg-slate-100 border-t border-slate-200 first:border-t-0"
+					onPointerDown={(event) => event.preventDefault()}
+					onClick={onSelect}
 				>
 					<AuthorAvatar
 						name={thread.author.name}

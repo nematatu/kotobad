@@ -78,6 +78,7 @@ const HeaderSearch = (_props: Props) => {
 						open={shouldShowSuggest}
 						query={trimmedValue}
 						state={suggestState}
+						onSelect={() => history.add(trimmedValue)}
 						className="hidden group-focus-within:block"
 					/>
 				)}
