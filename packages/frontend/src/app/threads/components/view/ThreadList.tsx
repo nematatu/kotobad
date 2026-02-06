@@ -48,7 +48,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								fallbackClassName="text-xs"
 							/>
 						</Link>
-						<div className="min-w-0 flex-1">
+						<div className="min-w-0 flex-1 space-y-2">
 							<Link
 								href={href}
 								aria-label={`スレッド: ${thread.title}`}
@@ -64,49 +64,53 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 									</h3>
 								</div>
 							</Link>
-							<div className="relative z-10 mt-2 flex flex-wrap space-x-2 pointer-events-none">
-								<button
-									type="button"
-									aria-pressed={isLiked}
-									aria-label={isLiked ? "いいねを解除" : "いいね"}
-									onPointerDown={(event) => {
-										if (event.button !== 0) return;
-										toggleLike(thread.id);
-									}}
-									onClick={(event) => {
-										if (event.detail !== 0) return;
-										toggleLike(thread.id);
-									}}
-									className="thread-card-nohover mt-2 inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto cursor-pointer"
-								>
-									<Heart
-										className={
-											isLiked ? "h-3 w-3 text-red-500" : "h-3 w-3 text-gray-600"
-										}
-										animation="fill"
-										animate={isLiked ? "fill" : false}
-									/>
-									<span className="text-[10px] leading-none transition-colors">
-										{thread.postCount}
-									</span>
-								</button>
-								<div className="thread-card-nohover mt-2 inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
-									<ChatIcon className="h-3 w-3" />
-									<span className="text-[10px] leading-none">
-										{thread.postCount}
-									</span>
+							<div className="flex flex-col space-y-2">
+								<div className="relative z-10 flex flex-wrap gap-3">
+									{thread.threadTags?.map((tl) => (
+										<Link
+											href="/"
+											key={tl.tagId}
+											className="inline-flex items-center gap-1 text-xs font-semibold text-blue-400 hover:underline"
+										>
+											#{tl.tags.name}
+										</Link>
+									))}
 								</div>
-							</div>
-							<div className="relative z-10 mt-2 flex flex-wrap gap-3">
-								{thread.threadTags?.map((tl) => (
-									<Link
-										href="/"
-										key={tl.tagId}
-										className="inline-flex items-center gap-1 text-xs font-semibold text-blue-400 hover:underline"
+								<div className="relative z-10 flex flex-wrap space-x-2 pointer-events-none">
+									<button
+										type="button"
+										aria-pressed={isLiked}
+										aria-label={isLiked ? "いいねを解除" : "いいね"}
+										onPointerDown={(event) => {
+											if (event.button !== 0) return;
+											toggleLike(thread.id);
+										}}
+										onClick={(event) => {
+											if (event.detail !== 0) return;
+											toggleLike(thread.id);
+										}}
+										className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto cursor-pointer"
 									>
-										#{tl.tags.name}
-									</Link>
-								))}
+										<Heart
+											className={
+												isLiked
+													? "h-3 w-3 text-red-500"
+													: "h-3 w-3 text-gray-600"
+											}
+											animation="fill"
+											animate={isLiked ? "fill" : false}
+										/>
+										<span className="text-[10px] leading-none transition-colors">
+											{thread.postCount}
+										</span>
+									</button>
+									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
+										<ChatIcon className="h-3 w-3" />
+										<span className="text-[10px] leading-none">
+											{thread.postCount}
+										</span>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
