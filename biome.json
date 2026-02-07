@@ -43,9 +43,7 @@
 	},
 	"overrides": [
 		{
-			"includes": [
-				"packages/frontend/src/components/animate-ui/**"
-			],
+			"includes": ["packages/frontend/src/components/animate-ui/**"],
 			"linter": {
 				"enabled": false
 			}
