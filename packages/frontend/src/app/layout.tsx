@@ -21,14 +21,23 @@ export default async function RootLayout({
 			<body className="min-h-screen bg-surface-100">
 				<UserProvider>
 					<PwaRegister />
-					<div className="min-h-screen flex flex-col">
+					<div id="app-shell" className="min-h-screen flex flex-col">
 						<Toaster richColors />
-						<Header tags={tags} />
-						<main className="flex-1 min-h-screen bg-surface-100 pb-16 mb-8 [@media(min-width:496px)]:pb-0">
+						<div id="app-header">
+							<Header tags={tags} />
+						</div>
+						<main
+							id="app-main"
+							className="flex-1 min-h-screen bg-surface-100 pb-16 mb-8 [@media(min-width:496px)]:pb-0"
+						>
 							{children}
 						</main>
-						<Footer />
-						<MobileBottomNav tags={tags} />
+						<div id="app-footer">
+							<Footer />
+						</div>
+						<div id="app-mobile-nav">
+							<MobileBottomNav tags={tags} />
+						</div>
 					</div>
 				</UserProvider>
 			</body>

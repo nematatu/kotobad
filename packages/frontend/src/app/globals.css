@@ -276,3 +276,21 @@
     opacity: 0.9;
   }
 }
+
+/* /lp page: hide the global app chrome and reset main spacing */
+body:has(#lp-root) #app-header,
+body:has(#lp-root) #app-footer,
+body:has(#lp-root) #app-mobile-nav {
+	display: none !important;
+}
+
+body:has(#lp-root) #app-main {
+	margin-bottom: 0 !important;
+	min-height: auto !important;
+	padding-bottom: 0 !important;
+	background: #f9f9f9 !important;
+}
+
+body:has(#lp-root) {
+	background: #f9f9f9 !important;
+}

@@ -6,9 +6,15 @@ import { Link } from "@/components/common/Link";
 
 export default function AboutPage() {
 	return (
-		<div className="relative isolate overflow-hidden">
-			<div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_0%_0%,#dbeafe_0%,#f8fafc_55%,#dcfce7_100%)]" />
-			<div className="pointer-events-none absolute -top-16 left-1/2 -z-10 h-56 w-56 -translate-x-1/2 rounded-full bg-blue-300/30 blur-3xl" />
+		<div className="relative isolate ">
+			<div className="absolute inset-0 -z-10 ">
+				<Image
+					src="/selfie/IMG_2735_Original.jpg"
+					alt=""
+					fill
+					className="min-h-screen object-cover"
+				/>
+			</div>
 
 			<section className="mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6">
 				<div className="animate-fade-in-up relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-float backdrop-blur sm:p-10">
