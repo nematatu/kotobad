@@ -1,8 +1,8 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { type MouseEvent, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { HEADER_SEARCH_CONFIG } from "../const/serach-config";
@@ -17,6 +17,8 @@ type Props = {
 };
 
 const HeaderSearch = (_props: Props) => {
+	const pathname = usePathname();
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const queryParam = (searchParams.get("q") ?? "").trim();
 	const [query, setQuery] = useState("");
@@ -31,6 +33,18 @@ const HeaderSearch = (_props: Props) => {
 	useEffect(() => {
 		setQuery(queryParam);
 	}, [queryParam]);
+
+	const handleClear = (event: MouseEvent<HTMLButtonElement>) => {
+		event.currentTarget.blur();
+		const input = event.currentTarget.form?.querySelector("input[name='q']");
+		if (input instanceof HTMLInputElement) {
+			input.blur();
+		}
+		setQuery("");
+		if (pathname === "/threads" && queryParam.length > 0) {
+			router.replace("/threads");
+		}
+	};
 
 	return (
 		<form
@@ -58,7 +72,8 @@ const HeaderSearch = (_props: Props) => {
 				<button
 					type="button"
 					aria-label="入力をクリア"
-					onClick={() => setQuery("")}
+					onMouseDown={(event) => event.preventDefault()}
+					onClick={handleClear}
 					className="absolute right-3 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center text-base leading-none text-slate-400 hover:text-slate-600"
 				>
 					×

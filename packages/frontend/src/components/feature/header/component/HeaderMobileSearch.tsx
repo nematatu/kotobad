@@ -1,7 +1,8 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { type MouseEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
 	Sheet,
@@ -18,6 +19,10 @@ import SuggestPanel from "./headerSearch/SuggestPanel";
 import { useThreadSuggest } from "./headerSearch/useThreadSuggest";
 
 const HeaderMobileSearch = () => {
+	const pathname = usePathname();
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const queryParam = (searchParams.get("q") ?? "").trim();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const history = useSearchHistory(5);
@@ -27,6 +32,19 @@ const HeaderMobileSearch = () => {
 	const shouldShowSuggest =
 		trimmedValue.length >= HEADER_SEARCH_CONFIG.MIN_QUERY_CHARS;
 	const shouldShowHistory = trimmedValue.length === 0;
+
+	const handleClear = (event: MouseEvent<HTMLButtonElement>) => {
+		event.currentTarget.blur();
+		const input = event.currentTarget.form?.querySelector("input[name='q']");
+		if (input instanceof HTMLInputElement) {
+			input.blur();
+		}
+		setQuery("");
+		if (pathname === "/threads" && queryParam.length > 0) {
+			setOpen(false);
+			router.replace("/threads");
+		}
+	};
 
 	return (
 		<div className="[@media(min-width:496px)]:hidden">
@@ -72,7 +90,8 @@ const HeaderMobileSearch = () => {
 							<button
 								type="button"
 								aria-label="入力をクリア"
-								onClick={() => setQuery("")}
+								onMouseDown={(event) => event.preventDefault()}
+								onClick={handleClear}
 								className="absolute right-3 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center text-base leading-none text-slate-400 hover:text-slate-600"
 							>
 								×
