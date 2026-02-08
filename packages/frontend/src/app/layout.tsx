@@ -22,6 +22,11 @@ export default async function RootLayout({
 				<UserProvider>
 					<PwaRegister />
 					<div className="min-h-screen flex flex-col">
+						<div
+							id="page-top-anchor"
+							className="h-0 w-full"
+							aria-hidden="true"
+						/>
 						<Toaster richColors />
 						<Header tags={tags} />
 						<main className="flex-1 min-h-screen bg-surface-100 pb-16 mb-8 [@media(min-width:496px)]:pb-0">

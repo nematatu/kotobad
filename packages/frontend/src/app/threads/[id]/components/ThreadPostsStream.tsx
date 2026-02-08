@@ -32,7 +32,10 @@ export const ThreadPostsStream = ({ threadId }: Props) => {
 	const hasPosts = posts.length > 0;
 
 	return (
-		<div className="flex flex-col items-center justify-center pb-24 sm:pb-28">
+		<div
+			id="thread-posts-top"
+			className="flex flex-col items-center justify-center pb-8"
+		>
 			<div className="w-full sm:w-1/2">
 				{hasPosts ? (
 					<PostList posts={posts} />
@@ -53,11 +56,10 @@ export const ThreadPostsStream = ({ threadId }: Props) => {
 				)}
 			</div>
 			{hasPosts ? <ScrollToBottomButton /> : null}
-			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">
-				<div className="max-w-2xl mx-auto">
-					<CreatePostForm threadId={threadId} />
-				</div>
+			<div id="thread-post-form" className="w-full sm:w-1/2 mt-6 px-1 sm:px-0">
+				<CreatePostForm threadId={threadId} />
 			</div>
+			<div id="thread-page-bottom" className="h-0 w-full" aria-hidden="true" />
 		</div>
 	);
 };
