@@ -3,11 +3,11 @@ import type { CSSProperties } from "react";
 import styles from "./page.module.css";
 
 const navItems = [
-	{ id: "top", label: "トラベルトラッカーとは" },
-	{ id: "feature", label: "特徴・機能" },
-	{ id: "uservoice", label: "ユーザーの声" },
-	{ id: "faq", label: "よくある質問" },
-	{ id: "download", label: "ダウンロード" },
+	{ id: "top", label: "Top" },
+	{ id: "feature", label: "Feature" },
+	{ id: "uservoice", label: "User Voice" },
+	{ id: "faq", label: "FAQ" },
+	{ id: "download", label: "Download" },
 ];
 
 const stats = [
@@ -17,10 +17,10 @@ const stats = [
 ];
 
 const achievementMetrics = [
-	{ value: "4.9 Stars", label: "Reviews" },
+	{ value: "4.9 stars", label: "App Rating" },
 	{ value: "10K+", label: "App Reviews" },
 	{ value: "100K+", label: "Users" },
-	{ value: "120%", label: "Growth" },
+	{ value: "97%", label: "Retention" },
 ];
 
 const featureBullets = [
@@ -35,6 +35,27 @@ const featureBullets = [
 	{
 		title: "オフライン対応",
 		body: "通信のない旅先でも記録・写真追加が可能で、あとから同期できます。",
+	},
+];
+
+const featureCards = [
+	{
+		icon: "C",
+		title: "写真を撮る",
+		subtitle: "Take a picture",
+		body: "このアプリは単なる旅行記録ツールではありません。あなたの冒険の物語を紡ぎ出す、デジタル時代の万華鏡です。",
+	},
+	{
+		icon: "H",
+		title: "気持ちを添える",
+		subtitle: "Add your feelings",
+		body: "写真やスポットに、その時の感動や思いをテキストで追加できます。気分を表す絵文字やタグを付けることで、後から振り返る際に鮮明に当時の感情を思い出せます。",
+	},
+	{
+		icon: "S",
+		title: "シェアする",
+		subtitle: "Share your journey",
+		body: "記録した旅の思い出は、美しいレイアウトアルバムや動画などに加工して自動編集されます。プライバシー設定も細かく調整でき、共有したい情報だけを選んで公開できます。",
 	},
 ];
 
@@ -223,12 +244,15 @@ export default function LpPage() {
 						</div>
 					</div>
 					<div className={styles.featureGrid}>
-						{featureBullets.map((card) => (
+						{featureCards.map((card) => (
 							<div key={card.title} className={styles.featureCard}>
 								<div className={styles.featureCardHead}>
-									<span className={styles.featureCardIcon}>✓</span>
+									<span className={styles.featureCardIcon}>{card.icon}</span>
 									<div className={styles.featureCardText}>
 										<h4>{card.title}</h4>
+										<p className={styles.featureCardSubTitle}>
+											{card.subtitle}
+										</p>
 										<p>{card.body}</p>
 									</div>
 								</div>
@@ -310,15 +334,26 @@ export default function LpPage() {
 
 			<footer className={styles.footer}>
 				<div className={styles.footerInner}>
+					<div className={styles.footerBrand}>TRAVEL TRACKER</div>
 					<ul className={styles.footerLinks}>
 						<li>
-							<a className={styles.footerLink} href="#top">
-								プライバシーポリシー
+							<a className={styles.footerLink} href="/about">
+								About
 							</a>
 						</li>
 						<li>
 							<a className={styles.footerLink} href="#feature">
-								運営会社
+								Feature
+							</a>
+						</li>
+						<li>
+							<a className={styles.footerLink} href="#faq">
+								FAQ
+							</a>
+						</li>
+						<li>
+							<a className={styles.footerLink} href="#download">
+								Download
 							</a>
 						</li>
 					</ul>
