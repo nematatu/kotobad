@@ -36,7 +36,7 @@ export default async function RootLayout({
 
 				<UserProvider>
 					<PwaRegister />
-					<div className="relative min-h-screen flex flex-col">
+					<div className="relative flex min-h-screen flex-col pb-[calc(env(safe-area-inset-bottom)+5rem)] [@media(min-width:496px)]:pb-0">
 						<div
 							id="page-top-anchor"
 							className="h-0 w-full"
