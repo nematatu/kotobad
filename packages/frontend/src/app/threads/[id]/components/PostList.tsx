@@ -1,6 +1,7 @@
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import { Emoji } from "./ui/emojiPicker";
 
 type PostListProps = {
 	posts: PostListType;
@@ -37,6 +38,7 @@ export const PostList = ({ posts }: PostListProps) => {
 								{post.post}
 							</span>
 						</div>
+						<Emoji />
 					</div>
 				</div>
 			))}

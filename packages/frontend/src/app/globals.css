@@ -183,6 +183,21 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+@keyframes emojiPopIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -50%, 0) scaleX(0);
+  }
+  75% {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scaleX(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scaleX(1);
+  }
+}
+
 @keyframes slideDown {
   0% { transform: translateY(-10px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
@@ -258,6 +273,7 @@
   .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   .animate-scale-up { animation: scaleUp 0.2s ease-out both; }
   .animate-scale-up-fast { animation: scaleUp 0.15s ease-out both; }
+  .animate-emoji-pop-in { animation: emojiPopIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-slide-down { animation: slideDown 0.2s ease-out both; }
   .animate-slide-up { animation: slideUp 0.2s ease-out both; }
   .animate-float { animation: float 6s ease-in-out infinite; }
