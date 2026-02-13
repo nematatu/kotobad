@@ -198,41 +198,6 @@
   }
 }
 
-@keyframes emojiRevealX {
-  0% {
-    opacity: 0;
-    clip-path: inset(0 100% 0 0);
-    transform: translate3d(0, -50%, 0);
-  }
-  100% {
-    opacity: 1;
-    clip-path: inset(0 0 0 0);
-    transform: translate3d(0, -50%, 0);
-  }
-}
-
-@keyframes emojiPanelIn {
-  0% {
-    opacity: 0;
-    transform: translate3d(-8px, -50%, 0) scale(0.98);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, -50%, 0) scale(1);
-  }
-}
-
-@keyframes emojiExpandX {
-  0% {
-    opacity: 0;
-    max-width: 0;
-  }
-  100% {
-    opacity: 1;
-    max-width: 220px;
-  }
-}
-
 @keyframes slideDown {
   0% { transform: translateY(-10px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
@@ -308,19 +273,7 @@
   .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   .animate-scale-up { animation: scaleUp 0.2s ease-out both; }
   .animate-scale-up-fast { animation: scaleUp 0.15s ease-out both; }
-  .animate-emoji-pop-in { animation: emojiPopIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .animate-emoji-reveal-x {
-    animation: emojiRevealX 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
-    will-change: clip-path, opacity;
-  }
-  .animate-emoji-panel-in {
-    animation: emojiPanelIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-    will-change: transform, opacity;
-  }
-  .animate-emoji-expand-x {
-    animation: emojiExpandX 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
-    will-change: max-width, opacity;
-  }
+  .animate-emoji-pop-in { animation: emojiPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-slide-down { animation: slideDown 0.2s ease-out both; }
   .animate-slide-up { animation: slideUp 0.2s ease-out both; }
   .animate-float { animation: float 6s ease-in-out infinite; }
