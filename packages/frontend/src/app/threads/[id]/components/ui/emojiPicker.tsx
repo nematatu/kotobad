@@ -1,21 +1,15 @@
 "use client";
 
+import EmojiPicker from "emoji-picker-react";
 import { SmilePlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import IconButton from "@/components/common/button/IconButton";
 
-const QUICK_REACTIONS = ["👍", "❤️", "🎉", "👀", "🤔", "🏸"] as const;
-const REACTION_ROWS = [
-	QUICK_REACTIONS.slice(0, 3),
-	QUICK_REACTIONS.slice(3, 6),
-];
-
 type EmojiProps = {
 	onReactAction: (emoji: string) => void;
-	selectedEmojis?: Record<string, true>;
 };
 
-export function Emoji({ onReactAction, selectedEmojis }: EmojiProps) {
+export function Emoji({ onReactAction }: EmojiProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,36 +48,31 @@ export function Emoji({ onReactAction, selectedEmojis }: EmojiProps) {
 				}
 			/>
 			{isOpen ? (
-				<div className="absolute left-[calc(100%+0.5rem)] top-1/2 -translate-y-1/2 z-[70] overflow-hidden animate-emoji-expand-x">
-					<div className="w-max rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
-						<div className="flex flex-col gap-1.5">
-							{REACTION_ROWS.map((row, rowIndex) => (
-								<div
-									key={`emoji-row-${rowIndex + 1}`}
-									className="flex items-center gap-3 p-1"
-								>
-									{row.map((reaction) => (
-										<button
-											type="button"
-											key={reaction}
-											onClick={() => {
-												onReactAction(reaction);
-												setIsOpen(false);
-											}}
-											aria-label={`${reaction} でリアクション`}
-											className={`relative z-0 flex px-2 py-1 scale-120 cursor-pointer items-center justify-center leading-none transform-gpu transition duration-150 ease-out hover:z-10 hover:scale-200 ${
-												selectedEmojis?.[reaction]
-													? "rounded-sm bg-sky-100/85 ring-1 ring-sky-400/80"
-													: ""
-											}`}
-										>
-											{reaction}
-										</button>
-									))}
-								</div>
-							))}
-						</div>
-					</div>
+				<div className="absolute left-[calc(100%+0.5rem)] top-1/2 z-[70] origin-left -translate-y-1/2 animate-emoji-pop-in">
+					<EmojiPicker
+						style={{ width: "100%" }}
+						previewConfig={{ showPreview: false }}
+						reactionsDefaultOpen
+						allowExpandReactions={false}
+						reactions={[
+							"1f44d",
+							"1f604",
+							"2764-fe0f",
+							"1f389",
+							"1f3f8",
+							"1f440",
+							"1f914",
+							"1f44e",
+						]}
+						onReactionClick={(emojiData) => {
+							onReactAction(emojiData.emoji);
+							setIsOpen(false);
+						}}
+						onEmojiClick={(emojiData) => {
+							onReactAction(emojiData.emoji);
+							setIsOpen(false);
+						}}
+					/>
 				</div>
 			) : null}
 		</div>

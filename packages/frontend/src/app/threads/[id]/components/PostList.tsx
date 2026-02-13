@@ -46,10 +46,17 @@ export const PostList = ({ posts }: PostListProps) => {
 			const currentMyReactions = { ...(prev.myReactionByPost[postId] ?? {}) };
 
 			if (currentMyReactions[emoji]) {
-				return prev;
+				const nextCount = (currentPostReactions[emoji] ?? 0) - 1;
+				if (nextCount > 0) {
+					currentPostReactions[emoji] = nextCount;
+				} else {
+					delete currentPostReactions[emoji];
+				}
+				delete currentMyReactions[emoji];
+			} else {
+				currentPostReactions[emoji] = (currentPostReactions[emoji] ?? 0) + 1;
+				currentMyReactions[emoji] = true;
 			}
-
-			currentPostReactions[emoji] = (currentPostReactions[emoji] ?? 0) + 1;
 
 			return {
 				reactionsByPost: {
@@ -58,10 +65,7 @@ export const PostList = ({ posts }: PostListProps) => {
 				},
 				myReactionByPost: {
 					...prev.myReactionByPost,
-					[postId]: {
-						...currentMyReactions,
-						[emoji]: true,
-					},
+					[postId]: currentMyReactions,
 				},
 			};
 		});
@@ -131,7 +135,6 @@ export const PostList = ({ posts }: PostListProps) => {
 									);
 								})}
 								<Emoji
-									selectedEmojis={myReactions}
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
 								/>
 							</div>
