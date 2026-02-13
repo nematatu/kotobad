@@ -65,7 +65,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								</div>
 							</Link>
 							<div className="flex flex-col space-y-2">
-								<div className="relative z-10 flex flex-wrap gap-3">
+								<div className="relative z-10 flex flex-wrap gap-3 self-start">
 									{thread.threadTags?.map((tl) => (
 										<Link
 											href="/"
