@@ -11,3 +11,4 @@
   - [APIのレスポンス時間測定](performance/api-responce-time-curl-2026-02-01.md)
   - [画面遷移時間を短く(フェーズ1)](performance/performace-boost-faster-transition-phase1.md)
   - [スレッド詳細のSSR/CSR切り分け方針](performance/thread-detail-ssr-csr-split-2026-02-02.md)
+  - [Chrome DevTools MCP計測と初期改善（2026-02-13）](performance/chrome-devtools-mcp-kotobad-2026-02-13.md)

@@ -1,6 +1,9 @@
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import ActionLink from "@/components/common/button/ActionLink";
+import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { getThreadById } from "../lib/getThreadById";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
 export const dynamic = "force-dynamic";
@@ -13,8 +16,19 @@ export default async function ThreadDetailPage({ params }: Props) {
 	const renderedparams = await params;
 	const threadId = Number(renderedparams.id);
 
-	if (!Number.isFinite(threadId)) {
+	if (!Number.isInteger(threadId) || threadId <= 0) {
 		return notFound();
+	}
+
+	let threadHeaderData: ThreadType;
+	try {
+		threadHeaderData = await getThreadById(String(threadId));
+	} catch (error) {
+		const fetchError = error as BffFetcherError;
+		if (fetchError.status === 404) {
+			return notFound();
+		}
+		throw error;
 	}
 
 	return (
@@ -26,8 +40,11 @@ export default async function ThreadDetailPage({ params }: Props) {
 					href: "/threads",
 				}}
 			/>
-			<ThreadDetailHeader threadId={threadId} />
-			<ThreadPostsStream threadId={threadId} />
+			<ThreadDetailHeader threadHeaderData={threadHeaderData} />
+			<ThreadPostsStream
+				threadId={threadId}
+				initialPostCount={threadHeaderData.postCount}
+			/>
 		</div>
 	);
 }

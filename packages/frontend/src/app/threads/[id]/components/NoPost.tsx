@@ -9,6 +9,9 @@ export default function NoPost() {
 				aria-hidden="true"
 				width={300}
 				height={300}
+				priority
+				fetchPriority="high"
+				sizes="(max-width: 640px) 50vw, 35vw"
 				className="w-[40%] object-contain opacity-20"
 			/>
 			<p className="text-md text-slate-500 font-semibold">

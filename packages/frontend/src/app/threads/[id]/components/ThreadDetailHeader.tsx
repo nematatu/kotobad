@@ -1,30 +1,15 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
-import { notFound } from "next/navigation";
 import { CategoryColorMap } from "@/lib/config/color/labelColor";
 import { cn } from "@/lib/utils";
-import { getThreadById } from "../../lib/getThreadById";
 
 type Props = {
-	threadId: number;
+	threadHeaderData: ThreadType;
 };
 
-export const ThreadDetailHeader = async ({ threadId }: Props) => {
+export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 	const getLabelClass = (tagId: number) =>
 		CategoryColorMap[tagId % CategoryColorMap.length];
-
-	let threadHeaderData: ThreadType;
-	const threadIdString = threadId.toString();
-
-	try {
-		threadHeaderData = await getThreadById(threadIdString);
-	} catch (e) {
-		const err = e as { status?: number };
-		if (err.status === 404) {
-			return notFound();
-		}
-		throw e;
-	}
 	return (
 		<div>
 			<div className="flex flex-col items-center justify-center">
