@@ -6,6 +6,7 @@ import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import NoThread from "./NoThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
 import { ThreadPageNation } from "./ThreadPageNation";
@@ -134,7 +135,7 @@ export default function ThreadPageClient({
 		? state.threads
 		: [...initialThreads].slice(0, PERPAGE);
 
-	const showEmptyAll = !isFiltering && totalCount === 0;
+	const showEmptyAll = totalCount === 0;
 
 	const statusText = showThresholdHint
 		? `${MIN_QUERY_CHARS}文字以上で検索してください`
@@ -162,11 +163,16 @@ export default function ThreadPageClient({
 				</div>
 			</div>
 			<div className="space-y-3">
-				<ThreadDisplayCount currentPage={currentPage} totalCount={totalCount} />
 				{showEmptyAll ? (
-					<div className="flex justify-center text-2xl">
-						スレッドがありません...
-					</div>
+					<></>
+				) : (
+					<ThreadDisplayCount
+						currentPage={currentPage}
+						totalCount={totalCount}
+					/>
+				)}
+				{showEmptyAll ? (
+					<NoThread query={state.activeQuery} />
 				) : (
 					<ThreadList threads={threadsToShow} />
 				)}
