@@ -10,7 +10,7 @@ export function ThreadDisplayCount({ currentPage, totalCount }: Props) {
 	const endIndex = Math.min(currentPage * PERPAGE, totalCount);
 
 	return (
-		<div className="text-sm shrink-0 dark:text-gray-300 whitespace-normal sm:whitespace-nowrap">
+		<div className="text-xs shrink-0 whitespace-normal sm:whitespace-nowrap">
 			{totalCount} 件中 {startIndex} ~ {endIndex} を表示中
 		</div>
 	);

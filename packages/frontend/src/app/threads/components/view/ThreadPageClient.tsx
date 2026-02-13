@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
-import { ThreadPagination } from "./ThreadPageNation";
+import { ThreadPageNation } from "./ThreadPageNation";
 
 type Props = {
 	initialThreads: ThreadType[];
@@ -135,8 +135,6 @@ export default function ThreadPageClient({
 		: [...initialThreads].slice(0, PERPAGE);
 
 	const showEmptyAll = !isFiltering && totalCount === 0;
-	const showEmptySearch =
-		isFiltering && !state.loading && !state.error && state.count === 0;
 
 	const statusText = showThresholdHint
 		? `${MIN_QUERY_CHARS}文字以上で検索してください`
@@ -163,25 +161,18 @@ export default function ThreadPageClient({
 					{statusText ? <p className={statusClass}>{statusText}</p> : null}
 				</div>
 			</div>
-			<div>
+			<div className="space-y-3">
+				<ThreadDisplayCount currentPage={currentPage} totalCount={totalCount} />
 				{showEmptyAll ? (
 					<div className="flex justify-center text-2xl">
 						スレッドがありません...
-					</div>
-				) : showEmptySearch ? (
-					<div className="flex justify-center text-2xl">
-						該当するスレッドがありません...
 					</div>
 				) : (
 					<ThreadList threads={threadsToShow} />
 				)}
 				{!isFiltering && (
 					<div className="flex flex-col items-center my-3 space-y-3">
-						<ThreadPagination
-							currentPage={currentPage}
-							totalCount={totalCount}
-						/>
-						<ThreadDisplayCount
+						<ThreadPageNation
 							currentPage={currentPage}
 							totalCount={totalCount}
 						/>
