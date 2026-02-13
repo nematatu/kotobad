@@ -48,31 +48,37 @@ export function Emoji({ onReactAction }: EmojiProps) {
 				}
 			/>
 			{isOpen ? (
-				<div className="absolute left-[calc(100%+0.5rem)] top-1/2 z-[70] origin-left -translate-y-1/2 animate-emoji-pop-in">
-					<EmojiPicker
-						style={{ width: "100%" }}
-						previewConfig={{ showPreview: false }}
-						reactionsDefaultOpen
-						allowExpandReactions={false}
-						reactions={[
-							"1f44d",
-							"1f604",
-							"2764-fe0f",
-							"1f389",
-							"1f3f8",
-							"1f440",
-							"1f914",
-							"1f44e",
-						]}
-						onReactionClick={(emojiData) => {
-							onReactAction(emojiData.emoji);
-							setIsOpen(false);
-						}}
-						onEmojiClick={(emojiData) => {
-							onReactAction(emojiData.emoji);
-							setIsOpen(false);
-						}}
-					/>
+				<div className="absolute left-0 bottom-[calc(100%+0.5rem)] z-[70] origin-bottom-left animate-emoji-pop-in">
+					<div className="w-[20rem] max-w-[calc(100vw-1rem)] rounded-xl">
+						<EmojiPicker
+							autoFocusSearch={false}
+							searchDisabled
+							width="100%"
+							height={300}
+							style={{ width: "100%" }}
+							previewConfig={{ showPreview: false }}
+							reactionsDefaultOpen
+							allowExpandReactions={false}
+							reactions={[
+								"1f44d",
+								"1f604",
+								"2764-fe0f",
+								"1f389",
+								"1f3f8",
+								"1f440",
+								"1f914",
+								"1f44e",
+							]}
+							onReactionClick={(emojiData) => {
+								onReactAction(emojiData.emoji);
+								setIsOpen(false);
+							}}
+							onEmojiClick={(emojiData) => {
+								onReactAction(emojiData.emoji);
+								setIsOpen(false);
+							}}
+						/>
+					</div>
 				</div>
 			) : null}
 		</div>
