@@ -17,7 +17,9 @@ export function UserPopover() {
 			<PopoverTrigger asChild>
 				<Button
 					enableClickAnimation
-					className="relative bg-transparent h-6 w-6"
+					variant="ghost"
+					size="icon"
+					className="relative size-8 rounded-full bg-transparent p-0 sm:size-10"
 				>
 					<UserAvatar />
 				</Button>

@@ -61,23 +61,8 @@ const Header = ({ tags }: Props) => {
 				</Suspense>
 				<HeaderNav links={headerNavLinks} />
 				<div className="ml-auto flex items-center gap-2 shrink-0">
-					<div className="hidden [@media(min-width:496px)_and_(max-width:767px)]:block">
-						<HeaderUserActions
-							isLoading={isLoading}
-							user={user}
-							tags={tags}
-							showUserPopover={false}
-						/>
-					</div>
-					<div className="hidden md:block">
-						<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
-					</div>
-					<HeaderMobileMenu
-						links={headerNavLinks}
-						tags={tags}
-						user={user}
-						isLoading={isLoading}
-					/>
+					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
+					<HeaderMobileMenu links={headerNavLinks} isLoading={isLoading} />
 				</div>
 			</div>
 		</div>
