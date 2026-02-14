@@ -164,6 +164,7 @@ export const createPostRouter: RouteHandler<
 					name: newPostWithAuthor.author?.name ?? "",
 					image: newPostWithAuthor.author?.image ?? "",
 				},
+				reactions: [],
 			},
 			201,
 		);
