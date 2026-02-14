@@ -13,7 +13,7 @@ import type { AppEnvironment } from "../../../../types";
 
 export const setPostReactionsRoute = createRoute({
 	method: "post",
-	path: "/set",
+	path: "/reactions/set",
 	description: "ポストにリアクションをつける",
 	request: {
 		body: {

@@ -12,6 +12,7 @@ import threadRouter from "./threads";
 const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/threads/create", betterAuthMiddleware)
 	.use("/posts/create", betterAuthMiddleware)
+	.use("/posts/reactions/set", betterAuthMiddleware)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter)
 	.route("/labels", tagRouter);

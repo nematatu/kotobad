@@ -12,11 +12,17 @@ import {
 	searchPostRouter,
 } from "./methods/get";
 
+import {
+	setPostReactionsRoute,
+	setPostReactionsRouter,
+} from "./methods/reactions";
+
 const postRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(createPostRoute, createPostRouter)
 	.openapi(deletePostRoute, deletePostRouter)
 	.openapi(getPostByThreadIdRoute, getPostByThreadIdRouter)
 	.openapi(getPostByIdRoute, getPostByIdRouter)
-	.openapi(searchPostRoute, searchPostRouter);
+	.openapi(searchPostRoute, searchPostRouter)
+	.openapi(setPostReactionsRoute, setPostReactionsRouter);
 
 export default postRouter;
