@@ -22,10 +22,13 @@ import { cn } from "@/lib/utils";
 
 type CreatePostFormProps = {
 	threadId: number;
-	onPosted?: () => void;
+	onPostedAction?: () => void;
 };
 
-export const CreatePostForm = ({ threadId, onPosted }: CreatePostFormProps) => {
+export const CreatePostForm = ({
+	threadId,
+	onPostedAction,
+}: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [isMinimized, setIsMinimized] = useState(false);
 	const { mutate } = useSWRConfig();
@@ -46,7 +49,7 @@ export const CreatePostForm = ({ threadId, onPosted }: CreatePostFormProps) => {
 				body: JSON.stringify(values),
 			});
 
-			onPosted?.();
+			onPostedAction?.();
 			mutate(["GET_POSTS_BY_THREADID", threadId]);
 			form.reset();
 			toast.success("投稿しました!");

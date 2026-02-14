@@ -51,7 +51,7 @@ export const ThreadPostsStream = ({ threadId, initialPostCount }: Props) => {
 			<div id="thread-post-form" className="w-full sm:w-1/2 mt-6 px-1 sm:px-0">
 				<CreatePostForm
 					threadId={threadId}
-					onPosted={() => setHasNewPost(true)}
+					onPostedAction={() => setHasNewPost(true)}
 				/>
 			</div>
 			<div id="thread-page-bottom" className="h-0 w-full" aria-hidden="true" />
