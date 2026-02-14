@@ -1,6 +1,9 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import type { PostReactionType } from "@kotobad/shared/src/types/reaction";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
+import { asc, eq, inArray, sql } from "drizzle-orm";
+import { postReactions, reactions } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIPostListSchema,
@@ -171,7 +174,6 @@ export const getPostByThreadIdRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const threadId = Number(c.req.param("threadId"));
-		console.log("threadId", threadId);
 
 		const posts = await db.query.posts.findMany({
 			where: (posts, { eq }) => eq(posts.threadId, threadId),
@@ -190,7 +192,56 @@ export const getPostByThreadIdRouter: RouteHandler<
 			return c.json({ error: "Post not found" }, 404);
 		}
 
-		return c.json(posts, 200);
+		const postIds = posts.map((post) => post.id);
+
+		const reactionRows =
+			postIds.length === 0
+				? []
+				: await db
+						.select({
+							postId: postReactions.postId,
+							id: reactions.id,
+							reactionCode: reactions.code,
+							emoji: reactions.emoji,
+							sortOrder: reactions.sortOrder,
+							count: sql<number>`count(*)`,
+							reactedByMe: sql<number>`0`,
+						})
+						// 1. postReactions を reactions と結合し、
+						// postIdsに含まれるポストを抽出。
+						.from(postReactions)
+						.innerJoin(reactions, eq(postReactions.reactionId, reactions.id))
+						.where(inArray(postReactions.postId, postIds))
+						// 2. 抽出したポストに対する、リアクションを集計する。
+						// そのために、同じポストID, リアクションIDなどをグループ化する。
+						.groupBy(
+							postReactions.postId,
+							reactions.id,
+							reactions.code,
+							reactions.emoji,
+							reactions.sortOrder,
+						)
+						.orderBy(asc(postReactions.postId), asc(reactions.sortOrder));
+
+		const reactionMap = new Map<number, PostReactionType[]>();
+		for (const row of reactionRows) {
+			const list = reactionMap.get(row.postId) ?? [];
+			list.push({
+				id: row.id,
+				reactionCode: row.reactionCode,
+				emoji: row.emoji,
+				count: row.count,
+				reactedByMe: row.reactedByMe === 1,
+				sortOrder: row.sortOrder,
+			});
+			reactionMap.set(row.postId, list);
+		}
+
+		const response = posts.map((post) => ({
+			...post,
+			reactions: reactionMap.get(post.id) ?? [],
+		}));
+		return c.json(response, 200);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(
