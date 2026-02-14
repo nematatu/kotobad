@@ -29,6 +29,45 @@ export function Emoji({ onReactAction }: EmojiProps) {
 		};
 	}, [isOpen]);
 
+	useEffect(() => {
+		if (!isOpen) return;
+
+		let rafId = 0;
+		let animations: Animation[] = [];
+
+		rafId = window.requestAnimationFrame(() => {
+			const buttons = rootRef.current?.querySelectorAll<HTMLButtonElement>(
+				".kotobad-reaction-picker .epr-emoji",
+			);
+			if (!buttons?.length) return;
+
+			animations = Array.from(buttons).map((button, index) => {
+				button.style.transformOrigin = "center";
+				button.style.willChange = "transform, opacity";
+				return button.animate(
+					[
+						{ opacity: 0, transform: "scale(0.2)" },
+						{ opacity: 1, transform: "scale(1.5)", offset: 0.72 },
+						{ opacity: 1, transform: "scale(1)" },
+					],
+					{
+						duration: 280,
+						delay: index * 45,
+						easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+						fill: "both",
+					},
+				);
+			});
+		});
+
+		return () => {
+			window.cancelAnimationFrame(rafId);
+			for (const animation of animations) {
+				animation.cancel();
+			}
+		};
+	}, [isOpen]);
+
 	return (
 		<div
 			ref={rootRef}
@@ -48,38 +87,47 @@ export function Emoji({ onReactAction }: EmojiProps) {
 				}
 			/>
 			{isOpen ? (
-				<div className="absolute left-0 bottom-[calc(100%+0.5rem)] z-[70] origin-bottom-left animate-emoji-pop-in">
-					<div className="w-[20rem] max-w-[calc(100vw-1rem)] rounded-xl">
-						<EmojiPicker
-							autoFocusSearch={false}
-							searchDisabled
-							width="100%"
-							height={300}
-							style={{ width: "100%" }}
-							previewConfig={{ showPreview: false }}
-							reactionsDefaultOpen
-							allowExpandReactions={false}
-							reactions={[
-								"1f44d",
-								"1f604",
-								"2764-fe0f",
-								"1f389",
-								"1f3f8",
-								"1f440",
-								"1f914",
-								"1f44e",
-							]}
-							onReactionClick={(emojiData) => {
-								onReactAction(emojiData.emoji);
-								setIsOpen(false);
-							}}
-							onEmojiClick={(emojiData) => {
-								onReactAction(emojiData.emoji);
-								setIsOpen(false);
-							}}
-						/>
+				<>
+					<button
+						type="button"
+						className="fixed inset-0 z-[60] bg-black/45 animate-fade-in"
+						aria-label="リアクション絵文字を閉じる"
+						onClick={() => setIsOpen(false)}
+					/>
+					<div className="absolute left-0 bottom-[calc(100%+0.5rem)] z-[70] origin-bottom-left animate-emoji-pop-in">
+						<div className="w-[20rem] max-w-[calc(100vw-1rem)] rounded-xl">
+							<EmojiPicker
+								className="kotobad-reaction-picker"
+								autoFocusSearch={false}
+								searchDisabled
+								width="100%"
+								height={300}
+								style={{ width: "100%" }}
+								previewConfig={{ showPreview: false }}
+								reactionsDefaultOpen
+								allowExpandReactions={false}
+								reactions={[
+									"1f44d",
+									"1f604",
+									"2764-fe0f",
+									"1f389",
+									"1f3f8",
+									"1f440",
+									"1f914",
+									"1f44e",
+								]}
+								onReactionClick={(emojiData) => {
+									onReactAction(emojiData.emoji);
+									setIsOpen(false);
+								}}
+								onEmojiClick={(emojiData) => {
+									onReactAction(emojiData.emoji);
+									setIsOpen(false);
+								}}
+							/>
+						</div>
 					</div>
-				</div>
+				</>
 			) : null}
 		</div>
 	);

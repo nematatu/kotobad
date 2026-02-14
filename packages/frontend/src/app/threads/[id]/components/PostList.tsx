@@ -24,14 +24,28 @@ type ReactionCountProps = {
 };
 
 const ReactionCount = ({ count }: ReactionCountProps) => {
+	const [isPopping, setIsPopping] = useState(false);
 	const previousCountRef = useRef(count);
 
 	useEffect(() => {
 		if (count === previousCountRef.current) return;
 		previousCountRef.current = count;
+		setIsPopping(true);
+		const timeoutId = window.setTimeout(() => {
+			setIsPopping(false);
+		}, 220);
+		return () => window.clearTimeout(timeoutId);
 	}, [count]);
 
-	return <span className="inline-block text-xs text-current">{count}</span>;
+	return (
+		<span
+			className={`inline-block text-xs text-current ${
+				isPopping ? "animate-reaction-count-pop" : ""
+			}`}
+		>
+			{count}
+		</span>
+	);
 };
 
 export const PostList = ({ posts }: PostListProps) => {
@@ -115,13 +129,16 @@ export const PostList = ({ posts }: PostListProps) => {
 								</span>
 							</div>
 							<div className="flex flex-wrap items-center gap-2">
+								<Emoji
+									onReactAction={(emoji) => handleReaction(post.id, emoji)}
+								/>
 								{reactionEntries.map(([emoji, count]) => {
 									const isReacted = Boolean(myReactions[emoji]);
 									return (
 										<button
 											type="button"
-											key={`${post.id}:${emoji}`}
-											className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 text-sm font-bold text-blue-500 transition-colors duration-150 ${
+											key={`${post.id}:${emoji}:${count}`}
+											className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 text-sm font-bold text-blue-500 transition-colors duration-150 animate-reaction-chip-pop ${
 												isReacted
 													? "bg-blue-300/20 hover:bg-blue-300/30 ring-1 ring-blue-400"
 													: "hover:bg-slate-100"
@@ -134,9 +151,6 @@ export const PostList = ({ posts }: PostListProps) => {
 										</button>
 									);
 								})}
-								<Emoji
-									onReactAction={(emoji) => handleReaction(post.id, emoji)}
-								/>
 							</div>
 						</div>
 					</div>
