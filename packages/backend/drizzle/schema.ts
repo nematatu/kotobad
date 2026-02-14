@@ -125,6 +125,53 @@ export const achievements = sqliteTable("achievements", {
 	result: text("result").notNull(),
 });
 
+export const reactions = sqliteTable("reactions", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	emoji: text("emoji").notNull(),
+  code: text("code").notNull().unique(), 
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at")
+        .default(sql`(strftime('%s', 'now'))`)
+        .notNull(), 
+}, (t) => ({
+        reactionsActiveSortIdx: index("reactions_active_sort_idx").on(
+            t.isActive, 
+            t.sortOrder
+        )
+    }) 
+)
+
+export const postReactions = sqliteTable("post_reactions", {
+	postId: integer("post_id")
+		      .notNull()
+		      .references(() => posts.id, {onDelete: "cascade"}),
+	reactionId: integer("reaction_id")
+		      .notNull()
+		      .references(() => reactions.id, {onDelete: "cascade"}),
+  userId: text("user_id")
+          .notNull()
+          .references(() => user.id, {onDelete: "cascade"}), 
+  createdAt: timestamp("created_at")
+             .default(sql`(strftime('%s', 'now'))`)
+             .notNull(),
+}, (t) => ({
+        postReactionsUnique: uniqueIndex("post_reactions_unique").on(
+            t.postId,
+            t.reactionId,
+            t.userId
+        ),
+        postReactionsIdx: index("post_reactions_idx").on(
+            t.postId, 
+            t.reactionId
+        ),
+        postReactionsUserIdx: index("post_reactions_user_idx").on(
+            t.postId, 
+            t.userId
+        ),
+    })
+)
+
 export const tags = sqliteTable("tags", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
 	name: text("name").notNull(),
@@ -184,7 +231,7 @@ export const careerRelations = relations(careers, ({ one }) => ({
 	}),
 }));
 
-export const postsRelations = relations(posts, ({ one }) => ({
+export const postsRelations = relations(posts, ({ one, many }) => ({
 	author: one(user, {
 		fields: [posts.authorId],
 		references: [user.id],
@@ -193,6 +240,7 @@ export const postsRelations = relations(posts, ({ one }) => ({
 		fields: [posts.threadId],
 		references: [threads.id],
 	}),
+  reactions: many(postReactions),
 }));
 
 export const threadsRelations = relations(threads, ({ one, many }) => ({
@@ -209,6 +257,20 @@ export const usersRelations = relations(user, ({ many }) => ({
 	threads: many(threads),
 }));
 
+export const reactionsRelations = relations(reactions, ({ many }) => ({
+	postReactions: many(postReactions),
+}));
+
+export const postReactionsRelations = relations(postReactions, ({ one }) => ({
+	post: one(posts, {
+		fields: [postReactions.postId],
+		references: [posts.id],
+	}),
+	reactions: one(reactions, {
+		fields: [postReactions.reactionId],
+		references: [reactions.id],
+	}),
+}));
 
 export const tagRelations = relations(tags, ({ many }) => ({
 	threadTags: many(threadTags),
