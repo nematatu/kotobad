@@ -7,9 +7,10 @@ import IconButton from "@/components/common/button/IconButton";
 
 type EmojiProps = {
 	onReactAction: (emoji: string) => void;
+	reactionCodes: string[];
 };
 
-export function Emoji({ onReactAction }: EmojiProps) {
+export function Emoji({ onReactAction, reactionCodes }: EmojiProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -106,22 +107,13 @@ export function Emoji({ onReactAction }: EmojiProps) {
 								previewConfig={{ showPreview: false }}
 								reactionsDefaultOpen
 								allowExpandReactions={false}
-								reactions={[
-									"1f44d",
-									"1f604",
-									"2764-fe0f",
-									"1f389",
-									"1f3f8",
-									"1f440",
-									"1f914",
-									"1f44e",
-								]}
+								reactions={reactionCodes}
 								onReactionClick={(emojiData) => {
-									onReactAction(emojiData.emoji);
+									onReactAction(emojiData.unified);
 									setIsOpen(false);
 								}}
 								onEmojiClick={(emojiData) => {
-									onReactAction(emojiData.emoji);
+									onReactAction(emojiData.unified);
 									setIsOpen(false);
 								}}
 							/>

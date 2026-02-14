@@ -1,4 +1,7 @@
-import { BasePostSchema } from "@kotobad/shared/src/schemas";
+import {
+	BasePostSchema,
+	BaseReactionSchema,
+} from "@kotobad/shared/src/schemas";
 
 export const OpenAPIPostSchema =
 	BasePostSchema.PostSchema.openapi("PostSchema");
@@ -18,4 +21,9 @@ export const OpenAPIPostSetPostReactionsScheme =
 export const OpenAPIPostSetPostReactionsResponseScheme =
 	BasePostSchema.SetPostReactionsResponseSchema.openapi(
 		"SetPostReactionsResponseScheme",
+	);
+
+export const OpenAPIReactionOptionListSchema =
+	BaseReactionSchema.ReactionOptionListSchema.openapi(
+		"ReactionOptionListSchema",
 	);

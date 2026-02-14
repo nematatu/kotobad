@@ -5,6 +5,8 @@ export const BFF_API_PATH = {
 	CREATE_THREAD: "threads/api/threads/createThread",
 	CREATE_POST: "threads/api/posts/createPost",
 	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId/",
+	GET_REACTION_OPTIONS: "threads/api/posts/getReactionOptions",
+	SET_POST_REACTIONS: "threads/api/posts/setPostReaction",
 } as const;
 
 export type BffApiPathKey = keyof typeof BFF_API_PATH;

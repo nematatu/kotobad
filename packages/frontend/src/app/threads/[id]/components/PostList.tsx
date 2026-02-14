@@ -1,22 +1,21 @@
 "use client";
 
+import {
+	SetPostReactionsResponseSchema,
+	SetPostReactionsScheme,
+} from "@kotobad/shared/src/schemas/post";
+import { ReactionOptionListSchema } from "@kotobad/shared/src/schemas/reaction";
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { useEffect, useRef, useState } from "react";
+import useSWRImmutable from "swr/immutable";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { Emoji } from "./ui/emojiPicker";
 
 type PostListProps = {
 	posts: PostListType;
-};
-
-type PostReactionType = Record<string, number>;
-type ReactionsByPostType = Record<number, PostReactionType>;
-type MyReactionByPostType = Record<number, Record<string, true>>;
-
-type ReactionStateType = {
-	reactionsByPost: ReactionsByPostType;
-	myReactionByPost: MyReactionByPostType;
 };
 
 type ReactionCountProps = {
@@ -49,57 +48,62 @@ const ReactionCount = ({ count }: ReactionCountProps) => {
 };
 
 export const PostList = ({ posts }: PostListProps) => {
-	const [reactionState, setReactionState] = useState<ReactionStateType>({
-		reactionsByPost: {},
-		myReactionByPost: {},
-	});
+	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
+	const { data: reactionOptions = [] } = useSWRImmutable(
+		"GET_REACTION_OPTIONS",
+		async () => {
+			const endpoint = await getBffApiUrl("GET_REACTION_OPTIONS");
+			const raw = await BffFetcher<unknown>(endpoint, {
+				method: "GET",
+			});
+			return ReactionOptionListSchema.parse(raw);
+		},
+	);
+	const reactionCodes = reactionOptions.map((item) => item.reactionCode);
 
-	const handleReaction = (postId: number, emoji: string) => {
-		setReactionState((prev) => {
-			const currentPostReactions = { ...(prev.reactionsByPost[postId] ?? {}) };
-			const currentMyReactions = { ...(prev.myReactionByPost[postId] ?? {}) };
+	useEffect(() => {
+		setLocalPosts(posts);
+	}, [posts]);
 
-			if (currentMyReactions[emoji]) {
-				const nextCount = (currentPostReactions[emoji] ?? 0) - 1;
-				if (nextCount > 0) {
-					currentPostReactions[emoji] = nextCount;
-				} else {
-					delete currentPostReactions[emoji];
-				}
-				delete currentMyReactions[emoji];
-			} else {
-				currentPostReactions[emoji] = (currentPostReactions[emoji] ?? 0) + 1;
-				currentMyReactions[emoji] = true;
-			}
+	const handleReaction = async (postId: number, reactionCode: string) => {
+		const post = localPosts.find((item) => item.id === postId);
+		if (!post) return;
 
-			return {
-				reactionsByPost: {
-					...prev.reactionsByPost,
-					[postId]: currentPostReactions,
-				},
-				myReactionByPost: {
-					...prev.myReactionByPost,
-					[postId]: currentMyReactions,
-				},
-			};
-		});
+		const current = post.reactions.find(
+			(item) => item.reactionCode === reactionCode,
+		);
+		const active = !(current?.reactedByMe ?? false);
+
+		try {
+			const endpoint = await getBffApiUrl("SET_POST_REACTIONS");
+			const requestBody = SetPostReactionsScheme.parse({
+				postId,
+				reactionCode,
+				active,
+			});
+
+			const raw = await BffFetcher<unknown>(endpoint, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(requestBody),
+			});
+			const response = SetPostReactionsResponseSchema.parse(raw);
+
+			setLocalPosts((prev) =>
+				prev.map((item) =>
+					item.id === response.postId
+						? { ...item, reactions: response.reactions }
+						: item,
+				),
+			);
+		} catch (error) {
+			console.error("Failed to set post reaction", error);
+		}
 	};
 
 	return (
 		<div className="radius-sm flex flex-col">
-			{posts.map((post) => {
-				const currentPostReactions =
-					reactionState.reactionsByPost[post.id] ?? {};
-				const myReactions = reactionState.myReactionByPost[post.id] ?? {};
-				const reactionEntries = Object.entries(currentPostReactions).sort(
-					([emojiA, countA], [emojiB, countB]) => {
-						if (countA === countB) {
-							return emojiA.localeCompare(emojiB);
-						}
-						return countB - countA;
-					},
-				);
-
+			{localPosts.map((post) => {
 				return (
 					<div
 						key={post.id}
@@ -130,27 +134,30 @@ export const PostList = ({ posts }: PostListProps) => {
 							</div>
 							<div className="flex flex-wrap items-center gap-2">
 								<Emoji
+									reactionCodes={reactionCodes}
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
 								/>
-								{reactionEntries.map(([emoji, count]) => {
-									const isReacted = Boolean(myReactions[emoji]);
-									return (
-										<button
-											type="button"
-											key={`${post.id}:${emoji}:${count}`}
-											className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 text-sm font-bold text-blue-500 transition-colors duration-150 animate-reaction-chip-pop ${
-												isReacted
-													? "bg-blue-300/20 hover:bg-blue-300/30 ring-1 ring-blue-400"
-													: "hover:bg-slate-100"
-											}`}
-											onClick={() => handleReaction(post.id, emoji)}
-											aria-label={`${emoji} をリアクション`}
-										>
-											<span>{emoji}</span>
-											<ReactionCount count={count} />
-										</button>
-									);
-								})}
+								{post.reactions.map(
+									({ id, reactionCode, emoji, reactedByMe, count }) => {
+										const isReacted = reactedByMe;
+										return (
+											<button
+												type="button"
+												key={`${post.id}:${reactionCode}:${id}`}
+												className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 text-sm font-bold text-blue-500 transition-colors duration-150 animate-reaction-chip-pop ${
+													isReacted
+														? "bg-blue-300/20 hover:bg-blue-300/30 ring-1 ring-blue-400"
+														: "hover:bg-slate-100"
+												}`}
+												onClick={() => handleReaction(post.id, reactionCode)}
+												aria-label={`${emoji} をリアクション`}
+											>
+												<span>{emoji}</span>
+												<ReactionCount count={count} />
+											</button>
+										);
+									},
+								)}
 							</div>
 						</div>
 					</div>

@@ -8,8 +8,33 @@ import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIPostSetPostReactionsResponseScheme,
 	OpenAPIPostSetPostReactionsScheme,
+	OpenAPIReactionOptionListSchema,
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
+
+export const getReactionOptionsRoute = createRoute({
+	method: "get",
+	path: "/reactions/available",
+	description: "利用可能なリアクション一覧を取得します",
+	responses: {
+		200: {
+			description: "利用可能なリアクション一覧",
+			content: {
+				"application/json": {
+					schema: OpenAPIReactionOptionListSchema,
+				},
+			},
+		},
+		500: {
+			description: "サーバーエラー",
+			content: {
+				"application/json": {
+					schema: ErrorResponse,
+				},
+			},
+		},
+	},
+});
 
 export const setPostReactionsRoute = createRoute({
 	method: "post",
@@ -59,6 +84,43 @@ export const setPostReactionsRoute = createRoute({
 		},
 	},
 });
+
+export const getReactionOptionsRouter: RouteHandler<
+	typeof getReactionOptionsRoute,
+	AppEnvironment
+> = async (c) => {
+	try {
+		const db = c.get("db");
+		const rows = await db.query.reactions.findMany({
+			where: (t, { eq }) => eq(t.isActive, true),
+			columns: {
+				id: true,
+				code: true,
+				emoji: true,
+				sortOrder: true,
+			},
+			orderBy: (t, { asc }) => [asc(t.sortOrder), asc(t.id)],
+		});
+
+		const response = rows.map((row) => ({
+			id: row.id,
+			reactionCode: row.code,
+			emoji: row.emoji,
+			sortOrder: row.sortOrder,
+		}));
+
+		return c.json(response, 200);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{
+				error: "Failed to fetch reaction options",
+				message: getErrorMessage(error),
+			},
+			500,
+		);
+	}
+};
 
 export const setPostReactionsRouter: RouteHandler<
 	typeof setPostReactionsRoute,
@@ -162,3 +224,4 @@ export const setPostReactionsRouter: RouteHandler<
 };
 
 export type SetPostReactionsRouterType = typeof setPostReactionsRoute;
+export type GetReactionOptionsRouterType = typeof getReactionOptionsRoute;

@@ -13,6 +13,8 @@ import {
 } from "./methods/get";
 
 import {
+	getReactionOptionsRoute,
+	getReactionOptionsRouter,
 	setPostReactionsRoute,
 	setPostReactionsRouter,
 } from "./methods/reactions";
@@ -20,6 +22,7 @@ import {
 const postRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(createPostRoute, createPostRouter)
 	.openapi(deletePostRoute, deletePostRouter)
+	.openapi(getReactionOptionsRoute, getReactionOptionsRouter)
 	.openapi(getPostByThreadIdRoute, getPostByThreadIdRouter)
 	.openapi(getPostByIdRoute, getPostByIdRouter)
 	.openapi(searchPostRoute, searchPostRouter)
