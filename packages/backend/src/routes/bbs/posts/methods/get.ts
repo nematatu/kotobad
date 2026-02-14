@@ -54,30 +54,6 @@ export const getPostByThreadIdRoute = createRoute({
 	},
 });
 
-export const getAllPostRoute = createRoute({
-	method: "get",
-	path: "/",
-	description: "すべての投稿をリストで取得します",
-	responses: {
-		200: {
-			description: "投稿のリスト",
-			content: {
-				"application/json": {
-					schema: OpenAPIPostListSchema,
-				},
-			},
-		},
-		500: {
-			description: "サーバーエラー",
-			content: {
-				"application/json": {
-					schema: ErrorResponse,
-				},
-			},
-		},
-	},
-});
-
 export const getPostByIdRoute = createRoute({
 	method: "get",
 	path: "/{postId}",
@@ -246,38 +222,6 @@ export const getPostByThreadIdRouter: RouteHandler<
 		console.error(error);
 		return c.json(
 			{ error: "Failed to fetch post", message: getErrorMessage(error) },
-			500,
-		);
-	}
-};
-
-export const getAllPostRouter: RouteHandler<
-	typeof getAllPostRoute,
-	AppEnvironment
-> = async (c) => {
-	try {
-		const db = c.get("db");
-		const page = Number(c.req.query("page") || "1");
-		const limit = 20;
-		const posts = await db.query.posts.findMany({
-			with: {
-				author: {
-					columns: {
-						name: true,
-						image: true,
-					},
-				},
-			},
-			limit: limit,
-			offset: (page - 1) * limit,
-			orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-		});
-
-		return c.json(posts, 200);
-	} catch (error: unknown) {
-		console.error(error);
-		return c.json(
-			{ error: "Failed to fetch posts", message: getErrorMessage(error) },
 			500,
 		);
 	}
