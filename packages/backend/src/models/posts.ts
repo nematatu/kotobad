@@ -11,3 +11,11 @@ export const OpenAPIEditPostSchema =
 
 export const OpenAPIPostListSchema =
 	BasePostSchema.PostListSchema.openapi("PostListSchema");
+
+export const OpenAPIPostSetPostReactionsScheme =
+	BasePostSchema.SetPostReactionsScheme.openapi("SetPostReactionsScheme");
+
+export const OpenAPIPostSetPostReactionsResponseScheme =
+	BasePostSchema.SetPostReactionsResponseSchema.openapi(
+		"SetPostReactionsResponseScheme",
+	);
