@@ -1,7 +1,7 @@
-import type { InferResponseType } from "hono";
+import { PostListSchema } from "@kotobad/shared/src/schemas/post";
+import type { PostListType } from "@kotobad/shared/src/types/post";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 type Params = {
@@ -40,13 +40,11 @@ export async function GET(_req: Request, { params }: Params) {
 	}
 }
 
-async function getPostByThreadId(threadId: string) {
-	type resType = InferResponseType<
-		(typeof client.bbs.posts.byThreadId)[":threadId"]["$get"]
-	>;
+async function getPostByThreadId(threadId: string): Promise<PostListType> {
 	const baseUrl = await getApiUrl("GET_POSTS_BY_THREADID");
 	const targetUrl = new URL(threadId, baseUrl);
-	return BffFetcher<resType>(targetUrl, {
+	const raw = await BffFetcher<PostListType>(targetUrl, {
 		method: "GET",
 	});
+	return PostListSchema.parse(raw);
 }

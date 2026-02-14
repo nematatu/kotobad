@@ -3,11 +3,9 @@ import {
 	ThreadSchema,
 } from "@kotobad/shared/src/schemas/thread";
 import type { ThreadType } from "@kotobad/shared/src/types";
-import type { InferResponseType } from "hono";
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function POST(req: Request) {
@@ -22,9 +20,8 @@ export async function POST(req: Request) {
 }
 
 async function createThread(values: ThreadType.CreateThreadType) {
-	type resType = InferResponseType<typeof client.bbs.threads.create.$post>;
 	const url = await getApiUrl("CREATE_THREAD");
-	return BffFetcher<resType>(url, {
+	return BffFetcher<ThreadType.ThreadType>(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(values),

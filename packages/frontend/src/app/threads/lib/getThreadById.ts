@@ -1,17 +1,14 @@
 import { ThreadSchema } from "@kotobad/shared/src/schemas/thread";
-import type { InferResponseType } from "hono";
+import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import normalizeThread from "./normalizeThread";
 
 export const getThreadById = async (id: string) => {
-	type ResType = InferResponseType<(typeof client.bbs.threads)[":id"]["$get"]>;
-
 	const baseUrl = await getApiUrl("GET_THREAD_BY_ID");
 	const targetUrl = new URL(encodeURIComponent(id), baseUrl);
 
-	const response = await BffFetcher<ResType>(targetUrl, {
+	const response = await BffFetcher<ThreadType>(targetUrl, {
 		method: "GET",
 		cache: "no-store",
 		skipCookie: true,

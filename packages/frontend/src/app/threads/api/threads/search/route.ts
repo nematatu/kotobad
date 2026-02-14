@@ -1,7 +1,7 @@
-import type { InferResponseType } from "hono";
+import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
+import type { ThreadListType } from "@kotobad/shared/src/types/thread";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
-import type { client } from "@/lib/api/honoClient";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,8 @@ export async function GET(req: Request) {
 	}
 
 	try {
-		const res = await searchThreads(query, Number(page), Number(limit));
+		const raw = await searchThreads(query, Number(page), Number(limit));
+		const res = ThreadListSchema.parse(raw);
 		return NextResponse.json(res, {
 			headers: {
 				"Cache-Control": "no-store",
@@ -37,15 +38,15 @@ export async function GET(req: Request) {
 }
 
 async function searchThreads(query: string, page: number, limit: number) {
-	type ResType = InferResponseType<typeof client.bbs.threads.search.$get>;
 	const url = await getApiUrl("SEARCH_THREADS");
 	url.searchParams.set("q", query);
 	url.searchParams.set("page", String(page));
 	url.searchParams.set("limit", String(limit));
 
-	return BffFetcher<ResType>(url, {
+	const raw = await BffFetcher<ThreadListType>(url, {
 		method: "GET",
 		cache: "no-store",
 		skipCookie: true,
 	});
+	return ThreadListSchema.parse(raw);
 }

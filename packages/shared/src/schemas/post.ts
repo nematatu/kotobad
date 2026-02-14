@@ -1,5 +1,5 @@
 import { z } from "@hono/zod-openapi";
-import { PostReactionsSchema } from "./reaction";
+import { PostReactionSchema } from "./reaction";
 
 export const PostSchema = z.object({
 	id: z.number().int().positive(),
@@ -8,7 +8,7 @@ export const PostSchema = z.object({
 	authorId: z.string(),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
-	reactions: z.array(PostReactionsSchema).default([]),
+	reactions: z.array(PostReactionSchema).default([]),
 	author: z.object({
 		name: z.string(),
 		image: z.string().optional().nullable(),
@@ -33,5 +33,5 @@ export const SetPostReactionsScheme = z.object({
 
 export const SetPostReactionsResponseSchema = z.object({
 	postId: z.number().int().positive(),
-	reactions: z.array(PostReactionsSchema),
+	reactions: z.array(PostReactionSchema),
 });
