@@ -101,7 +101,7 @@ export const CreateThreadForm = ({
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(handleSubmit)}
-						className="space-y-4"
+						className="flex flex-col space-y-4"
 					>
 						<FormField
 							control={form.control}
@@ -131,10 +131,6 @@ export const CreateThreadForm = ({
 													placeholder="例: 〇〇の試合について"
 													className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
 												/>
-
-												<p className="hidden sm:block text-neutral-400 text-xs">
-													Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-												</p>
 											</div>
 										</FormControl>
 										<FormMessage />
@@ -159,17 +155,24 @@ export const CreateThreadForm = ({
 											selectedTagIds={selectedTagIds}
 										/>
 
-										<IconButton
-											hover="brightness"
-											icon={<PencilLine />}
-											variant="logo1"
-											enableClickAnimation
-											rounded="full"
-											type="submit"
-											disabled={isSubmitDisabled || form.formState.isSubmitting}
-										>
-											<span className="text-md">投稿</span>
-										</IconButton>
+										<div className="flex space-x-3 items-end">
+											<p className="hidden sm:block text-neutral-400 text-xs">
+												Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
+											</p>
+											<IconButton
+												hover="brightness"
+												icon={<PencilLine />}
+												variant="logo1"
+												enableClickAnimation
+												rounded="full"
+												type="submit"
+												disabled={
+													isSubmitDisabled || form.formState.isSubmitting
+												}
+											>
+												<span className="text-md">投稿</span>
+											</IconButton>
+										</div>
 									</div>
 								</div>
 							</div>

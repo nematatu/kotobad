@@ -5,6 +5,7 @@ import NextLink, {
 	useLinkStatus,
 } from "next/link";
 import type * as React from "react";
+import { createPortal } from "react-dom";
 
 type LinkProps = NextLinkProps &
 	React.AnchorHTMLAttributes<HTMLAnchorElement> & {
@@ -15,7 +16,14 @@ type LinkProps = NextLinkProps &
 
 function LinkIndicator() {
 	const { pending } = useLinkStatus();
-	return pending ? <span className="link-progress" aria-hidden="true" /> : null;
+	if (!pending || typeof document === "undefined") {
+		return null;
+	}
+
+	return createPortal(
+		<span className="link-progress" aria-hidden="true" />,
+		document.body,
+	);
 }
 
 export function Link({
