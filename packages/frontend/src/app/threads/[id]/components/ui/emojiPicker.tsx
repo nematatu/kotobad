@@ -52,8 +52,8 @@ export function Emoji({ onReactAction, reactionCodes }: EmojiProps) {
 						{ opacity: 1, transform: "scale(1)" },
 					],
 					{
-						duration: 280,
-						delay: index * 45,
+						duration: 180,
+						delay: index * 25,
 						easing: "cubic-bezier(0.16, 1, 0.3, 1)",
 						fill: "both",
 					},
@@ -91,14 +91,14 @@ export function Emoji({ onReactAction, reactionCodes }: EmojiProps) {
 				<>
 					<button
 						type="button"
-						className="fixed inset-0 z-[60] bg-black/45 animate-fade-in"
+						className="fixed inset-0 z-[60] animate-fade-in"
 						aria-label="リアクション絵文字を閉じる"
 						onClick={() => setIsOpen(false)}
 					/>
-					<div className="absolute left-0 bottom-[calc(100%+0.5rem)] z-[70] origin-bottom-left animate-emoji-pop-in">
+					<div className="absolute left-[calc(100%)] bottom-[calc(100%+1.7rem)] z-[70] origin-bottom-left">
 						<div className="w-[20rem] max-w-[calc(100vw-1rem)] rounded-xl">
 							<EmojiPicker
-								className="kotobad-reaction-picker"
+								className="kotobad-reaction-picker shadow-float"
 								autoFocusSearch={false}
 								searchDisabled
 								width="100%"
