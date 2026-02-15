@@ -79,7 +79,7 @@ export function Emoji({ onReactAction, reactionCodes }: EmojiProps) {
 				type="button"
 				size="icon"
 				variant="outline"
-				className="group h-10 w-10 rounded-full border-0 bg-slate-100 text-slate-600 hover:bg-slate-200"
+				className="group h-8 w-8 rounded-full border-0 bg-slate-100 text-slate-600 hover:bg-slate-200"
 				onClick={() => setIsOpen((prev) => !prev)}
 				aria-expanded={isOpen}
 				aria-label="リアクション絵文字を開く"
