@@ -144,10 +144,10 @@ export const PostList = ({ posts }: PostListProps) => {
 											<button
 												type="button"
 												key={`${post.id}:${reactionCode}:${id}`}
-												className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 text-sm font-bold text-blue-500 transition-colors duration-150 animate-reaction-chip-pop ${
+												className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-[0.6rem] py-[0.1rem] text-sm font-bold transition-colors duration-150 animate-reaction-chip-pop ${
 													isReacted
-														? "bg-blue-300/20 hover:bg-blue-300/30 ring-1 ring-blue-400"
-														: "hover:bg-slate-100"
+														? "bg-blue-300/20 hover:bg-blue-300/30 ring-1 ring-blue-400 text-blue-600"
+														: "text-slate-600 ring-1 ring-slate-400/40 hover:ring-blue-300 hover:bg-blue-300/10"
 												}`}
 												onClick={() => handleReaction(post.id, reactionCode)}
 												aria-label={`${emoji} をリアクション`}

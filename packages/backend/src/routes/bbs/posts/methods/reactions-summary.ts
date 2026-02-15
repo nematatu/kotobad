@@ -13,9 +13,10 @@ type PostQueryItem = Omit<PostType, "reactions" | "createdAt" | "updatedAt"> & {
 type props = {
 	db: AppEnvironment["Variables"]["db"];
 	posts: PostQueryItem[];
+	viewerUserId: string | null;
 };
 
-export async function getPostReactions({ db, posts }: props) {
+export async function getPostReactions({ db, posts, viewerUserId }: props) {
 	const postIds = posts.map((post) => post.id);
 	const reactionRows =
 		postIds.length === 0
@@ -28,7 +29,7 @@ export async function getPostReactions({ db, posts }: props) {
 						emoji: reactions.emoji,
 						sortOrder: reactions.sortOrder,
 						count: sql<number>`count(*)`,
-						reactedByMe: sql<number>`0`,
+						reactedByMe: sql<number>`max(case when ${postReactions.userId} = ${viewerUserId} then 1 else 0 end)`,
 					})
 					// 1. postReactions を reactions と結合し、
 					// postIdsに含まれるポストを抽出。
@@ -66,10 +67,12 @@ export async function getPostReactions({ db, posts }: props) {
 export async function getPostReactionsByPost({
 	db,
 	post,
+	viewerUserId,
 }: {
 	db: AppEnvironment["Variables"]["db"];
 	post: PostQueryItem;
+	viewerUserId: string | null;
 }) {
-	const map = await getPostReactions({ db, posts: [post] });
+	const map = await getPostReactions({ db, posts: [post], viewerUserId });
 	return map;
 }

@@ -1,6 +1,7 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
+import { createAuth } from "../../../../auth";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIPostListSchema,
@@ -8,6 +9,21 @@ import {
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
 import { getPostReactions, getPostReactionsByPost } from "./reactions-summary";
+
+const resolveViewerUserId = async (c: {
+	env: AppEnvironment["Bindings"];
+	req: { raw: Request };
+}): Promise<string | null> => {
+	try {
+		const auth = createAuth({ env: c.env, restRequest: c.req.raw });
+		const session = await auth.api.getSession({
+			headers: c.req.raw.headers,
+		});
+		return session?.user?.id ?? null;
+	} catch {
+		return null;
+	}
+};
 
 export const getPostByThreadIdRoute = createRoute({
 	method: "get",
@@ -148,6 +164,7 @@ export const getPostByThreadIdRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const threadId = Number(c.req.param("threadId"));
+		const viewerUserId = await resolveViewerUserId(c);
 
 		const posts = await db.query.posts.findMany({
 			where: (posts, { eq }) => eq(posts.threadId, threadId),
@@ -166,7 +183,7 @@ export const getPostByThreadIdRouter: RouteHandler<
 			return c.json({ error: "Post not found" }, 404);
 		}
 
-		const reactionMap = await getPostReactions({ db, posts });
+		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
 		const response = posts.map((post) => ({
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
@@ -188,6 +205,7 @@ export const getPostByIdRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const id = Number(c.req.param("postId"));
+		const viewerUserId = await resolveViewerUserId(c);
 
 		const post = await db.query.posts.findFirst({
 			where: (posts, { eq }) => eq(posts.id, id),
@@ -205,7 +223,11 @@ export const getPostByIdRouter: RouteHandler<
 			return c.json({ error: "Post not found" }, 404);
 		}
 
-		const reactionMap = await getPostReactionsByPost({ db, post });
+		const reactionMap = await getPostReactionsByPost({
+			db,
+			post,
+			viewerUserId,
+		});
 		const response = {
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
@@ -226,6 +248,7 @@ export const searchPostRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
+		const viewerUserId = await resolveViewerUserId(c);
 		const query = c.req.query("q");
 		if (!query) {
 			return c.json({ error: "Query parameter 'q' is required" }, 400);
@@ -248,7 +271,7 @@ export const searchPostRouter: RouteHandler<
 			return c.json({ error: "Post not found" }, 404);
 		}
 
-		const reactionMap = await getPostReactions({ db, posts });
+		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
 		const response = posts.map((post) => ({
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
