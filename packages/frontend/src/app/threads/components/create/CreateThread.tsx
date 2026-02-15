@@ -164,6 +164,7 @@ export const CreateThreadForm = ({
 											icon={<PencilLine />}
 											variant="logo1"
 											enableClickAnimation
+											rounded="full"
 											type="submit"
 											disabled={isSubmitDisabled || form.formState.isSubmitting}
 										>

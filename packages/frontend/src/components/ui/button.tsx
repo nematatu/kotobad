@@ -27,7 +27,7 @@ const buttonVariants = cva(
 				...buttonColor,
 			},
 			size: {
-				default: "h-9 px-4 py-2 has-[>svg]:px-3",
+				default: "h-9 px-4 py-4",
 				sm: "h-7 rounded-md gap-1.5 px-1 has-[>svg]:px-2.5",
 				lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
 				icon: "size-9",
@@ -39,6 +39,13 @@ const buttonVariants = cva(
 			hover: {
 				none: "",
 				brightness: "hover:brightness-110",
+			},
+			rounded: {
+				sm: "rounded-sm",
+				md: "rounded-md",
+				lg: "rounded-lg",
+				xl: "rounded-xl",
+				full: "rounded-full",
 			},
 		},
 		defaultVariants: {
@@ -55,6 +62,7 @@ function Button({
 	hover = "none",
 	asChild = false,
 	enableClickAnimation = false,
+	rounded,
 	...props
 }: React.ComponentProps<"button"> &
 	VariantProps<typeof buttonVariants> & {
@@ -71,6 +79,7 @@ function Button({
 					size,
 					hover,
 					enableClickAnimation,
+					rounded,
 					className,
 				}),
 			)}

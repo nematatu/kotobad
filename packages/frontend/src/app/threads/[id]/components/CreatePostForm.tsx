@@ -1,7 +1,6 @@
 "use client";
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
-import { cn } from "@/lib/utils";
 
 type CreatePostFormProps = {
 	threadId: number;
@@ -30,7 +28,6 @@ export const CreatePostForm = ({
 	onPostedAction,
 }: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
-	const [isMinimized, setIsMinimized] = useState(false);
 	const { mutate } = useSWRConfig();
 
 	const form = useForm<CreatePostType>({
@@ -78,38 +75,12 @@ export const CreatePostForm = ({
 			<div className="p-4">
 				<div className="mb-4 relative flex items-center gap-2">
 					<h1 className="text-md sm:text-xl font-bold">書き込み</h1>
-					<button
-						type="button"
-						className="absolute left-1/2 -translate-x-1/2 p-1.5 transition cursor-pointer"
-						onClick={() => setIsMinimized((prev) => !prev)}
-						aria-expanded={!isMinimized}
-						aria-label={
-							isMinimized
-								? "書き込みフォームを開く"
-								: "書き込みフォームを最小化"
-						}
-					>
-						<ChevronDown
-							className={cn(
-								"h-5 w-5 transition-transform",
-								isMinimized ? "" : "rotate-180",
-							)}
-						/>
-					</button>
 				</div>
-				<div
-					className={cn(
-						"overflow-hidden transition-[max-height,opacity] duration-200 ease-out",
-						isMinimized
-							? "max-h-0 opacity-0 pointer-events-none"
-							: "max-h-[600px] opacity-100",
-					)}
-					aria-hidden={isMinimized}
-				>
+				<div className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out max-h-[600px]">
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(handleSubmit)}
-							className="space-y-2"
+							className="flex flex-col space-y-2"
 						>
 							<FormField
 								control={form.control}
@@ -141,10 +112,6 @@ export const CreatePostForm = ({
 														placeholder="内容"
 														className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
 													/>
-
-													<p className="hidden sm:block text-neutral-400 text-xs">
-														Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-													</p>
 												</div>
 											</FormControl>
 											<FormMessage />
@@ -153,12 +120,18 @@ export const CreatePostForm = ({
 									</FormItem>
 								)}
 							/>
-							<Button
-								className="text-white my-2 cursor-pointer bg-blue-500 hover:bg-blue-600 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
-								type="submit"
-							>
-								書き込む
-							</Button>
+							<div className="flex space-x-3 items-end self-end">
+								<p className="hidden sm:block text-neutral-400 text-xs">
+									Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
+								</p>
+								<Button
+									className="text-white cursor-pointer bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
+									rounded="full"
+									type="submit"
+								>
+									書き込む
+								</Button>
+							</div>
 						</form>
 					</Form>
 				</div>

@@ -11,6 +11,8 @@ export default function CreateThreadButton(
 			hover="brightness"
 			icon={<PencilLine />}
 			variant="logo1"
+			size="lg"
+			rounded="full"
 			{...props}
 			enableClickAnimation
 		>
