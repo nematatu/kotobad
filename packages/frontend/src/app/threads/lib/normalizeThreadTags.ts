@@ -1,5 +1,9 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 
+type RelationLike = {
+	tags?: unknown;
+};
+
 const toNormalizedTag = (value: unknown): TagType | null => {
 	if (typeof value !== "object" || value === null) {
 		return null;
@@ -28,41 +32,26 @@ const toNormalizedTag = (value: unknown): TagType | null => {
 	};
 };
 
+const toTagCandidate = (entry: unknown): unknown => {
+	if (typeof entry === "object" && entry !== null && "tags" in entry) {
+		return (entry as RelationLike).tags;
+	}
+	return entry;
+};
+
 const normalizeThreadTags = (
 	thread: Record<string, unknown>,
 ): Record<string, unknown> => {
-	if (Array.isArray(thread.threadTags)) {
-		const threadTags = thread.threadTags
-			.map((entry) => {
-				if (typeof entry === "object" && entry !== null && "tags" in entry) {
-					const relation = entry as { tags?: unknown };
-					return toNormalizedTag(relation.tags);
-				}
-				return toNormalizedTag(entry);
-			})
-			.filter((tag): tag is TagType => tag !== null);
-		return { ...thread, threadTags };
+	if (!Array.isArray(thread.threadTags)) {
+		return { ...thread, threadTags: [] };
 	}
-	if (Array.isArray(thread.threadLabels)) {
-		const threadTags = thread.threadLabels
-			.filter(
-				(
-					label,
-				): label is {
-					threadId: number;
-					labelId: number;
-					labels: Record<string, unknown>;
-				} =>
-					typeof label === "object" &&
-					label !== null &&
-					"labels" in label &&
-					"labelId" in label,
-			)
-			.map((label) => toNormalizedTag(label.labels))
-			.filter((tag): tag is TagType => tag !== null);
-		return { ...thread, threadTags };
-	}
-	return { ...thread, threadTags: [] };
+
+	const threadTags = thread.threadTags
+		.map(toTagCandidate)
+		.map(toNormalizedTag)
+		.filter((tag): tag is TagType => tag !== null);
+
+	return { ...thread, threadTags };
 };
 
 export default normalizeThreadTags;
