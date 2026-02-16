@@ -28,7 +28,9 @@ const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
 				<div className="flex items-center justify-center [@media(max-width:767px)]:hidden">
 					<UserPopover />
 				</div>
-				<CreateThreadDialog tags={tags} />
+				<div className="hidden [@media(min-width:496px)]:block">
+					<CreateThreadDialog tags={tags} />
+				</div>
 			</div>
 		);
 	}
