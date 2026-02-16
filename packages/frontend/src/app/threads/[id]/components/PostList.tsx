@@ -135,6 +135,9 @@ export const PostList = ({ posts }: PostListProps) => {
 							<div className="flex flex-wrap items-center gap-2">
 								<Emoji
 									reactionCodes={reactionCodes}
+									selectedReactionCodes={post.reactions
+										.filter((reaction) => reaction.reactedByMe)
+										.map((reaction) => reaction.reactionCode)}
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
 								/>
 								{post.reactions.map(

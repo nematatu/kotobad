@@ -8,9 +8,14 @@ import IconButton from "@/components/common/button/IconButton";
 type EmojiProps = {
 	onReactAction: (emoji: string) => void;
 	reactionCodes: string[];
+	selectedReactionCodes: string[];
 };
 
-export function Emoji({ onReactAction, reactionCodes }: EmojiProps) {
+export function Emoji({
+	onReactAction,
+	reactionCodes,
+	selectedReactionCodes,
+}: EmojiProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,6 +34,37 @@ export function Emoji({ onReactAction, reactionCodes }: EmojiProps) {
 			document.removeEventListener("pointerdown", handlePointerDown);
 		};
 	}, [isOpen]);
+
+	const selectedCodeKey = selectedReactionCodes
+		.map((c) => c.toLowerCase())
+		.sort()
+		.join(",");
+
+	useEffect(() => {
+		if (!isOpen) return;
+
+		const selectedCodeSet = new Set(
+			selectedCodeKey ? selectedCodeKey.split(",") : [],
+		);
+		const applySelectedState = () => {
+			const buttons = rootRef.current?.querySelectorAll<HTMLButtonElement>(
+				".kotobad-reaction-picker .epr-emoji",
+			);
+			if (!buttons?.length) return;
+
+			for (const button of buttons) {
+				const unified = button.dataset.unified?.toLowerCase();
+				const isSelected = Boolean(unified && selectedCodeSet.has(unified));
+				button.classList.toggle("kotobad-reaction-selected", isSelected);
+			}
+		};
+
+		const rafId = window.requestAnimationFrame(applySelectedState);
+
+		return () => {
+			window.cancelAnimationFrame(rafId);
+		};
+	}, [isOpen, selectedCodeKey]);
 
 	useEffect(() => {
 		if (!isOpen) return;

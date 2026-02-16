@@ -307,6 +307,12 @@
     pointer-events: none;
     animation: link-indicator-bar 800ms ease-in-out forwards;
   }
+  .kotobad-reaction-picker .epr-emoji.kotobad-reaction-selected {
+    background: rgba(59, 130, 246, 0.18) !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(59, 130, 246, 0.55),
+      0 2px 8px rgba(37, 99, 235, 0.24);
+  }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }
