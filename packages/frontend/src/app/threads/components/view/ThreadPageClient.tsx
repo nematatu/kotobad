@@ -10,6 +10,7 @@ import NoThread from "./NoThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
 import { ThreadPageNation } from "./ThreadPageNation";
+import { SortSelect } from "./ui/sort/sortSelect";
 
 type Props = {
 	initialThreads: ThreadType[];
@@ -164,17 +165,18 @@ export default function ThreadPageClient({
 			</div>
 			<div className="space-y-3">
 				{showEmptyAll ? (
-					<></>
-				) : (
-					<ThreadDisplayCount
-						currentPage={currentPage}
-						totalCount={totalCount}
-					/>
-				)}
-				{showEmptyAll ? (
 					<NoThread query={state.activeQuery} />
 				) : (
-					<ThreadList threads={threadsToShow} />
+					<div className="flex flex-col">
+						<div className="flex items-center justify-between">
+							<ThreadDisplayCount
+								currentPage={currentPage}
+								totalCount={totalCount}
+							/>
+							<SortSelect />
+						</div>
+						<ThreadList threads={threadsToShow} />
+					</div>
 				)}
 				{!isFiltering && (
 					<div className="flex flex-col items-center my-3 space-y-3">

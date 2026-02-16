@@ -67,10 +67,18 @@ const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
 	});
 };
 
+const SortSchema = z.enum(["new", "old"]).default("new");
+
 export const getAllThreadRoute = createRoute({
 	method: "get",
 	path: "/",
 	description: "すべてのスレッドをリストで取得します",
+	request: {
+		query: z.object({
+			page: z.coerce.number().int().min(1).default(1),
+			sort: SortSchema,
+		}),
+	},
 	responses: {
 		200: {
 			description: "スレッドのリスト",
@@ -204,8 +212,8 @@ export const getAllThreadRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const pageParam = c.req.query("page");
-		const page = pageParam ? Number(pageParam) : 1;
+		const { page, sort } = c.req.valid("query");
+
 		const limit = PERPAGE;
 
 		c.header("Cache-Control", "no-store");
@@ -224,7 +232,10 @@ export const getAllThreadRouter: RouteHandler<
 				},
 				limit: limit,
 				offset: (page - 1) * limit,
-				orderBy: (threads, { desc }) => [desc(threads.createdAt)],
+				orderBy: (threads, { desc, asc }) =>
+					sort === "new"
+						? [desc(threads.createdAt), desc(threads.id)]
+						: [asc(threads.createdAt), asc(threads.id)],
 			}),
 			db.select({ value: count() }).from(threads),
 		]);

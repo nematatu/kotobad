@@ -5,9 +5,18 @@ import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import normalizeThread from "./normalizeThread";
 
-export async function getThreads(page: number): Promise<ThreadListType> {
+type Options = {
+	currentPage: number;
+	sort?: string;
+};
+
+export async function getThreads({
+	currentPage,
+	sort,
+}: Options): Promise<ThreadListType> {
 	const targetUrl = await getApiUrl("GET_ALL_THREADS");
-	targetUrl.searchParams.set("page", String(page));
+	targetUrl.searchParams.set("page", String(currentPage));
+	targetUrl.searchParams.set("sort", sort ?? "new");
 
 	let raw: ThreadListType;
 	try {
