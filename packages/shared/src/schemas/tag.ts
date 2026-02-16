@@ -9,10 +9,4 @@ export const ThreadTagSchema = z.object({
 	iconValue: z.string(),
 });
 
-export const ThreadThreadTagSchema = z.object({
-	threadId: z.number().int().positive(),
-	tagId: z.number().int().positive(),
-	tags: ThreadTagSchema,
-});
-
 export const TagListSchema = z.array(ThreadTagSchema);
