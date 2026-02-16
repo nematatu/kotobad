@@ -23,8 +23,9 @@ export default async function Page({ searchParams }: Props) {
 				query,
 				page: 1,
 				limit: SEARCH_LIMIT,
+				sort,
 			})
-		: await getThreads({ currentPage, sort: sort });
+		: await getThreads({ currentPage, sort });
 
 	return (
 		<div className="px-2 sm:px-5">
@@ -34,6 +35,7 @@ export default async function Page({ searchParams }: Props) {
 				initialSearchCount={isSearch ? totalCount : 0}
 				currentPage={currentPage}
 				totalCount={totalCount}
+				sort={sort}
 			/>
 		</div>
 	);

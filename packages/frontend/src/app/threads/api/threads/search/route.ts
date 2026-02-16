@@ -1,6 +1,7 @@
 import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
 import type { ThreadListType } from "@kotobad/shared/src/types/thread";
 import { NextResponse } from "next/server";
+import { parseSort, type Sort } from "@/app/threads/lib/sort";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
@@ -11,6 +12,8 @@ export async function GET(req: Request) {
 	const query = url.searchParams.get("q")?.trim();
 	const page = url.searchParams.get("page") ?? "1";
 	const limit = url.searchParams.get("limit") ?? "20";
+	const sortParam = url.searchParams.get("sort");
+	const sort = parseSort(sortParam);
 
 	if (!query) {
 		return NextResponse.json(
@@ -20,7 +23,7 @@ export async function GET(req: Request) {
 	}
 
 	try {
-		const raw = await searchThreads(query, Number(page), Number(limit));
+		const raw = await searchThreads(query, Number(page), Number(limit), sort);
 		const res = ThreadListSchema.parse(raw);
 		return NextResponse.json(res, {
 			headers: {
@@ -37,11 +40,17 @@ export async function GET(req: Request) {
 	}
 }
 
-async function searchThreads(query: string, page: number, limit: number) {
+async function searchThreads(
+	query: string,
+	page: number,
+	limit: number,
+	sort: Sort,
+) {
 	const url = await getApiUrl("SEARCH_THREADS");
 	url.searchParams.set("q", query);
 	url.searchParams.set("page", String(page));
 	url.searchParams.set("limit", String(limit));
+	url.searchParams.set("sort", sort);
 
 	const raw = await BffFetcher<ThreadListType>(url, {
 		method: "GET",

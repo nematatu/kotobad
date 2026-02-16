@@ -4,19 +4,20 @@ import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
 import normalizeThread from "./normalizeThread";
+import type { Sort } from "./sort";
 
 type Options = {
 	currentPage: number;
-	sort?: string;
+	sort?: Sort;
 };
 
 export async function getThreads({
 	currentPage,
-	sort,
+	sort = "new",
 }: Options): Promise<ThreadListType> {
 	const targetUrl = await getApiUrl("GET_ALL_THREADS");
 	targetUrl.searchParams.set("page", String(currentPage));
-	targetUrl.searchParams.set("sort", sort ?? "new");
+	targetUrl.searchParams.set("sort", sort);
 
 	let raw: ThreadListType;
 	try {

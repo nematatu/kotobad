@@ -5,7 +5,8 @@ import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
 import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { Sort } from "@/app/threads/lib/sort";
 import NoThread from "./NoThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
@@ -19,6 +20,7 @@ type Props = {
 	initialSearchCount?: number;
 	currentPage: number;
 	totalCount: number;
+	sort: Sort;
 };
 
 type SearchState = {
@@ -49,6 +51,7 @@ export default function ThreadPageClient({
 	initialSearchCount,
 	currentPage,
 	totalCount,
+	sort,
 }: Props) {
 	const normalizedInitialQuery = (initialQuery ?? "").trim();
 	const initialIsSearch = normalizedInitialQuery.length >= MIN_QUERY_CHARS;
@@ -69,6 +72,8 @@ export default function ThreadPageClient({
 	const isFiltering = state.activeQuery.length >= MIN_QUERY_CHARS;
 	const showThresholdHint = showMinCharsHint;
 
+	const prevSortRef = useRef<Sort>(sort);
+
 	const runSearch = useCallback(
 		async (query: string) => {
 			set({ loading: true, error: null, threads: [], count: 0 });
@@ -76,6 +81,7 @@ export default function ThreadPageClient({
 				q: query,
 				page: "1",
 				limit: String(SEARCH_LIMIT),
+				sort,
 			});
 
 			try {
@@ -96,7 +102,7 @@ export default function ThreadPageClient({
 				set({ loading: false });
 			}
 		},
-		[set],
+		[set, sort],
 	);
 
 	useEffect(() => {
@@ -122,7 +128,10 @@ export default function ThreadPageClient({
 			return;
 		}
 
-		if (trimmedInput === state.activeQuery) return;
+		if (trimmedInput === state.activeQuery && prevSortRef.current === sort)
+			return;
+
+		prevSortRef.current = sort;
 
 		const handle = setTimeout(() => {
 			set({ activeQuery: trimmedInput });
@@ -130,7 +139,7 @@ export default function ThreadPageClient({
 		}, DEBOUNCE_MS);
 
 		return () => clearTimeout(handle);
-	}, [trimmedInput, state.activeQuery, runSearch, set]);
+	}, [trimmedInput, state.activeQuery, runSearch, set, sort]);
 
 	const threadsToShow = isFiltering
 		? state.threads

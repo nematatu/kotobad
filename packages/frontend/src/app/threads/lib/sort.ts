@@ -1,5 +1,5 @@
 export const sortOptions = ["new", "old"] as const;
-type Sort = (typeof sortOptions)[number];
+export type Sort = (typeof sortOptions)[number];
 
 export const sortLabel: Record<Sort, string> = {
 	new: "新しい順",

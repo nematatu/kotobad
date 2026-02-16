@@ -160,14 +160,15 @@ export const searchThreadRoute = createRoute({
 				description: "検索キーワード",
 				example: "hono",
 			}),
-			page: z.string().optional().openapi({
+			page: z.coerce.number().int().min(1).default(1).openapi({
 				description: "ページ番号",
 				example: "1",
 			}),
-			limit: z.string().optional().openapi({
+			limit: z.coerce.number().int().min(1).default(20).openapi({
 				description: "1ページあたりの件数",
 				example: "20",
 			}),
+			sort: SortSchema,
 		}),
 	},
 	responses: {
@@ -305,10 +306,9 @@ export const searchThreadRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const rawQuery = (c.req.query("q") ?? "").trim();
-		const page = Math.max(Number(c.req.query("page") || "1"), 1);
-		const limitParam = Number(c.req.query("limit") || "20");
-		const limit = Math.min(Math.max(limitParam, 1), 50);
+
+		const { q, page, limit, sort } = c.req.valid("query");
+		const rawQuery = (q ?? "").trim();
 		const offset = (page - 1) * limit;
 
 		c.header("Cache-Control", "no-store");
@@ -349,7 +349,10 @@ export const searchThreadRouter: RouteHandler<
 				},
 				limit: limit,
 				offset: offset,
-				orderBy: (threads, { desc }) => [desc(threads.id)],
+				orderBy: (threads, { desc, asc }) =>
+					sort === "new"
+						? [desc(threads.createdAt), desc(threads.id)]
+						: [asc(threads.createdAt), asc(threads.id)],
 			}),
 			db.select({ value: count() }).from(threads).where(whereClause),
 		]);
