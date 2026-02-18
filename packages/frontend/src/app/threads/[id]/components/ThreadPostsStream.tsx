@@ -47,9 +47,9 @@ export const ThreadPostsStream = ({
 	return (
 		<div
 			id="thread-posts-top"
-			className="flex flex-col items-center justify-center pb-8"
+			className="flex flex-col w-full items-center space-y-3"
 		>
-			<div className="w-full sm:w-1/2">
+			<div className="md:w-1/2 [@media(max-width:1290px)]:w-full">
 				{hasPosts ? (
 					<PostList posts={posts} highlightPostId={highlightPostId} />
 				) : (
@@ -57,7 +57,10 @@ export const ThreadPostsStream = ({
 				)}
 			</div>
 			{hasPosts ? <ScrollToBottomButton /> : null}
-			<div id="thread-post-form" className="w-full sm:w-1/2 mt-6 px-1 sm:px-0">
+			<div
+				id="thread-post-form"
+				className="md:w-1/2 [@media(max-width:1290px)]:w-full"
+			>
 				<CreatePostForm
 					threadId={threadId}
 					onPostedAction={() => setHasNewPost(true)}

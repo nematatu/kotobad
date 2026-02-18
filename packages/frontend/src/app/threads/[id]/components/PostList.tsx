@@ -124,34 +124,22 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 p-4 min-h-14 flex items-center border bg-slate-50 ${
+						className={`scroll-mt-24 px-4 py-3 min-h-14 flex items-center border bg-slate-50 ${
 							highlightPostId === post.id ? "animate-post-highlight-once" : ""
 						}`}
 					>
-						<div className="flex flex-col w-full gap-2">
-							<div className="flex items-center">
-								<div className="flex w-full items-center text-xs sm:text-sm whitespace-nowrap gap-2">
-									<AuthorAvatar
-										name={post.author.name}
-										image={post.author.image}
-										className="h-5 w-5"
-										fallbackClassName="text-[8px]"
-									/>
-									<div className="flex gap-2 flex-wrap items-center text-xs text-gray-500">
-										<span>{post.author.name}</span>
-										<span>{getRelativeDate(post.createdAt)}</span>
-									</div>
-									<div className="ml-auto shrink-0">
-										<DropDownMenu postId={post.id} />
-									</div>
+						<div className="flex flex-col w-full gap-1">
+							<div className="flex w-full items-center text-xs sm:text-sm whitespace-nowrap gap-2">
+								<AuthorAvatar
+									name={post.author.name}
+									image={post.author.image}
+									className="h-5 w-5"
+									fallbackClassName="text-[8px]"
+								/>
+								<div className="flex gap-2 flex-wrap text-xs text-gray-500">
+									<span>{post.author.name}</span>
+									<span>{getRelativeDate(post.createdAt)}</span>
 								</div>
-							</div>
-							<div className="flex flex-col">
-								<span className="block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words ">
-									{post.post}
-								</span>
-							</div>
-							<div className="flex flex-wrap items-center gap-2">
 								<Emoji
 									reactionCodes={reactionCodes}
 									selectedReactionCodes={post.reactions
@@ -159,6 +147,14 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 										.map((reaction) => reaction.reactionCode)}
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
 								/>
+								<div className="ml-auto shrink-0">
+									<DropDownMenu postId={post.id} />
+								</div>
+							</div>
+							<span className="block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
+								{post.post}
+							</span>
+							<div className="flex flex-wrap items-center gap-2">
 								{post.reactions.map(
 									({ id, reactionCode, emoji, reactedByMe, count }) => {
 										const isReacted = reactedByMe;

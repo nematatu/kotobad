@@ -10,7 +10,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 	return (
 		<div>
 			<div className="flex flex-col items-center justify-center">
-				<div className="text-xl sm:text-3xl font-bold break-words">
+				<div className="text-xl sm:text-2xl font-bold break-words">
 					{threadHeaderData.title}
 				</div>
 				<div className="mt-2 flex flex-wrap justify-center gap-2">
