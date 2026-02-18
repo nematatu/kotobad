@@ -22,14 +22,14 @@ const buttonVariants = cva(
 				link: "text-primary underline-offset-4 hover:underline",
 				google:
 					"bg-white text-slate-700 border border-slate-300 hover:bg-surface-100 text-sm",
-				tag: "rounded-full border text-xs font-medium transition text-blue-500",
+				tag: "bg-blue-200/20 hover:bg-blue-300/40 ring-1 ring-blue-300/60 text-blue-500 text-xs transition-colors duration-150",
 
 				...buttonColor,
 			},
 			size: {
 				default: "h-9 px-4 py-4 has-[>svg]:px-3",
-				sm: "h-7 rounded-md gap-1.5 px-1 has-[>svg]:px-2.5",
-				lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+				sm: "h-7 gap-1.5 px-1 has-[>svg]:px-2.5",
+				lg: "h-10 px-6 has-[>svg]:px-4",
 				icon: "size-9",
 			},
 			enableClickAnimation: {

@@ -8,7 +8,7 @@ type Props = {
 
 export const TagList = ({ tags, onToggle }: Props) => {
 	return (
-		<div className="flex flex-wrap gap-1">
+		<div className="flex flex-wrap gap-2">
 			{tags.map((tag) => {
 				return (
 					<Tag
@@ -16,6 +16,7 @@ export const TagList = ({ tags, onToggle }: Props) => {
 						tag={tag}
 						variant="tag"
 						size="sm"
+						rounded="full"
 						onClick={onToggle ? () => onToggle(tag.id) : undefined}
 						className={onToggle ? "cursor-pointer" : undefined}
 					/>
