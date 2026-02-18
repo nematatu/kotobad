@@ -328,6 +328,13 @@
       inset 0 0 0 1px rgba(59, 130, 246, 0.55),
       0 2px 8px rgba(37, 99, 235, 0.24);
   }
+  .kotobad-reaction-picker,
+  .kotobad-reaction-picker.epr-main,
+  .kotobad-reaction-picker .epr-header,
+  .kotobad-reaction-picker .epr-body {
+    background-color: #fff !important;
+    backdrop-filter: none !important;
+  }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-card { box-shadow: var(--shadow-card); }

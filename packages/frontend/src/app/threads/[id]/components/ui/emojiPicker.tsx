@@ -128,10 +128,10 @@ export function Emoji({
 						aria-label="リアクション絵文字を閉じる"
 						onClick={() => setIsOpen(false)}
 					/>
-					<div className="absolute left-[calc(100%)] bottom-[calc(100%+1.7rem)] z-[70] origin-bottom-left">
+					<div className="absolute left-[calc(100%)] bottom-[calc(100%+0.3rem)] z-[70] origin-bottom-left">
 						<div className="w-[20rem] max-w-[calc(100vw-1rem)] rounded-xl">
 							<EmojiPicker
-								className="kotobad-reaction-picker shadow-float"
+								className="kotobad-reaction-picker shadow-float bg-white"
 								autoFocusSearch={false}
 								searchDisabled
 								width="100%"

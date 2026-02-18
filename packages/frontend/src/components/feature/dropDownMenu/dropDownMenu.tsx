@@ -62,7 +62,7 @@ export function DropDownMenu({ postId }: DropDownMenuProps) {
 									</DropdownMenuItem>
 									<DropdownMenuItem>
 										<PiXLogo
-											className="w-6 h-6 rounded-full bg-black text-white"
+											className="w-6 h-6 bg-black text-white"
 											aria-hidden="true"
 										/>
 										X
