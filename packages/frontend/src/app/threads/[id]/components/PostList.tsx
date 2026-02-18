@@ -9,6 +9,7 @@ import type { PostListType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { useEffect, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
+import { DropDownMenu } from "@/components/feature/dropDownMenu/dropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
@@ -111,10 +112,7 @@ export const PostList = ({ posts }: PostListProps) => {
 					>
 						<div className="flex flex-col w-full gap-2">
 							<div className="flex items-center">
-								<span className="text-gray-500 mr-2 text-sm">
-									{post.localId ?? post.id}
-								</span>
-								<div className="flex items-center justify-center text-xs sm:text-sm whitespace-nowrap gap-2">
+								<div className="flex w-full items-center text-xs sm:text-sm whitespace-nowrap gap-2">
 									<AuthorAvatar
 										name={post.author.name}
 										image={post.author.image}
@@ -124,6 +122,9 @@ export const PostList = ({ posts }: PostListProps) => {
 									<div className="flex gap-2 flex-wrap items-center text-xs text-gray-500">
 										<span>{post.author.name}</span>
 										<span>{getRelativeDate(post.createdAt)}</span>
+									</div>
+									<div className="ml-auto shrink-0">
+										<DropDownMenu />
 									</div>
 								</div>
 							</div>
