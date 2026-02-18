@@ -151,32 +151,34 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 									<DropDownMenu postId={post.id} />
 								</div>
 							</div>
-							<span className="block mb-1 overflow-hidden text-xs md:text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
+							<span className="block overflow-hidden text-xs md:text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
 								{post.post}
 							</span>
-							<div className="flex flex-wrap items-center gap-2">
-								{post.reactions.map(
-									({ id, reactionCode, emoji, reactedByMe, count }) => {
-										const isReacted = reactedByMe;
-										return (
-											<button
-												type="button"
-												key={`${post.id}:${reactionCode}:${id}`}
-												className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-[0.3rem] md:px-[0.6rem] md:py-[0.1rem] text-sm font-bold transition-colors duration-150 animate-reaction-chip-pop ${
-													isReacted
-														? "bg-blue-300/20 hover:bg-blue-300/40 ring-1 ring-blue-400 text-blue-600"
-														: "bg-slate-300/30 text-slate-600 hover:ring-1 hover:ring-blue-300 hover:bg-blue-400/10"
-												}`}
-												onClick={() => handleReaction(post.id, reactionCode)}
-												aria-label={`${emoji} をリアクション`}
-											>
-												<span>{emoji}</span>
-												<ReactionCount count={count} />
-											</button>
-										);
-									},
-								)}
-							</div>
+							{post.reactions.length > 0 && (
+								<div className="flex mt-2 flex-wrap items-center gap-2">
+									{post.reactions.map(
+										({ id, reactionCode, emoji, reactedByMe, count }) => {
+											const isReacted = reactedByMe;
+											return (
+												<button
+													type="button"
+													key={`${post.id}:${reactionCode}:${id}`}
+													className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-[0.3rem] md:px-[0.6rem] md:py-[0.1rem] text-sm font-bold transition-colors duration-150 animate-reaction-chip-pop ${
+														isReacted
+															? "bg-blue-300/20 hover:bg-blue-300/40 ring-1 ring-blue-400 text-blue-600"
+															: "bg-slate-300/30 text-slate-600 hover:ring-1 hover:ring-blue-300 hover:bg-blue-400/10"
+													}`}
+													onClick={() => handleReaction(post.id, reactionCode)}
+													aria-label={`${emoji} をリアクション`}
+												>
+													<span>{emoji}</span>
+													<ReactionCount count={count} />
+												</button>
+											);
+										},
+									)}
+								</div>
+							)}
 						</div>
 					</div>
 				);
