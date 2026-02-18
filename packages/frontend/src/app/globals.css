@@ -243,6 +243,21 @@
   }
 }
 
+@keyframes postHighlightOnce {
+  0% {
+    background-color: #93c5fd;
+    box-shadow:
+      inset 0 0 0 2px #2563eb,
+      0 2px 8px rgba(37, 99, 235, 0.28);
+  }
+  100% {
+    background-color: #f8fafc;
+    box-shadow:
+      inset 0 0 0 0 transparent,
+      0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
 @keyframes slideDown {
   0% { transform: translateY(-10px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
@@ -327,6 +342,7 @@
   .animate-emoji-pop-in { animation: emojiPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-reaction-chip-pop { animation: reactionChipPop 0.24s cubic-bezier(0.16, 1, 0.3, 1) both; }
   .animate-reaction-count-pop { animation: reactionCountPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-post-highlight-once { animation: postHighlightOnce 2.2s ease-out both; }
   .animate-slide-down { animation: slideDown 0.2s ease-out both; }
   .animate-slide-up { animation: slideUp 0.2s ease-out both; }
   .animate-float { animation: float 6s ease-in-out infinite; }

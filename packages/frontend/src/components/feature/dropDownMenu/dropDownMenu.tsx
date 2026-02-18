@@ -16,7 +16,23 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function DropDownMenu() {
+type DropDownMenuProps = {
+	postId: number;
+};
+
+export function DropDownMenu({ postId }: DropDownMenuProps) {
+	const urlCopyHandler = async () => {
+		if (typeof window === "undefined") return;
+
+		try {
+			const url = new URL(window.location.href);
+			url.searchParams.set("postId", String(postId));
+			await navigator.clipboard.writeText(url.toString());
+			toast.success("コピーしました");
+		} catch (_e) {
+			toast.error("コピーに失敗しました");
+		}
+	};
 	return (
 		<div className="flex items-center justify-center">
 			<DropdownMenu modal={false}>
@@ -40,9 +56,7 @@ export function DropDownMenu() {
 							</DropdownMenuSubTrigger>
 							<DropdownMenuPortal>
 								<DropdownMenuSubContent>
-									<DropdownMenuItem
-										onClick={() => toast.success("コピーしました")}
-									>
+									<DropdownMenuItem onClick={urlCopyHandler}>
 										<Copy aria-hidden="true" />
 										コピー
 									</DropdownMenuItem>

@@ -17,6 +17,7 @@ import { Emoji } from "./ui/emojiPicker";
 
 type PostListProps = {
 	posts: PostListType;
+	highlightPostId: number | null;
 };
 
 type ReactionCountProps = {
@@ -48,7 +49,7 @@ const ReactionCount = ({ count }: ReactionCountProps) => {
 	);
 };
 
-export const PostList = ({ posts }: PostListProps) => {
+export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
@@ -65,6 +66,20 @@ export const PostList = ({ posts }: PostListProps) => {
 	useEffect(() => {
 		setLocalPosts(posts);
 	}, [posts]);
+
+	useEffect(() => {
+		if (!highlightPostId) return;
+		const targetElement = document.getElementById(
+			`post-${highlightPostId}`,
+		) as HTMLElement | null;
+		if (!targetElement) return;
+
+		targetElement.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "nearest",
+		});
+	}, [highlightPostId]);
 
 	const handleReaction = async (postId: number, reactionCode: string) => {
 		const post = localPosts.find((item) => item.id === postId);
@@ -108,7 +123,10 @@ export const PostList = ({ posts }: PostListProps) => {
 				return (
 					<div
 						key={post.id}
-						className={"p-4 min-h-14 flex items-center border bg-slate-50"}
+						id={`post-${post.id}`}
+						className={`scroll-mt-24 p-4 min-h-14 flex items-center border bg-slate-50 ${
+							highlightPostId === post.id ? "animate-post-highlight-once" : ""
+						}`}
 					>
 						<div className="flex flex-col w-full gap-2">
 							<div className="flex items-center">
@@ -124,7 +142,7 @@ export const PostList = ({ posts }: PostListProps) => {
 										<span>{getRelativeDate(post.createdAt)}</span>
 									</div>
 									<div className="ml-auto shrink-0">
-										<DropDownMenu />
+										<DropDownMenu postId={post.id} />
 									</div>
 								</div>
 							</div>

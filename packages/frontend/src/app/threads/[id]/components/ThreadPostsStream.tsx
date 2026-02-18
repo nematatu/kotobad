@@ -14,9 +14,14 @@ import ScrollToBottomButton from "./ScrollToBottomButton";
 type Props = {
 	threadId: number;
 	initialPostCount: number;
+	highlightPostId: number | null;
 };
 
-export const ThreadPostsStream = ({ threadId, initialPostCount }: Props) => {
+export const ThreadPostsStream = ({
+	threadId,
+	initialPostCount,
+	highlightPostId,
+}: Props) => {
 	const [hasNewPost, setHasNewPost] = useState(false);
 	const shouldFetchPosts = initialPostCount > 0 || hasNewPost;
 	const swrKey = shouldFetchPosts
@@ -45,7 +50,11 @@ export const ThreadPostsStream = ({ threadId, initialPostCount }: Props) => {
 			className="flex flex-col items-center justify-center pb-8"
 		>
 			<div className="w-full sm:w-1/2">
-				{hasPosts ? <PostList posts={posts} /> : <NoPost />}
+				{hasPosts ? (
+					<PostList posts={posts} highlightPostId={highlightPostId} />
+				) : (
+					<NoPost />
+				)}
 			</div>
 			{hasPosts ? <ScrollToBottomButton /> : null}
 			<div id="thread-post-form" className="w-full sm:w-1/2 mt-6 px-1 sm:px-0">

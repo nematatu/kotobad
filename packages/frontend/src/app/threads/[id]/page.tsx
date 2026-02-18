@@ -10,11 +10,21 @@ export const dynamic = "force-dynamic";
 
 export type Props = {
 	params: Promise<{ id: string }>;
+	searchParams: Promise<{ postId?: string }>;
 };
 
-export default async function ThreadDetailPage({ params }: Props) {
+export default async function ThreadDetailPage({
+	params,
+	searchParams,
+}: Props) {
 	const renderedparams = await params;
+	const renderedSearchParams = await searchParams;
 	const threadId = Number(renderedparams.id);
+	const parsedHighlightPostId = Number(renderedSearchParams.postId);
+	const highlightPostId =
+		Number.isInteger(parsedHighlightPostId) && parsedHighlightPostId > 0
+			? parsedHighlightPostId
+			: null;
 
 	if (!Number.isInteger(threadId) || threadId <= 0) {
 		return notFound();
@@ -44,6 +54,7 @@ export default async function ThreadDetailPage({ params }: Props) {
 			<ThreadPostsStream
 				threadId={threadId}
 				initialPostCount={threadHeaderData.postCount}
+				highlightPostId={highlightPostId}
 			/>
 		</div>
 	);
