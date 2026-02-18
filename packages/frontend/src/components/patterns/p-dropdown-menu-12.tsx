@@ -83,7 +83,7 @@ export function Pattern() {
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem variant="destructive">
+					<DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
 						<TrashIcon aria-hidden="true" />
 						Delete
 						<DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
