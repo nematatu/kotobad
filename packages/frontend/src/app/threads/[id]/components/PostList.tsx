@@ -124,19 +124,19 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-3 min-h-14 flex items-center border bg-slate-50 ${
+						className={`scroll-mt-24 px-4 py-1 md:py-3 min-h-14 flex items-center border bg-slate-50 ${
 							highlightPostId === post.id ? "animate-post-highlight-once" : ""
 						}`}
 					>
-						<div className="flex flex-col w-full gap-1">
+						<div className="flex flex-col w-full">
 							<div className="flex w-full items-center text-xs sm:text-sm whitespace-nowrap gap-2">
 								<AuthorAvatar
 									name={post.author.name}
 									image={post.author.image}
-									className="h-5 w-5"
+									className="h-4 w-4 md:h-5 md:w-5"
 									fallbackClassName="text-[8px]"
 								/>
-								<div className="flex gap-2 flex-wrap text-xs text-gray-500">
+								<div className="flex gap-1 md:gap-2 flex-wrap text-xs text-gray-500">
 									<span>{post.author.name}</span>
 									<span>{getRelativeDate(post.createdAt)}</span>
 								</div>
@@ -151,7 +151,7 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 									<DropDownMenu postId={post.id} />
 								</div>
 							</div>
-							<span className="block overflow-hidden text-ellipsis line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
+							<span className="block mb-1 overflow-hidden text-xs md:text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
 								{post.post}
 							</span>
 							<div className="flex flex-wrap items-center gap-2">
@@ -162,7 +162,7 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 											<button
 												type="button"
 												key={`${post.id}:${reactionCode}:${id}`}
-												className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-[0.6rem] py-[0.1rem] text-sm font-bold transition-colors duration-150 animate-reaction-chip-pop ${
+												className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-[0.3rem] md:px-[0.6rem] md:py-[0.1rem] text-sm font-bold transition-colors duration-150 animate-reaction-chip-pop ${
 													isReacted
 														? "bg-blue-300/20 hover:bg-blue-300/40 ring-1 ring-blue-400 text-blue-600"
 														: "bg-slate-300/30 text-slate-600 hover:ring-1 hover:ring-blue-300 hover:bg-blue-400/10"

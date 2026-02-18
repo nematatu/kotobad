@@ -38,7 +38,7 @@ export function DropDownMenu({ postId }: DropDownMenuProps) {
 			<DropdownMenu modal={false}>
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" size="icon" aria-label="投稿メニューを開く">
-						<EllipsisVerticalIcon aria-hidden="true" />
+						<EllipsisVerticalIcon size={10} aria-hidden="true" />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
