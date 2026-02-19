@@ -49,6 +49,7 @@ export default async function ThreadDetailPage({
 					label: "スレッド一覧へ",
 					href: "/threads",
 				}}
+				className="fixed"
 			/>
 			<ThreadDetailHeader threadHeaderData={threadHeaderData} />
 			<ThreadPostsStream
