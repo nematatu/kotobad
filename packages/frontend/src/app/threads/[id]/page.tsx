@@ -53,7 +53,6 @@ export default async function ThreadDetailPage({
 						label: "スレッド一覧へ",
 						href: "/threads",
 					}}
-					className="border border-slate-200 shadow-sm backdrop-blur"
 				/>
 			</div>
 			<ThreadDetailHeader threadHeaderData={threadHeaderData} />
