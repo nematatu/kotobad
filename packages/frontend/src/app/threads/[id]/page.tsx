@@ -42,15 +42,20 @@ export default async function ThreadDetailPage({
 	}
 
 	return (
-		<div className="p-1 sm:p-4">
-			<ActionLink
-				item={{
-					icon: ArrowLeft,
-					label: "スレッド一覧へ",
-					href: "/threads",
-				}}
-				className="fixed"
-			/>
+		<div className="flex flex-col gap-3 p-1 sm:p-4">
+			<div
+				className="hidden sm:block sticky z-40 self-start"
+				style={{ top: "calc(var(--header-height, 0px) + 0.5rem)" }}
+			>
+				<ActionLink
+					item={{
+						icon: ArrowLeft,
+						label: "スレッド一覧へ",
+						href: "/threads",
+					}}
+					className="border border-slate-200 shadow-sm backdrop-blur"
+				/>
+			</div>
 			<ThreadDetailHeader threadHeaderData={threadHeaderData} />
 			<ThreadPostsStream
 				threadId={threadId}

@@ -9,7 +9,7 @@ import type { PostListType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { useEffect, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
-import { DropDownMenu } from "@/components/feature/dropDownMenu/dropDownMenu";
+import { PostDropDownMenu } from "@/components/feature/dropDownMenu/PostDropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
@@ -148,7 +148,7 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
 								/>
 								<div className="ml-auto shrink-0">
-									<DropDownMenu postId={post.id} />
+									<PostDropDownMenu postId={post.id} />
 								</div>
 							</div>
 							<span className="block overflow-hidden text-xs md:text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">

@@ -20,7 +20,7 @@ type DropDownMenuProps = {
 	postId: number;
 };
 
-export function DropDownMenu({ postId }: DropDownMenuProps) {
+export function PostDropDownMenu({ postId }: DropDownMenuProps) {
 	const urlCopyHandler = async () => {
 		if (typeof window === "undefined") return;
 

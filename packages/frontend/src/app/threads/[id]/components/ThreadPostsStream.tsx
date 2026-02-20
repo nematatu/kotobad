@@ -5,11 +5,11 @@ import { useState } from "react";
 import useSWR from "swr";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { BackToThreadList } from "./BackToThreadList";
 import { CreatePostForm } from "./CreatePostForm";
 import { ThreadPostsFallback } from "./fallback/ThreadPostsFallback";
 import NoPost from "./NoPost";
 import { PostList } from "./PostList";
-import ScrollToBottomButton from "./ScrollToBottomButton";
 
 type Props = {
 	threadId: number;
@@ -56,7 +56,7 @@ export const ThreadPostsStream = ({
 					<NoPost />
 				)}
 			</div>
-			{hasPosts ? <ScrollToBottomButton /> : null}
+			<BackToThreadList />
 			<div
 				id="thread-post-form"
 				className="md:w-1/2 [@media(max-width:1290px)]:w-full"
