@@ -5,10 +5,11 @@ import Image from "next/image";
 import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
 import PwaRegister from "@/components/common/PwaRegister";
+import AuthRequiredModal from "@/components/feature/auth/AuthRequiredModal";
 import Footer from "@/components/feature/footer/Footer";
 import Header from "@/components/feature/header/header";
 import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
-import { UserProvider } from "@/components/feature/provider/UserProvider";
+import { Providers } from "./providers";
 
 export default async function RootLayout({
 	children,
@@ -34,7 +35,7 @@ export default async function RootLayout({
 					/>
 				</div>
 
-				<UserProvider>
+				<Providers>
 					<PwaRegister />
 					<div className="relative flex min-h-screen flex-col pb-[calc(env(safe-area-inset-bottom)+5rem)] [@media(min-width:496px)]:pb-0">
 						<div
@@ -44,13 +45,14 @@ export default async function RootLayout({
 						/>
 						<Toaster richColors />
 						<Header tags={tags} />
+						<AuthRequiredModal />
 						<main className="flex-1 min-h-screen pb-16 mb-8 [@media(min-width:496px)]:pb-0">
 							{children}
 						</main>
 						<Footer />
 						<MobileBottomNav tags={tags} />
 					</div>
-				</UserProvider>
+				</Providers>
 			</body>
 		</html>
 	);

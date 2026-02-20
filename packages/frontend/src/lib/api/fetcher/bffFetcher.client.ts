@@ -1,3 +1,5 @@
+import { emitAuthRequiredEvent } from "@/lib/auth/authRequiredEvent";
+
 type FetchArgs = Parameters<typeof fetch>;
 
 const toHeaders = (value: HeadersInit | undefined) =>
@@ -23,6 +25,10 @@ export async function BffFetcherRaw(
 		headers: mergeHeaders,
 		cache: cache ?? "no-cache",
 	});
+
+	if (response.status === 401) {
+		emitAuthRequiredEvent();
+	}
 
 	//TODO RFCにAPIのエラー型出たらしいので試したい
 	if (!response.ok && !skipErrorThrow) {

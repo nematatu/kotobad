@@ -3,7 +3,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq } from "drizzle-orm";
 import { threads, threadTags } from "../../../../../drizzle/schema";
-import { ErrorResponse } from "../../../../models/error";
+import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPICreateThreadSchema,
 	OpenAPIThreadSchema,
@@ -30,6 +30,14 @@ export const createThreadRoute = createRoute({
 			content: {
 				"application/json": {
 					schema: OpenAPIThreadSchema,
+				},
+			},
+		},
+		401: {
+			description: "未認証",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
 				},
 			},
 		},

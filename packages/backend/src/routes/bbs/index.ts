@@ -11,7 +11,10 @@ import threadRouter from "./threads";
 // better auth用のミドルウェアを適用
 const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/threads/create", betterAuthMiddleware)
+	.use("/threads/delete/*", betterAuthMiddleware)
+	.use("/threads/edit/*", betterAuthMiddleware)
 	.use("/posts/create", betterAuthMiddleware)
+	.use("/posts/delete/*", betterAuthMiddleware)
 	.use("/posts/reactions/set", betterAuthMiddleware)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter)

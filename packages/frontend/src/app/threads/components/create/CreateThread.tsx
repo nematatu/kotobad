@@ -81,8 +81,7 @@ export const CreateThreadForm = ({
 		} catch (error: unknown) {
 			const fetchError = error as BffFetcherError;
 			if (fetchError.status === 401) {
-				setError("ログインが必要です");
-				toast.error("ログインが必要です");
+				return;
 			} else {
 				const message =
 					error instanceof Error ? error.message : "不明なエラーが発生しました";

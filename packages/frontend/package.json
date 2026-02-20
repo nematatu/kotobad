@@ -15,6 +15,7 @@
 		"build:check-and-save-assets": "bun run cf:build && bun ../../scripts/check-save-next-static-assets.ts"
 	},
 	"dependencies": {
+		"@daveyplate/better-auth-ui": "^3.3.15",
 		"@hookform/resolvers": "^5.2.2",
 		"@kotobad/backend": "workspace:*",
 		"@kotobad/shared": "workspace:*",

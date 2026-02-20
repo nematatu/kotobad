@@ -11,7 +11,10 @@ import { useEffect, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
 import { PostDropDownMenu } from "@/components/feature/dropDownMenu/PostDropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
-import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
+import {
+	BffFetcher,
+	type BffFetcherError,
+} from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { Emoji } from "./ui/emojiPicker";
 
@@ -112,7 +115,11 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 						: item,
 				),
 			);
-		} catch (error) {
+		} catch (error: unknown) {
+			const fetchError = error as BffFetcherError;
+			if (fetchError.status === 401) {
+				return;
+			}
 			console.error("Failed to set post reaction", error);
 		}
 	};

@@ -7,6 +7,7 @@ import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Sort } from "@/app/threads/lib/sort";
+import { emitAuthRequiredEvent } from "@/lib/auth/authRequiredEvent";
 import NoThread from "./NoThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
@@ -89,6 +90,11 @@ export default function ThreadPageClient({
 					`/threads/api/threads/search?${params.toString()}`,
 					{ method: "GET", cache: "no-store" },
 				);
+				if (res.status === 401) {
+					emitAuthRequiredEvent();
+					set({ threads: [], count: 0, error: null });
+					return;
+				}
 				if (!res.ok) throw new Error(`Search failed: ${res.status}`);
 
 				const resThreadList = await res.json();

@@ -32,6 +32,14 @@ export const createPostRoute = createRoute({
 				},
 			},
 		},
+		401: {
+			description: "未認証",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
 		400: {
 			description: "バリデーションエラー",
 			content: {

@@ -1,9 +1,5 @@
-import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
+import { redirect } from "next/navigation";
 
-export default function app() {
-	return (
-		<div className="flex flex-col items-center justify-center">
-			<GoogleOAuth />
-		</div>
-	);
+export default function AuthLoginPage() {
+	redirect("/auth/sign-in");
 }

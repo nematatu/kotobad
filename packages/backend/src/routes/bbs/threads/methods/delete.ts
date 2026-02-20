@@ -32,6 +32,14 @@ export const deleteThreadRoute = createRoute({
 				},
 			},
 		},
+		401: {
+			description: "未認証",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
 		403: {
 			description: "権限がありません",
 			content: {

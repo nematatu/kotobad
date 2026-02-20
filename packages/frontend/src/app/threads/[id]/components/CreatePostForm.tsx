@@ -16,6 +16,10 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import {
+	BffFetcher,
+	type BffFetcherError,
+} from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
 type CreatePostFormProps = {
@@ -40,7 +44,7 @@ export const CreatePostForm = ({
 	const handleSubmit = async (values: CreatePostType) => {
 		try {
 			const endpoint = await getBffApiUrl("CREATE_POST");
-			await fetch(endpoint, {
+			await BffFetcher(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(values),
@@ -52,15 +56,9 @@ export const CreatePostForm = ({
 			toast.success("投稿しました!");
 			setTimeout(() => form.setFocus("post"), 1);
 		} catch (error: unknown) {
-			if (
-				typeof error === "object" &&
-				error !== null &&
-				"status" in error &&
-				typeof (error as { status?: unknown }).status === "number" &&
-				(error as { status: number }).status === 401
-			) {
-				setError("ログインが必要です");
-				toast.error("ログインが必要です");
+			const fetchError = error as BffFetcherError;
+			if (fetchError.status === 401) {
+				return;
 			} else {
 				const message =
 					error instanceof Error ? error.message : "不明なエラーが発生しました";
