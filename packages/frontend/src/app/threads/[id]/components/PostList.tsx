@@ -124,12 +124,12 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-1 md:py-3 min-h-14 flex items-center border bg-slate-50 ${
+						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border bg-slate-50 ${
 							highlightPostId === post.id ? "animate-post-highlight-once" : ""
 						}`}
 					>
 						<div className="flex flex-col w-full">
-							<div className="flex w-full items-center text-xs sm:text-sm whitespace-nowrap gap-2">
+							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
 								<AuthorAvatar
 									name={post.author.name}
 									image={post.author.image}
@@ -151,7 +151,7 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 									<PostDropDownMenu postId={post.id} />
 								</div>
 							</div>
-							<span className="block overflow-hidden text-xs md:text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
+							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
 								{post.post}
 							</span>
 							{post.reactions.length > 0 && (
