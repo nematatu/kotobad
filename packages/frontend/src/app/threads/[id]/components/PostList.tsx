@@ -16,14 +16,16 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { CreatePostForm } from "./CreatePostForm";
 import type { ReplyTarget } from "./types/replyTarget";
 import { Emoji } from "./ui/emojiPicker";
 import { PostReply } from "./ui/PostReply";
 
 type PostListProps = {
 	posts: PostListType;
+	threadId: number;
 	highlightPostId: number | null;
-	onReplyAction: (target: ReplyTarget) => void;
+	onPostedAction?: () => void;
 };
 
 type ReactionCountProps = {
@@ -102,10 +104,12 @@ const ReactionCount = ({ count }: ReactionCountProps) => {
 
 export const PostList = ({
 	posts,
+	threadId,
 	highlightPostId,
-	onReplyAction,
+	onPostedAction,
 }: PostListProps) => {
 	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
+	const [replyTarget, setReplyTarget] = useState<ReplyTarget | null>(null);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
 		async () => {
@@ -128,6 +132,12 @@ export const PostList = ({
 	useEffect(() => {
 		setLocalPosts(posts);
 	}, [posts]);
+
+	useEffect(() => {
+		if (!replyTarget) return;
+		if (postLocalIdMap.has(replyTarget.postId)) return;
+		setReplyTarget(null);
+	}, [postLocalIdMap, replyTarget]);
 
 	useEffect(() => {
 		if (!highlightPostId) return;
@@ -191,6 +201,7 @@ export const PostList = ({
 						? null
 						: (postLocalIdMap.get(post.replyToPostId) ?? null);
 				const indent = Math.min(depth * 14, 84);
+				const isReplyingToThisPost = replyTarget?.postId === post.id;
 
 				return (
 					<div
@@ -225,11 +236,15 @@ export const PostList = ({
 								/>
 								<PostReply
 									handleClick={() =>
-										onReplyAction({
-											postId: post.id,
-											localId: post.localId,
-											authorName: post.author.name,
-										})
+										setReplyTarget((current) =>
+											current?.postId === post.id
+												? null
+												: {
+														postId: post.id,
+														localId: post.localId,
+														authorName: post.author.name,
+													},
+										)
 									}
 								/>
 								<div className="ml-auto shrink-0">
@@ -262,6 +277,20 @@ export const PostList = ({
 											);
 										},
 									)}
+								</div>
+							)}
+							{isReplyingToThisPost && (
+								<div className="mt-3">
+									<CreatePostForm
+										threadId={threadId}
+										replyTarget={replyTarget}
+										variant="inline"
+										onPostedAction={() => {
+											setReplyTarget(null);
+											onPostedAction?.();
+										}}
+										onClearReplyTargetAction={() => setReplyTarget(null)}
+									/>
 								</div>
 							)}
 						</div>

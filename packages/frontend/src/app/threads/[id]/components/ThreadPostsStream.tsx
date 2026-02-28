@@ -10,7 +10,6 @@ import { CreatePostForm } from "./CreatePostForm";
 import { ThreadPostsFallback } from "./fallback/ThreadPostsFallback";
 import NoPost from "./NoPost";
 import { PostList } from "./PostList";
-import type { ReplyTarget } from "./types/replyTarget";
 
 type Props = {
 	threadId: number;
@@ -24,7 +23,6 @@ export const ThreadPostsStream = ({
 	highlightPostId,
 }: Props) => {
 	const [hasNewPost, setHasNewPost] = useState(false);
-	const [replyTarget, setReplyTarget] = useState<ReplyTarget | null>(null);
 	const shouldFetchPosts = initialPostCount > 0 || hasNewPost;
 	const swrKey = shouldFetchPosts
 		? (["GET_POSTS_BY_THREADID", threadId] as const)
@@ -45,13 +43,6 @@ export const ThreadPostsStream = ({
 	if (swrKey && isLoading) return <ThreadPostsFallback />;
 	const posts: PostListType = swrKey ? (data ?? []) : [];
 	const hasPosts = posts.length > 0;
-	const handleReplyAction = (target: ReplyTarget) => {
-		setReplyTarget(target);
-		document.getElementById("thread-post-form")?.scrollIntoView({
-			behavior: "smooth",
-			block: "center",
-		});
-	};
 
 	return (
 		<div
@@ -62,8 +53,9 @@ export const ThreadPostsStream = ({
 				{hasPosts ? (
 					<PostList
 						posts={posts}
+						threadId={threadId}
 						highlightPostId={highlightPostId}
-						onReplyAction={handleReplyAction}
+						onPostedAction={() => setHasNewPost(true)}
 					/>
 				) : (
 					<NoPost />
@@ -76,12 +68,9 @@ export const ThreadPostsStream = ({
 			>
 				<CreatePostForm
 					threadId={threadId}
-					replyTarget={replyTarget}
 					onPostedAction={() => {
 						setHasNewPost(true);
-						setReplyTarget(null);
 					}}
-					onClearReplyTargetAction={() => setReplyTarget(null)}
 				/>
 			</div>
 			<div id="thread-page-bottom" className="h-0 w-full" aria-hidden="true" />
