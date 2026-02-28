@@ -78,6 +78,13 @@
       "when": 1771059496571,
       "tag": "0010_rainy_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1772303671644,
+      "tag": "0011_strong_talon",
+      "breakpoints": true
     }
   ]
 }

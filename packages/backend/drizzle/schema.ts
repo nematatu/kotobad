@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+	type AnySQLiteColumn,
 	customType,
 	index,
 	integer,
@@ -72,6 +73,12 @@ export const posts = sqliteTable(
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		localId: integer("local_id").notNull(),
 		post: text("post").notNull(),
+		replyToPostId: integer("reply_to_post_id").references(
+			(): AnySQLiteColumn => posts.id,
+			{
+				onDelete: "set null",
+			},
+		),
 		threadId: integer("thread_id")
 			.notNull()
 			.references(() => threads.id),
@@ -90,6 +97,7 @@ export const posts = sqliteTable(
 			table.threadId,
 			table.localId,
 		),
+		replyToPostIdx: index("posts_reply_to_post_idx").on(table.replyToPostId),
 	}),
 );
 
@@ -240,7 +248,15 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 		fields: [posts.threadId],
 		references: [threads.id],
 	}),
-  reactions: many(postReactions),
+	replyTo: one(posts, {
+		relationName: "postReplyTree",
+		fields: [posts.replyToPostId],
+		references: [posts.id],
+	}),
+	replies: many(posts, {
+		relationName: "postReplyTree",
+	}),
+	reactions: many(postReactions),
 }));
 
 export const threadsRelations = relations(threads, ({ one, many }) => ({

@@ -6,6 +6,7 @@ export const PostSchema = z.object({
 	localId: z.number().int().positive(),
 	post: z.string().min(1),
 	authorId: z.string(),
+	replyToPostId: z.number().int().nullable().optional(),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
 	reactions: z.array(PostReactionSchema).default([]),
@@ -17,6 +18,7 @@ export const PostSchema = z.object({
 
 export const CreatePostSchema = PostSchema.pick({
 	post: true,
+	replyToPostId: true,
 }).extend({
 	threadId: z.number().int().positive(),
 });

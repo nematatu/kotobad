@@ -5,9 +5,9 @@ import {
 	SetPostReactionsScheme,
 } from "@kotobad/shared/src/schemas/post";
 import { ReactionOptionListSchema } from "@kotobad/shared/src/schemas/reaction";
-import type { PostListType } from "@kotobad/shared/src/types/post";
+import type { PostListType, PostType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
 import { PostDropDownMenu } from "@/components/feature/dropDownMenu/PostDropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
@@ -16,15 +16,63 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import type { ReplyTarget } from "./types/replyTarget";
 import { Emoji } from "./ui/emojiPicker";
+import { PostReply } from "./ui/PostReply";
 
 type PostListProps = {
 	posts: PostListType;
 	highlightPostId: number | null;
+	onReplyAction: (target: ReplyTarget) => void;
 };
 
 type ReactionCountProps = {
 	count: number;
+};
+
+type ReplyTreeNode = {
+	post: PostType;
+	children: ReplyTreeNode[];
+};
+
+const buildReplyTree = (posts: PostListType): ReplyTreeNode[] => {
+	const nodeMap = new Map<number, ReplyTreeNode>();
+	for (const post of posts) {
+		nodeMap.set(post.id, {
+			post,
+			children: [],
+		});
+	}
+
+	const roots: ReplyTreeNode[] = [];
+	for (const post of posts) {
+		const node = nodeMap.get(post.id);
+		if (!node) continue;
+
+		const parentId = post.replyToPostId;
+		if (parentId && nodeMap.has(parentId)) {
+			nodeMap.get(parentId)?.children.push(node);
+			continue;
+		}
+		roots.push(node);
+	}
+
+	return roots;
+};
+
+const flattenReplyTree = (
+	nodes: ReplyTreeNode[],
+	depth = 0,
+): Array<{ post: PostType; depth: number }> => {
+	const flattened: Array<{ post: PostType; depth: number }> = [];
+	for (const node of nodes) {
+		flattened.push({
+			post: node.post,
+			depth,
+		});
+		flattened.push(...flattenReplyTree(node.children, depth + 1));
+	}
+	return flattened;
 };
 
 const ReactionCount = ({ count }: ReactionCountProps) => {
@@ -52,7 +100,11 @@ const ReactionCount = ({ count }: ReactionCountProps) => {
 	);
 };
 
-export const PostList = ({ posts, highlightPostId }: PostListProps) => {
+export const PostList = ({
+	posts,
+	highlightPostId,
+	onReplyAction,
+}: PostListProps) => {
 	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
@@ -65,6 +117,13 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 		},
 	);
 	const reactionCodes = reactionOptions.map((item) => item.reactionCode);
+	const postLocalIdMap = useMemo(() => {
+		return new Map(localPosts.map((post) => [post.id, post.localId]));
+	}, [localPosts]);
+	const flattenedPosts = useMemo(() => {
+		const tree = buildReplyTree(localPosts);
+		return flattenReplyTree(tree);
+	}, [localPosts]);
 
 	useEffect(() => {
 		setLocalPosts(posts);
@@ -126,7 +185,13 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 
 	return (
 		<div className="radius-sm flex flex-col">
-			{localPosts.map((post) => {
+			{flattenedPosts.map(({ post, depth }) => {
+				const parentLocalId =
+					post.replyToPostId === null || post.replyToPostId === undefined
+						? null
+						: (postLocalIdMap.get(post.replyToPostId) ?? null);
+				const indent = Math.min(depth * 14, 84);
+
 				return (
 					<div
 						key={post.id}
@@ -134,6 +199,7 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border bg-slate-50 ${
 							highlightPostId === post.id ? "animate-post-highlight-once" : ""
 						}`}
+						style={{ paddingLeft: `${16 + indent}px` }}
 					>
 						<div className="flex flex-col w-full">
 							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
@@ -146,6 +212,9 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 								<div className="flex gap-1 md:gap-2 flex-wrap text-xs text-gray-500">
 									<span>{post.author.name}</span>
 									<span>{getRelativeDate(post.createdAt)}</span>
+									{parentLocalId !== null && (
+										<span>返信元: #{parentLocalId}</span>
+									)}
 								</div>
 								<Emoji
 									reactionCodes={reactionCodes}
@@ -153,6 +222,15 @@ export const PostList = ({ posts, highlightPostId }: PostListProps) => {
 										.filter((reaction) => reaction.reactedByMe)
 										.map((reaction) => reaction.reactionCode)}
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
+								/>
+								<PostReply
+									handleClick={() =>
+										onReplyAction({
+											postId: post.id,
+											localId: post.localId,
+											authorName: post.author.name,
+										})
+									}
 								/>
 								<div className="ml-auto shrink-0">
 									<PostDropDownMenu postId={post.id} />

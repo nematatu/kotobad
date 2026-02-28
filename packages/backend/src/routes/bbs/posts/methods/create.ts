@@ -88,6 +88,7 @@ export const createPostRouter: RouteHandler<
 		}
 
 		let { threadId } = validatedData;
+		const replyToPostId = validatedData.replyToPostId ?? null;
 
 		threadId = Number(threadId);
 
@@ -97,6 +98,19 @@ export const createPostRouter: RouteHandler<
 
 		if (!thread) {
 			return c.json({ error: "Thread not found" }, 404);
+		}
+
+		if (replyToPostId !== null) {
+			const replyTarget = await db.query.posts.findFirst({
+				where: (posts, { and, eq }) =>
+					and(eq(posts.id, replyToPostId), eq(posts.threadId, threadId)),
+				columns: {
+					id: true,
+				},
+			});
+			if (!replyTarget) {
+				return c.json({ error: "Invalid reply target post" }, 400);
+			}
 		}
 
 		let insertedId: number | null = null;
@@ -115,17 +129,25 @@ export const createPostRouter: RouteHandler<
 			const nextLocalId = (maxLocalId ?? 0) + 1;
 
 			try {
-				const result = await db
-					.insert(posts)
-					.values({
-						post: validatedData.post,
-						authorId: user.id,
-						threadId: threadId,
-						localId: nextLocalId,
-					})
-					.returning({
-						insertedId: posts.id,
-					});
+				const postValues =
+					replyToPostId === null
+						? {
+								post: validatedData.post,
+								authorId: user.id,
+								threadId: threadId,
+								localId: nextLocalId,
+							}
+						: {
+								post: validatedData.post,
+								replyToPostId,
+								authorId: user.id,
+								threadId: threadId,
+								localId: nextLocalId,
+							};
+
+				const result = await db.insert(posts).values(postValues).returning({
+					insertedId: posts.id,
+				});
 
 				insertedId = result[0].insertedId;
 

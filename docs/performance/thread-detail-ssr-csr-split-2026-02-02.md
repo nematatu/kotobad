@@ -63,7 +63,7 @@ CSRで実行すると、クライアントによって(PC, モバイルなど)�
 - `encodeURIComponent(String(id))` を **パスセグメントとして連結**する方式に変更
 
 ### SWR / mutate の方針
-- `CreatePostForm` は **関数propsを持てない**（`"use client"` の export コンポーネントの制約）
+- `CreatePostForm` は **Client Component 同士であれば関数propsを受け渡せる**（制約があるのは Server Component から Client Component への関数props受け渡し）
 - 投稿成功時は `useSWRConfig().mutate(["GET_POSTS_BY_THREADID", threadId])` で再取得
 - `getBffApiUrl` は **固定文字列で呼ぶ**（`getBffApiUrl("GET_POSTS_BY_THREADID")`）
 - SWR key は `["GET_POSTS_BY_THREADID", threadId] as const` で型を固定

@@ -1,10 +1,12 @@
 "use client";
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
-import { useState } from "react";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,15 +23,20 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import type { ReplyTarget } from "./types/replyTarget";
 
 type CreatePostFormProps = {
 	threadId: number;
+	replyTarget: ReplyTarget | null;
 	onPostedAction?: () => void;
+	onClearReplyTargetAction?: () => void;
 };
 
 export const CreatePostForm = ({
 	threadId,
+	replyTarget,
 	onPostedAction,
+	onClearReplyTargetAction,
 }: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const { mutate } = useSWRConfig();
@@ -38,21 +45,40 @@ export const CreatePostForm = ({
 		defaultValues: {
 			post: "",
 			threadId: threadId,
+			replyToPostId: null,
 		},
 	});
+
+	useEffect(() => {
+		form.setValue("replyToPostId", replyTarget?.postId ?? null);
+		form.setFocus("post");
+	}, [form, replyTarget]);
 
 	const handleSubmit = async (values: CreatePostType) => {
 		try {
 			const endpoint = await getBffApiUrl("CREATE_POST");
+			const requestBody: CreatePostType =
+				values.replyToPostId === null
+					? {
+							post: values.post,
+							threadId: values.threadId,
+						}
+					: values;
+
 			await BffFetcher(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(values),
+				body: JSON.stringify(requestBody),
 			});
 
 			onPostedAction?.();
 			mutate(["GET_POSTS_BY_THREADID", threadId]);
-			form.reset();
+			form.reset({
+				post: "",
+				threadId,
+				replyToPostId: null,
+			});
+			onClearReplyTargetAction?.();
 			toast.success("投稿しました!");
 			setTimeout(() => form.setFocus("post"), 1);
 		} catch (error: unknown) {
@@ -74,6 +100,20 @@ export const CreatePostForm = ({
 				<div className="mb-4 relative flex items-center gap-2">
 					<h1 className="text-md sm:text-xl font-bold">書き込み</h1>
 				</div>
+				{replyTarget && (
+					<div className="mb-2 inline-flex items-center gap-2 rounded-lg bg-slate-100 p-1 text-xs text-slate-800">
+						<span>
+							#{replyTarget.localId} {replyTarget.authorName}に返信
+						</span>
+						<IconButton
+							onClick={onClearReplyTargetAction}
+							enableClickAnimation
+							variant="ghost"
+							icon={<X />}
+							className="!p-0"
+						/>
+					</div>
+				)}
 				<div className="overflow-hidden transition-[max-height,opacity] duration-200 ease-out max-h-[600px]">
 					<Form {...form}>
 						<form
