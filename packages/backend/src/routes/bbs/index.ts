@@ -7,6 +7,7 @@ import type { AppEnvironment } from "../../types";
 import postRouter from "./posts";
 import tagRouter from "./tags";
 import threadRouter from "./threads";
+import userRouter from "./users";
 
 // better auth用のミドルウェアを適用
 const bbsRouter = new OpenAPIHono<AppEnvironment>()
@@ -18,6 +19,7 @@ const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/posts/reactions/set", betterAuthMiddleware)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter)
+	.route("/users", userRouter)
 	.route("/labels", tagRouter);
 
 export type BbsType = typeof bbsRouter;

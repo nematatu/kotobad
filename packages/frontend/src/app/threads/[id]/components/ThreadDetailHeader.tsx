@@ -1,5 +1,6 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
+import Link from "next/link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { TagList } from "../../components/view/tag/tagList";
 
@@ -17,12 +18,17 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 				<span>{threadHeaderData.title}</span>
 				<div className="text-gray-400 text-xs sm:text-sm flex space-x-1">
 					<span>by</span>
-					<AuthorAvatar
-						name={threadHeaderData.author.name}
-						image={threadHeaderData.author.image}
-						className="h-4 w-4 md:h-5 md:w-5 mr-1"
-					/>
-					{threadHeaderData.author.name}
+					<Link
+						href={`/users/${encodeURIComponent(threadHeaderData.authorId)}`}
+						className="inline-flex items-center hover:text-blue-700 transition-colors"
+					>
+						<AuthorAvatar
+							name={threadHeaderData.author.name}
+							image={threadHeaderData.author.image}
+							className="h-4 w-4 md:h-5 md:w-5 mr-1"
+						/>
+						{threadHeaderData.author.name}
+					</Link>
 				</div>
 			</div>
 			<div className="flex items-center gap-2">

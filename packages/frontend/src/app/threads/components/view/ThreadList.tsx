@@ -28,7 +28,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 		<div className="flex flex-col gap-3">
 			{threadList.map((thread) => {
 				const href = `/threads/${thread.id}`;
-				const authorHref = `/users/${thread.authorId}`;
+				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
 				const isLiked = !!likedByThreadId[thread.id];
 				return (

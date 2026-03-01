@@ -12,6 +12,9 @@ import UserAvatar from "../UserAvatar";
 
 export function UserPopover() {
 	const { user } = useUser();
+	const profileHref = user?.id
+		? `/users/${encodeURIComponent(user.id)}`
+		: "/threads";
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -25,7 +28,7 @@ export function UserPopover() {
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-50 mt-4 p-0 overflow-hidden">
-				<Link href="/profile">
+				<Link href={profileHref}>
 					<div className="bg-blue-50 px-4 py-2">
 						<div className="flex justify-between">
 							<div className="text-lg">{user?.name}</div>
