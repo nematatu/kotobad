@@ -1,7 +1,9 @@
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
+import { Pencil } from "lucide-react";
 import Link from "next/link";
+import IconButton from "@/components/common/button/IconButton";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
 type Props = {
@@ -13,8 +15,19 @@ const numberFormatter = new Intl.NumberFormat("ja-JP");
 export function UserProfileView({ profile }: Props) {
 	return (
 		<div className="mx-auto w-full max-w-5xl px-3 py-4 sm:px-5 sm:py-6">
-			<section className="overflow-hidden bg-white">
+			<section className="relative overflow-hidden bg-white">
 				<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
+				<div className="flex-1 absolute top-2 right-2">
+					<IconButton
+						variant="outline"
+						icon={<Pencil />}
+						rounded="full"
+						enableClickAnimation
+						className="transition-colors text-slate-500 hover:text-slate-700 hover:bg-black/10"
+					>
+						<span className="font-bold">編集</span>
+					</IconButton>
+				</div>
 				<div className="-mt-12 px-4 pb-6 sm:-mt-14 sm:px-6">
 					<AuthorAvatar
 						name={profile.name}

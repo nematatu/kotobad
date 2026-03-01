@@ -27,3 +27,7 @@ export const UserProfileSchema = z.object({
 	recentThreads: z.array(UserRecentThreadSchema),
 	recentPosts: z.array(UserRecentPostSchema),
 });
+
+export const UploadAvatarResponseSchema = z.object({
+	imageUrl: z.string().url(),
+});

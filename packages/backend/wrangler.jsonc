@@ -20,5 +20,11 @@
 				"APP_ENV": "production"
 			}
 		}
-	}
+	},
+  "r2_buckets": [
+      {
+          "binding": "KOTOBAD_BUCKET", 
+          "bucket_name": "kotobad-bucket"
+      }
+  ]
 }
