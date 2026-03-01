@@ -16,6 +16,8 @@
 	},
 	"dependencies": {
 		"@daveyplate/better-auth-ui": "^3.3.15",
+		"@headless-tree/core": "^1.6.3",
+		"@headless-tree/react": "^1.6.3",
 		"@hookform/resolvers": "^5.2.2",
 		"@kotobad/backend": "workspace:*",
 		"@kotobad/shared": "workspace:*",
@@ -63,6 +65,7 @@
 		"next": "15.4.6",
 		"next-themes": "^0.4.6",
 		"picocolors": "^1.1.1",
+		"radix-ui": "^1.4.3",
 		"react": "19.1.0",
 		"react-day-picker": "^9.13.0",
 		"react-dom": "19.1.0",

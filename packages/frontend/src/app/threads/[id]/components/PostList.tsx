@@ -113,6 +113,8 @@ export const PostList = ({
 	const [expandedReplyPostIds, setExpandedReplyPostIds] = useState<number[]>(
 		[],
 	);
+	const [replyEnterPostIds, setReplyEnterPostIds] = useState<number[]>([]);
+	const previousVisiblePostIdsRef = useRef<number[] | null>(null);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
 		async () => {
@@ -153,6 +155,9 @@ export const PostList = ({
 			return true;
 		});
 	}, [flattenedPosts, expandedReplyPostIdSet, postByIdMap]);
+	const replyEnterPostIdSet = useMemo(() => {
+		return new Set(replyEnterPostIds);
+	}, [replyEnterPostIds]);
 
 	useEffect(() => {
 		setLocalPosts(posts);
@@ -163,6 +168,40 @@ export const PostList = ({
 		if (postLocalIdMap.has(replyTarget.postId)) return;
 		setReplyTarget(null);
 	}, [postLocalIdMap, replyTarget]);
+
+	useEffect(() => {
+		const currentVisiblePostIds = visibleFlattenedPosts.map(
+			({ post }) => post.id,
+		);
+		const previousVisiblePostIds = previousVisiblePostIdsRef.current;
+		previousVisiblePostIdsRef.current = currentVisiblePostIds;
+
+		if (!previousVisiblePostIds) {
+			return;
+		}
+
+		const previousVisiblePostIdSet = new Set(previousVisiblePostIds);
+		const enteringReplyPostIds = visibleFlattenedPosts
+			.filter(
+				({ post, depth }) =>
+					depth > 0 && !previousVisiblePostIdSet.has(post.id),
+			)
+			.map(({ post }) => post.id);
+
+		if (enteringReplyPostIds.length === 0) {
+			return;
+		}
+
+		setReplyEnterPostIds(enteringReplyPostIds);
+		const enteringReplyPostIdSet = new Set(enteringReplyPostIds);
+		const timeoutId = window.setTimeout(() => {
+			setReplyEnterPostIds((prev) =>
+				prev.filter((id) => !enteringReplyPostIdSet.has(id)),
+			);
+		}, 420);
+
+		return () => window.clearTimeout(timeoutId);
+	}, [visibleFlattenedPosts]);
 
 	useEffect(() => {
 		if (!highlightPostId) return;
@@ -229,18 +268,25 @@ export const PostList = ({
 	return (
 		<div className="radius-sm flex flex-col">
 			{visibleFlattenedPosts.map(({ post, depth }) => {
-				const indent = Math.min(depth * 14, 84);
+				const indent = Math.min(depth * 25, 84);
 				const isReplyingToThisPost = replyTarget?.postId === post.id;
 				const isRepliesExpanded = expandedReplyPostIdSet.has(post.id);
+				const isReplyEnterAnimating = replyEnterPostIdSet.has(post.id);
+				const replyEnterDelayMs = isReplyEnterAnimating
+					? Math.min(depth * 28, 140)
+					: 0;
 
 				return (
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border bg-slate-50 ${
-							highlightPostId === post.id ? "animate-post-highlight-once" : ""
-						}`}
-						style={{ paddingLeft: `${16 + indent}px` }}
+						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400 bg-slate-50 ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${isReplyEnterAnimating ? "animate-reply-expand-down" : ""}`}
+						style={{
+							paddingLeft: `${16 + indent}px`,
+							animationDelay: isReplyEnterAnimating
+								? `${replyEnterDelayMs}ms`
+								: undefined,
+						}}
 					>
 						<div className="flex flex-col w-full">
 							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
@@ -307,15 +353,17 @@ export const PostList = ({
 								</div>
 							)}
 							{post.replyCount > 0 && (
-								<button
-									type="button"
-									className="text-xs text-blue-600 hover:underline cursor-pointer"
-									onClick={() => toggleReplies(post.id)}
-								>
-									{isRepliesExpanded
-										? "返信を隠す"
-										: `${post.replyCount}件の返信を表示`}
-								</button>
+								<div className="items-start mt-2">
+									<button
+										type="button"
+										className="text-xs text-blue-600 hover:underline cursor-pointer"
+										onClick={() => toggleReplies(post.id)}
+									>
+										{isRepliesExpanded
+											? "返信を隠す"
+											: `${post.replyCount}件の返信を表示`}
+									</button>
+								</div>
 							)}
 							{isReplyingToThisPost && (
 								<div className="mt-3">
