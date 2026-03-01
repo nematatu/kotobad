@@ -10,6 +10,7 @@ export const PostSchema = z.object({
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
 	reactions: z.array(PostReactionSchema).default([]),
+	replyCount: z.number().int().nonnegative(),
 	author: z.object({
 		name: z.string(),
 		image: z.string().optional().nullable(),

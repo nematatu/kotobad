@@ -11,7 +11,7 @@ type PostReplyProps = {
 	handleClick: () => void;
 };
 
-export function PostReply({ handleClick }: PostReplyProps) {
+export function PostReplyButton({ handleClick }: PostReplyProps) {
 	return (
 		<TooltipProvider delayDuration={0}>
 			<Tooltip>

@@ -19,7 +19,7 @@ import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { CreatePostForm } from "./CreatePostForm";
 import type { ReplyTarget } from "./types/replyTarget";
 import { Emoji } from "./ui/emojiPicker";
-import { PostReply } from "./ui/PostReply";
+import { PostReplyButton } from "./ui/PostReplyButton";
 
 type PostListProps = {
 	posts: PostListType;
@@ -110,6 +110,9 @@ export const PostList = ({
 }: PostListProps) => {
 	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
 	const [replyTarget, setReplyTarget] = useState<ReplyTarget | null>(null);
+	const [expandedReplyPostIds, setExpandedReplyPostIds] = useState<number[]>(
+		[],
+	);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
 		async () => {
@@ -121,13 +124,35 @@ export const PostList = ({
 		},
 	);
 	const reactionCodes = reactionOptions.map((item) => item.reactionCode);
+	const postByIdMap = useMemo(() => {
+		return new Map(localPosts.map((post) => [post.id, post]));
+	}, [localPosts]);
 	const postLocalIdMap = useMemo(() => {
 		return new Map(localPosts.map((post) => [post.id, post.localId]));
 	}, [localPosts]);
+	const expandedReplyPostIdSet = useMemo(() => {
+		return new Set(expandedReplyPostIds);
+	}, [expandedReplyPostIds]);
 	const flattenedPosts = useMemo(() => {
 		const tree = buildReplyTree(localPosts);
 		return flattenReplyTree(tree);
 	}, [localPosts]);
+	const visibleFlattenedPosts = useMemo(() => {
+		return flattenedPosts.filter(({ post }) => {
+			let parentId = post.replyToPostId;
+			while (typeof parentId === "number") {
+				if (!expandedReplyPostIdSet.has(parentId)) {
+					return false;
+				}
+				const parentPost = postByIdMap.get(parentId);
+				if (!parentPost) {
+					return false;
+				}
+				parentId = parentPost.replyToPostId ?? null;
+			}
+			return true;
+		});
+	}, [flattenedPosts, expandedReplyPostIdSet, postByIdMap]);
 
 	useEffect(() => {
 		setLocalPosts(posts);
@@ -193,15 +218,20 @@ export const PostList = ({
 		}
 	};
 
+	const toggleReplies = (postId: number) => {
+		setExpandedReplyPostIds((prev) =>
+			prev.includes(postId)
+				? prev.filter((id) => id !== postId)
+				: [...prev, postId],
+		);
+	};
+
 	return (
 		<div className="radius-sm flex flex-col">
-			{flattenedPosts.map(({ post, depth }) => {
-				const parentLocalId =
-					post.replyToPostId === null || post.replyToPostId === undefined
-						? null
-						: (postLocalIdMap.get(post.replyToPostId) ?? null);
+			{visibleFlattenedPosts.map(({ post, depth }) => {
 				const indent = Math.min(depth * 14, 84);
 				const isReplyingToThisPost = replyTarget?.postId === post.id;
+				const isRepliesExpanded = expandedReplyPostIdSet.has(post.id);
 
 				return (
 					<div
@@ -223,9 +253,6 @@ export const PostList = ({
 								<div className="flex gap-1 md:gap-2 flex-wrap text-xs text-gray-500">
 									<span>{post.author.name}</span>
 									<span>{getRelativeDate(post.createdAt)}</span>
-									{parentLocalId !== null && (
-										<span>返信元: #{parentLocalId}</span>
-									)}
 								</div>
 								<Emoji
 									reactionCodes={reactionCodes}
@@ -234,7 +261,7 @@ export const PostList = ({
 										.map((reaction) => reaction.reactionCode)}
 									onReactAction={(emoji) => handleReaction(post.id, emoji)}
 								/>
-								<PostReply
+								<PostReplyButton
 									handleClick={() =>
 										setReplyTarget((current) =>
 											current?.postId === post.id
@@ -278,6 +305,17 @@ export const PostList = ({
 										},
 									)}
 								</div>
+							)}
+							{post.replyCount > 0 && (
+								<button
+									type="button"
+									className="text-xs text-blue-600 hover:underline cursor-pointer"
+									onClick={() => toggleReplies(post.id)}
+								>
+									{isRepliesExpanded
+										? "返信を隠す"
+										: `${post.replyCount}件の返信を表示`}
+								</button>
 							)}
 							{isReplyingToThisPost && (
 								<div className="mt-3">

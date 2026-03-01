@@ -1,6 +1,8 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
+import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { posts as postsTable } from "../../../../../drizzle/schema";
 import { createAuth } from "../../../../auth";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
@@ -183,10 +185,32 @@ export const getPostByThreadIdRouter: RouteHandler<
 			return c.json({ error: "Post not found" }, 404);
 		}
 
+		const replyCountRows = await db
+			.select({
+				replyToPostId: postsTable.replyToPostId,
+				replyCount: sql<number>`count(*)`,
+			})
+			.from(postsTable)
+			.where(
+				and(
+					eq(postsTable.threadId, threadId),
+					isNotNull(postsTable.replyToPostId),
+				),
+			)
+			.groupBy(postsTable.replyToPostId);
+
+		const replyCountMap = new Map<number, number>();
+		for (const row of replyCountRows) {
+			if (typeof row.replyToPostId === "number") {
+				replyCountMap.set(row.replyToPostId, row.replyCount);
+			}
+		}
+
 		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
 		const response = posts.map((post) => ({
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
+			replyCount: replyCountMap.get(post.id) ?? 0,
 		}));
 		return c.json(response, 200);
 	} catch (error: unknown) {
@@ -228,9 +252,17 @@ export const getPostByIdRouter: RouteHandler<
 			post,
 			viewerUserId,
 		});
+		const [{ replyCount }] = await db
+			.select({
+				replyCount: sql<number>`count(*)`,
+			})
+			.from(postsTable)
+			.where(eq(postsTable.replyToPostId, post.id));
+
 		const response = {
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
+			replyCount,
 		};
 		return c.json(response, 200);
 	} catch (error: unknown) {
@@ -271,10 +303,35 @@ export const searchPostRouter: RouteHandler<
 			return c.json({ error: "Post not found" }, 404);
 		}
 
+		const postIds = posts.map((post) => post.id);
+		const replyCountRows =
+			postIds.length === 0
+				? []
+				: await db
+						.select({
+							replyToPostId: postsTable.replyToPostId,
+							replyCount: sql<number>`count(*)`,
+						})
+						.from(postsTable)
+						.where(
+							and(
+								isNotNull(postsTable.replyToPostId),
+								inArray(postsTable.replyToPostId, postIds),
+							),
+						)
+						.groupBy(postsTable.replyToPostId);
+		const replyCountMap = new Map<number, number>();
+		for (const row of replyCountRows) {
+			if (typeof row.replyToPostId === "number") {
+				replyCountMap.set(row.replyToPostId, row.replyCount);
+			}
+		}
+
 		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
 		const response = posts.map((post) => ({
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
+			replyCount: replyCountMap.get(post.id) ?? 0,
 		}));
 		return c.json(response, 200);
 	} catch (error: unknown) {
