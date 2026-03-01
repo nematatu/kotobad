@@ -24,7 +24,8 @@
   "r2_buckets": [
       {
           "binding": "KOTOBAD_BUCKET", 
-          "bucket_name": "kotobad-bucket"
+          "bucket_name": "kotobad-bucket",
+          "remote": true
       }
   ]
 }

@@ -1,15 +1,31 @@
 "use client";
 
+import { UploadAvatarResponseSchema } from "@kotobad/shared/src/schemas/user";
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { Check, Pencil } from "lucide-react";
+import { Camera, Check, Loader2, Pencil } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import IconButton from "@/components/common/button/IconButton";
 import { useUser } from "@/components/feature/provider/UserProvider";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
-import { LogoutButton } from "@/components/patterns/p-alert-dialog-13";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+	BffFetcher,
+	type BffFetcherError,
+} from "@/lib/api/fetcher/bffFetcher.client";
+import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
 type Props = {
 	profile: UserProfileType;
@@ -18,18 +34,88 @@ type Props = {
 const numberFormatter = new Intl.NumberFormat("ja-JP");
 
 export function UserProfileView({ profile }: Props) {
-	const { user } = useUser();
+	const { user, setUser } = useUser();
 	const canEdit = user?.id === profile.id;
 	const [isEditing, setIsEditing] = useState(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [editedName, setEditedName] = useState(profile.name);
 	const [editedBio, setEditedBio] = useState(profile.bio ?? "");
+	const [avatarImage, setAvatarImage] = useState<string | null>(
+		profile.image ?? null,
+	);
+	const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+	const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
 	useEffect(() => {
 		setEditedName(profile.name);
 		setEditedBio(profile.bio ?? "");
 		setIsEditing(false);
 	}, [profile.bio, profile.name]);
+
+	useEffect(() => {
+		setAvatarImage(profile.image ?? null);
+	}, [profile.image]);
+
+	const openAvatarFileDialog = () => {
+		if (!isEditing || isUploadingAvatar) return;
+		avatarInputRef.current?.click();
+	};
+
+	const handleAvatarFileChange = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const file = event.target.files?.[0];
+		event.target.value = "";
+		if (!file) return;
+
+		if (file.size <= 0) {
+			toast.error("ファイルが空です");
+			return;
+		}
+
+		if (file.size > 2 * 1024 * 1024) {
+			toast.error("2MB以下の画像を選択してください");
+			return;
+		}
+
+		setIsUploadingAvatar(true);
+		try {
+			const endpoint = await getBffApiUrl("UPLOAD_MY_AVATAR");
+			const formData = new FormData();
+			formData.append("file", file);
+			const raw = await BffFetcher<unknown>(endpoint, {
+				method: "POST",
+				body: formData,
+			});
+			const response = UploadAvatarResponseSchema.parse(raw);
+			setAvatarImage(response.imageUrl);
+
+			if (user) {
+				setUser({
+					...user,
+					image: response.imageUrl,
+				});
+			}
+			toast.success("アイコン画像を更新しました");
+		} catch (error: unknown) {
+			const fetchError = error as BffFetcherError;
+			if (fetchError.body) {
+				try {
+					const parsed = JSON.parse(fetchError.body) as {
+						error?: string;
+						message?: string;
+					};
+					toast.error(parsed.message ?? parsed.error ?? "更新に失敗しました");
+					return;
+				} catch {
+					// no-op
+				}
+			}
+			toast.error("アイコン画像の更新に失敗しました");
+		} finally {
+			setIsUploadingAvatar(false);
+		}
+	};
 
 	return (
 		<>
@@ -57,12 +143,36 @@ export function UserProfileView({ profile }: Props) {
 						</div>
 					)}
 					<div className="-mt-12 px-4 pb-6 sm:-mt-14 sm:px-6">
-						<AuthorAvatar
-							name={profile.name}
-							image={profile.image}
-							className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white"
-							fallbackClassName="text-lg"
-						/>
+						<div className="relative inline-flex group">
+							<AuthorAvatar
+								name={profile.name}
+								image={avatarImage}
+								className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white"
+								fallbackClassName="text-lg"
+							/>
+							{canEdit && isEditing && (
+								<button
+									type="button"
+									className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-white bg-black/30 text-white transition-colors hover:bg-black/25"
+									onClick={openAvatarFileDialog}
+									disabled={isUploadingAvatar}
+									aria-label="アイコン画像を変更"
+								>
+									{isUploadingAvatar ? (
+										<Loader2 className="h-5 w-5 animate-spin" />
+									) : (
+										<Camera className="h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100" />
+									)}
+								</button>
+							)}
+							<input
+								ref={avatarInputRef}
+								type="file"
+								accept="image/jpeg,image/png,image/webp,image/avif"
+								className="hidden"
+								onChange={handleAvatarFileChange}
+							/>
+						</div>
 						<div className="space-y-4">
 							<div className="mt-3 flex flex-col flex-wrap gap-x-3 gap-y-1">
 								{isEditing ? (
@@ -197,11 +307,37 @@ export function UserProfileView({ profile }: Props) {
 					</section>
 				</div>
 			</div>
-			<LogoutButton
-				isConfirmOpen={isConfirmOpen}
-				setIsConfirmOpen={setIsConfirmOpen}
-				setIsEditing={setIsEditing}
-			/>
+			<AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+				<AlertDialogContent className="gap-0 overflow-hidden p-0 sm:max-w-sm">
+					<div className="flex flex-col items-center justify-center gap-2 p-8 mb-2">
+						<div className="rounded-full size-12 flex items-center justify-center">
+							<Pencil className="size-6" />
+						</div>
+						<AlertDialogHeader>
+							<AlertDialogTitle className="text-center text-base font-semibold">
+								プロフィールを更新しますか？
+							</AlertDialogTitle>
+							<AlertDialogDescription className="p-0 text-center text-sm text-slate-500">
+								現在の編集内容でプロフィールを更新します。
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+					</div>
+					<AlertDialogFooter className="grid flex-none grid-cols-2 gap-0 border-t pt-0">
+						<AlertDialogCancel className="border-border h-12 flex-1 rounded-none border-0 border-r p-0">
+							戻る
+						</AlertDialogCancel>
+						<AlertDialogAction
+							className="h-12 flex-1 rounded-none border-0 p-0"
+							onClick={() => {
+								setIsEditing(false);
+								setIsConfirmOpen(false);
+							}}
+						>
+							更新する
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</>
 	);
 }

@@ -118,7 +118,7 @@ export const uploadMyAvatarRouter: RouteHandler<
 		}
 
 		const fileBuffer = await fileEntry.arrayBuffer();
-		const objectKey = `avatars/${authUser.id}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+		const objectKey = `user-icon/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 		await c.env.KOTOBAD_BUCKET.put(objectKey, fileBuffer, {
 			httpMetadata: {
 				contentType: fileEntry.type,
