@@ -35,7 +35,7 @@ const numberFormatter = new Intl.NumberFormat("ja-JP");
 
 export function UserProfileView({ profile }: Props) {
 	const { user, setUser } = useUser();
-	const canEdit = user?.id === profile.id;
+	const isLogin = user?.id === profile.id;
 	const [isEditing, setIsEditing] = useState(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [editedName, setEditedName] = useState(profile.name);
@@ -122,7 +122,7 @@ export function UserProfileView({ profile }: Props) {
 			<div className="mx-auto w-full max-w-5xl px-3 py-4 sm:px-5 sm:py-6">
 				<section className="relative overflow-hidden bg-white">
 					<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
-					{canEdit && (
+					{isLogin && (
 						<div className="flex-1 absolute top-2 right-2">
 							<IconButton
 								variant="outline"
@@ -150,10 +150,10 @@ export function UserProfileView({ profile }: Props) {
 								className=" h-24 w-24 sm:h-28 sm:w-28 border-4 border-white"
 								fallbackClassName="text-lg"
 							/>
-							{canEdit && isEditing && (
+							{isLogin && isEditing && (
 								<button
 									type="button"
-									className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-white bg-black/30 text-white transition-colors hover:bg-black/25"
+									className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-white bg-black/30 text-white transition-colors hover:bg-black/25 cursor-pointer"
 									onClick={openAvatarFileDialog}
 									disabled={isUploadingAvatar}
 									aria-label="アイコン画像を変更"
@@ -161,14 +161,14 @@ export function UserProfileView({ profile }: Props) {
 									{isUploadingAvatar ? (
 										<Loader2 className="h-5 w-5 animate-spin" />
 									) : (
-										<Camera className="h-5 w-5 opacity-0 transition-opacity group-hover:opacity-100" />
+										<Camera className="h-5 w-5" />
 									)}
 								</button>
 							)}
 							<input
 								ref={avatarInputRef}
 								type="file"
-								accept="image/jpeg,image/png,image/webp,image/avif"
+								accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
 								className="hidden"
 								onChange={handleAvatarFileChange}
 							/>

@@ -14,6 +14,7 @@ const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
 	"image/png": "png",
 	"image/webp": "webp",
 	"image/avif": "avif",
+	"image/svg+xml": "svg",
 };
 
 const toPublicAvatarUrl = (baseUrl: string, objectKey: string): string => {
