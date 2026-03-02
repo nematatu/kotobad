@@ -21,7 +21,11 @@ export default function AuthorAvatar({
 	return (
 		<Avatar className={cn("h-10 w-10 bg-white", className)}>
 			{resolvedImage && (
-				<AvatarImage src={resolvedImage} alt={resolvedName ?? ""} />
+				<AvatarImage
+					className="object-cover"
+					src={resolvedImage}
+					alt={resolvedName ?? ""}
+				/>
 			)}
 			<AvatarFallback
 				className={cn(

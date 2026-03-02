@@ -147,7 +147,7 @@ export function UserProfileView({ profile }: Props) {
 							<AuthorAvatar
 								name={profile.name}
 								image={avatarImage}
-								className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-white"
+								className=" h-24 w-24 sm:h-28 sm:w-28 border-4 border-white"
 								fallbackClassName="text-lg"
 							/>
 							{canEdit && isEditing && (
