@@ -1,0 +1,232 @@
+import type { RouteHandler } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
+import { UpdateUserProfileSchema } from "@kotobad/shared/src/schemas/user";
+import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
+import { eq } from "drizzle-orm";
+import { user } from "../../../../../drizzle/schema";
+import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
+import {
+	OpenAPIUpdateUserProfileResponseSchema,
+	OpenAPIUpdateUserProfileSchema,
+} from "../../../../models/users";
+import type { AppEnvironment } from "../../../../types";
+
+const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
+	"image/jpeg": "jpg",
+	"image/png": "png",
+	"image/webp": "webp",
+	"image/avif": "avif",
+	"image/svg+xml": "svg",
+};
+
+const toPublicAvatarUrl = (baseUrl: string, objectKey: string): string => {
+	const normalized = baseUrl.trim().replace(/\/+$/, "");
+	return `${normalized}/${objectKey}`;
+};
+
+const toObjectKeyFromPublicAvatarUrl = (
+	publicUrl: string,
+	baseUrl: string,
+): string | null => {
+	const normalizedBase = baseUrl.trim().replace(/\/+$/, "");
+	const prefix = `${normalizedBase}/`;
+	if (!publicUrl.startsWith(prefix)) {
+		return null;
+	}
+
+	const objectKey = publicUrl.slice(prefix.length);
+	return objectKey.length > 0 ? objectKey : null;
+};
+
+export const updateUserProfileRoute = createRoute({
+	method: "patch",
+	path: "/update",
+	description: "ユーザー情報を更新",
+	request: {
+		body: {
+			content: {
+				"multipart/form-data": {
+					schema: OpenAPIUpdateUserProfileSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: "更新されたかどうか",
+			content: {
+				"application/json": {
+					schema: OpenAPIUpdateUserProfileResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "バリデーションエラー",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		401: {
+			description: "未認証",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		404: {
+			description: "Not Found",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		500: {
+			description: "サーバーエラー",
+			content: {
+				"application/json": {
+					schema: ErrorResponse,
+				},
+			},
+		},
+	},
+});
+
+export const updateUserProfileRouter: RouteHandler<
+	typeof updateUserProfileRoute,
+	AppEnvironment
+> = async (c) => {
+	try {
+		const db = c.get("db");
+		const authUser = c.get("betterAuthUser");
+		const publicBaseUrl = c.env.R2_PUBLIC_BASE_URL;
+
+		if (!publicBaseUrl) {
+			return c.json(
+				{
+					error: "Failed to update profile",
+					message: "R2 public base url is not configured",
+				},
+				500,
+			);
+		}
+
+		const formData = await c.req.formData();
+		const parsedResult = UpdateUserProfileSchema.safeParse({
+			name: formData.has("name")
+				? String(formData.get("name") ?? "").trim()
+				: undefined,
+			bio: formData.has("bio") ? String(formData.get("bio") ?? "") : undefined,
+			image: (() => {
+				const f = formData.get("image");
+				return f instanceof File && f.size > 0 ? f : undefined;
+			})(),
+		});
+		if (!parsedResult.success) {
+			return c.json({ error: "Invalid request body" }, 400);
+		}
+		const parsed = parsedResult.data;
+
+		const current = await db.query.user.findFirst({
+			where: (u, { eq }) => eq(u.id, authUser.id),
+			columns: { name: true, bio: true, image: true },
+		});
+
+		if (!current) return c.json({ error: "User not found" }, 404);
+
+		const currentUser = {
+			name: current.name,
+			bio: current.bio ?? null,
+			image: current.image ?? null,
+		};
+
+		const patch: {
+			name?: string;
+			bio?: string | null;
+			image?: string | null;
+			updatedAt?: Date;
+		} = {};
+
+		if (parsed.name !== undefined && parsed.name !== current.name) {
+			patch.name = parsed.name;
+		}
+		if (parsed.bio !== undefined && parsed.bio !== current.bio) {
+			patch.bio = parsed.bio;
+		}
+
+		let oldImageUrlToDelete: string | null = null;
+		if (parsed.image) {
+			const extension = MIME_TYPE_TO_EXTENSION[parsed.image.type];
+			if (!extension) {
+				return c.json(
+					{ error: "file type must be jpeg, png, webp, avif or svg" },
+					400,
+				);
+			}
+
+			const fileBuffer = await parsed.image.arrayBuffer();
+			const objectKey = `user-icon/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+			await c.env.KOTOBAD_BUCKET.put(objectKey, fileBuffer, {
+				httpMetadata: {
+					contentType: parsed.image.type,
+					cacheControl: "public, max-age=31536000, immutable",
+				},
+			});
+
+			const imageUrl = toPublicAvatarUrl(publicBaseUrl, objectKey);
+			if (imageUrl !== current.image) {
+				patch.image = imageUrl;
+				oldImageUrlToDelete = current.image;
+			}
+		}
+
+		if (Object.keys(patch).length === 0) {
+			return c.json(
+				{
+					updated: false,
+					user: currentUser,
+				},
+				200,
+			);
+		}
+
+		patch.updatedAt = new Date();
+
+		await db.update(user).set(patch).where(eq(user.id, authUser.id));
+
+		if (oldImageUrlToDelete) {
+			const oldObjectKey = toObjectKeyFromPublicAvatarUrl(
+				oldImageUrlToDelete,
+				publicBaseUrl,
+			);
+			if (oldObjectKey) {
+				try {
+					await c.env.KOTOBAD_BUCKET.delete(oldObjectKey);
+				} catch (deleteError: unknown) {
+					console.error("Failed to delete old avatar object", deleteError);
+				}
+			}
+		}
+
+		return c.json(
+			{
+				updated: true,
+				user: {
+					name: patch.name ?? currentUser.name,
+					bio: patch.bio ?? currentUser.bio,
+					image: patch.image ?? currentUser.image,
+				},
+			},
+			200,
+		);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{ error: "Failed to update profile", message: getErrorMessage(error) },
+			500,
+		);
+	}
+};

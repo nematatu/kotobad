@@ -1,0 +1,46 @@
+import { UpdateUserProfileResponseSchema } from "@kotobad/shared/src/schemas/user";
+import { NextResponse } from "next/server";
+import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { getApiUrl } from "@/lib/config/apiUrls";
+
+export async function PATCH(req: Request) {
+	try {
+		const formData = await req.formData();
+		const raw = await updateMyProfile(formData);
+		const response = UpdateUserProfileResponseSchema.parse(raw);
+		return NextResponse.json(response, { status: 200 });
+	} catch (error: unknown) {
+		const fetchError = error as BffFetcherError;
+		if (fetchError.status) {
+			let payload: Record<string, unknown> = {
+				error: "Failed to update profile",
+			};
+			if (fetchError.body) {
+				try {
+					const parsed = JSON.parse(fetchError.body);
+					if (parsed && typeof parsed === "object") {
+						payload = parsed as Record<string, unknown>;
+					}
+				} catch {
+					payload = { error: "Failed to update profile" };
+				}
+			}
+			return NextResponse.json(payload, { status: fetchError.status });
+		}
+
+		console.error("Failed to update profile via BFF", error);
+		return NextResponse.json(
+			{ error: "Failed to update profile" },
+			{ status: 500 },
+		);
+	}
+}
+
+const updateMyProfile = async (formData: FormData) => {
+	const url = await getApiUrl("UPDATE_MY_PROFILE");
+	return BffFetcher<unknown>(url, {
+		method: "PATCH",
+		body: formData,
+		credentials: "include",
+	});
+};

@@ -28,6 +28,31 @@ export const UserProfileSchema = z.object({
 	recentPosts: z.array(UserRecentPostSchema),
 });
 
+export const UpdateUserProfileSchema = z.object({
+	name: z.string().min(1).max(20).optional(),
+	bio: z.string().max(240).nullable().optional(),
+	image: z
+		.file()
+		.max(2 * 1024 * 1024)
+		.mime([
+			"image/png",
+			"image/jpeg",
+			"image/webp",
+			"image/avif",
+			"image/svg+xml",
+		])
+		.optional(),
+});
+
 export const UploadAvatarResponseSchema = z.object({
 	imageUrl: z.string().url(),
+});
+
+export const UpdateUserProfileResponseSchema = z.object({
+	updated: z.boolean(),
+	user: z.object({
+		name: z.string().min(1),
+		bio: z.string().nullable(),
+		image: z.string().nullable(),
+	}),
 });

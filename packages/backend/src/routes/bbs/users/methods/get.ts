@@ -67,6 +67,7 @@ export const getUserProfileByIdRouter: RouteHandler<
 				id: true,
 				name: true,
 				image: true,
+				bio: true,
 				createdAt: true,
 			},
 		});
@@ -125,7 +126,7 @@ export const getUserProfileByIdRouter: RouteHandler<
 			id: targetUser.id,
 			name: targetUser.name,
 			image: targetUser.image ?? null,
-			bio: null,
+			bio: targetUser.bio ?? null,
 			createdAt: targetUser.createdAt.toISOString(),
 			threadCount,
 			postCount,

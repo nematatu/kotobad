@@ -85,6 +85,13 @@
       "when": 1772303671644,
       "tag": "0011_strong_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1772433467636,
+      "tag": "0012_curved_red_shift",
+      "breakpoints": true
     }
   ]
 }

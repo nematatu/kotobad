@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
-import { UserProfileView } from "./components/UserProfileView";
+import { UserProfileActivity } from "./components/UserProfileActivity";
+import { UserProfileEditor } from "./components/UserProfileEditor";
 import { getUserProfileById } from "./lib/getUserProfileById";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +20,12 @@ export default async function UserProfilePage({ params }: Props) {
 
 	try {
 		const profile = await getUserProfileById(userId);
-		return <UserProfileView profile={profile} />;
+		return (
+			<div className="mx-auto w-full max-w-5xl px-3 py-4 sm:px-5 sm:py-6">
+				<UserProfileEditor profile={profile} />
+				<UserProfileActivity profile={profile} />
+			</div>
+		);
 	} catch (error) {
 		const fetchError = error as BffFetcherError;
 		if (fetchError.status === 404) {

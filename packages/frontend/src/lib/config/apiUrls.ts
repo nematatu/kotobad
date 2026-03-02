@@ -10,6 +10,7 @@ export const API_PATH = {
 	GET_POSTS_BY_THREADID: "bbs/posts/byThreadId/",
 	GET_USER_PROFILE_BY_ID: "bbs/users/",
 	UPLOAD_MY_AVATAR: "bbs/users/me/avatar",
+	UPDATE_MY_PROFILE: "bbs/users/update",
 	GET_ALL_TAGS: "bbs/labels",
 	GET_REACTION_OPTIONS: "bbs/posts/reactions/available",
 	SET_POST_REACTIONS: "bbs/posts/reactions/set",

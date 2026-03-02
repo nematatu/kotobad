@@ -5,9 +5,14 @@ import {
 	getUserProfileByIdRoute,
 	getUserProfileByIdRouter,
 } from "./methods/get";
+import {
+	updateUserProfileRoute,
+	updateUserProfileRouter,
+} from "./methods/update";
 
 const userRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(getUserProfileByIdRoute, getUserProfileByIdRouter)
+	.openapi(updateUserProfileRoute, updateUserProfileRouter)
 	.openapi(uploadMyAvatarRoute, uploadMyAvatarRouter);
 
 export default userRouter;
