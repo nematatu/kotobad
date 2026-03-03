@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Pencil } from "lucide-react";
+import type { MouseEvent } from "react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -16,7 +17,7 @@ type Props = {
 	open: boolean;
 	onOpenChangeAction: (open: boolean) => void;
 	isSavingProfile: boolean;
-	onConfirmAction: () => void;
+	onConfirmAction: () => Promise<void> | void;
 };
 
 export function UserProfileUpdateConfirmDialog({
@@ -25,8 +26,18 @@ export function UserProfileUpdateConfirmDialog({
 	isSavingProfile,
 	onConfirmAction,
 }: Props) {
+	const handleOpenChange = (nextOpen: boolean) => {
+		if (!nextOpen && isSavingProfile) return;
+		onOpenChangeAction(nextOpen);
+	};
+
+	const handleConfirmClick = (event: MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+		void onConfirmAction();
+	};
+
 	return (
-		<AlertDialog open={open} onOpenChange={onOpenChangeAction}>
+		<AlertDialog open={open} onOpenChange={handleOpenChange}>
 			<AlertDialogContent className="gap-0 overflow-hidden p-0 sm:max-w-sm">
 				<div className="mb-2 flex flex-col items-center justify-center gap-2 p-8">
 					<div className="flex size-12 items-center justify-center rounded-full">
@@ -42,13 +53,16 @@ export function UserProfileUpdateConfirmDialog({
 					</AlertDialogHeader>
 				</div>
 				<AlertDialogFooter className="grid flex-none grid-cols-2 gap-0 border-t pt-0">
-					<AlertDialogCancel className="border-border h-12 flex-1 rounded-none border-0 border-r p-0">
+					<AlertDialogCancel
+						className="border-border h-12 flex-1 rounded-none border-0 border-r p-0"
+						disabled={isSavingProfile}
+					>
 						戻る
 					</AlertDialogCancel>
 					<AlertDialogAction
 						className="h-12 flex-1 rounded-none border-0 p-0"
 						disabled={isSavingProfile}
-						onClick={onConfirmAction}
+						onClick={handleConfirmClick}
 					>
 						{isSavingProfile ? (
 							<span className="inline-flex items-center gap-2">
