@@ -18,7 +18,7 @@
 		"packages/*"
 	],
 	"scripts": {
-		"dev": "bun --filter '@kotobad/backend' dev & bun --filter '@kotobad/frontend' dev",
+		"dev": "bun --filter '@kotobad/backend' dev & bun --filter '@kotobad/frontend' dev & bun --filter '@kotobad/backend' studio",
 		"dev:frontend": "bun --filter '@kotobad/frontend' dev",
 		"dev:backend": "bun --filter '@kotobad/backend' dev",
 		"build:frontend": "bun --filter '@kotobad/frontend' build",
