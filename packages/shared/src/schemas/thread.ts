@@ -16,6 +16,19 @@ export const ThreadSchema = z.object({
 		image: z.string().optional().nullable(),
 	}),
 	threadTags: TagListSchema,
+	likeCount: z.number().int().nonnegative(),
+	likedByMe: z.boolean(),
+});
+
+export const SetThreadLikesSchema = z.object({
+	threadId: z.number().int().positive(),
+	active: z.boolean(),
+});
+
+export const SetThreadLikesResponseSchema = z.object({
+	threadId: z.number().int().positive(),
+	likeCount: z.number().int().nonnegative(),
+	likedByMe: z.boolean(),
 });
 
 export const CreateThreadSchema = ThreadSchema.pick({

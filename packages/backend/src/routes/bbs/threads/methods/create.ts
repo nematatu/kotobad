@@ -125,7 +125,14 @@ export const createThreadRouter: RouteHandler<
 			);
 		}
 
-		return c.json(toThreadResponse(createdThreadResult), 201);
+		return c.json(
+			toThreadResponse({
+				...createdThreadResult,
+				likeCount: 0,
+				likedByMe: false,
+			}),
+			201,
+		);
 	} catch (error: unknown) {
 		return c.json(
 			{

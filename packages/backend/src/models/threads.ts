@@ -9,3 +9,9 @@ export const OpenAPIEditThreadSchema =
 	BaseThreadSchema.EditThreadSchema.openapi("EditThreadSchema");
 export const OpenAPIThreadListSchema =
 	BaseThreadSchema.ThreadListSchema.openapi("ThreadListSchema");
+export const OpenAPISetThreadLikesSchema =
+	BaseThreadSchema.SetThreadLikesSchema.openapi("SetThreadLikesSchema");
+export const OpenAPISetThreadLikesResponseSchema =
+	BaseThreadSchema.SetThreadLikesResponseSchema.openapi(
+		"SetThreadLikesResponseSchema",
+	);

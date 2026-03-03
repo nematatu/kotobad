@@ -128,7 +128,14 @@ export const editThreadRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
-		return c.json(toThreadResponse(editThreadResult), 200);
+		return c.json(
+			toThreadResponse({
+				...editThreadResult,
+				likeCount: 0,
+				likedByMe: false,
+			}),
+			200,
+		);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(

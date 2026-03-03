@@ -10,7 +10,9 @@ import {
 	OpenAPIThreadSchema,
 } from "../../../../models/threads";
 import type { AppEnvironment } from "../../../../types";
+import { getThreadLikeSummaryMap } from "./likes-summary";
 import { toThreadResponse } from "./transform";
+import { resolveViewerUserId } from "./viewer-session";
 
 type ThreadWithOptionalAuthor = {
 	id: number;
@@ -214,6 +216,7 @@ export const getAllThreadRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const { page, sort } = c.req.valid("query");
+		const viewerUserId = await resolveViewerUserId(c);
 
 		const limit = PERPAGE;
 
@@ -243,9 +246,20 @@ export const getAllThreadRouter: RouteHandler<
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
 		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
-		const threadsResponse = resolvedThreads.map((thread) =>
-			toThreadResponse(thread),
-		);
+		const likeMap = await getThreadLikeSummaryMap({
+			db,
+			threadIds: resolvedThreads.map((thread) => thread.id),
+			viewerUserId,
+		});
+		const threadsResponse = resolvedThreads.map((thread) => {
+			const like = likeMap.get(thread.id);
+			return toThreadResponse({
+				...thread,
+				likeCount: like?.likeCount ?? 0,
+				likedByMe: like?.likedByMe ?? false,
+			});
+		});
+
 		return c.json({ threads: threadsResponse, totalCount: totalCount }, 200);
 	} catch (error: unknown) {
 		console.error(error);
@@ -266,6 +280,7 @@ export const getThreadByIdRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const id = Number(c.req.param("id"));
+		const viewerUserId = await resolveViewerUserId(c);
 
 		const thread = await db.query.threads.findFirst({
 			where: (threads, { eq }) => eq(threads.id, id),
@@ -290,7 +305,20 @@ export const getThreadByIdRouter: RouteHandler<
 
 		c.header("Cache-Control", "no-store");
 		const [resolvedThread] = await fillLegacyAuthorNames(db, [thread]);
-		return c.json(toThreadResponse(resolvedThread), 200);
+		const likeMap = await getThreadLikeSummaryMap({
+			db,
+			threadIds: [resolvedThread.id],
+			viewerUserId,
+		});
+		const like = likeMap.get(resolvedThread.id);
+		return c.json(
+			toThreadResponse({
+				...resolvedThread,
+				likeCount: like?.likeCount ?? 0,
+				likedByMe: like?.likedByMe ?? false,
+			}),
+			200,
+		);
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(
@@ -306,6 +334,7 @@ export const searchThreadRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
+		const viewerUserId = await resolveViewerUserId(c);
 
 		const { q, page, limit, sort } = c.req.valid("query");
 		const rawQuery = (q ?? "").trim();
@@ -358,8 +387,17 @@ export const searchThreadRouter: RouteHandler<
 		]);
 
 		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
+		const likeMap = await getThreadLikeSummaryMap({
+			db,
+			threadIds: resolvedThreads.map((thread) => thread.id),
+			viewerUserId,
+		});
 		const threadsResponse = resolvedThreads.map((thread) =>
-			toThreadResponse(thread),
+			toThreadResponse({
+				...thread,
+				likeCount: likeMap.get(thread.id)?.likeCount ?? 0,
+				likedByMe: likeMap.get(thread.id)?.likedByMe ?? false,
+			}),
 		);
 		const totalCount = totalCountResult[0]?.value ?? 0;
 
