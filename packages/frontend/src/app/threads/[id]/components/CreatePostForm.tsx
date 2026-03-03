@@ -9,7 +9,6 @@ import { useSWRConfig } from "swr";
 import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
 	Form,
 	FormControl,
@@ -179,7 +178,7 @@ export const CreatePostForm = ({
 	}
 
 	return (
-		<Card className="w-full">
+		<div className="border rounded-lg bg-white w-full">
 			<div className="p-4">
 				<div className="mb-4 relative flex items-center gap-2">
 					<h1 className="text-md sm:text-xl font-bold">書き込み</h1>
@@ -202,6 +201,6 @@ export const CreatePostForm = ({
 					{formView}
 				</div>
 			</div>
-		</Card>
+		</div>
 	);
 };

@@ -11,9 +11,7 @@ export const ThreadAuthorPanel = ({ thread }: Props) => {
 
 	return (
 		<div className="rounded-xl bg-white p-3 sm:p-4">
-			<p className="text-lg font-semibold tracking-wide text-slate-900">
-				書いた人
-			</p>
+			<p className="font-semibold tracking-wide text-slate-900">書いた人</p>
 			<Link
 				href={`/users/${encodeURIComponent(thread.authorId)}`}
 				className="mt-2 inline-flex items-center gap-2 hover:text-blue-700 transition-colors"

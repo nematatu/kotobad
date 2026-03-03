@@ -6,6 +6,7 @@ import ActionLink from "@/components/common/button/ActionLink";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { TagList } from "../components/view/tag/tagList";
 import { getThreadById } from "../lib/getThreadById";
+import { CreatePostForm } from "./components/CreatePostForm";
 import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
@@ -63,40 +64,31 @@ export default async function ThreadDetailPage({
 					<ThreadDetailHeader threadHeaderData={threadHeaderData} />
 				</section>
 				<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-					<div>
+					<div className="space-y-4 sm:space-y-12">
 						<div className="min-w-0 space-y-4 rounded-lg bg-white p-2 sm:p-4">
-							<section>
-								<ThreadPostsStream
-									threadId={threadId}
-									initialPostCount={threadHeaderData.postCount}
-									highlightPostId={highlightPostId}
-								/>
-							</section>
+							<ThreadPostsStream
+								threadId={threadId}
+								initialPostCount={threadHeaderData.postCount}
+								highlightPostId={highlightPostId}
+							/>
+						</div>
+						<div id="thread-post-form" className="w-full">
+							<CreatePostForm threadId={threadId} />
 						</div>
 					</div>
 					<aside className="space-y-4 lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">
-						<div className="rounded-xl bg-white p-3 sm:p-4">
+						<div className="hidden sm:block rounded-xl bg-white p-3">
 							<div className="flex flex-col gap-4">
-								<div className="space-y-2">
-									<p className="font-semibold tracking-wide text-slate-900">
-										タグ
-									</p>
-									{threadHeaderData.threadTags.length > 0 && (
-										<div className="flex flex-wrap gap-2">
-											<TagList tags={threadHeaderData.threadTags} />
-										</div>
-									)}
-								</div>
-								<div className="space-y-2">
-									<p className="font-semibold tracking-wide text-slate-900">
-										投稿日
-									</p>
-									<p className="text-gray-400 text-xs sm:text-sm">
-										{formatDate(threadHeaderData.createdAt, {
-											withTime: false,
-										})}
-									</p>
-								</div>
+								<p className="text-gray-400 text-xs sm:text-sm">
+									{formatDate(threadHeaderData.createdAt, {
+										withTime: false,
+									})}
+								</p>
+								{threadHeaderData.threadTags.length > 0 && (
+									<div className="flex flex-wrap gap-2">
+										<TagList tags={threadHeaderData.threadTags} />
+									</div>
+								)}
 							</div>
 						</div>
 						<ThreadAuthorPanel thread={threadHeaderData} />

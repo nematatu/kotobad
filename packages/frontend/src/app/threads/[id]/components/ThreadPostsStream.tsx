@@ -58,14 +58,6 @@ export const ThreadPostsStream = ({
 					<NoPost />
 				)}
 			</div>
-			<div id="thread-post-form" className="w-full">
-				<CreatePostForm
-					threadId={threadId}
-					onPostedAction={() => {
-						setHasNewPost(true);
-					}}
-				/>
-			</div>
 			<BackToThreadList />
 			<div id="thread-page-bottom" className="h-0 w-full" aria-hidden="true" />
 		</div>
