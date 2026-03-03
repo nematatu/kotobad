@@ -108,7 +108,7 @@ export const createThreadRouter: RouteHandler<
 			where: eq(threads.id, newThreadId),
 			with: {
 				author: {
-					columns: { name: true, image: true },
+					columns: { name: true, image: true, bio: true },
 				},
 				threadTags: {
 					with: {

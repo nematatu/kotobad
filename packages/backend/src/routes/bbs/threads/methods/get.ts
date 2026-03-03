@@ -17,7 +17,11 @@ import { resolveViewerUserId } from "./viewer-session";
 type ThreadWithOptionalAuthor = {
 	id: number;
 	authorId: string;
-	author?: { name?: string | null; image?: string | null } | null;
+	author?: {
+		name?: string | null;
+		image?: string | null;
+		bio?: string | null;
+	} | null;
 };
 
 const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
@@ -64,7 +68,11 @@ const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
 		}
 		return {
 			...thread,
-			author: { name: legacyName, image: thread.author?.image ?? null },
+			author: {
+				name: legacyName,
+				image: thread.author?.image ?? null,
+				bio: thread.author?.bio ?? null,
+			},
 		};
 	});
 };
@@ -226,7 +234,7 @@ export const getAllThreadRouter: RouteHandler<
 			db.query.threads.findMany({
 				with: {
 					author: {
-						columns: { name: true, image: true },
+						columns: { name: true, image: true, bio: true },
 					},
 					threadTags: {
 						with: {
@@ -289,6 +297,7 @@ export const getThreadByIdRouter: RouteHandler<
 					columns: {
 						name: true,
 						image: true,
+						bio: true,
 					},
 				},
 				threadTags: {
@@ -368,6 +377,7 @@ export const searchThreadRouter: RouteHandler<
 						columns: {
 							name: true,
 							image: true,
+							bio: true,
 						},
 					},
 					threadTags: {

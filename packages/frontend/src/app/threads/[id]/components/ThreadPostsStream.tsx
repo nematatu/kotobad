@@ -46,7 +46,7 @@ export const ThreadPostsStream = ({
 
 	return (
 		<div id="thread-posts-top" className="flex w-full flex-col gap-3">
-			<div className="w-full">
+			<div className="w-full py-3">
 				{hasPosts ? (
 					<PostList
 						posts={posts}
@@ -58,7 +58,6 @@ export const ThreadPostsStream = ({
 					<NoPost />
 				)}
 			</div>
-			<BackToThreadList />
 			<div id="thread-post-form" className="w-full">
 				<CreatePostForm
 					threadId={threadId}
@@ -67,6 +66,7 @@ export const ThreadPostsStream = ({
 					}}
 				/>
 			</div>
+			<BackToThreadList />
 			<div id="thread-page-bottom" className="h-0 w-full" aria-hidden="true" />
 		</div>
 	);

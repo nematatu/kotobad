@@ -12,7 +12,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 			<h1 className="text-left text-lg sm:text-2xl font-bold break-words">
 				{threadHeaderData.title}
 			</h1>
-			<div className="flex flex-wrap justify-center gap-2">
+			<div className="mt-4 flex flex-wrap justify-center gap-2">
 				<TagList tags={threadHeaderData.threadTags} />
 			</div>
 			<p className="self-end text-gray-400 text-xs sm:text-sm">

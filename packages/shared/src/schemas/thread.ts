@@ -14,6 +14,7 @@ export const ThreadSchema = z.object({
 	author: z.object({
 		name: z.string(),
 		image: z.string().optional().nullable(),
+		bio: z.string().optional().nullable(),
 	}),
 	threadTags: TagListSchema,
 	likeCount: z.number().int().nonnegative(),

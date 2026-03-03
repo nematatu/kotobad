@@ -10,6 +10,7 @@ export type ThreadQueryResult = Omit<
 	author: {
 		name: string;
 		image?: string | null;
+		bio?: string | null;
 	};
 	threadTags?: Array<{
 		threadId: number;

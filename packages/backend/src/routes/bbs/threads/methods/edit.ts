@@ -114,7 +114,7 @@ export const editThreadRouter: RouteHandler<
 			where: eq(threads.id, newEdietedThreadId),
 			with: {
 				author: {
-					columns: { name: true, image: true },
+					columns: { name: true, image: true, bio: true },
 				},
 				threadTags: {
 					with: {

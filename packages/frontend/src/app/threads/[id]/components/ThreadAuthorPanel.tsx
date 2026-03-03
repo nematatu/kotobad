@@ -7,9 +7,11 @@ type Props = {
 };
 
 export const ThreadAuthorPanel = ({ thread }: Props) => {
+	const bio = thread.author.bio?.trim() ?? "";
+
 	return (
-		<div className="rounded-xl border border-slate-200 p-3 sm:p-4">
-			<p className="text-[11px] font-semibold tracking-wide text-slate-500">
+		<div className="rounded-xl bg-white p-3 sm:p-4">
+			<p className="text-lg font-semibold tracking-wide text-slate-900">
 				書いた人
 			</p>
 			<Link
@@ -19,15 +21,14 @@ export const ThreadAuthorPanel = ({ thread }: Props) => {
 				<AuthorAvatar
 					name={thread.author.name}
 					image={thread.author.image}
-					className="h-7 w-7 md:h-8 md:w-8"
+					className="h-8 w-8 md:h-10 md:w-10"
 				/>
 				<span className="text-sm font-semibold text-slate-700">
 					{thread.author.name}
 				</span>
 			</Link>
 			<div className="mt-3">
-				<p className="text-[11px] font-semibold text-slate-500">Bio</p>
-				<p className="mt-1 text-xs text-slate-600">プロフィールは未設定です</p>
+				<p className="mt-1 text-xs text-slate-600">{bio}</p>
 			</div>
 		</div>
 	);

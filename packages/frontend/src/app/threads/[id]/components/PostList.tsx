@@ -293,15 +293,17 @@ export const PostList = ({
 							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
 								<Link
 									href={`/users/${encodeURIComponent(post.authorId)}`}
-									className="inline-flex items-center gap-2 text-xs text-gray-500 hover:text-blue-700 transition-colors"
+									className="inline-flex items-center gap-2"
 								>
 									<AuthorAvatar
 										name={post.author.name}
 										image={post.author.image}
-										className="h-4 w-4 md:h-5 md:w-5"
+										className="h-4 w-4 md:h-7 md:w-7"
 										fallbackClassName="text-[8px]"
 									/>
-									<span>{post.author.name}</span>
+									<span className="text- text-gray-500 hover:text-blue-700 transition-colors">
+										{post.author.name}
+									</span>
 								</Link>
 								<div className="flex gap-1 md:gap-2 flex-wrap text-xs text-gray-500">
 									<span>{getRelativeDate(post.createdAt)}</span>
