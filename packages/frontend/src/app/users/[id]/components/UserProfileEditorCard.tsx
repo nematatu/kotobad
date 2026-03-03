@@ -65,15 +65,16 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 			{isLogin && (
 				<div className="absolute top-2 right-2 flex-1">
 					<IconButton
-						variant="outline"
+						variant="logo1"
 						icon={isEditing ? <Check /> : <Pencil />}
 						rounded="full"
 						enableClickAnimation
-						className="transition-colors text-slate-500 hover:text-slate-700 hover:bg-black/10"
+						hover="brightness"
+						className="transition-colors text-slate-100"
 						disabled={isSavingProfile}
 						onClick={isEditing ? onOpenConfirmAction : onStartEditingAction}
 					>
-						<span className="font-bold">{isEditing ? "完了" : "編集"}</span>
+						<span className="">{isEditing ? "完了" : "編集"}</span>
 					</IconButton>
 				</div>
 			)}
