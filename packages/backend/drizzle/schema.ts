@@ -201,6 +201,21 @@ export const tags = sqliteTable("tags", {
     ]
 )
 
+export const threadLikes = sqliteTable("thread_likes", {
+	threadId: integer("thread_id")
+		.notNull()
+		.references(() => threads.id, {onDelete: "cascade"}),
+  userId: text("user_id")
+          .notNull()
+          .references(() => user.id, {onDelete: "cascade"}), 
+  createdAt: timestamp("created_at")
+          .default(sql`(strftime('%s', 'now'))`)
+          .notNull(),
+}, (t) => ({
+        threadLikesUnique: uniqueIndex("thread_likes_unique").on(t.threadId, t.userId),
+    })
+)
+
 export const threadTags = sqliteTable("thread_tag", {
 	threadId: integer("thread_id")
 		.notNull()
@@ -266,11 +281,13 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 	}),
 	posts: many(posts),
 	threadTags: many(threadTags),
+  likes: many(threadLikes),
 }));
 
 export const usersRelations = relations(user, ({ many }) => ({
 	posts: many(posts),
 	threads: many(threads),
+  threadLikes: many(threadLikes),
 }));
 
 export const reactionsRelations = relations(reactions, ({ many }) => ({
@@ -300,6 +317,17 @@ export const threadTagRelations = relations(threadTags, ({ one }) => ({
 	tags: one(tags, {
 		fields: [threadTags.tagId],
 		references: [tags.id],
+	}),
+}));
+
+export const threadLikesRelations = relations(threadLikes, ({ one }) => ({
+	thread: one(threads, {
+		fields: [threadLikes.threadId],
+		references: [threads.id],
+	}),
+	user: one(user, {
+		fields: [threadLikes.userId],
+		references: [user.id],
 	}),
 }));
 
