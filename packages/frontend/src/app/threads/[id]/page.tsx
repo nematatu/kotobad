@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import ActionLink from "@/components/common/button/ActionLink";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { getThreadById } from "../lib/getThreadById";
+import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
 export const dynamic = "force-dynamic";
@@ -42,9 +43,9 @@ export default async function ThreadDetailPage({
 	}
 
 	return (
-		<div className="flex flex-col gap-3 p-1 sm:p-4">
+		<div className="mx-auto w-full max-w-6xl p-1 sm:p-4">
 			<div
-				className="hidden sm:block sticky z-40 self-start"
+				className="hidden sm:block fixed z-40 sm:left-3"
 				style={{ top: "calc(var(--header-height, 0px) + 0.5rem)" }}
 			>
 				<ActionLink
@@ -55,12 +56,23 @@ export default async function ThreadDetailPage({
 					}}
 				/>
 			</div>
-			<ThreadDetailHeader threadHeaderData={threadHeaderData} />
-			<ThreadPostsStream
-				threadId={threadId}
-				initialPostCount={threadHeaderData.postCount}
-				highlightPostId={highlightPostId}
-			/>
+			<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+				<div className="min-w-0 space-y-4 rounded-lg bg-white p-2 sm:p-4">
+					<section>
+						<ThreadDetailHeader threadHeaderData={threadHeaderData} />
+					</section>
+					<section>
+						<ThreadPostsStream
+							threadId={threadId}
+							initialPostCount={threadHeaderData.postCount}
+							highlightPostId={highlightPostId}
+						/>
+					</section>
+				</div>
+				<aside className="lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">
+					<ThreadAuthorPanel thread={threadHeaderData} />
+				</aside>
+			</div>
 		</div>
 	);
 }

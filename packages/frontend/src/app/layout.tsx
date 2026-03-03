@@ -20,7 +20,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja">
-			<body className="min-h-screen bg-surface-100">
+			<body className="min-h-screen bg-[#F0F0F0]">
 				<div
 					className="pointer-events-none fixed inset-0"
 					style={{ zIndex: -1 }}

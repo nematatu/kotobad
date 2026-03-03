@@ -45,11 +45,8 @@ export const ThreadPostsStream = ({
 	const hasPosts = posts.length > 0;
 
 	return (
-		<div
-			id="thread-posts-top"
-			className="flex flex-col w-full items-center space-y-3"
-		>
-			<div className="md:w-1/2 [@media(max-width:1290px)]:w-full">
+		<div id="thread-posts-top" className="flex w-full flex-col gap-3">
+			<div className="w-full">
 				{hasPosts ? (
 					<PostList
 						posts={posts}
@@ -62,10 +59,7 @@ export const ThreadPostsStream = ({
 				)}
 			</div>
 			<BackToThreadList />
-			<div
-				id="thread-post-form"
-				className="md:w-1/2 [@media(max-width:1290px)]:w-full"
-			>
+			<div id="thread-post-form" className="w-full">
 				<CreatePostForm
 					threadId={threadId}
 					onPostedAction={() => {
