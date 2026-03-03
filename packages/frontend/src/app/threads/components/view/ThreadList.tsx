@@ -2,7 +2,6 @@
 
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { useCallback, useState } from "react";
 import ChatIcon from "@/assets/threads/chat.svg";
 import { Heart } from "@/components/animate-ui/icons/heart";
 import { Link } from "@/components/common/Link";
@@ -14,15 +13,6 @@ type ThreadListType = {
 
 export const ThreadList = ({ threads }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
-	const [likedByThreadId, setLikedByThreadId] = useState<
-		Record<number, boolean>
-	>({});
-	const toggleLike = useCallback((threadId: number) => {
-		setLikedByThreadId((prev) => ({
-			...prev,
-			[threadId]: !prev[threadId],
-		}));
-	}, []);
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -30,7 +20,6 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 				const href = `/threads/${thread.id}`;
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
-				const isLiked = !!likedByThreadId[thread.id];
 				return (
 					<div
 						key={thread.id}
@@ -77,33 +66,15 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 									))}
 								</div>
 								<div className="relative z-10 flex flex-wrap space-x-2 pointer-events-none">
-									<button
-										type="button"
-										aria-pressed={isLiked}
-										aria-label={isLiked ? "いいねを解除" : "いいね"}
-										onPointerDown={(event) => {
-											if (event.button !== 0) return;
-											toggleLike(thread.id);
-										}}
-										onClick={(event) => {
-											if (event.detail !== 0) return;
-											toggleLike(thread.id);
-										}}
-										className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto cursor-pointer"
-									>
+									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
 										<Heart
-											className={
-												isLiked
-													? "h-3 w-3 text-red-500"
-													: "h-3 w-3 text-gray-600"
-											}
+											className={"h-3 w-3 text-gray-600"}
 											animation="fill"
-											animate={isLiked ? "fill" : false}
 										/>
 										<span className="text-[10px] leading-none transition-colors">
-											{thread.postCount}
+											{thread.likeCount}
 										</span>
-									</button>
+									</div>
 									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
 										<ChatIcon className="h-3 w-3" />
 										<span className="text-[10px] leading-none">
