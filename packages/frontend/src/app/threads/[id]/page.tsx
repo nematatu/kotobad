@@ -1,8 +1,10 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import ActionLink from "@/components/common/button/ActionLink";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { TagList } from "../components/view/tag/tagList";
 import { getThreadById } from "../lib/getThreadById";
 import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
@@ -43,7 +45,7 @@ export default async function ThreadDetailPage({
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-6xl p-1 sm:p-4">
+		<>
 			<div
 				className="hidden sm:block fixed z-40 sm:left-3"
 				style={{ top: "calc(var(--header-height, 0px) + 0.5rem)" }}
@@ -56,23 +58,51 @@ export default async function ThreadDetailPage({
 					}}
 				/>
 			</div>
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-				<div className="min-w-0 space-y-4 rounded-lg bg-white p-2 sm:p-4">
-					<section>
-						<ThreadDetailHeader threadHeaderData={threadHeaderData} />
-					</section>
-					<section>
-						<ThreadPostsStream
-							threadId={threadId}
-							initialPostCount={threadHeaderData.postCount}
-							highlightPostId={highlightPostId}
-						/>
-					</section>
+			<div className="mx-auto w-full max-w-6xl p-3 sm:p-4">
+				<section>
+					<ThreadDetailHeader threadHeaderData={threadHeaderData} />
+				</section>
+				<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+					<div>
+						<div className="min-w-0 space-y-4 rounded-lg bg-white p-2 sm:p-4">
+							<section>
+								<ThreadPostsStream
+									threadId={threadId}
+									initialPostCount={threadHeaderData.postCount}
+									highlightPostId={highlightPostId}
+								/>
+							</section>
+						</div>
+					</div>
+					<aside className="space-y-4 lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">
+						<div className="rounded-xl bg-white p-3 sm:p-4">
+							<div className="flex flex-col gap-4">
+								<div className="space-y-2">
+									<p className="font-semibold tracking-wide text-slate-900">
+										タグ
+									</p>
+									{threadHeaderData.threadTags.length > 0 && (
+										<div className="flex flex-wrap gap-2">
+											<TagList tags={threadHeaderData.threadTags} />
+										</div>
+									)}
+								</div>
+								<div className="space-y-2">
+									<p className="font-semibold tracking-wide text-slate-900">
+										投稿日
+									</p>
+									<p className="text-gray-400 text-xs sm:text-sm">
+										{formatDate(threadHeaderData.createdAt, {
+											withTime: false,
+										})}
+									</p>
+								</div>
+							</div>
+						</div>
+						<ThreadAuthorPanel thread={threadHeaderData} />
+					</aside>
 				</div>
-				<aside className="lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">
-					<ThreadAuthorPanel thread={threadHeaderData} />
-				</aside>
 			</div>
-		</div>
+		</>
 	);
 }
