@@ -267,7 +267,7 @@ export const PostList = ({
 	};
 
 	return (
-		<div className="radius-sm flex flex-col">
+		<div className="rounded-lg bg-white p-2 sm:pb-4 radius-sm flex flex-col">
 			{visibleFlattenedPosts.map(({ post, depth }) => {
 				const indent = Math.min(depth * 25, 84);
 				const isReplyingToThisPost = replyTarget?.postId === post.id;
