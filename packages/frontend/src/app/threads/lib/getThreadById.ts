@@ -11,7 +11,6 @@ export const getThreadById = async (id: string) => {
 	const response = await BffFetcher<ThreadType>(targetUrl, {
 		method: "GET",
 		cache: "no-store",
-		skipCookie: true,
 	});
 
 	const normalizedResponse = normalizeThread(

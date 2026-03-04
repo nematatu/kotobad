@@ -12,6 +12,7 @@ import {
 	searchThreadRoute,
 	searchThreadRouter,
 } from "./methods/get";
+import { setThreadLikesRoute, setThreadLikesRouter } from "./methods/likes";
 
 const threadRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(getAllThreadRoute, getAllThreadRouter)
@@ -19,6 +20,7 @@ const threadRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(getThreadByIdRoute, getThreadByIdRouter)
 	.openapi(createThreadRoute, createThreadRouter)
 	.openapi(deleteThreadRoute, deleteThreadRouter)
-	.openapi(editThreadRoute, editThreadRouter);
+	.openapi(editThreadRoute, editThreadRouter)
+	.openapi(setThreadLikesRoute, setThreadLikesRouter);
 
 export default threadRouter;
