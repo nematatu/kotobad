@@ -63,7 +63,7 @@ export default async function ThreadDetailPage({
 				<section>
 					<ThreadDetailHeader threadHeaderData={threadHeaderData} />
 				</section>
-				<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+				<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_250px] lg:items-start">
 					<div className="space-y-4 sm:space-y-12">
 						<div className="min-w-0 space-y-4 rounded-lg bg-white p-2 sm:p-4">
 							<ThreadPostsStream

@@ -281,7 +281,7 @@ export const PostList = ({
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400 bg-slate-50 ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${isReplyEnterAnimating ? "animate-reply-expand-down" : ""}`}
+						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400  ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${isReplyEnterAnimating ? "animate-reply-expand-down" : ""}`}
 						style={{
 							paddingLeft: `${16 + indent}px`,
 							animationDelay: isReplyEnterAnimating

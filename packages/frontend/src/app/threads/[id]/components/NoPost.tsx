@@ -15,7 +15,7 @@ export default function NoPost() {
 				className="w-[40%] object-contain opacity-20"
 			/>
 			<p className="text-md text-slate-500 font-semibold">
-				投稿してみましょう !
+				ポストがありません。 投稿してみましょう !
 			</p>
 		</div>
 	);
