@@ -301,7 +301,7 @@ export const PostList = ({
 										className="h-4 w-4 md:h-7 md:w-7"
 										fallbackClassName="text-[8px]"
 									/>
-									<span className="text- text-gray-500 hover:text-blue-700 transition-colors">
+									<span className="text-xs sm:text-md text-gray-500 hover:text-blue-700 transition-colors">
 										{post.author.name}
 									</span>
 								</Link>
