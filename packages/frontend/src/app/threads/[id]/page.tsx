@@ -52,6 +52,7 @@ export default async function ThreadDetailPage({
 				style={{ top: "calc(var(--header-height, 0px) + 0.5rem)" }}
 			>
 				<ActionLink
+					className="hover:bg-white"
 					item={{
 						icon: ArrowLeft,
 						label: "スレッド一覧へ",
