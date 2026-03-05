@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { ArrowDown, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 const REFRESH_TRIGGER_PX = 84;
 const MAX_PULL_PX = 128;
@@ -23,6 +25,21 @@ export default function PwaPullToRefresh() {
 	const pullDistanceRef = useRef(0);
 	const isTrackingRef = useRef(false);
 	const isRefreshingRef = useRef(false);
+	const [isEnabled, setIsEnabled] = useState(false);
+	const [isVisible, setIsVisible] = useState(false);
+	const [pullDistance, setPullDistance] = useState(0);
+	const [isReady, setIsReady] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
+
+	const indicatorLabel = useMemo(() => {
+		if (isRefreshing) {
+			return "更新中...";
+		}
+		if (isReady) {
+			return "離して更新";
+		}
+		return "下にスワイプで更新";
+	}, [isRefreshing, isReady]);
 
 	useEffect(() => {
 		if (typeof window === "undefined") {
@@ -34,12 +51,17 @@ export default function PwaPullToRefresh() {
 			(window.navigator as NavigatorWithStandalone).standalone === true;
 
 		if (!isStandalone) {
+			setIsEnabled(false);
 			return;
 		}
+		setIsEnabled(true);
 
 		const resetPull = () => {
 			isTrackingRef.current = false;
 			pullDistanceRef.current = 0;
+			setPullDistance(0);
+			setIsReady(false);
+			setIsVisible(false);
 		};
 
 		const onTouchStart = (event: TouchEvent) => {
@@ -61,6 +83,8 @@ export default function PwaPullToRefresh() {
 			isTrackingRef.current = true;
 			startYRef.current = event.touches[0]?.clientY ?? 0;
 			pullDistanceRef.current = 0;
+			setPullDistance(0);
+			setIsReady(false);
 		};
 
 		const onTouchMove = (event: TouchEvent) => {
@@ -78,7 +102,11 @@ export default function PwaPullToRefresh() {
 				return;
 			}
 
-			pullDistanceRef.current = Math.min(delta, MAX_PULL_PX);
+			const clamped = Math.min(delta, MAX_PULL_PX);
+			pullDistanceRef.current = clamped;
+			setPullDistance(clamped);
+			setIsVisible(true);
+			setIsReady(clamped >= REFRESH_TRIGGER_PX);
 			event.preventDefault();
 		};
 
@@ -89,13 +117,20 @@ export default function PwaPullToRefresh() {
 			}
 
 			const shouldRefresh = pullDistanceRef.current >= REFRESH_TRIGGER_PX;
-			resetPull();
+			const nextDistance = pullDistanceRef.current;
 			if (!shouldRefresh) {
+				resetPull();
 				return;
 			}
 
 			isRefreshingRef.current = true;
-			window.location.reload();
+			isTrackingRef.current = false;
+			setPullDistance(nextDistance);
+			setIsRefreshing(true);
+			setIsVisible(true);
+			window.setTimeout(() => {
+				window.location.reload();
+			}, 160);
 		};
 
 		window.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -111,5 +146,45 @@ export default function PwaPullToRefresh() {
 		};
 	}, []);
 
-	return null;
+	if (!isEnabled && !isVisible && !isRefreshing) {
+		return null;
+	}
+
+	const progress = Math.min(1, pullDistance / REFRESH_TRIGGER_PX);
+	const translateY = isRefreshing
+		? 52
+		: isVisible
+			? Math.min(52, pullDistance * 0.42)
+			: -60;
+	const iconRotate = `${Math.round(progress * 180)}deg`;
+
+	return (
+		<div
+			aria-hidden="true"
+			className="pointer-events-none fixed left-1/2 top-[calc(env(safe-area-inset-top)+0.4rem)] z-[70] transition-[opacity,transform] duration-150 ease-out"
+			style={{
+				opacity: isVisible || isRefreshing ? 1 : 0,
+				transform: `translate(-50%, ${translateY}px)`,
+			}}
+		>
+			<div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-2 text-slate-700 shadow-sm backdrop-blur">
+				<span className="inline-flex size-5 items-center justify-center text-blue-600">
+					{isRefreshing ? (
+						<Loader2 className="h-4 w-4 animate-spin" />
+					) : (
+						<ArrowDown
+							className={cn(
+								"h-4 w-4 transition-transform duration-100",
+								isReady ? "text-blue-700" : "text-blue-500",
+							)}
+							style={{ transform: `rotate(${iconRotate})` }}
+						/>
+					)}
+				</span>
+				<span className="text-[11px] font-semibold whitespace-nowrap">
+					{indicatorLabel}
+				</span>
+			</div>
+		</div>
+	);
 }
