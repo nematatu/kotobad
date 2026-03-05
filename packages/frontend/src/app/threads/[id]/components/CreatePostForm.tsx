@@ -123,6 +123,7 @@ export const CreatePostForm = ({
 													message: "80文字以内で入力してください",
 												},
 											})}
+											autoFocus={isInline && replyTargetPostId !== null}
 											onKeyDown={(e) => {
 												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
 													e.preventDefault();
