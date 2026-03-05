@@ -140,11 +140,22 @@ export const PostList = ({
 		const tree = buildReplyTree(localPosts);
 		return flattenReplyTree(tree);
 	}, [localPosts]);
+	const postDepthById = useMemo(() => {
+		return new Map(flattenedPosts.map(({ post, depth }) => [post.id, depth]));
+	}, [flattenedPosts]);
 	const visibleFlattenedPosts = useMemo(() => {
-		return flattenedPosts.filter(({ post }) => {
+		return flattenedPosts.filter(({ post, depth }) => {
+			if (depth <= 1) {
+				return true;
+			}
+
 			let parentId = post.replyToPostId;
 			while (typeof parentId === "number") {
-				if (!expandedReplyPostIdSet.has(parentId)) {
+				const parentDepth = postDepthById.get(parentId);
+				if (typeof parentDepth !== "number") {
+					return false;
+				}
+				if (parentDepth > 0 && !expandedReplyPostIdSet.has(parentId)) {
 					return false;
 				}
 				const parentPost = postByIdMap.get(parentId);
@@ -155,7 +166,7 @@ export const PostList = ({
 			}
 			return true;
 		});
-	}, [flattenedPosts, expandedReplyPostIdSet, postByIdMap]);
+	}, [flattenedPosts, postDepthById, expandedReplyPostIdSet, postByIdMap]);
 	const replyEnterPostIdSet = useMemo(() => {
 		return new Set(replyEnterPostIds);
 	}, [replyEnterPostIds]);
@@ -360,7 +371,7 @@ export const PostList = ({
 									)}
 								</div>
 							)}
-							{post.replyCount > 0 && (
+							{post.replyCount > 0 && depth > 0 && (
 								<div className="items-start mt-2">
 									<button
 										type="button"
