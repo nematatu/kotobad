@@ -27,8 +27,21 @@ export function PostDropDownMenu({ postId }: DropDownMenuProps) {
 		try {
 			const url = new URL(window.location.href);
 			url.searchParams.set("postId", String(postId));
-			await navigator.clipboard.writeText(url.toString());
-			toast.success("コピーしました");
+			const copiedUrl = url.toString();
+			await navigator.clipboard.writeText(copiedUrl);
+			toast.success("コピーしました", {
+				description: (
+					<a
+						href={copiedUrl}
+						target="_blank"
+						rel="noreferrer noopener"
+						className="block max-w-[70vw] overflow-hidden text-ellipsis whitespace-nowrap text-blue-600 underline underline-offset-2 hover:text-blue-500 sm:max-w-[420px]"
+						title={copiedUrl}
+					>
+						{copiedUrl}
+					</a>
+				),
+			});
 		} catch (_e) {
 			toast.error("コピーに失敗しました");
 		}
