@@ -55,7 +55,6 @@ async function searchThreads(
 	const raw = await BffFetcher<ThreadListType>(url, {
 		method: "GET",
 		cache: "no-store",
-		skipCookie: true,
 	});
 	return ThreadListSchema.parse(raw);
 }

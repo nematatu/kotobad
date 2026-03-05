@@ -24,7 +24,6 @@ export async function getThreads({
 		raw = await BffFetcher<ThreadListType>(targetUrl, {
 			method: "GET",
 			cache: "no-store",
-			skipCookie: true,
 		});
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;

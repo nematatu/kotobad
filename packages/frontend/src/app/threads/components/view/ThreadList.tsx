@@ -2,8 +2,8 @@
 
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
+import { Heart } from "lucide-react";
 import ChatIcon from "@/assets/threads/chat.svg";
-import { Heart } from "@/components/animate-ui/icons/heart";
 import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
@@ -67,18 +67,22 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 								</div>
 								<div className="relative z-10 flex flex-wrap space-x-2 pointer-events-none">
 									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
-										<Heart
-											className={"h-3 w-3 text-gray-600"}
-											animation="fill"
-										/>
-										<span className="text-[10px] leading-none transition-colors">
-											{thread.likeCount}
+										<ChatIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+										<span className="text-[10px] leading-none">
+											{thread.postCount}
 										</span>
 									</div>
 									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
-										<ChatIcon className="h-3 w-3" />
-										<span className="text-[10px] leading-none">
-											{thread.postCount}
+										<Heart
+											fill={thread.likedByMe ? "currentColor" : "none"}
+											className={
+												thread.likedByMe
+													? "h-4 w-4 sm:h-5 sm:w-5 text-[#ff5353] fill-[#ff5353]"
+													: "h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+											}
+										/>
+										<span className="text-[10px] leading-none transition-colors">
+											{thread.likeCount}
 										</span>
 									</div>
 								</div>
