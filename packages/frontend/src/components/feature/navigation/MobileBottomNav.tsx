@@ -1,7 +1,7 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import { Home, PencilLine } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import { Link } from "@/components/common/Link";
 import CreateThreadDialog from "@/components/feature/header/component/createThreadDialog";
 
@@ -21,23 +21,21 @@ const MobileBottomNav = ({ tags }: Props) => {
 					className="flex flex-1 flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900"
 				>
 					<Home className="h-5 w-5" />
-					<span>ホーム</span>
+					<span>スレッド一覧</span>
 				</Link>
-				<CreateThreadDialog
-					tags={tags}
-					className="flex-1"
-					trigger={
-						<button
-							type="button"
-							className="flex w-full flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900"
-							aria-label="投稿作成"
-						>
-							<PencilLine className="h-5 w-5" />
-							<span>投稿</span>
-						</button>
-					}
-				/>
 			</div>
+			<CreateThreadDialog
+				tags={tags}
+				trigger={
+					<button
+						type="button"
+						aria-label="スレッドを投稿する"
+						className="fixed bottom-20 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white shadow-lg"
+					>
+						<Plus size={24} />
+					</button>
+				}
+			/>
 		</nav>
 	);
 };
