@@ -16,11 +16,6 @@ export const ThreadPostsFallback = () => {
 					</div>
 				))}
 			</div>
-			<div className="fixed inset-x-0 bottom-0 px-3 pb-3 sm:px-4 sm:pb-4">
-				<div className="mx-auto max-w-2xl">
-					<Skeleton className="h-16 w-full" />
-				</div>
-			</div>
 		</div>
 	);
 };
