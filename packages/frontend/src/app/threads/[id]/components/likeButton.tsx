@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useRef } from "react";
+import { Button } from "@/components/ui/button";
 
 const ThreadHeartLottiePlayer = dynamic(
 	() =>
@@ -28,12 +29,13 @@ export function LikeButton() {
 	};
 
 	return (
-		<button
-			type="button"
+		<Button
+			variant="ghost"
+			enableClickAnimation
 			onClick={onClick}
 			className="inline-flex items-center"
 		>
 			<ThreadHeartLottiePlayer onReadyAction={onReadyAction} />
-		</button>
+		</Button>
 	);
 }
