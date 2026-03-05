@@ -1,12 +1,10 @@
 "use client";
 
 import type { PostListType } from "@kotobad/shared/src/types/post";
-import { useState } from "react";
 import useSWR from "swr";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { BackToThreadList } from "./BackToThreadList";
-import { CreatePostForm } from "./CreatePostForm";
 import { ThreadPostsFallback } from "./fallback/ThreadPostsFallback";
 import NoPost from "./NoPost";
 import { PostList } from "./PostList";
@@ -22,11 +20,7 @@ export const ThreadPostsStream = ({
 	initialPostCount,
 	highlightPostId,
 }: Props) => {
-	const [hasNewPost, setHasNewPost] = useState(false);
-	const shouldFetchPosts = initialPostCount > 0 || hasNewPost;
-	const swrKey = shouldFetchPosts
-		? (["GET_POSTS_BY_THREADID", threadId] as const)
-		: null;
+	const swrKey = ["GET_POSTS_BY_THREADID", threadId] as const;
 
 	const { data, error, isLoading } = useSWR<PostListType>(
 		swrKey,
@@ -40,8 +34,8 @@ export const ThreadPostsStream = ({
 	);
 
 	if (error) return <div>投稿の読み込みに失敗しました。</div>;
-	if (swrKey && isLoading) return <ThreadPostsFallback />;
-	const posts: PostListType = swrKey ? (data ?? []) : [];
+	if (isLoading && initialPostCount > 0) return <ThreadPostsFallback />;
+	const posts: PostListType = data ?? [];
 	const hasPosts = posts.length > 0;
 
 	return (
@@ -52,7 +46,6 @@ export const ThreadPostsStream = ({
 						posts={posts}
 						threadId={threadId}
 						highlightPostId={highlightPostId}
-						onPostedAction={() => setHasNewPost(true)}
 					/>
 				) : (
 					<NoPost />
