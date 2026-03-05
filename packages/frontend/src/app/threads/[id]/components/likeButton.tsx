@@ -120,7 +120,7 @@ export function LikeButton({
 			aria-label={likedByMe ? "いいねを解除" : "いいねする"}
 			className="inline-flex h-auto items-center gap-1.5 px-2 py-1 text-xs sm:text-sm"
 		>
-			<span className="relative inline-flex items-center justify-center shrink-0 sm:size-9">
+			<span className="relative inline-flex size-8 items-center justify-center shrink-0 sm:size-9">
 				<ThreadHeartLottiePlayer
 					onReadyAction={onReadyAction}
 					className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[2.55]"
