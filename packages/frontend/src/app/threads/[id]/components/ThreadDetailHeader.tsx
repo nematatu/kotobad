@@ -9,7 +9,7 @@ type Props = {
 
 export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 	return (
-		<div className="px-2 flex flex-col justify-center space-y-4 mt-8 mb-4 sm:mb-9">
+		<div className="px-2 sm:px-0 flex flex-col justify-center space-y-4 mt-8 mb-4 sm:mb-9">
 			<p className="block sm:hidden text-gray-400 text-xs sm:text-sm">
 				{formatDate(threadHeaderData.createdAt, {
 					withTime: false,
