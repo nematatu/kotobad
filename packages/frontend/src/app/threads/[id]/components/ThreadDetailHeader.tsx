@@ -20,7 +20,11 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 					{threadHeaderData.title}
 				</h1>
 			</div>
-			<LikeButton />
+			<LikeButton
+				threadId={threadHeaderData.id}
+				initialLikeCount={threadHeaderData.likeCount}
+				initialLikedByMe={threadHeaderData.likedByMe}
+			/>
 			{threadHeaderData.threadTags.length > 0 && (
 				<div className="block sm:hidden flex flex-wrap gap-2">
 					<TagList tags={threadHeaderData.threadTags} />
