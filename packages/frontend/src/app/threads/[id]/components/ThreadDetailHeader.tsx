@@ -9,8 +9,8 @@ type Props = {
 
 export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 	return (
-		<div className="space-y-4 mb-4">
-			<div className="flex flex-col justify-center space-y-2 my-8 sm:my-13">
+		<div className="space-y-4 mb-11">
+			<div className="flex flex-col justify-center space-y-4 mt-8 mb-4">
 				<p className="block sm:hidden text-gray-400 text-xs sm:text-sm">
 					{formatDate(threadHeaderData.createdAt, {
 						withTime: false,
@@ -19,12 +19,14 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 				<h1 className="max-w-4xl text-left text-lg sm:text-2xl font-bold break-words">
 					{threadHeaderData.title}
 				</h1>
+				<div className="block">
+					<LikeButton
+						threadId={threadHeaderData.id}
+						initialLikeCount={threadHeaderData.likeCount}
+						initialLikedByMe={threadHeaderData.likedByMe}
+					/>
+				</div>
 			</div>
-			<LikeButton
-				threadId={threadHeaderData.id}
-				initialLikeCount={threadHeaderData.likeCount}
-				initialLikedByMe={threadHeaderData.likedByMe}
-			/>
 			{threadHeaderData.threadTags.length > 0 && (
 				<div className="block sm:hidden flex flex-wrap gap-2">
 					<TagList tags={threadHeaderData.threadTags} />

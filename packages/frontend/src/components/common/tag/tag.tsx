@@ -30,7 +30,7 @@ export default function Tag({
 			size="icon"
 			{...buttonProps}
 		>
-			{isViewLabel && <span>{name}</span>}
+			{isViewLabel && <span className="font-bold">{name}</span>}
 		</IconButton>
 	);
 }

@@ -10,7 +10,7 @@ export const ThreadAuthorPanel = ({ thread }: Props) => {
 	const bio = thread.author.bio?.trim() ?? "";
 
 	return (
-		<div className="rounded-xl bg-white p-3 sm:p-4">
+		<div className="rounded-lg bg-white p-3 sm:p-4">
 			<p className="font-semibold tracking-wide text-slate-900">書いた人</p>
 			<Link
 				href={`/users/${encodeURIComponent(thread.authorId)}`}

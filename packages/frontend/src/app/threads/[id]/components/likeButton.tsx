@@ -114,15 +114,19 @@ export function LikeButton({
 	return (
 		<Button
 			variant="outline"
+			enableClickAnimation
 			onClick={onLikeClick}
 			aria-pressed={likedByMe}
-			className="inline-flex items-center gap-2 px-3 py-1 text-xs sm:text-sm"
+			aria-label={likedByMe ? "いいねを解除" : "いいねする"}
+			className="inline-flex h-auto items-center gap-1.5 px-2 py-1 text-xs sm:text-sm"
 		>
-			<ThreadHeartLottiePlayer
-				onReadyAction={onReadyAction}
-				className="h-16 w-16 shrink-0"
-			/>
-			<span>いいね {likeCount}</span>
+			<span className="relative inline-flex items-center justify-center shrink-0 sm:size-9">
+				<ThreadHeartLottiePlayer
+					onReadyAction={onReadyAction}
+					className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[2.55]"
+				/>
+			</span>
+			<span className="whitespace-nowrap">{likeCount}</span>
 		</Button>
 	);
 }

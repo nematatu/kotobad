@@ -78,7 +78,7 @@ export default async function ThreadDetailPage({
 						</div>
 					</div>
 					<aside className="space-y-4 lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">
-						<div className="hidden sm:block rounded-xl bg-white p-3">
+						<div className="hidden sm:block rounded-lg bg-white p-3">
 							<div className="flex flex-col gap-4">
 								<p className="text-gray-400 text-xs sm:text-sm">
 									{formatDate(threadHeaderData.createdAt, {

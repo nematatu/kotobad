@@ -178,7 +178,7 @@ export const CreatePostForm = ({
 	}
 
 	return (
-		<div className="border rounded-lg bg-white w-full">
+		<div className="rounded-lg bg-white w-full">
 			<div className="p-4">
 				<div className="mb-4 relative flex items-center gap-2">
 					<h1 className="text-md sm:text-xl font-bold">書き込み</h1>

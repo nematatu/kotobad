@@ -46,7 +46,7 @@ export const ThreadPostsStream = ({
 
 	return (
 		<div id="thread-posts-top" className="flex w-full flex-col gap-3">
-			<div className="w-full py-3">
+			<div className="w-full">
 				{hasPosts ? (
 					<PostList
 						posts={posts}

@@ -77,11 +77,8 @@ export function ThreadHeartLottiePlayer({ onReadyAction, className }: Props) {
 			loop={false}
 			speed={1.9}
 			keepLastFrame
-			className={cn(
-				"[&_svg]:!h-full [&_svg]:!w-full [&_svg]:max-w-none",
-				className,
-			)}
-			style={{ width: "100%", height: "100%" }}
+			className={cn("h-full w-full overflow-visible", className)}
+			style={{ width: "100%", height: "100%", overflow: "visible", margin: 0 }}
 			onEvent={(event) => {
 				if (
 					(event === "instanceSaved" || event === "ready") &&
