@@ -1,7 +1,7 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { TagList } from "../../components/view/tag/tagList";
-import { ThreadLikeButton } from "./ThreadLikeButton";
+import { LikeButton } from "./likeButton";
 
 type Props = {
 	threadHeaderData: ThreadType;
@@ -19,12 +19,8 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 				<h1 className="max-w-4xl text-left text-lg sm:text-2xl font-bold break-words">
 					{threadHeaderData.title}
 				</h1>
-				<ThreadLikeButton
-					threadId={threadHeaderData.id}
-					initialLikeCount={threadHeaderData.likeCount}
-					initialLikedByMe={threadHeaderData.likedByMe}
-				/>
 			</div>
+			<LikeButton />
 			{threadHeaderData.threadTags.length > 0 && (
 				<div className="block sm:hidden flex flex-wrap gap-2">
 					<TagList tags={threadHeaderData.threadTags} />

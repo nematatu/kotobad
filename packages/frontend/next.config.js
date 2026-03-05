@@ -7,6 +7,10 @@ const nextConfig = {
     externalDir: true,
   },
   async headers() {
+    if (process.env.NODE_ENV !== "production") {
+      return [];
+    }
+
     return [
       {
         source: "/_next/static/:path*",
