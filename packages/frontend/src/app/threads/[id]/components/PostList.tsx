@@ -10,6 +10,7 @@ import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate"
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
+import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { PostDropDownMenu } from "@/components/feature/dropDownMenu/PostDropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import {
@@ -344,7 +345,7 @@ export const PostList = ({
 								</div>
 							</div>
 							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words pl-2">
-								{post.post}
+								<AutoLinkText text={post.post} />
 							</span>
 							{post.reactions.length > 0 && (
 								<div className="flex mt-2 flex-wrap items-center gap-2">

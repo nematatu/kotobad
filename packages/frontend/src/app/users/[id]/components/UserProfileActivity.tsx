@@ -3,6 +3,7 @@
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import Link from "next/link";
+import { AutoLinkText } from "@/components/common/AutoLinkText";
 
 type Props = {
 	profile: UserProfileType;
@@ -67,7 +68,7 @@ export function UserProfileActivity({ profile }: Props) {
 									{post.threadTitle} / #{post.localId}
 								</Link>
 								<p className="mt-1 line-clamp-2 text-sm text-slate-800">
-									{post.post}
+									<AutoLinkText text={post.post} />
 								</p>
 								<div className="mt-1 text-xs text-slate-500">
 									{getRelativeDate(post.createdAt)}
