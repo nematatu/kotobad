@@ -54,7 +54,7 @@ export const CreatePostForm = ({
 
 	useEffect(() => {
 		form.setValue("replyToPostId", replyTargetPostId);
-		if (isInline && replyTargetPostId === null) return;
+		if (!isInline || replyTargetPostId === null) return;
 		const timeoutId = window.setTimeout(() => form.setFocus("post"), 1);
 		return () => window.clearTimeout(timeoutId);
 	}, [form, isInline, replyTargetPostId]);
