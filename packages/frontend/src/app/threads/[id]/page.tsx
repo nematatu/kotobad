@@ -1,11 +1,10 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
-import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
-import ActionLink from "@/components/common/button/ActionLink";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { TagList } from "../components/view/tag/tagList";
 import { getThreadById } from "../lib/getThreadById";
+import { BackToThreadListHeaderButton } from "./components/BackToThreadListHeaderButton";
 import { CreatePostForm } from "./components/CreatePostForm";
 import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
@@ -51,14 +50,7 @@ export default async function ThreadDetailPage({
 				className="hidden sm:block fixed z-40 sm:left-3"
 				style={{ top: "calc(var(--header-height, 0px) + 0.5rem)" }}
 			>
-				<ActionLink
-					className="hover:bg-white"
-					item={{
-						icon: ArrowLeft,
-						label: "スレッド一覧へ",
-						href: "/threads",
-					}}
-				/>
+				<BackToThreadListHeaderButton className="hover:bg-white" />
 			</div>
 			<div className="mx-auto w-full max-w-6xl sm:p-3 sm:p-4">
 				<section>
