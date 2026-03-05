@@ -27,3 +27,13 @@ export const OpenAPIReactionOptionListSchema =
 	BaseReactionSchema.ReactionOptionListSchema.openapi(
 		"ReactionOptionListSchema",
 	);
+
+export const OpenAPIGetThreadReplyNotificationsQuerySchema =
+	BasePostSchema.GetThreadReplyNotificationsQuerySchema.openapi(
+		"GetThreadReplyNotificationsQuerySchema",
+	);
+
+export const OpenAPIThreadReplyNotificationListSchema =
+	BasePostSchema.ThreadReplyNotificationListSchema.openapi(
+		"ThreadReplyNotificationListSchema",
+	);

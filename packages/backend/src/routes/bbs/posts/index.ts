@@ -11,6 +11,10 @@ import {
 	searchPostRoute,
 	searchPostRouter,
 } from "./methods/get";
+import {
+	getThreadReplyNotificationsRoute,
+	getThreadReplyNotificationsRouter,
+} from "./methods/notifications";
 
 import {
 	getReactionOptionsRoute,
@@ -24,6 +28,7 @@ const postRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(deletePostRoute, deletePostRouter)
 	.openapi(getReactionOptionsRoute, getReactionOptionsRouter)
 	.openapi(getPostByThreadIdRoute, getPostByThreadIdRouter)
+	.openapi(getThreadReplyNotificationsRoute, getThreadReplyNotificationsRouter)
 	.openapi(getPostByIdRoute, getPostByIdRouter)
 	.openapi(searchPostRoute, searchPostRouter)
 	.openapi(setPostReactionsRoute, setPostReactionsRouter);

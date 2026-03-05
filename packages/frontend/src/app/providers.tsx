@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import PwaPullToRefresh from "@/components/feature/navigation/PwaPullToRefresh";
+import { ThreadReplyNotificationWatcher } from "@/components/feature/notification/ThreadReplyNotificationWatcher";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 import { authClient } from "@/lib/auth/auth-client";
 
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
 		>
 			<UserProvider>
 				<PwaPullToRefresh />
+				<ThreadReplyNotificationWatcher />
 				{children}
 			</UserProvider>
 		</AuthUIProvider>

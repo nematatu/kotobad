@@ -38,3 +38,25 @@ export const SetPostReactionsResponseSchema = z.object({
 	postId: z.number().int().positive(),
 	reactions: z.array(PostReactionSchema),
 });
+
+export const GetThreadReplyNotificationsQuerySchema = z.object({
+	since: z.coerce.number().int().nonnegative().optional(),
+	limit: z.coerce.number().int().positive().max(50).default(20),
+});
+
+export const ThreadReplyNotificationSchema = z.object({
+	postId: z.number().int().positive(),
+	threadId: z.number().int().positive(),
+	threadTitle: z.string().min(1),
+	postExcerpt: z.string(),
+	createdAt: z.string(),
+	repliedBy: z.object({
+		id: z.string(),
+		name: z.string(),
+		image: z.string().nullable().optional(),
+	}),
+});
+
+export const ThreadReplyNotificationListSchema = z.object({
+	notifications: z.array(ThreadReplyNotificationSchema),
+});
