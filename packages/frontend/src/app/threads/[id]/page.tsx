@@ -60,7 +60,7 @@ export default async function ThreadDetailPage({
 					}}
 				/>
 			</div>
-			<div className="mx-auto w-full max-w-6xl p-3 sm:p-4">
+			<div className="mx-auto w-full max-w-6xl sm:p-3 sm:p-4">
 				<section>
 					<ThreadDetailHeader threadHeaderData={threadHeaderData} />
 				</section>
