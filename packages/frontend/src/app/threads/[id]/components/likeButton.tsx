@@ -123,7 +123,7 @@ export function LikeButton({
 			<span className="relative inline-flex size-8 items-center justify-center shrink-0 sm:size-9">
 				<ThreadHeartLottiePlayer
 					onReadyAction={onReadyAction}
-					className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[2.55]"
+					className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[2.1]"
 				/>
 			</span>
 			<span className="whitespace-nowrap">{likeCount}</span>
