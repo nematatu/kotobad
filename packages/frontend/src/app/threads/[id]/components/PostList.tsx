@@ -300,7 +300,7 @@ export const PostList = ({
 								: undefined,
 						}}
 					>
-						<div className="flex flex-col w-full">
+						<div className="flex flex-col w-full space-y-2">
 							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
 								<Link
 									href={`/users/${encodeURIComponent(post.authorId)}`}
@@ -343,7 +343,7 @@ export const PostList = ({
 									<PostDropDownMenu postId={post.id} />
 								</div>
 							</div>
-							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words">
+							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words pl-2">
 								{post.post}
 							</span>
 							{post.reactions.length > 0 && (
