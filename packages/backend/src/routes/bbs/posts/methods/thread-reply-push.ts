@@ -125,6 +125,70 @@ const textToBase64Url = (value: string): string => {
 	return uint8ArrayToBase64Url(new TextEncoder().encode(value));
 };
 
+const readDerLength = (
+	bytes: Uint8Array,
+	offset: number,
+): { length: number; nextOffset: number } => {
+	const first = bytes[offset];
+	if ((first & 0x80) === 0) {
+		return { length: first, nextOffset: offset + 1 };
+	}
+	const count = first & 0x7f;
+	let length = 0;
+	for (let i = 0; i < count; i += 1) {
+		length = (length << 8) | bytes[offset + 1 + i];
+	}
+	return { length, nextOffset: offset + 1 + count };
+};
+
+const toFixedLengthInt = (value: Uint8Array, size: number): Uint8Array => {
+	let normalized = value;
+	while (normalized.length > 0 && normalized[0] === 0x00) {
+		normalized = normalized.slice(1);
+	}
+	if (normalized.length > size) {
+		throw new Error("Invalid ECDSA integer length");
+	}
+	const out = new Uint8Array(size);
+	out.set(normalized, size - normalized.length);
+	return out;
+};
+
+// WebCrypto ECDSA署名(DER)をJWS ES256形式(R||S)へ変換する。
+const derSignatureToJose = (der: Uint8Array): Uint8Array => {
+	let offset = 0;
+	if (der[offset] !== 0x30) {
+		throw new Error("Invalid DER signature");
+	}
+	offset += 1;
+	const seqLen = readDerLength(der, offset);
+	offset = seqLen.nextOffset;
+
+	if (der[offset] !== 0x02) {
+		throw new Error("Invalid DER signature");
+	}
+	offset += 1;
+	const rLen = readDerLength(der, offset);
+	offset = rLen.nextOffset;
+	const r = der.slice(offset, offset + rLen.length);
+	offset += rLen.length;
+
+	if (der[offset] !== 0x02) {
+		throw new Error("Invalid DER signature");
+	}
+	offset += 1;
+	const sLen = readDerLength(der, offset);
+	offset = sLen.nextOffset;
+	const s = der.slice(offset, offset + sLen.length);
+
+	const rFixed = toFixedLengthInt(r, 32);
+	const sFixed = toFixedLengthInt(s, 32);
+	const jose = new Uint8Array(64);
+	jose.set(rFixed, 0);
+	jose.set(sFixed, 32);
+	return jose;
+};
+
 const buildPrivateJwk = ({
 	publicKey,
 	privateKey,
@@ -207,7 +271,8 @@ const createVapidJwt = async ({
 		new TextEncoder().encode(unsigned),
 	);
 
-	return `${unsigned}.${uint8ArrayToBase64Url(new Uint8Array(signature))}`;
+	const joseSignature = derSignatureToJose(new Uint8Array(signature));
+	return `${unsigned}.${uint8ArrayToBase64Url(joseSignature)}`;
 };
 
 const sendWebPushRequest = async ({
