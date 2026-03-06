@@ -11,6 +11,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", () => {
 	// Intentionally no custom caching to avoid stale static-asset issues.
 });
+<<<<<<< HEAD
 
 self.addEventListener("notificationclick", (event) => {
 	event.notification.close();
@@ -20,3 +21,5 @@ self.addEventListener("notificationclick", (event) => {
 
 	event.waitUntil(clients.openWindow(absoluteUrl));
 });
+=======
+>>>>>>> parent of 6dd3baf (feat: pwa通知デモ)

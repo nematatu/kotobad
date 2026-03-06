@@ -7,7 +7,6 @@ import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Sort } from "@/app/threads/lib/sort";
-import { NotificationDemoButton } from "@/components/feature/notification/NotificationDemoButton";
 import { emitAuthRequiredEvent } from "@/lib/auth/authRequiredEvent";
 import NoThread from "./NoThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
@@ -170,13 +169,8 @@ export default function ThreadPageClient({
 	return (
 		<div className="w-full max-w-5xl mx-auto flex flex-col space-y-3">
 			<div className="w-full px-3 md:px-0 pt-5">
-				<div className="flex items-center justify-between gap-2">
-					<div className="text-xl font-bold">
-						{isFiltering
-							? `「${state.activeQuery}」の検索結果`
-							: "スレッド一覧"}
-					</div>
-					<NotificationDemoButton />
+				<div className="text-xl font-bold">
+					{isFiltering ? `「${state.activeQuery}」の検索結果` : "スレッド一覧"}
 				</div>
 			</div>
 			<div className="w-full px-3 md:px-0">
