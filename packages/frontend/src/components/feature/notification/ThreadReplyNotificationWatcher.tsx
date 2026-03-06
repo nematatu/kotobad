@@ -1,21 +1,12 @@
 "use client";
 
-import {
-	SetThreadReplyPushSubscriptionSchema,
-	ThreadReplyNotificationListSchema,
-} from "@kotobad/shared/src/schemas/post";
+import { ThreadReplyNotificationListSchema } from "@kotobad/shared/src/schemas/post";
 import { useEffect, useRef } from "react";
-import { useUser } from "@/components/feature/provider/UserProvider";
 
 const POLLING_INTERVAL_MS = 30_000;
-const STORAGE_CURSOR_KEY_PREFIX = "kotobad:reply-notify:cursor";
-const STORAGE_NOTIFIED_POST_IDS_KEY_PREFIX = "kotobad:reply-notify:post-ids";
+const STORAGE_LAST_SEEN_KEY = "kotobad:reply-notify:last-seen";
+const STORAGE_NOTIFIED_POST_IDS_KEY = "kotobad:reply-notify:post-ids";
 const STORAGE_NOTIFIED_POST_IDS_MAX = 200;
-
-type NotificationCursor = {
-	createdAt: number;
-	postId: number;
-};
 
 const toEpochSeconds = (dateString: string): number => {
 	const timestamp = Date.parse(dateString);
@@ -25,53 +16,30 @@ const toEpochSeconds = (dateString: string): number => {
 	return Math.floor(timestamp / 1000);
 };
 
-const toScopedStorageKey = (prefix: string, userId: string): string =>
-	`${prefix}:${userId}`;
-
-const readCursor = (userId: string): NotificationCursor | null => {
+const readLastSeen = (): number => {
 	try {
-		const raw = localStorage.getItem(
-			toScopedStorageKey(STORAGE_CURSOR_KEY_PREFIX, userId),
-		);
+		const raw = localStorage.getItem(STORAGE_LAST_SEEN_KEY);
 		if (!raw) {
-			return null;
+			return 0;
 		}
-		const parsed = JSON.parse(raw);
-		if (!parsed || typeof parsed !== "object") {
-			return null;
-		}
-		const createdAt = Number((parsed as { createdAt?: unknown }).createdAt);
-		const postId = Number((parsed as { postId?: unknown }).postId);
-		if (
-			!Number.isInteger(createdAt) ||
-			createdAt < 0 ||
-			!Number.isInteger(postId) ||
-			postId <= 0
-		) {
-			return null;
-		}
-		return { createdAt, postId };
+		const parsed = Number(raw);
+		return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 	} catch {
-		return null;
+		return 0;
 	}
 };
 
-const writeCursor = (userId: string, cursor: NotificationCursor): void => {
+const writeLastSeen = (value: number): void => {
 	try {
-		localStorage.setItem(
-			toScopedStorageKey(STORAGE_CURSOR_KEY_PREFIX, userId),
-			JSON.stringify(cursor),
-		);
+		localStorage.setItem(STORAGE_LAST_SEEN_KEY, String(value));
 	} catch {
 		// Ignore storage failures.
 	}
 };
 
-const readNotifiedPostIds = (userId: string): number[] => {
+const readNotifiedPostIds = (): number[] => {
 	try {
-		const raw = localStorage.getItem(
-			toScopedStorageKey(STORAGE_NOTIFIED_POST_IDS_KEY_PREFIX, userId),
-		);
+		const raw = localStorage.getItem(STORAGE_NOTIFIED_POST_IDS_KEY);
 		if (!raw) {
 			return [];
 		}
@@ -87,95 +55,15 @@ const readNotifiedPostIds = (userId: string): number[] => {
 	}
 };
 
-const writeNotifiedPostIds = (userId: string, postIds: number[]): void => {
+const writeNotifiedPostIds = (postIds: number[]): void => {
 	try {
 		localStorage.setItem(
-			toScopedStorageKey(STORAGE_NOTIFIED_POST_IDS_KEY_PREFIX, userId),
+			STORAGE_NOTIFIED_POST_IDS_KEY,
 			JSON.stringify(postIds),
 		);
 	} catch {
 		// Ignore storage failures.
 	}
-};
-
-const base64UrlToUint8Array = (value: string): Uint8Array => {
-	const padded = value + "=".repeat((4 - (value.length % 4)) % 4);
-	const base64 = padded.replace(/-/g, "+").replace(/_/g, "/");
-	const binary = atob(base64);
-	const bytes = new Uint8Array(binary.length);
-	for (let i = 0; i < binary.length; i += 1) {
-		bytes[i] = binary.charCodeAt(i);
-	}
-	return bytes;
-};
-
-const toArrayBuffer = (bytes: Uint8Array): ArrayBuffer => {
-	const buffer = new ArrayBuffer(bytes.byteLength);
-	new Uint8Array(buffer).set(bytes);
-	return buffer;
-};
-
-const getServiceWorkerRegistration =
-	async (): Promise<ServiceWorkerRegistration | null> => {
-		if (!("serviceWorker" in navigator)) {
-			return null;
-		}
-		const current = await navigator.serviceWorker.getRegistration();
-		if (current) {
-			return current;
-		}
-		return navigator.serviceWorker.ready.catch(() => null);
-	};
-
-const ensurePushSubscription = async (): Promise<boolean> => {
-	if (!("PushManager" in window)) {
-		return false;
-	}
-
-	const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-	if (!vapidPublicKey) {
-		return false;
-	}
-
-	const registration = await getServiceWorkerRegistration();
-	if (!registration) {
-		return false;
-	}
-
-	let subscription = await registration.pushManager.getSubscription();
-	if (!subscription) {
-		subscription = await registration.pushManager.subscribe({
-			userVisibleOnly: true,
-			applicationServerKey: toArrayBuffer(
-				base64UrlToUint8Array(vapidPublicKey),
-			),
-		});
-	}
-
-	const json = subscription.toJSON();
-	const requestBody = SetThreadReplyPushSubscriptionSchema.parse({
-		active: true,
-		subscription: {
-			endpoint: subscription.endpoint,
-			expirationTime: subscription.expirationTime ?? null,
-			keys: {
-				p256dh: json.keys?.p256dh ?? "",
-				auth: json.keys?.auth ?? "",
-			},
-		},
-	});
-
-	const response = await fetch(
-		"/threads/api/posts/setThreadReplyPushSubscription",
-		{
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(requestBody),
-			cache: "no-store",
-		},
-	);
-
-	return response.ok;
 };
 
 type NotificationPayload = {
@@ -187,7 +75,6 @@ type NotificationPayload = {
 
 async function pushLocalNotification(
 	payload: NotificationPayload,
-	registration: ServiceWorkerRegistration | null,
 ): Promise<void> {
 	if (typeof window === "undefined" || !("Notification" in window)) {
 		return;
@@ -196,15 +83,20 @@ async function pushLocalNotification(
 		return;
 	}
 
-	if (registration) {
-		await registration.showNotification(payload.title, {
-			body: payload.body,
-			tag: payload.tag,
-			icon: "/pwa-192x192.png",
-			badge: "/pwa-192x192.png",
-			data: { url: payload.url },
-		});
-		return;
+	if ("serviceWorker" in navigator) {
+		const registration =
+			(await navigator.serviceWorker.getRegistration()) ??
+			(await navigator.serviceWorker.ready.catch(() => null));
+		if (registration) {
+			await registration.showNotification(payload.title, {
+				body: payload.body,
+				tag: payload.tag,
+				icon: "/pwa-192x192.png",
+				badge: "/pwa-192x192.png",
+				data: { url: payload.url },
+			});
+			return;
+		}
 	}
 
 	new Notification(payload.title, {
@@ -214,19 +106,11 @@ async function pushLocalNotification(
 }
 
 export function ThreadReplyNotificationWatcher() {
-	const { user, isLoading } = useUser();
-	const userId = typeof user?.id === "string" ? user.id : null;
+	const isInitialFetchRef = useRef(true);
 	const isFetchingRef = useRef(false);
-	const initializedUsersRef = useRef<Set<string>>(new Set());
-	const subscribedUsersRef = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
-		if (
-			typeof window === "undefined" ||
-			!("Notification" in window) ||
-			isLoading ||
-			!userId
-		) {
+		if (typeof window === "undefined" || !("Notification" in window)) {
 			return;
 		}
 
@@ -234,28 +118,18 @@ export function ThreadReplyNotificationWatcher() {
 			if (isFetchingRef.current) {
 				return;
 			}
+
 			if (document.visibilityState === "hidden") {
-				return;
-			}
-			if (Notification.permission !== "granted") {
 				return;
 			}
 
 			isFetchingRef.current = true;
 
 			try {
-				if (!subscribedUsersRef.current.has(userId)) {
-					const registered = await ensurePushSubscription();
-					if (registered) {
-						subscribedUsersRef.current.add(userId);
-					}
-				}
-
 				const params = new URLSearchParams({ limit: "20" });
-				const cursor = readCursor(userId);
-				if (cursor) {
-					params.set("cursorCreatedAt", String(cursor.createdAt));
-					params.set("cursorPostId", String(cursor.postId));
+				const since = readLastSeen();
+				if (since > 0) {
+					params.set("since", String(since));
 				}
 
 				const response = await fetch(
@@ -266,59 +140,64 @@ export function ThreadReplyNotificationWatcher() {
 					},
 				);
 
-				if (response.status === 401 || !response.ok) {
+				if (response.status === 401) {
+					return;
+				}
+				if (!response.ok) {
 					return;
 				}
 
 				const raw = await response.json();
 				const parsed = ThreadReplyNotificationListSchema.parse(raw);
 				const notifications = parsed.notifications;
-				const isInitialFetch = !initializedUsersRef.current.has(userId);
+				if (notifications.length === 0) {
+					return;
+				}
 
-				const notifiedPostIds = readNotifiedPostIds(userId);
+				let maxSeen = since;
+				for (const notification of notifications) {
+					const createdAt = toEpochSeconds(notification.createdAt);
+					if (createdAt > maxSeen) {
+						maxSeen = createdAt;
+					}
+				}
+
+				const notifiedPostIds = readNotifiedPostIds();
 				const notifiedPostIdSet = new Set(notifiedPostIds);
 
-				if (!isInitialFetch && notifications.length > 0) {
-					const registration = await getServiceWorkerRegistration();
-					for (const notification of notifications) {
+				if (!isInitialFetchRef.current) {
+					const orderedNotifications = [...notifications].sort(
+						(a, b) => toEpochSeconds(a.createdAt) - toEpochSeconds(b.createdAt),
+					);
+					for (const notification of orderedNotifications) {
 						if (notifiedPostIdSet.has(notification.postId)) {
 							continue;
 						}
-						await pushLocalNotification(
-							{
-								title: `${notification.repliedBy.name} さんが返信しました`,
-								body: `${notification.threadTitle} / ${notification.postExcerpt}`,
-								url: `/threads/${notification.threadId}?postId=${notification.postId}`,
-								tag: `reply:${notification.postId}`,
-							},
-							registration,
-						);
+
+						await pushLocalNotification({
+							title: `${notification.repliedBy.name} さんが返信しました`,
+							body: `${notification.threadTitle} / ${notification.postExcerpt}`,
+							url: `/threads/${notification.threadId}?postId=${notification.postId}`,
+							tag: `reply:${notification.postId}`,
+						});
 					}
 				}
 
 				for (const notification of notifications) {
 					notifiedPostIdSet.add(notification.postId);
 				}
+
 				const nextNotifiedPostIds = Array.from(notifiedPostIdSet).slice(
 					-STORAGE_NOTIFIED_POST_IDS_MAX,
 				);
-				writeNotifiedPostIds(userId, nextNotifiedPostIds);
-
-				const latestNotification = notifications[notifications.length - 1];
-				if (latestNotification) {
-					const createdAt = toEpochSeconds(latestNotification.createdAt);
-					if (createdAt > 0) {
-						writeCursor(userId, {
-							createdAt,
-							postId: latestNotification.postId,
-						});
-					}
+				writeNotifiedPostIds(nextNotifiedPostIds);
+				if (maxSeen > 0) {
+					writeLastSeen(maxSeen);
 				}
-
-				initializedUsersRef.current.add(userId);
 			} catch (_error) {
 				// Ignore polling errors to keep UX unaffected.
 			} finally {
+				isInitialFetchRef.current = false;
 				isFetchingRef.current = false;
 			}
 		};
@@ -339,7 +218,7 @@ export function ThreadReplyNotificationWatcher() {
 			window.clearInterval(intervalId);
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
-	}, [isLoading, userId]);
+	}, []);
 
 	return null;
 }

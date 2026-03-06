@@ -1,7 +1,7 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
-import { and, asc, eq, gt, ne, or } from "drizzle-orm";
+import { and, desc, eq, gt, ne } from "drizzle-orm";
 import { posts, threads, user } from "../../../../../drizzle/schema";
 import { ErrorResponse } from "../../../../models/error";
 import {
@@ -52,7 +52,7 @@ export const getThreadReplyNotificationsRouter: RouteHandler<
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const { cursorCreatedAt, cursorPostId, limit } = c.req.valid("query");
+		const { since, limit } = c.req.valid("query");
 		const authUser = c.get("betterAuthUser");
 
 		const conditions = [
@@ -60,18 +60,8 @@ export const getThreadReplyNotificationsRouter: RouteHandler<
 			ne(posts.authorId, authUser.id),
 		];
 
-		if (
-			typeof cursorCreatedAt === "number" &&
-			typeof cursorPostId === "number"
-		) {
-			const cursorDate = new Date(cursorCreatedAt * 1000);
-			const cursorCondition = or(
-				gt(posts.createdAt, cursorDate),
-				and(eq(posts.createdAt, cursorDate), gt(posts.id, cursorPostId)),
-			);
-			if (cursorCondition) {
-				conditions.push(cursorCondition);
-			}
+		if (typeof since === "number") {
+			conditions.push(gt(posts.createdAt, new Date(since * 1000)));
 		}
 
 		const rows = await db
@@ -89,7 +79,7 @@ export const getThreadReplyNotificationsRouter: RouteHandler<
 			.innerJoin(threads, eq(posts.threadId, threads.id))
 			.leftJoin(user, eq(posts.authorId, user.id))
 			.where(and(...conditions))
-			.orderBy(asc(posts.createdAt), asc(posts.id))
+			.orderBy(desc(posts.createdAt), desc(posts.id))
 			.limit(limit);
 
 		const notifications = rows.map((row) => ({

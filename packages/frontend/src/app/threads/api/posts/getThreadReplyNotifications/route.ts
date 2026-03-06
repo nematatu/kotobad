@@ -11,9 +11,7 @@ export async function GET(req: Request) {
 	try {
 		const requestUrl = new URL(req.url);
 		const query = GetThreadReplyNotificationsQuerySchema.parse({
-			cursorCreatedAt:
-				requestUrl.searchParams.get("cursorCreatedAt") ?? undefined,
-			cursorPostId: requestUrl.searchParams.get("cursorPostId") ?? undefined,
+			since: requestUrl.searchParams.get("since") ?? undefined,
 			limit: requestUrl.searchParams.get("limit") ?? undefined,
 		});
 
@@ -47,21 +45,13 @@ export async function GET(req: Request) {
 }
 
 async function getThreadReplyNotifications(query: {
-	cursorCreatedAt?: number;
-	cursorPostId?: number;
+	since?: number;
 	limit: number;
 }): Promise<ThreadReplyNotificationListType> {
 	const targetUrl = await getApiUrl("GET_THREAD_REPLY_NOTIFICATIONS");
 	targetUrl.searchParams.set("limit", String(query.limit));
-	if (
-		typeof query.cursorCreatedAt === "number" &&
-		typeof query.cursorPostId === "number"
-	) {
-		targetUrl.searchParams.set(
-			"cursorCreatedAt",
-			String(query.cursorCreatedAt),
-		);
-		targetUrl.searchParams.set("cursorPostId", String(query.cursorPostId));
+	if (typeof query.since === "number") {
+		targetUrl.searchParams.set("since", String(query.since));
 	}
 	const raw = await BffFetcher<unknown>(targetUrl, {
 		method: "GET",

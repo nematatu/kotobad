@@ -37,13 +37,3 @@ export const OpenAPIThreadReplyNotificationListSchema =
 	BasePostSchema.ThreadReplyNotificationListSchema.openapi(
 		"ThreadReplyNotificationListSchema",
 	);
-
-export const OpenAPISetThreadReplyPushSubscriptionSchema =
-	BasePostSchema.SetThreadReplyPushSubscriptionSchema.openapi(
-		"SetThreadReplyPushSubscriptionSchema",
-	);
-
-export const OpenAPISetThreadReplyPushSubscriptionResponseSchema =
-	BasePostSchema.SetThreadReplyPushSubscriptionResponseSchema.openapi(
-		"SetThreadReplyPushSubscriptionResponseSchema",
-	);

@@ -16,7 +16,6 @@ export const API_PATH = {
 	SET_POST_REACTIONS: "bbs/posts/reactions/set",
 	SET_THREAD_LIKES: "bbs/threads/likes/set",
 	GET_THREAD_REPLY_NOTIFICATIONS: "bbs/posts/notifications/replies",
-	SET_THREAD_REPLY_PUSH_SUBSCRIPTION: "bbs/posts/notifications/subscriptions",
 } as const;
 
 export type ApiPathKey = keyof typeof API_PATH;
