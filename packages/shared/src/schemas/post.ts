@@ -39,10 +39,23 @@ export const SetPostReactionsResponseSchema = z.object({
 	reactions: z.array(PostReactionSchema),
 });
 
-export const GetThreadReplyNotificationsQuerySchema = z.object({
-	since: z.coerce.number().int().nonnegative().optional(),
-	limit: z.coerce.number().int().positive().max(50).default(20),
-});
+export const GetThreadReplyNotificationsQuerySchema = z
+	.object({
+		cursorCreatedAt: z.coerce.number().int().nonnegative().optional(),
+		cursorPostId: z.coerce.number().int().positive().optional(),
+		limit: z.coerce.number().int().positive().max(50).default(20),
+	})
+	.superRefine((value, ctx) => {
+		const hasCreatedAt = typeof value.cursorCreatedAt === "number";
+		const hasPostId = typeof value.cursorPostId === "number";
+		if (hasCreatedAt !== hasPostId) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "cursorCreatedAt and cursorPostId must be provided together",
+				path: hasCreatedAt ? ["cursorPostId"] : ["cursorCreatedAt"],
+			});
+		}
+	});
 
 export const ThreadReplyNotificationSchema = z.object({
 	postId: z.number().int().positive(),
@@ -59,4 +72,22 @@ export const ThreadReplyNotificationSchema = z.object({
 
 export const ThreadReplyNotificationListSchema = z.object({
 	notifications: z.array(ThreadReplyNotificationSchema),
+});
+
+export const ThreadReplyPushSubscriptionSchema = z.object({
+	endpoint: z.string().url(),
+	expirationTime: z.number().nullable().optional(),
+	keys: z.object({
+		p256dh: z.string().min(1),
+		auth: z.string().min(1),
+	}),
+});
+
+export const SetThreadReplyPushSubscriptionSchema = z.object({
+	active: z.boolean(),
+	subscription: ThreadReplyPushSubscriptionSchema,
+});
+
+export const SetThreadReplyPushSubscriptionResponseSchema = z.object({
+	active: z.boolean(),
 });

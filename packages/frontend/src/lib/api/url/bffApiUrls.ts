@@ -10,6 +10,8 @@ export const BFF_API_PATH = {
 	SET_THREAD_LIKES: "threads/api/threads/setThreadLike",
 	GET_THREAD_REPLY_NOTIFICATIONS:
 		"threads/api/posts/getThreadReplyNotifications",
+	SET_THREAD_REPLY_PUSH_SUBSCRIPTION:
+		"threads/api/posts/setThreadReplyPushSubscription",
 	UPLOAD_MY_AVATAR: "threads/api/users/uploadAvatar",
 	UPDATE_MY_PROFILE: "threads/api/users/updateProfile",
 } as const;

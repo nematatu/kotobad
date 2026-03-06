@@ -9,6 +9,7 @@ import {
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
+import { sendThreadReplyPushToUser } from "./thread-reply-push";
 
 export const createPostRoute = createRoute({
 	method: "post",
@@ -184,6 +185,15 @@ export const createPostRouter: RouteHandler<
 			return c.json(
 				{ error: "Failed to create post", message: "Post not found" },
 				500,
+			);
+		}
+
+		if (thread.authorId !== user.id) {
+			c.executionCtx.waitUntil(
+				sendThreadReplyPushToUser({
+					env: c.env,
+					userId: thread.authorId,
+				}),
 			);
 		}
 

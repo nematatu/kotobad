@@ -18,6 +18,9 @@ export type Bindings = {
 	GOOGLE_CLIENT_SECRET: string;
 	KOTOBAD_BUCKET: R2Bucket;
 	R2_PUBLIC_BASE_URL?: string;
+	VAPID_PUBLIC_KEY?: string;
+	VAPID_PRIVATE_KEY?: string;
+	VAPID_SUBJECT?: string;
 };
 
 export type UserTokenPayload = {

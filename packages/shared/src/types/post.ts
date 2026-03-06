@@ -5,8 +5,11 @@ import type {
 	GetThreadReplyNotificationsQuerySchema,
 	PostListSchema,
 	PostSchema,
+	SetThreadReplyPushSubscriptionResponseSchema,
+	SetThreadReplyPushSubscriptionSchema,
 	ThreadReplyNotificationListSchema,
 	ThreadReplyNotificationSchema,
+	ThreadReplyPushSubscriptionSchema,
 } from "../schemas/post";
 
 export type PostType = z.infer<typeof PostSchema>;
@@ -27,4 +30,16 @@ export type ThreadReplyNotificationType = z.infer<
 
 export type ThreadReplyNotificationListType = z.infer<
 	typeof ThreadReplyNotificationListSchema
+>;
+
+export type ThreadReplyPushSubscriptionType = z.infer<
+	typeof ThreadReplyPushSubscriptionSchema
+>;
+
+export type SetThreadReplyPushSubscriptionType = z.infer<
+	typeof SetThreadReplyPushSubscriptionSchema
+>;
+
+export type SetThreadReplyPushSubscriptionResponseType = z.infer<
+	typeof SetThreadReplyPushSubscriptionResponseSchema
 >;
