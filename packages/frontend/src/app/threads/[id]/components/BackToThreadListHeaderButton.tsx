@@ -2,6 +2,7 @@
 
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -20,7 +21,9 @@ export function BackToThreadListHeaderButton({ className }: Props) {
 	};
 
 	return (
-		<button
+		<Button
+			variant="ghost"
+			enableClickAnimation
 			type="button"
 			onClick={onBackClick}
 			aria-label="スレッド一覧へ戻る"
@@ -31,6 +34,6 @@ export function BackToThreadListHeaderButton({ className }: Props) {
 		>
 			<ArrowLeft className="h-4 w-4" />
 			<span>スレッド一覧へ</span>
-		</button>
+		</Button>
 	);
 }
