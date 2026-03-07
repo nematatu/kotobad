@@ -1,4 +1,8 @@
-import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
+import type {
+	D1Database,
+	DurableObjectNamespace,
+	R2Bucket,
+} from "@cloudflare/workers-types";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import type { Context } from "hono";
 import type { z } from "zod";
@@ -18,6 +22,7 @@ export type Bindings = {
 	GOOGLE_CLIENT_SECRET: string;
 	KOTOBAD_BUCKET: R2Bucket;
 	R2_PUBLIC_BASE_URL?: string;
+	THREAD_ROOM: DurableObjectNamespace;
 };
 
 export type UserTokenPayload = {

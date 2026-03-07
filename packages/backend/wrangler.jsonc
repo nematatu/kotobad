@@ -27,5 +27,19 @@
           "bucket_name": "kotobad-bucket",
           "remote": true
       }
+  ], 
+  "durable_objects": {
+      "bindings": [
+        {
+            "name": "THREAD_ROOM", 
+            "class_name": "ThreadRoom"
+        }
+      ]
+  }, 
+  "migrations": [
+      {
+          "tag": "v1-thread-room", 
+          "new_sqlite_class": ["ThreadRoom"]
+      }
   ]
 }
