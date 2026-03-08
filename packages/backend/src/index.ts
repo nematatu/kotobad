@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { prettyJSON } from "hono/pretty-json";
 import { ZodError } from "zod";
 import { db } from "./middleware/db";
+import { ThreadRoom } from "./realtime/thread-room";
 import mainRouter from "./routes";
 import type { AppEnvironment } from "./types";
 
@@ -51,5 +52,6 @@ app.onError((err, c) => {
 	);
 });
 
+export { ThreadRoom };
 export type AppType = typeof app;
 export default app;

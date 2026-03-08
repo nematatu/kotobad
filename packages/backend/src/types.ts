@@ -1,8 +1,4 @@
-import type {
-	D1Database,
-	DurableObjectNamespace,
-	R2Bucket,
-} from "@cloudflare/workers-types";
+import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import type { Context } from "hono";
 import type { z } from "zod";

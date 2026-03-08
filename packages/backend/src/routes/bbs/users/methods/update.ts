@@ -129,6 +129,11 @@ export const updateUserProfileRouter: RouteHandler<
 			return c.json({ error: "Invalid request body" }, 400);
 		}
 		const parsed = parsedResult.data;
+		const imageFileEntry = formData.get("image");
+		const imageFile =
+			imageFileEntry instanceof File && imageFileEntry.size > 0
+				? imageFileEntry
+				: null;
 
 		const current = await db.query.user.findFirst({
 			where: (u, { eq }) => eq(u.id, authUser.id),
@@ -158,8 +163,8 @@ export const updateUserProfileRouter: RouteHandler<
 		}
 
 		let oldImageUrlToDelete: string | null = null;
-		if (parsed.image) {
-			const extension = MIME_TYPE_TO_EXTENSION[parsed.image.type];
+		if (imageFile) {
+			const extension = MIME_TYPE_TO_EXTENSION[imageFile.type];
 			if (!extension) {
 				return c.json(
 					{ error: "file type must be jpeg, png, webp, avif or svg" },
@@ -167,11 +172,11 @@ export const updateUserProfileRouter: RouteHandler<
 				);
 			}
 
-			const fileBuffer = await parsed.image.arrayBuffer();
+			const fileBuffer = await imageFile.arrayBuffer();
 			const objectKey = `user-icon/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 			await c.env.KOTOBAD_BUCKET.put(objectKey, fileBuffer, {
 				httpMetadata: {
-					contentType: parsed.image.type,
+					contentType: imageFile.type,
 					cacheControl: "public, max-age=31536000, immutable",
 				},
 			});

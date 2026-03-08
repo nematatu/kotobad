@@ -39,7 +39,7 @@
   "migrations": [
       {
           "tag": "v1-thread-room", 
-          "new_sqlite_class": ["ThreadRoom"]
+          "new_sqlite_classes": ["ThreadRoom"]
       }
   ]
 }

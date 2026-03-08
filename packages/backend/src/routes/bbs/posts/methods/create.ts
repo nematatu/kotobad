@@ -8,6 +8,7 @@ import {
 	OpenAPICreatePostSchema,
 	OpenAPIPostSchema,
 } from "../../../../models/posts";
+import { publishThreadEvent } from "../../../../realtime/thread-event";
 import type { AppEnvironment } from "../../../../types";
 
 export const createPostRoute = createRoute({
@@ -186,6 +187,14 @@ export const createPostRouter: RouteHandler<
 				500,
 			);
 		}
+
+		void publishThreadEvent(c.env, {
+			type: "post.created",
+			threadId,
+			postId: insertedId,
+		}).catch((e) => {
+			console.error("Failed to publish thread event", e);
+		});
 
 		return c.json(
 			{
