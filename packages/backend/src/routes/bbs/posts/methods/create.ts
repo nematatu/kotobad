@@ -188,11 +188,6 @@ export const createPostRouter: RouteHandler<
 			);
 		}
 
-		console.log("[post] publishThreadEvent", {
-			threadId,
-			postId: insertedId,
-		});
-
 		c.executionCtx.waitUntil(
 			publishThreadEvent(c.env, {
 				type: "post.created",
