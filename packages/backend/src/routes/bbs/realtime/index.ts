@@ -15,6 +15,12 @@ realtimeRouter.get("/threads/:threadId/ws", async (c): Promise<Response> => {
 		return c.json({ error: "Invalid threadId" }, 400);
 	}
 
+	console.log("[rt] ws connect", {
+		threadId,
+		upgrade: c.req.raw.headers.get("Upgrade"),
+		origin: c.req.raw.headers.get("Origin"),
+	});
+
 	const stub = getThreadRoomStub(c.env, threadId);
 	return await stub.fetch("https://thread-room.internal/ws", {
 		headers: c.req.raw.headers,
