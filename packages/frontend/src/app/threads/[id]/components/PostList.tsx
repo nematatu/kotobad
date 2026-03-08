@@ -116,7 +116,11 @@ export const PostList = ({
 		[],
 	);
 	const [replyEnterPostIds, setReplyEnterPostIds] = useState<number[]>([]);
+	const [realtimeEnterPostIds, setRealtimeEnterPostIds] = useState<number[]>(
+		[],
+	);
 	const previousVisiblePostIdsRef = useRef<number[] | null>(null);
+	const previousPostIdsRef = useRef<number[] | null>(null);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
 		async () => {
@@ -171,9 +175,44 @@ export const PostList = ({
 	const replyEnterPostIdSet = useMemo(() => {
 		return new Set(replyEnterPostIds);
 	}, [replyEnterPostIds]);
+	const realtimeEnterPostIdSet = useMemo(() => {
+		return new Set(realtimeEnterPostIds);
+	}, [realtimeEnterPostIds]);
 
 	useEffect(() => {
+		const nextPostIds = posts.map((post) => post.id);
+		const previousPostIds = previousPostIdsRef.current;
+		previousPostIdsRef.current = nextPostIds;
 		setLocalPosts(posts);
+
+		if (!previousPostIds) {
+			return;
+		}
+
+		const previousPostIdSet = new Set(previousPostIds);
+		const enteringPostIds = nextPostIds.filter(
+			(id) => !previousPostIdSet.has(id),
+		);
+		if (enteringPostIds.length === 0) {
+			return;
+		}
+
+		setRealtimeEnterPostIds((prev) => {
+			const merged = new Set(prev);
+			for (const id of enteringPostIds) {
+				merged.add(id);
+			}
+			return [...merged];
+		});
+
+		const enteringPostIdSet = new Set(enteringPostIds);
+		const timeoutId = window.setTimeout(() => {
+			setRealtimeEnterPostIds((prev) =>
+				prev.filter((id) => !enteringPostIdSet.has(id)),
+			);
+		}, 460);
+
+		return () => window.clearTimeout(timeoutId);
 	}, [posts]);
 
 	useEffect(() => {
@@ -285,15 +324,21 @@ export const PostList = ({
 				const isReplyingToThisPost = replyTarget?.postId === post.id;
 				const isRepliesExpanded = expandedReplyPostIdSet.has(post.id);
 				const isReplyEnterAnimating = replyEnterPostIdSet.has(post.id);
+				const isRealtimeEnterAnimating = realtimeEnterPostIdSet.has(post.id);
 				const replyEnterDelayMs = isReplyEnterAnimating
 					? Math.min(depth * 28, 140)
 					: 0;
+				const rowEnterAnimationClass = isReplyEnterAnimating
+					? "animate-reply-expand-down"
+					: isRealtimeEnterAnimating
+						? "animate-post-realtime-rise"
+						: "";
 
 				return (
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400  ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${isReplyEnterAnimating ? "animate-reply-expand-down" : ""}`}
+						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400 ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${rowEnterAnimationClass}`}
 						style={{
 							paddingLeft: `${16 + indent}px`,
 							animationDelay: isReplyEnterAnimating
