@@ -193,13 +193,15 @@ export const createPostRouter: RouteHandler<
 			postId: insertedId,
 		});
 
-		void publishThreadEvent(c.env, {
-			type: "post.created",
-			threadId,
-			postId: insertedId,
-		}).catch((e) => {
-			console.error("Failed to publish thread event", e);
-		});
+		c.executionCtx.waitUntil(
+			publishThreadEvent(c.env, {
+				type: "post.created",
+				threadId,
+				postId: insertedId,
+			}).catch((e) => {
+				console.error("Failed to publish thread event", e);
+			}),
+		);
 
 		return c.json(
 			{
