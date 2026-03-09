@@ -320,19 +320,9 @@
     @apply text-slate-500;
   }
 
-  .thread-list-card:has(.thread-card-nohover:hover) {
-    border-color: rgb(229 231 235);
-    background-color: rgb(255 255 255);
-  }
-
   .thread-list-meta-chip {
     background-color: rgb(243 244 246);
     color: rgb(31 41 55);
-  }
-
-  .dark .thread-list-card:has(.thread-card-nohover:hover) {
-    border-color: rgb(30 41 59);
-    background-color: rgb(2 6 23);
   }
 
   .dark .thread-list-meta-chip,

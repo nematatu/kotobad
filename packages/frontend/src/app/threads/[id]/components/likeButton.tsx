@@ -24,7 +24,7 @@ const ThreadHeartLottiePlayer = dynamic(
 );
 
 export const THREAD_LIST_META_CHIP_CLASS =
-	"thread-list-meta-chip thread-card-nohover box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm bg-gray-100 px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
+	"thread-list-meta-chip box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm bg-gray-100 px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
 
 type Props = {
 	threadId: number;
@@ -122,7 +122,7 @@ export function LikeButton({
 	const isCompact = size === "compact";
 	const compactButtonClass = cn(
 		THREAD_LIST_META_CHIP_CLASS,
-		"min-h-0 appearance-none overflow-visible border-0 bg-gray-100 text-[10px] shadow-none transition-transform duration-50 hover:bg-gray-100 hover:text-gray-800 active:scale-95 cursor-pointer",
+		"group/like-button min-h-0 appearance-none overflow-visible border-0 bg-gray-100 text-[10px] shadow-none hover:bg-gray-100 hover:text-gray-800 active:scale-95 cursor-pointer",
 	);
 
 	if (isCompact) {
@@ -135,7 +135,7 @@ export function LikeButton({
 				className={compactButtonClass}
 			>
 				<span
-					className="relative inline-flex items-center justify-center overflow-visible shrink-0"
+					className="relative inline-flex items-center justify-center overflow-visible shrink-0 transition-transform duration-100 [@media(hover:hover)]:group-hover/like-button:scale-110"
 					style={{
 						width: compactHeartViewportSizePx,
 						height: compactHeartViewportSizePx,
@@ -164,9 +164,9 @@ export function LikeButton({
 			onClick={onLikeClick}
 			aria-pressed={likedByMe}
 			aria-label={likedByMe ? "いいねを解除" : "いいねする"}
-			className="inline-flex h-auto items-center gap-1.5 px-2 py-1 text-xs sm:text-sm"
+			className="group/like-button inline-flex h-auto items-center gap-1.5 px-2 py-1 text-xs sm:text-sm"
 		>
-			<span className="relative inline-flex size-8 items-center justify-center shrink-0 sm:size-9">
+			<span className="relative inline-flex size-8 items-center justify-center shrink-0 transition-transform duration-100 sm:size-9 [@media(hover:hover)]:group-hover/like-button:scale-110">
 				<ThreadHeartLottiePlayer
 					onReadyAction={onReadyAction}
 					className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[2.1]"
