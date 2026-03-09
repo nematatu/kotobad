@@ -2,7 +2,10 @@
 
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { Heart } from "lucide-react";
+import {
+	LikeButton,
+	THREAD_LIST_META_CHIP_CLASS,
+} from "@/app/threads/[id]/components/likeButton";
 import ChatIcon from "@/assets/threads/chat.svg";
 import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
@@ -65,26 +68,19 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 										</Link>
 									))}
 								</div>
-								<div className="relative z-10 flex flex-wrap space-x-2 pointer-events-none">
-									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
-										<ChatIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+								<div className="relative z-10 flex flex-wrap items-center gap-2 pointer-events-none">
+									<div className={THREAD_LIST_META_CHIP_CLASS}>
+										<ChatIcon className="h-3 w-3" />
 										<span className="text-[10px] leading-none">
 											{thread.postCount}
 										</span>
 									</div>
-									<div className="thread-card-nohover inline-flex items-center gap-[5px] rounded-sm bg-gray-100 px-2 py-1 text-gray-800 font-semibold leading-none pointer-events-auto">
-										<Heart
-											fill={thread.likedByMe ? "currentColor" : "none"}
-											className={
-												thread.likedByMe
-													? "h-4 w-4 sm:h-5 sm:w-5 text-[#ff5353] fill-[#ff5353]"
-													: "h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
-											}
-										/>
-										<span className="text-[10px] leading-none transition-colors">
-											{thread.likeCount}
-										</span>
-									</div>
+									<LikeButton
+										threadId={thread.id}
+										initialLikeCount={thread.likeCount}
+										initialLikedByMe={thread.likedByMe}
+										size="compact"
+									/>
 								</div>
 							</div>
 						</div>

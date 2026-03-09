@@ -12,6 +12,7 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { cn } from "@/lib/utils";
 import type { ThreadHeartLottieController } from "./ThreadHeartLottiePlayer";
 
 const ThreadHeartLottiePlayer = dynamic(
@@ -22,16 +23,21 @@ const ThreadHeartLottiePlayer = dynamic(
 	{ ssr: false },
 );
 
+export const THREAD_LIST_META_CHIP_CLASS =
+	"thread-card-nohover box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm bg-gray-100 px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
+
 type Props = {
 	threadId: number;
 	initialLikeCount: number;
 	initialLikedByMe: boolean;
+	size?: "default" | "compact";
 };
 
 export function LikeButton({
 	threadId,
 	initialLikeCount,
 	initialLikedByMe,
+	size = "default",
 }: Props) {
 	const controllerRef = useRef<ThreadHeartLottieController | null>(null);
 	const likedByMeRef = useRef(initialLikedByMe);
@@ -110,6 +116,34 @@ export function LikeButton({
 			setIsUpdating(false);
 		}
 	};
+
+	const isCompact = size === "compact";
+	const compactButtonClass = cn(
+		THREAD_LIST_META_CHIP_CLASS,
+		"min-h-0 appearance-none border-0 bg-gray-100 text-[10px] shadow-none transition-transform duration-50 hover:bg-gray-100 hover:text-gray-800 active:scale-95 cursor-pointer",
+	);
+
+	if (isCompact) {
+		return (
+			<button
+				type="button"
+				onClick={onLikeClick}
+				aria-pressed={likedByMe}
+				aria-label={likedByMe ? "いいねを解除" : "いいねする"}
+				className={compactButtonClass}
+			>
+				<span className="relative inline-flex h-3 w-3 items-center justify-center overflow-visible shrink-0">
+					<ThreadHeartLottiePlayer
+						onReadyAction={onReadyAction}
+						className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[3.2]"
+					/>
+				</span>
+				<span className="whitespace-nowrap text-[10px] font-semibold leading-none">
+					{likeCount}
+				</span>
+			</button>
+		);
+	}
 
 	return (
 		<Button
