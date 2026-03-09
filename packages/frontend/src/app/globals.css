@@ -547,6 +547,27 @@
   }
   .view-transition-static-bottom-nav {
     view-transition-name: none;
+    isolation: isolate;
+    contain: paint;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    overflow: hidden;
+  }
+  .view-transition-static-bottom-nav::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 1);
+  }
+  .dark .view-transition-static-bottom-nav::before {
+    background: rgb(15 23 42);
+  }
+  .view-transition-static-bottom-nav > * {
+    position: relative;
+    z-index: 1;
   }
   .link-progress {
     position: fixed;
@@ -647,6 +668,20 @@
   html[data-route-transition] nav[aria-label="モバイルナビゲーション"] button[aria-label="スレッドを投稿する"] {
     opacity: 0;
     pointer-events: none;
+  }
+
+  html[data-route-transition] nav[aria-label="モバイルナビゲーション"] {
+    background-color: rgba(255, 255, 255, 1);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  html[data-route-transition] nav[aria-label="モバイルナビゲーション"]::before {
+    opacity: 1;
+  }
+
+  html.dark[data-route-transition] nav[aria-label="モバイルナビゲーション"] {
+    background-color: rgb(15 23 42);
   }
 
   ::view-transition-group(page-background) {
