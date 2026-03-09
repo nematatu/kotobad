@@ -466,13 +466,13 @@
     transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translate3d(-28%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
   }
 }
 
 @keyframes pageSlideInFromLeft {
   0% {
-    transform: translate3d(-28%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
   }
   100% {
     transform: translate3d(0, 0, 0);
@@ -626,6 +626,11 @@
     pointer-events: none;
   }
 
+  html[data-route-transition] nav[aria-label="モバイルナビゲーション"] button[aria-label="スレッドを投稿する"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   ::view-transition-group(page-background) {
     z-index: 0;
   }
@@ -638,15 +643,14 @@
   }
 
   ::view-transition-group(page-footer),
+  ::view-transition-image-pair(page-footer),
   ::view-transition-group(page-header),
   ::view-transition-group(page-bottom-nav) {
+    animation: none;
     z-index: 60;
   }
 
   ::view-transition-old(page-background),
-  ::view-transition-new(page-background),
-  ::view-transition-old(page-footer),
-  ::view-transition-new(page-footer),
   ::view-transition-old(page-header),
   ::view-transition-new(page-header),
   ::view-transition-old(page-bottom-nav),
@@ -655,24 +659,30 @@
     mix-blend-mode: normal;
   }
 
+  ::view-transition-old(page-footer) {
+    animation: none;
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
+
+  ::view-transition-new(page-footer) {
+    animation: none;
+    mix-blend-mode: normal;
+    opacity: 0;
+  }
+
+  ::view-transition-new(page-background) {
+    animation: none;
+    mix-blend-mode: normal;
+    opacity: 0;
+  }
+
   ::view-transition-old(page-content),
   ::view-transition-new(page-content) {
     mix-blend-mode: normal;
-    background-color: #f0f0f0;
-    background-image: url("/haikei/wave-haikei.svg");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+    background: transparent;
     backface-visibility: hidden;
     overflow: clip;
-  }
-
-  .dark::view-transition-old(page-content),
-  .dark::view-transition-new(page-content) {
-    background-color: #0f172a;
-    background-image:
-      linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.55)),
-      url("/haikei/wave-haikei.svg");
   }
 
   html[data-route-transition="forward"]::view-transition-old(page-content) {

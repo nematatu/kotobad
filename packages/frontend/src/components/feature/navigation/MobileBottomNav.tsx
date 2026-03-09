@@ -35,7 +35,7 @@ const MobileBottomNav = ({ tags }: Props) => {
 						<button
 							type="button"
 							aria-label="スレッドを投稿する"
-							className="route-transition-floating-action fixed bottom-20 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white shadow-lg"
+							className="fixed bottom-20 right-4 z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white shadow-lg"
 						>
 							<Plus size={24} />
 						</button>
