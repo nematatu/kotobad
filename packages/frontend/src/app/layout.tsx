@@ -11,6 +11,26 @@ import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
 
+const themeInitScript = `
+(() => {
+	try {
+		const storageKey = "kotobad-theme";
+		const storedTheme = window.localStorage.getItem(storageKey);
+		const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+		const resolvedTheme =
+			storedTheme === "light" || storedTheme === "dark"
+				? storedTheme
+				: systemPrefersDark
+					? "dark"
+					: "light";
+
+		document.documentElement.classList.remove("light", "dark");
+		document.documentElement.classList.add(resolvedTheme);
+		document.documentElement.style.colorScheme = resolvedTheme;
+	} catch {}
+})();
+`;
+
 export default async function RootLayout({
 	children,
 }: Readonly<{
@@ -20,6 +40,9 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ja" suppressHydrationWarning>
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+			</head>
 			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
 				<div
 					className="view-transition-static-background pointer-events-none fixed inset-0"
