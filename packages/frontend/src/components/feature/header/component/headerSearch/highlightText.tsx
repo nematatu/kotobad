@@ -20,7 +20,7 @@ export const highlightText = (threadTitle: string, query: string) => {
 		return shouldHighlight ? (
 			<mark
 				key={key}
-				className="rounded-[2px] bg-yellow-200 px-0.5 text-slate-900"
+				className="rounded-[2px] bg-yellow-200 px-0.5 text-slate-900 dark:bg-yellow-300/80 dark:text-slate-950"
 			>
 				{part}
 			</mark>

@@ -87,6 +87,7 @@
 
 :root {
   --radius: 0.625rem;
+  color-scheme: light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -123,6 +124,16 @@
 }
 
 .dark {
+  color-scheme: dark;
+  --color-surface-50: #020617;
+  --color-surface-100: #0f172a;
+  --color-surface-200: #1e293b;
+  --color-surface-300: #334155;
+  --color-text-label: #64748b;
+  --color-text-body: #cbd5e1;
+  --color-text-emphasis: #e2e8f0;
+  --color-text-display: #f8fafc;
+  --color-text-muted: #94a3b8;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -166,6 +177,148 @@
     letter-spacing: var(--tracking-body);
   }
 
+}
+
+@layer utilities {
+  .dark .bg-white {
+    @apply bg-slate-950;
+  }
+
+  .dark .bg-surface-50 {
+    @apply bg-slate-950;
+  }
+
+  .dark .bg-surface-100,
+  .dark .bg-slate-50 {
+    @apply bg-slate-900;
+  }
+
+  .dark .bg-slate-100,
+  .dark .bg-gray-100,
+  .dark .bg-gray-200 {
+    @apply bg-slate-800;
+  }
+
+  .dark .bg-blue-50 {
+    background-color: rgb(30 58 138 / 0.28);
+  }
+
+  .dark .bg-white\/95 {
+    background-color: rgb(2 6 23 / 0.95);
+  }
+
+  .dark .bg-white\/90 {
+    background-color: rgb(2 6 23 / 0.9);
+  }
+
+  .dark .bg-slate-200\/70 {
+    background-color: rgb(51 65 85 / 0.7);
+  }
+
+  .dark .bg-slate-300\/30 {
+    background-color: rgb(51 65 85 / 0.3);
+  }
+
+  .dark .text-slate-900,
+  .dark .text-gray-900 {
+    @apply text-slate-50;
+  }
+
+  .dark .text-slate-800,
+  .dark .text-gray-800 {
+    @apply text-slate-100;
+  }
+
+  .dark .text-slate-700,
+  .dark .text-gray-700 {
+    @apply text-slate-200;
+  }
+
+  .dark .text-slate-600,
+  .dark .text-gray-600 {
+    @apply text-slate-300;
+  }
+
+  .dark .text-slate-500,
+  .dark .text-gray-500,
+  .dark .text-neutral-400 {
+    @apply text-slate-400;
+  }
+
+  .dark .text-slate-400,
+  .dark .text-gray-400 {
+    @apply text-slate-500;
+  }
+
+  .dark .text-slate-300,
+  .dark .text-gray-300 {
+    @apply text-slate-600;
+  }
+
+  .dark .text-blue-700 {
+    @apply text-blue-300;
+  }
+
+  .dark .text-blue-600,
+  .dark .text-blue-500 {
+    @apply text-blue-400;
+  }
+
+  .dark .text-blue-400 {
+    @apply text-blue-300;
+  }
+
+  .dark .border-slate-200,
+  .dark .border-gray-200 {
+    @apply border-slate-800;
+  }
+
+  .dark .border-slate-300,
+  .dark .border-gray-300 {
+    @apply border-slate-700;
+  }
+
+  .dark .border-slate-400 {
+    @apply border-slate-700;
+  }
+
+  .dark .border-blue-400 {
+    border-color: rgb(59 130 246 / 0.6);
+  }
+
+  .dark .hover\:bg-gray-50:hover,
+  .dark .hover\:bg-gray-100:hover,
+  .dark .hover\:bg-slate-100:hover {
+    @apply bg-slate-800;
+  }
+
+  .dark .hover\:bg-slate-200:hover {
+    @apply bg-slate-700;
+  }
+
+  .dark .hover\:text-slate-900:hover,
+  .dark .hover\:text-slate-800:hover {
+    @apply text-white;
+  }
+
+  .dark .hover\:text-slate-700:hover,
+  .dark .hover\:text-slate-600:hover {
+    @apply text-slate-200;
+  }
+
+  .dark .hover\:text-blue-700:hover,
+  .dark .hover\:text-blue-500:hover {
+    @apply text-blue-300;
+  }
+
+  .dark .focus\:border-slate-400:focus,
+  .dark .focus-visible\:border-slate-400:focus-visible {
+    @apply border-slate-600;
+  }
+
+  .dark .placeholder\:text-slate-400::placeholder {
+    @apply text-slate-500;
+  }
 }
 
 /* Custom keyframes (migrated from tailwind.config.ts) */

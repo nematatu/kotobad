@@ -21,7 +21,7 @@ const buttonVariants = cva(
 					"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
 				link: "text-primary underline-offset-4 hover:underline",
 				google:
-					"bg-white text-slate-700 border border-slate-300 hover:bg-surface-100 text-sm",
+					"bg-white text-slate-700 border border-slate-300 hover:bg-surface-100 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800",
 				tag: "bg-blue-200/20 hover:bg-blue-300/40 ring-1 ring-blue-300/60 text-blue-500 text-xs transition-colors duration-150",
 
 				...buttonColor,

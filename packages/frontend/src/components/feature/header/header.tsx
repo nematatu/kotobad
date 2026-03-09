@@ -2,6 +2,7 @@
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Suspense, useEffect, useRef } from "react";
+import ThemeToggle from "@/components/feature/theme/ThemeToggle";
 import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
@@ -46,7 +47,7 @@ const Header = ({ tags }: Props) => {
 	return (
 		<div
 			ref={headerRef}
-			className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur"
+			className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
 		>
 			<div className="mx-auto flex items-center gap-3 px-5 py-2">
 				<div className="flex items-center gap-2 shrink-0">
@@ -61,6 +62,9 @@ const Header = ({ tags }: Props) => {
 				</Suspense>
 				<HeaderNav links={headerNavLinks} />
 				<div className="ml-auto flex items-center gap-2 shrink-0">
+					<div className="hidden [@media(min-width:496px)]:block">
+						<ThemeToggle />
+					</div>
 					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
 					<HeaderMobileMenu links={headerNavLinks} isLoading={isLoading} />
 				</div>

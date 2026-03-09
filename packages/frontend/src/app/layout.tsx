@@ -2,13 +2,13 @@ export { metadata, viewport } from "@/lib/config/metadata/metadata";
 import "./globals.css";
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import Image from "next/image";
-import { Toaster } from "sonner";
 import { getTags } from "@/app/threads/lib/getTags";
 import PwaRegister from "@/components/common/PwaRegister";
 import AuthRequiredModal from "@/components/feature/auth/AuthRequiredModal";
 import Footer from "@/components/feature/footer/Footer";
 import Header from "@/components/feature/header/header";
 import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
+import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
 
 export default async function RootLayout({
@@ -19,8 +19,8 @@ export default async function RootLayout({
 	const tags: TagType[] = await getTags();
 
 	return (
-		<html lang="ja">
-			<body className="min-h-screen bg-[#F0F0F0]">
+		<html lang="ja" suppressHydrationWarning>
+			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
 				<div
 					className="pointer-events-none fixed inset-0"
 					style={{ zIndex: -1 }}
@@ -31,7 +31,7 @@ export default async function RootLayout({
 						alt=""
 						aria-hidden="true"
 						sizes="100vw"
-						className="object-cover opacity-50"
+						className="object-cover opacity-50 dark:brightness-[0.45] dark:saturate-75"
 					/>
 				</div>
 

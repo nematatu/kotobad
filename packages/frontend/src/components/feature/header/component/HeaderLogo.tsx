@@ -10,7 +10,7 @@ const HeaderLogo = () => {
 			<span className="inline-flex transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110 motion-reduce:group-hover:[animation:none]">
 				<LogoIcon className="w-6 sm:w-8" />
 			</span>
-			<LogoMojiIcon className="w-[70px] sm:w-24 text-gray-800" />
+			<LogoMojiIcon className="w-[70px] sm:w-24 text-gray-800 dark:text-slate-50" />
 		</Link>
 	);
 };
