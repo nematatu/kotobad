@@ -31,6 +31,7 @@ type ViewTransitionRouter = {
 
 const ROUTE_TRANSITION_ATTRIBUTE = "data-route-transition";
 const ROUTE_TRANSITION_ID_ATTRIBUTE = "data-route-transition-id";
+const ROUTE_TRANSITION_HIDE_BOTTOM_NAV_ATTRIBUTE = "data-route-hide-bottom-nav";
 const FORWARD_ROUTE_TRANSITION_TIMEOUT_MS = 420;
 const BACK_ROUTE_TRANSITION_TIMEOUT_MS = 140;
 const VIEW_TRANSITION_MOBILE_MEDIA_QUERY = "(max-width: 495px)";
@@ -294,6 +295,7 @@ export const notifyViewTransitionRouteCommit = (routeKey?: string) => {
 const startRouteViewTransition = (
 	update: () => void,
 	direction: ViewTransitionDirection,
+	hideBottomNav = false,
 ) => {
 	if (
 		typeof document === "undefined" ||
@@ -309,6 +311,11 @@ const startRouteViewTransition = (
 	const transitionId = String(++transitionSequence);
 	root.setAttribute(ROUTE_TRANSITION_ATTRIBUTE, direction);
 	root.setAttribute(ROUTE_TRANSITION_ID_ATTRIBUTE, transitionId);
+	if (hideBottomNav) {
+		root.setAttribute(ROUTE_TRANSITION_HIDE_BOTTOM_NAV_ATTRIBUTE, "true");
+	} else {
+		root.removeAttribute(ROUTE_TRANSITION_HIDE_BOTTOM_NAV_ATTRIBUTE);
+	}
 
 	const cleanup = () => {
 		if (root.getAttribute(ROUTE_TRANSITION_ID_ATTRIBUTE) !== transitionId) {
@@ -317,6 +324,7 @@ const startRouteViewTransition = (
 
 		root.removeAttribute(ROUTE_TRANSITION_ATTRIBUTE);
 		root.removeAttribute(ROUTE_TRANSITION_ID_ATTRIBUTE);
+		root.removeAttribute(ROUTE_TRANSITION_HIDE_BOTTOM_NAV_ATTRIBUTE);
 	};
 
 	const transition = document.startViewTransition(async () => {
@@ -372,9 +380,13 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 				router.push(navigationHref, toNextNavigationOptions(options));
 				return;
 			}
-			startRouteViewTransition(() => {
-				router.push(navigationHref, toNextNavigationOptions(options));
-			}, behavior.direction);
+			startRouteViewTransition(
+				() => {
+					router.push(navigationHref, toNextNavigationOptions(options));
+				},
+				behavior.direction,
+				isThreadDetailPath(target.pathname),
+			);
 		},
 		refresh: () => {
 			router.refresh();
@@ -400,9 +412,13 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 				router.replace(navigationHref, toNextNavigationOptions(options));
 				return;
 			}
-			startRouteViewTransition(() => {
-				router.replace(navigationHref, toNextNavigationOptions(options));
-			}, behavior.direction);
+			startRouteViewTransition(
+				() => {
+					router.replace(navigationHref, toNextNavigationOptions(options));
+				},
+				behavior.direction,
+				isThreadDetailPath(target.pathname),
+			);
 		},
 	};
 }

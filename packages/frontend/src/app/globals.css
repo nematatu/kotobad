@@ -629,6 +629,10 @@
   .view-transition-static-bottom-nav {
     view-transition-name: page-bottom-nav;
   }
+
+  html[data-route-hide-bottom-nav="true"] .view-transition-static-bottom-nav {
+    view-transition-name: none;
+  }
 }
 
 @media (max-width: 495px) and (prefers-reduced-motion: no-preference) {
@@ -651,6 +655,10 @@
   html[data-route-transition] nav[aria-label="モバイルナビゲーション"] button[aria-label="スレッドを投稿する"] {
     opacity: 0;
     pointer-events: none;
+  }
+
+  html[data-route-hide-bottom-nav="true"] nav[aria-label="モバイルナビゲーション"] {
+    display: none;
   }
 
   ::view-transition-group(page-background) {
