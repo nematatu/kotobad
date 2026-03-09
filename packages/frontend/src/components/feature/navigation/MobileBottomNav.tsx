@@ -13,7 +13,12 @@ type Props = {
 
 const MobileBottomNav = ({ tags }: Props) => {
 	const pathname = usePathname();
-	const shouldShowCreateThreadButton = !pathname.startsWith("/threads/");
+	const isThreadDetailPage = pathname.startsWith("/threads/");
+	const shouldShowCreateThreadButton = !isThreadDetailPage;
+
+	if (isThreadDetailPage) {
+		return null;
+	}
 
 	return (
 		<>
