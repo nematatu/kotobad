@@ -32,7 +32,7 @@ type ViewTransitionRouter = {
 const ROUTE_TRANSITION_ATTRIBUTE = "data-route-transition";
 const ROUTE_TRANSITION_ID_ATTRIBUTE = "data-route-transition-id";
 const FORWARD_ROUTE_TRANSITION_TIMEOUT_MS = 420;
-const BACK_ROUTE_TRANSITION_TIMEOUT_MS = 220;
+const BACK_ROUTE_TRANSITION_TIMEOUT_MS = 140;
 const VIEW_TRANSITION_MOBILE_MEDIA_QUERY = "(max-width: 495px)";
 
 let transitionSequence = 0;

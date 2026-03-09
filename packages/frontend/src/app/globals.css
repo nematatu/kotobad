@@ -711,12 +711,12 @@
   }
 
   html[data-route-transition="back"]::view-transition-old(page-content) {
-    animation: pageSlideOutToRight 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageSlideOutToRight 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
     z-index: 21;
   }
 
   html[data-route-transition="back"]::view-transition-new(page-content) {
-    animation: pageSlideInFromLeft 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageSlideInFromLeft 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
     z-index: 20;
   }
 }
