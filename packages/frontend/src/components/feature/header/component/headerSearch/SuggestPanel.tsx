@@ -10,12 +10,21 @@ type Props = {
 	state: SuggestState;
 	className?: string;
 	onSelect?: () => void;
+	showCount?: boolean;
 };
 
-const SuggestPanel = ({ open, query, state, className, onSelect }: Props) => {
+const SuggestPanel = ({
+	open,
+	query,
+	state,
+	className,
+	onSelect,
+	showCount = true,
+}: Props) => {
 	if (!open) return null;
 
-	const showCount = state.totalCount !== null && query.length > 0;
+	const shouldShowCount =
+		showCount && state.totalCount !== null && query.length > 0;
 
 	return (
 		<div
@@ -24,7 +33,7 @@ const SuggestPanel = ({ open, query, state, className, onSelect }: Props) => {
 				className,
 			)}
 		>
-			{showCount ? (
+			{shouldShowCount ? (
 				<div className="px-3 pt-3 text-xs text-slate-500">
 					{query}の{state.totalCount}件の検索結果
 				</div>

@@ -8,13 +8,18 @@ import {
 } from "@/app/threads/[id]/components/likeButton";
 import ChatIcon from "@/assets/threads/chat.svg";
 import { Link } from "@/components/common/Link";
+import { highlightText } from "@/components/feature/header/component/headerSearch/highlightText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
 type ThreadListType = {
 	threads: ThreadType[];
+	highlightQuery?: string;
 };
 
-export const ThreadList = ({ threads }: ThreadListType) => {
+export const ThreadList = ({
+	threads,
+	highlightQuery = "",
+}: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
 
 	return (
@@ -52,7 +57,7 @@ export const ThreadList = ({ threads }: ThreadListType) => {
 										<span>{relativeDate}</span>
 									</div>
 									<h3 className="mt-1 block text-base font-bold line-clamp-2 sm:text-lg">
-										{thread.title}
+										{highlightText(thread.title, highlightQuery)}
 									</h3>
 								</div>
 							</Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/components/common/Link";
+import type { ViewTransitionKey } from "@/config/viewTransition";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -9,6 +10,8 @@ type Props = {
 	onRemove: (query: string) => void;
 	onClear: () => void;
 	className?: string;
+	hrefBuilder?: (query: string) => string;
+	viewTransitionKey?: ViewTransitionKey;
 };
 
 const HistoryPanel = ({
@@ -17,6 +20,8 @@ const HistoryPanel = ({
 	onRemove,
 	onClear,
 	className,
+	hrefBuilder = (query) => `/threads?q=${encodeURIComponent(query)}`,
+	viewTransitionKey,
 }: Props) => {
 	return (
 		<div
@@ -48,7 +53,8 @@ const HistoryPanel = ({
 							className="flex items-center gap-2 border-t border-slate-200 px-3 py-2 first:border-t-0"
 						>
 							<Link
-								href={`/threads?q=${encodeURIComponent(item.query)}`}
+								href={hrefBuilder(item.query)}
+								viewTransitionKey={viewTransitionKey}
 								className="min-w-0 flex-1 text-sm text-slate-900 truncate hover:underline"
 								onPointerDown={(event) => event.preventDefault()}
 								onClick={(event) => {

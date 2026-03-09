@@ -5,6 +5,8 @@ export type ViewTransitionNavigationMethod = "push" | "replace" | "back";
 
 export const viewTransitionKeys = {
 	homeNavigation: "home-navigation",
+	searchPageNavigation: "search-page-navigation",
+	searchPageQueryControls: "search-page-query-controls",
 	threadDetailBackNavigation: "thread-detail-back-navigation",
 	threadListNavigation: "thread-list-navigation",
 	threadListQueryControls: "thread-list-query-controls",
@@ -61,6 +63,27 @@ const getChangedQueryKeys = (
 };
 
 const viewTransitionRules: ViewTransitionRule[] = [
+	{
+		id: "search-page-navigation-on-search-page",
+		matches: ({ current, next, key }) =>
+			key === viewTransitionKeys.searchPageNavigation &&
+			current.pathname === "/search" &&
+			next?.pathname === "/search",
+		resolve: () => ({
+			enabled: false,
+			direction: "forward",
+			ruleId: "search-page-navigation-on-search-page",
+		}),
+	},
+	{
+		id: "search-page-query-controls",
+		matches: ({ key }) => key === viewTransitionKeys.searchPageQueryControls,
+		resolve: () => ({
+			enabled: false,
+			direction: "forward",
+			ruleId: "search-page-query-controls",
+		}),
+	},
 	{
 		id: "thread-detail-back-navigation",
 		matches: ({ key, next }) =>
