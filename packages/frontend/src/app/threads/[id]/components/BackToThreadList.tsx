@@ -1,17 +1,26 @@
 "use client";
 
 import { Undo2 } from "lucide-react";
-import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import {
+	getLastThreadListHref,
+	useViewTransitionRouter,
+} from "@/hooks/useViewTransitionRouter";
 
 export function BackToThreadList() {
-	const router = useViewTransitionRouter();
+	const transitionRouter = useViewTransitionRouter();
+	const router = useRouter();
+
+	useEffect(() => {
+		router.prefetch(getLastThreadListHref());
+	}, [router]);
 
 	const onBackClick = () => {
-		if (typeof window !== "undefined" && window.history.length > 1) {
-			router.back();
-			return;
-		}
-		router.push("/threads");
+		transitionRouter.replace(getLastThreadListHref(), {
+			restoreScrollOnCommit: true,
+			scroll: false,
+		});
 	};
 
 	return (

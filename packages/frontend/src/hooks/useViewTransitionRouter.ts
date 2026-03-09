@@ -11,6 +11,7 @@ import {
 } from "@/config/viewTransition";
 
 export type ViewTransitionNavigateOptions = {
+	restoreScrollOnCommit?: boolean;
 	scroll?: boolean;
 	viewTransitionKey?: ViewTransitionKey;
 };
@@ -30,17 +31,20 @@ type ViewTransitionRouter = {
 
 const ROUTE_TRANSITION_ATTRIBUTE = "data-route-transition";
 const ROUTE_TRANSITION_ID_ATTRIBUTE = "data-route-transition-id";
-const ROUTE_TRANSITION_TIMEOUT_MS = 350;
+const FORWARD_ROUTE_TRANSITION_TIMEOUT_MS = 420;
+const BACK_ROUTE_TRANSITION_TIMEOUT_MS = 220;
 const VIEW_TRANSITION_MOBILE_MEDIA_QUERY = "(max-width: 495px)";
 
 let transitionSequence = 0;
 const routeScrollPositions = new Map<string, number>();
+let lastThreadListHref = "/threads";
 let pendingCommit: {
 	id: string;
 	resolve: () => void;
 	timeoutId: number;
 } | null = null;
 let pendingBackScrollRestore = false;
+let pendingRouteScrollRestoreKey: string | null = null;
 let previousScrollRestoration: History["scrollRestoration"] | null = null;
 
 const prefersReducedMotion = () =>
@@ -74,6 +78,40 @@ const getCurrentRouteKey = () =>
 		window.location.pathname,
 		new URLSearchParams(window.location.search),
 	);
+
+const isThreadDetailPath = (pathname: string) =>
+	/^\/threads\/[^/]+$/.test(pathname);
+
+const resolveNavigationHrefAndTarget = (href: string | UrlObject) => {
+	const navigationHref = toNavigationHref(href);
+	return {
+		navigationHref,
+		target: toNavigationTarget(navigationHref),
+	};
+};
+
+const rememberThreadListHref = (href?: string | UrlObject) => {
+	if (!href) {
+		return;
+	}
+
+	const current = getCurrentNavigationTarget();
+	if (current.pathname !== "/threads") {
+		return;
+	}
+
+	const next = toNavigationTarget(toNavigationHref(href));
+	if (!isThreadDetailPath(next.pathname)) {
+		return;
+	}
+
+	lastThreadListHref = getViewTransitionRouteKey(
+		current.pathname,
+		current.searchParams,
+	);
+};
+
+export const getLastThreadListHref = () => lastThreadListHref;
 
 const toNavigationTarget = (href: string): ViewTransitionTarget => {
 	const url = new URL(href, window.location.href);
@@ -192,7 +230,24 @@ const resetScrollRestoration = () => {
 	previousScrollRestoration = null;
 };
 
-const waitForNavigationCommit = (id: string) =>
+const clearPendingBackScrollRestore = () => {
+	if (!pendingBackScrollRestore) {
+		return;
+	}
+
+	pendingBackScrollRestore = false;
+	resetScrollRestoration();
+};
+
+const getRouteTransitionTimeoutMs = (direction: ViewTransitionDirection) =>
+	direction === "back"
+		? BACK_ROUTE_TRANSITION_TIMEOUT_MS
+		: FORWARD_ROUTE_TRANSITION_TIMEOUT_MS;
+
+const waitForNavigationCommit = (
+	id: string,
+	direction: ViewTransitionDirection,
+) =>
 	new Promise<void>((resolve) => {
 		clearPendingCommit();
 		pendingCommit = {
@@ -205,27 +260,27 @@ const waitForNavigationCommit = (id: string) =>
 					return;
 				}
 				clearPendingCommit(id);
-			}, ROUTE_TRANSITION_TIMEOUT_MS),
+			}, getRouteTransitionTimeoutMs(direction)),
 		};
 	});
 
 export const notifyViewTransitionRouteCommit = (routeKey?: string) => {
-	if (pendingBackScrollRestore) {
-		if (routeKey) {
-			restoreScrollPosition(routeKey);
-		}
-		pendingBackScrollRestore = false;
-		resetScrollRestoration();
-	}
+	const scrollRestoreRouteKey =
+		pendingRouteScrollRestoreKey ??
+		(pendingBackScrollRestore && routeKey ? routeKey : null);
 
-	if (!pendingCommit) {
-		return;
-	}
+	pendingRouteScrollRestoreKey = null;
 
-	const { id } = pendingCommit;
-	window.requestAnimationFrame(() => {
+	clearPendingBackScrollRestore();
+
+	if (pendingCommit) {
+		const { id } = pendingCommit;
 		clearPendingCommit(id);
-	});
+	}
+
+	if (scrollRestoreRouteKey) {
+		restoreScrollPosition(scrollRestoreRouteKey);
+	}
 };
 
 const startRouteViewTransition = (
@@ -257,7 +312,7 @@ const startRouteViewTransition = (
 	};
 
 	const transition = document.startViewTransition(async () => {
-		const committed = waitForNavigationCommit(transitionId);
+		const committed = waitForNavigationCommit(transitionId, direction);
 		update();
 		await committed;
 	});
@@ -272,6 +327,7 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 		back: (options?: ViewTransitionNavigateOptions) => {
 			const currentRouteKey = getCurrentRouteKey();
 			saveScrollPosition(currentRouteKey);
+			pendingRouteScrollRestoreKey = null;
 			pendingBackScrollRestore = true;
 			enableManualScrollRestoration();
 			const behavior = resolveNavigationDirection(
@@ -292,18 +348,24 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 			options?: ViewTransitionNavigateOptions,
 		) => {
 			const currentRouteKey = getCurrentRouteKey();
+			const { navigationHref, target } = resolveNavigationHrefAndTarget(href);
+			rememberThreadListHref(href);
 			saveScrollPosition(currentRouteKey);
+			clearPendingBackScrollRestore();
+			pendingRouteScrollRestoreKey = options?.restoreScrollOnCommit
+				? getViewTransitionRouteKey(target.pathname, target.searchParams)
+				: null;
 			const behavior = resolveNavigationDirection(
 				"push",
-				href,
+				navigationHref,
 				options?.viewTransitionKey,
 			);
 			if (!behavior.enabled) {
-				router.push(toNavigationHref(href), toNextNavigationOptions(options));
+				router.push(navigationHref, toNextNavigationOptions(options));
 				return;
 			}
 			startRouteViewTransition(() => {
-				router.push(toNavigationHref(href), toNextNavigationOptions(options));
+				router.push(navigationHref, toNextNavigationOptions(options));
 			}, behavior.direction);
 		},
 		refresh: () => {
@@ -314,24 +376,24 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 			options?: ViewTransitionNavigateOptions,
 		) => {
 			const currentRouteKey = getCurrentRouteKey();
+			const { navigationHref, target } = resolveNavigationHrefAndTarget(href);
+			rememberThreadListHref(href);
 			saveScrollPosition(currentRouteKey);
+			clearPendingBackScrollRestore();
+			pendingRouteScrollRestoreKey = options?.restoreScrollOnCommit
+				? getViewTransitionRouteKey(target.pathname, target.searchParams)
+				: null;
 			const behavior = resolveNavigationDirection(
 				"replace",
-				href,
+				navigationHref,
 				options?.viewTransitionKey,
 			);
 			if (!behavior.enabled) {
-				router.replace(
-					toNavigationHref(href),
-					toNextNavigationOptions(options),
-				);
+				router.replace(navigationHref, toNextNavigationOptions(options));
 				return;
 			}
 			startRouteViewTransition(() => {
-				router.replace(
-					toNavigationHref(href),
-					toNextNavigationOptions(options),
-				);
+				router.replace(navigationHref, toNextNavigationOptions(options));
 			}, behavior.direction);
 		},
 	};

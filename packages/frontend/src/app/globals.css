@@ -625,10 +625,6 @@
   .view-transition-static-footer {
     view-transition-name: page-footer;
   }
-
-  .view-transition-static-bottom-nav {
-    view-transition-name: page-bottom-nav;
-  }
 }
 
 @media (max-width: 495px) and (prefers-reduced-motion: no-preference) {
@@ -666,17 +662,14 @@
 
   ::view-transition-group(page-footer),
   ::view-transition-image-pair(page-footer),
-  ::view-transition-group(page-header),
-  ::view-transition-group(page-bottom-nav) {
+  ::view-transition-group(page-header) {
     animation: none;
     z-index: 60;
   }
 
   ::view-transition-old(page-background),
   ::view-transition-old(page-header),
-  ::view-transition-new(page-header),
-  ::view-transition-old(page-bottom-nav),
-  ::view-transition-new(page-bottom-nav) {
+  ::view-transition-new(page-header) {
     animation: none;
     mix-blend-mode: normal;
   }
@@ -708,22 +701,22 @@
   }
 
   html[data-route-transition="forward"]::view-transition-old(page-content) {
-    animation: pageSlideOutToLeft 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageSlideOutToLeft 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
     z-index: 20;
   }
 
   html[data-route-transition="forward"]::view-transition-new(page-content) {
-    animation: pageSlideInFromRight 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageSlideInFromRight 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
     z-index: 21;
   }
 
   html[data-route-transition="back"]::view-transition-old(page-content) {
-    animation: pageSlideOutToRight 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageSlideOutToRight 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
     z-index: 21;
   }
 
   html[data-route-transition="back"]::view-transition-new(page-content) {
-    animation: pageSlideInFromLeft 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pageSlideInFromLeft 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
     z-index: 20;
   }
 }
