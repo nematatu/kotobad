@@ -1,9 +1,10 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { type MouseEvent, useEffect, useState } from "react";
+import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import type { Sort } from "@/app/threads/lib/sort";
 import HistoryPanel from "@/components/feature/header/component/headerSearch/HistoryPanel";
+import { HEADER_SEARCH_CONFIG } from "@/components/feature/header/const/serach-config";
 import { Input } from "@/components/ui/input";
 import { viewTransitionKeys } from "@/config/viewTransition";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
@@ -42,11 +43,32 @@ export default function ThreadSearchForm({ initialQuery, sort }: Props) {
 		setQuery(initialQuery);
 	}, [initialQuery]);
 
-	const navigateToSearch = (nextQuery: string) => {
-		router.replace(buildSearchHref(nextQuery, sort), {
-			viewTransitionKey: viewTransitionKeys.searchPageQueryControls,
-		});
-	};
+	const navigateToSearch = useCallback(
+		(nextQuery: string) => {
+			router.replace(buildSearchHref(nextQuery, sort), {
+				scroll: false,
+				viewTransitionKey: viewTransitionKeys.searchPageQueryControls,
+			});
+		},
+		[router, sort],
+	);
+
+	useEffect(() => {
+		const trimmedQuery = query.trim();
+		const trimmedInitialQuery = initialQuery.trim();
+
+		if (trimmedQuery === trimmedInitialQuery) {
+			return;
+		}
+
+		const timeoutId = window.setTimeout(() => {
+			navigateToSearch(query);
+		}, HEADER_SEARCH_CONFIG.DEBOUNCE_MS);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+		};
+	}, [initialQuery, navigateToSearch, query]);
 
 	const handleClear = (event: MouseEvent<HTMLButtonElement>) => {
 		event.currentTarget.blur();
