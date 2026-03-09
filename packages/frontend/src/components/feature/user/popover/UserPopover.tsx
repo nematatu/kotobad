@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "@/components/common/Link";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,13 +11,18 @@ import LogoutButton from "../../button/auth/logoutButton";
 import { useUser } from "../../provider/UserProvider";
 import UserAvatar from "../UserAvatar";
 
-export function UserPopover() {
+type Props = {
+	onProfileNavigate?: () => void;
+};
+
+export function UserPopover({ onProfileNavigate }: Props) {
 	const { user } = useUser();
+	const [open, setOpen] = useState(false);
 	const profileHref = user?.id
 		? `/users/${encodeURIComponent(user.id)}`
 		: "/threads";
 	return (
-		<Popover>
+		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
 					enableClickAnimation
@@ -28,7 +34,13 @@ export function UserPopover() {
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-50 mt-4 p-0 overflow-hidden">
-				<Link href={profileHref}>
+				<Link
+					href={profileHref}
+					onNavigate={() => {
+						setOpen(false);
+						onProfileNavigate?.();
+					}}
+				>
 					<div className="bg-blue-50 px-4 py-2">
 						<div className="flex justify-between">
 							<div className="text-lg">{user?.name}</div>

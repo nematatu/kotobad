@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
+import { useState } from "react";
 import type { ActionLinkItem } from "@/components/common/button/ActionLink";
 import ActionLink from "@/components/common/button/ActionLink";
 import ThemeToggle from "@/components/feature/theme/ThemeToggle";
@@ -22,6 +23,8 @@ type Props = {
 };
 
 const HeaderMobileMenu = ({ links, isLoading }: Props) => {
+	const [open, setOpen] = useState(false);
+
 	if (isLoading) {
 		return (
 			<div
@@ -32,7 +35,7 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 	}
 	return (
 		<div className="md:hidden">
-			<Sheet>
+			<Sheet open={open} onOpenChange={setOpen}>
 				<SheetTrigger asChild>
 					<Button variant="ghost" size="icon">
 						<Menu />
@@ -46,7 +49,7 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 						</SheetDescription>
 					</SheetHeader>
 					<div className="mt-4 border-b border-slate-200 pb-3 dark:border-slate-800">
-						<UserPopover />
+						<UserPopover onProfileNavigate={() => setOpen(false)} />
 					</div>
 					<nav className="mt-4 flex flex-col gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
 						{links.map((item) => (
