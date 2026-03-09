@@ -26,6 +26,7 @@ import { PostReplyButton } from "./ui/PostReplyButton";
 type PostListProps = {
 	posts: PostListType;
 	threadId: number;
+	threadTitle: string;
 	highlightPostId: number | null;
 	onPostedAction?: () => void;
 };
@@ -107,6 +108,7 @@ const ReactionCount = ({ count }: ReactionCountProps) => {
 export const PostList = ({
 	posts,
 	threadId,
+	threadTitle,
 	highlightPostId,
 	onPostedAction,
 }: PostListProps) => {
@@ -387,7 +389,11 @@ export const PostList = ({
 									}
 								/>
 								<div className="ml-auto shrink-0">
-									<PostDropDownMenu postId={post.id} />
+									<PostDropDownMenu
+										postId={post.id}
+										postBody={post.post}
+										threadTitle={threadTitle}
+									/>
 								</div>
 							</div>
 							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words pl-2">

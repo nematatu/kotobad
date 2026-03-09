@@ -61,6 +61,7 @@ export default async function ThreadDetailPage({
 						<div className="min-w-0 space-y-4">
 							<ThreadPostsStream
 								threadId={threadId}
+								threadTitle={threadHeaderData.title}
 								initialPostCount={threadHeaderData.postCount}
 								highlightPostId={highlightPostId}
 							/>

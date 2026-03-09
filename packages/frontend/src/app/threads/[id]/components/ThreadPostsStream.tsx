@@ -13,12 +13,14 @@ import { PostList } from "./PostList";
 
 type Props = {
 	threadId: number;
+	threadTitle: string;
 	initialPostCount: number;
 	highlightPostId: number | null;
 };
 
 export const ThreadPostsStream = ({
 	threadId,
+	threadTitle,
 	initialPostCount,
 	highlightPostId,
 }: Props) => {
@@ -91,6 +93,7 @@ export const ThreadPostsStream = ({
 					<PostList
 						posts={posts}
 						threadId={threadId}
+						threadTitle={threadTitle}
 						highlightPostId={highlightPostId}
 					/>
 				) : (

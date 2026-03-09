@@ -1,3 +1,5 @@
+"use client";
+
 import { Copy, EllipsisVerticalIcon, Share2Icon } from "lucide-react";
 import Image from "next/image";
 import { PiXLogo } from "react-icons/pi";
@@ -15,19 +17,45 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+	buildLineShareUrl,
+	buildPostShareUrl,
+	buildXShareUrl,
+} from "@/lib/thread/postShare";
 
 type DropDownMenuProps = {
 	postId: number;
+	postBody: string;
+	threadTitle: string;
 };
 
-export function PostDropDownMenu({ postId }: DropDownMenuProps) {
+export function PostDropDownMenu({
+	postId,
+	postBody,
+	threadTitle,
+}: DropDownMenuProps) {
+	const shareInput = {
+		postId,
+		postBody,
+		threadTitle,
+	};
+
+	const openShareWindow = (shareUrl: string) => {
+		if (typeof window === "undefined") return;
+
+		const popup = window.open(shareUrl, "_blank", "noopener,noreferrer");
+		if (popup) {
+			return;
+		}
+
+		window.location.href = shareUrl;
+	};
+
 	const urlCopyHandler = async () => {
 		if (typeof window === "undefined") return;
 
 		try {
-			const url = new URL(window.location.href);
-			url.searchParams.set("postId", String(postId));
-			const copiedUrl = url.toString();
+			const copiedUrl = buildPostShareUrl(shareInput);
 			await navigator.clipboard.writeText(copiedUrl);
 			toast.success("コピーしました", {
 				description: (
@@ -46,6 +74,15 @@ export function PostDropDownMenu({ postId }: DropDownMenuProps) {
 			toast.error("コピーに失敗しました");
 		}
 	};
+
+	const xShareHandler = () => {
+		openShareWindow(buildXShareUrl(shareInput));
+	};
+
+	const lineShareHandler = () => {
+		openShareWindow(buildLineShareUrl(shareInput));
+	};
+
 	return (
 		<div className="flex items-center justify-center">
 			<DropdownMenu modal={false}>
@@ -73,14 +110,14 @@ export function PostDropDownMenu({ postId }: DropDownMenuProps) {
 										<Copy aria-hidden="true" />
 										コピー
 									</DropdownMenuItem>
-									<DropdownMenuItem>
+									<DropdownMenuItem onClick={xShareHandler}>
 										<PiXLogo
 											className="w-6 h-6 bg-black text-white"
 											aria-hidden="true"
 										/>
 										X
 									</DropdownMenuItem>
-									<DropdownMenuItem>
+									<DropdownMenuItem onClick={lineShareHandler}>
 										<Image
 											src={lineIcon.src}
 											alt=""
