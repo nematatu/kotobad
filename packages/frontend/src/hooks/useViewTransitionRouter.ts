@@ -214,6 +214,14 @@ const restoreScrollPosition = (routeKey: string) => {
 	});
 };
 
+const restoreScrollPositionAfterCommit = (routeKey: string) => {
+	window.requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
+			restoreScrollPosition(routeKey);
+		});
+	});
+};
+
 const enableManualScrollRestoration = () => {
 	if (previousScrollRestoration === null) {
 		previousScrollRestoration = window.history.scrollRestoration;
@@ -279,7 +287,7 @@ export const notifyViewTransitionRouteCommit = (routeKey?: string) => {
 	}
 
 	if (scrollRestoreRouteKey) {
-		restoreScrollPosition(scrollRestoreRouteKey);
+		restoreScrollPositionAfterCommit(scrollRestoreRouteKey);
 	}
 };
 

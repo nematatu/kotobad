@@ -5,6 +5,7 @@ export type ViewTransitionNavigationMethod = "push" | "replace" | "back";
 
 export const viewTransitionKeys = {
 	homeNavigation: "home-navigation",
+	threadDetailBackNavigation: "thread-detail-back-navigation",
 	threadListNavigation: "thread-list-navigation",
 	threadListQueryControls: "thread-list-query-controls",
 } as const;
@@ -60,6 +61,17 @@ const getChangedQueryKeys = (
 };
 
 const viewTransitionRules: ViewTransitionRule[] = [
+	{
+		id: "thread-detail-back-navigation",
+		matches: ({ key, next }) =>
+			key === viewTransitionKeys.threadDetailBackNavigation &&
+			next?.pathname === "/threads",
+		resolve: () => ({
+			enabled: false,
+			direction: "back",
+			ruleId: "thread-detail-back-navigation",
+		}),
+	},
 	{
 		id: "thread-list-navigation-on-thread-list",
 		matches: ({ current, next, key }) =>

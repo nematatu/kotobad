@@ -547,27 +547,6 @@
   }
   .view-transition-static-bottom-nav {
     view-transition-name: none;
-    isolation: isolate;
-    contain: paint;
-    backface-visibility: hidden;
-    transform: translateZ(0);
-    overflow: hidden;
-  }
-  .view-transition-static-bottom-nav::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    opacity: 0;
-    pointer-events: none;
-    background: rgba(255, 255, 255, 1);
-  }
-  .dark .view-transition-static-bottom-nav::before {
-    background: rgb(15 23 42);
-  }
-  .view-transition-static-bottom-nav > * {
-    position: relative;
-    z-index: 1;
   }
   .link-progress {
     position: fixed;
@@ -646,6 +625,10 @@
   .view-transition-static-footer {
     view-transition-name: page-footer;
   }
+
+  .view-transition-static-bottom-nav {
+    view-transition-name: page-bottom-nav;
+  }
 }
 
 @media (max-width: 495px) and (prefers-reduced-motion: no-preference) {
@@ -670,20 +653,6 @@
     pointer-events: none;
   }
 
-  html[data-route-transition] nav[aria-label="モバイルナビゲーション"] {
-    background-color: rgba(255, 255, 255, 1);
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  html[data-route-transition] nav[aria-label="モバイルナビゲーション"]::before {
-    opacity: 1;
-  }
-
-  html.dark[data-route-transition] nav[aria-label="モバイルナビゲーション"] {
-    background-color: rgb(15 23 42);
-  }
-
   ::view-transition-group(page-background) {
     z-index: 0;
   }
@@ -697,7 +666,9 @@
 
   ::view-transition-group(page-footer),
   ::view-transition-image-pair(page-footer),
-  ::view-transition-group(page-header) {
+  ::view-transition-group(page-header),
+  ::view-transition-group(page-bottom-nav),
+  ::view-transition-image-pair(page-bottom-nav) {
     animation: none;
     z-index: 60;
   }
@@ -715,7 +686,19 @@
     opacity: 1;
   }
 
+  ::view-transition-old(page-bottom-nav) {
+    animation: none;
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
+
   ::view-transition-new(page-footer) {
+    animation: none;
+    mix-blend-mode: normal;
+    opacity: 0;
+  }
+
+  ::view-transition-new(page-bottom-nav) {
     animation: none;
     mix-blend-mode: normal;
     opacity: 0;
