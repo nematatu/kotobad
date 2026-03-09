@@ -24,7 +24,7 @@ const ThreadHeartLottiePlayer = dynamic(
 );
 
 export const THREAD_LIST_META_CHIP_CLASS =
-	"thread-card-nohover box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm bg-gray-100 px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
+	"thread-list-meta-chip thread-card-nohover box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm bg-gray-100 px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
 
 type Props = {
 	threadId: number;

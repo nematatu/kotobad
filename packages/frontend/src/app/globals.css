@@ -319,6 +319,43 @@
   .dark .placeholder\:text-slate-400::placeholder {
     @apply text-slate-500;
   }
+
+  .thread-list-card:has(.thread-card-nohover:hover) {
+    border-color: rgb(229 231 235);
+    background-color: rgb(255 255 255);
+  }
+
+  .thread-list-meta-chip {
+    background-color: rgb(243 244 246);
+    color: rgb(31 41 55);
+  }
+
+  .dark .thread-list-card:has(.thread-card-nohover:hover) {
+    border-color: rgb(30 41 59);
+    background-color: rgb(2 6 23);
+  }
+
+  .dark .thread-list-meta-chip,
+  .dark .thread-list-meta-chip:hover {
+    background-color: rgb(51 65 85);
+    color: rgb(241 245 249);
+  }
+
+  @media (hover: none) {
+    .thread-list-card:hover {
+      border-color: rgb(229 231 235);
+      background-color: rgb(255 255 255);
+    }
+
+    .dark .thread-list-card:hover {
+      border-color: rgb(30 41 59);
+      background-color: rgb(2 6 23);
+    }
+
+    .thread-list-tag-link:hover {
+      text-decoration-line: none;
+    }
+  }
 }
 
 /* Custom keyframes (migrated from tailwind.config.ts) */
