@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { type MouseEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,6 +13,7 @@ import {
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 import { HEADER_SEARCH_CONFIG } from "../const/serach-config";
 import HistoryPanel from "./headerSearch/HistoryPanel";
 import SuggestPanel from "./headerSearch/SuggestPanel";
@@ -20,8 +21,8 @@ import { useThreadSuggest } from "./headerSearch/useThreadSuggest";
 
 const HeaderMobileSearch = () => {
 	const pathname = usePathname();
-	const router = useRouter();
 	const searchParams = useSearchParams();
+	const router = useViewTransitionRouter();
 	const queryParam = (searchParams.get("q") ?? "").trim();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
@@ -68,9 +69,16 @@ const HeaderMobileSearch = () => {
 					<form
 						action="/threads"
 						method="get"
-						onSubmit={() => {
+						onSubmit={(event) => {
+							event.preventDefault();
 							history.add(query);
 							setOpen(false);
+							const nextQuery = query.trim();
+							const href =
+								nextQuery.length > 0
+									? `/threads?q=${encodeURIComponent(query)}`
+									: "/threads";
+							router.push(href);
 						}}
 						aria-label="スレッド検索"
 						className="flex flex-col gap-3"

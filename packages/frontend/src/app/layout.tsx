@@ -22,7 +22,7 @@ export default async function RootLayout({
 		<html lang="ja" suppressHydrationWarning>
 			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
 				<div
-					className="pointer-events-none fixed inset-0"
+					className="view-transition-static-background pointer-events-none fixed inset-0"
 					style={{ zIndex: -1 }}
 				>
 					<Image
@@ -46,7 +46,7 @@ export default async function RootLayout({
 						<Toaster richColors />
 						<Header tags={tags} />
 						<AuthRequiredModal />
-						<main className="flex-1 min-h-screen pb-16 mb-8 [@media(min-width:496px)]:pb-0">
+						<main className="view-transition-page-content flex-1 min-h-screen pb-16 mb-8 [@media(min-width:496px)]:pb-0">
 							{children}
 						</main>
 						<Footer />

@@ -1,5 +1,5 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
-import Link from "next/link";
+import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 
 type Props = {
@@ -14,6 +14,7 @@ export const ThreadAuthorPanel = ({ thread }: Props) => {
 			<p className="font-semibold tracking-wide text-slate-900">書いた人</p>
 			<Link
 				href={`/users/${encodeURIComponent(thread.authorId)}`}
+				showIndicator={false}
 				className="mt-2 inline-flex items-center gap-2 hover:text-blue-700 transition-colors"
 			>
 				<AuthorAvatar

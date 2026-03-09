@@ -452,6 +452,42 @@
   100% { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes pageSlideInFromRight {
+  0% {
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pageSlideOutToLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-28%, 0, 0);
+  }
+}
+
+@keyframes pageSlideInFromLeft {
+  0% {
+    transform: translate3d(-28%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pageSlideOutToRight {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -494,6 +530,24 @@
 /* Utility classes re-created for Tailwind v4 */
 @layer utilities {
   .font-sans { font-family: var(--font-sans); }
+  .route-transition-floating-action {
+    will-change: opacity;
+  }
+  .view-transition-static-background {
+    view-transition-name: page-background;
+  }
+  .view-transition-page-content {
+    view-transition-name: page-content;
+  }
+  .view-transition-static-header {
+    view-transition-name: page-header;
+  }
+  .view-transition-static-footer {
+    view-transition-name: page-footer;
+  }
+  .view-transition-static-bottom-nav {
+    view-transition-name: page-bottom-nav;
+  }
   .link-progress {
     position: fixed;
     top: 0;
@@ -553,6 +607,93 @@
   .animate-marquee { animation: marquee 60s linear infinite; }
   .animate-marquee-reverse { animation: marqueeReverse 60s linear infinite; }
   .animate-blob { animation: blob 7s infinite; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(root),
+  ::view-transition-image-pair(root) {
+    animation: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    opacity: 0;
+  }
+
+  html[data-route-transition] .route-transition-floating-action {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  ::view-transition-group(page-background) {
+    z-index: 0;
+  }
+
+  ::view-transition-group(page-content),
+  ::view-transition-image-pair(page-content) {
+    animation: none;
+    z-index: 20;
+    isolation: isolate;
+  }
+
+  ::view-transition-group(page-footer),
+  ::view-transition-group(page-header),
+  ::view-transition-group(page-bottom-nav) {
+    z-index: 60;
+  }
+
+  ::view-transition-old(page-background),
+  ::view-transition-new(page-background),
+  ::view-transition-old(page-footer),
+  ::view-transition-new(page-footer),
+  ::view-transition-old(page-header),
+  ::view-transition-new(page-header),
+  ::view-transition-old(page-bottom-nav),
+  ::view-transition-new(page-bottom-nav) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(page-content),
+  ::view-transition-new(page-content) {
+    mix-blend-mode: normal;
+    background-color: #f0f0f0;
+    background-image: url("/haikei/wave-haikei.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    backface-visibility: hidden;
+    overflow: clip;
+  }
+
+  .dark::view-transition-old(page-content),
+  .dark::view-transition-new(page-content) {
+    background-color: #0f172a;
+    background-image:
+      linear-gradient(rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.55)),
+      url("/haikei/wave-haikei.svg");
+  }
+
+  html[data-route-transition="forward"]::view-transition-old(page-content) {
+    animation: pageSlideOutToLeft 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    z-index: 20;
+  }
+
+  html[data-route-transition="forward"]::view-transition-new(page-content) {
+    animation: pageSlideInFromRight 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    z-index: 21;
+  }
+
+  html[data-route-transition="back"]::view-transition-old(page-content) {
+    animation: pageSlideOutToRight 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    z-index: 21;
+  }
+
+  html[data-route-transition="back"]::view-transition-new(page-content) {
+    animation: pageSlideInFromLeft 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    z-index: 20;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

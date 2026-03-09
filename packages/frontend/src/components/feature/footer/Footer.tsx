@@ -48,7 +48,7 @@ const FooterItemLink = ({ item }: { item: FooterItem }) => {
 
 const Footer = () => {
 	return (
-		<footer className="border-t border-slate-200 bg-surface-50">
+		<footer className="view-transition-static-footer border-t border-slate-200 bg-surface-50">
 			<div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
 				<div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:gap-x-14 lg:gap-y-10">
 					<div className="space-y-3 sm:space-y-4">

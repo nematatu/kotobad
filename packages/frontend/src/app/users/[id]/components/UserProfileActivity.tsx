@@ -2,8 +2,8 @@
 
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import Link from "next/link";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
+import { Link } from "@/components/common/Link";
 
 type Props = {
 	profile: UserProfileType;
@@ -39,6 +39,7 @@ export function UserProfileActivity({ profile }: Props) {
 							<li key={thread.id} className="rounded-lg bg-slate-50 px-3 py-2">
 								<Link
 									href={`/threads/${thread.id}`}
+									showIndicator={false}
 									className="line-clamp-1 text-sm font-semibold text-slate-900 hover:text-blue-700"
 								>
 									{thread.title}
@@ -63,6 +64,7 @@ export function UserProfileActivity({ profile }: Props) {
 							<li key={post.id} className="rounded-lg bg-slate-50 px-3 py-2">
 								<Link
 									href={`/threads/${post.threadId}?postId=${post.id}`}
+									showIndicator={false}
 									className="line-clamp-1 text-xs text-slate-500 hover:text-slate-700"
 								>
 									{post.threadTitle} / #{post.localId}

@@ -7,10 +7,10 @@ import {
 import { ReactionOptionListSchema } from "@kotobad/shared/src/schemas/reaction";
 import type { PostListType, PostType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
+import { Link } from "@/components/common/Link";
 import { PostDropDownMenu } from "@/components/feature/dropDownMenu/PostDropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import {
@@ -350,6 +350,7 @@ export const PostList = ({
 							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
 								<Link
 									href={`/users/${encodeURIComponent(post.authorId)}`}
+									showIndicator={false}
 									className="inline-flex items-center gap-2"
 								>
 									<AuthorAvatar

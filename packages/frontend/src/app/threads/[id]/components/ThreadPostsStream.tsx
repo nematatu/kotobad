@@ -57,8 +57,30 @@ export const ThreadPostsStream = ({
 		if (postId <= latestPostIdRef.current) return;
 		queueRefresh();
 	});
-	if (error) return <div>投稿の読み込みに失敗しました。</div>;
-	if (isLoading && initialPostCount > 0) return <ThreadPostsFallback />;
+	if (error)
+		return (
+			<div id="thread-posts-top" className="flex w-full flex-col gap-3">
+				<div>投稿の読み込みに失敗しました。</div>
+				<BackToThreadList />
+				<div
+					id="thread-page-bottom"
+					className="h-0 w-full"
+					aria-hidden="true"
+				/>
+			</div>
+		);
+	if (isLoading && initialPostCount > 0)
+		return (
+			<div id="thread-posts-top" className="flex w-full flex-col gap-3">
+				<ThreadPostsFallback />
+				<BackToThreadList />
+				<div
+					id="thread-page-bottom"
+					className="h-0 w-full"
+					aria-hidden="true"
+				/>
+			</div>
+		);
 	const posts: PostListType = data ?? [];
 	const hasPosts = posts.length > 0;
 

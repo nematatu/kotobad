@@ -1,14 +1,14 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 import IconButton from "@/components/common/button/IconButton";
 import { useUser } from "@/components/feature/provider/UserProvider";
+import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 import { signOut } from "@/lib/auth/auth-client";
 
 const LogoutButton = () => {
-	const router = useRouter();
+	const router = useViewTransitionRouter();
 	const { setUser } = useUser();
 	const [isPending, setIsPending] = useState(false);
 

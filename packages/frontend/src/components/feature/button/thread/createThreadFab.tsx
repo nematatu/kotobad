@@ -18,7 +18,7 @@ export default function CreateThreadFabButton(
 			hover="brightness"
 			enableClickAnimation
 			className={cn(
-				"fixed bottom-5 right-5 z-[60] h-12 w-12 rounded-full shadow-lg md:hidden",
+				"route-transition-floating-action fixed bottom-5 right-5 z-[60] h-12 w-12 rounded-full shadow-lg md:hidden",
 				className,
 			)}
 			{...rest}

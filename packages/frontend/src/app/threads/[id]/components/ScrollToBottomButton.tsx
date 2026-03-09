@@ -57,7 +57,7 @@ export default function ScrollToBottomButton() {
 				href={href}
 				aria-label={ariaLabel}
 				onClick={handleClick}
-				className="fixed bottom-20 sm:bottom-40 right-4 sm:right-10 z-[60] inline-flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white transition-all duration-200 hover:bg-blue-500/80 hover:shadow-card"
+				className="route-transition-floating-action fixed bottom-20 sm:bottom-40 right-4 sm:right-10 z-[60] inline-flex h-14 w-14 sm:h-20 sm:w-20 items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white transition-all duration-200 hover:bg-blue-500/80 hover:shadow-card"
 			>
 				{isNearBottom ? (
 					<MoveUp size={20} className={iconClassName} />

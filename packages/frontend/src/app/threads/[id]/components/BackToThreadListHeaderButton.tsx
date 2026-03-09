@@ -1,8 +1,8 @@
 "use client";
 
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function BackToThreadListHeaderButton({ className }: Props) {
-	const router = useRouter();
+	const router = useViewTransitionRouter();
 
 	const onBackClick = () => {
 		if (typeof window !== "undefined" && window.history.length > 1) {

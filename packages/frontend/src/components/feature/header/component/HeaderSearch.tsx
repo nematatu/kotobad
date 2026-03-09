@@ -1,10 +1,11 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { type MouseEvent, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 import { HEADER_SEARCH_CONFIG } from "../const/serach-config";
 import HistoryPanel from "./headerSearch/HistoryPanel";
 import SuggestPanel from "./headerSearch/SuggestPanel";
@@ -18,8 +19,8 @@ type Props = {
 
 const HeaderSearch = (_props: Props) => {
 	const pathname = usePathname();
-	const router = useRouter();
 	const searchParams = useSearchParams();
+	const router = useViewTransitionRouter();
 	const queryParam = (searchParams.get("q") ?? "").trim();
 	const [query, setQuery] = useState("");
 	const trimmedValue = query.trim();
@@ -51,9 +52,16 @@ const HeaderSearch = (_props: Props) => {
 			action="/threads"
 			method="get"
 			onSubmit={(event) => {
+				event.preventDefault();
 				history.add(query);
 				const input = event.currentTarget.querySelector("input");
 				if (input instanceof HTMLInputElement) input.blur();
+				const nextQuery = query.trim();
+				const href =
+					nextQuery.length > 0
+						? `/threads?q=${encodeURIComponent(query)}`
+						: "/threads";
+				router.push(href);
 			}}
 			className="hidden flex-1 min-w-0 items-center gap-2 [@media(min-width:496px)]:flex"
 			aria-label="スレッド検索"

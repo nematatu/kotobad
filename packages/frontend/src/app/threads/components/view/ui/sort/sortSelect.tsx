@@ -1,10 +1,11 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { parseSort, sortLabel, sortOptions } from "@/app/threads/lib/sort";
+import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 
 export function SortSelect() {
-	const router = useRouter();
+	const router = useViewTransitionRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const currentSort = parseSort(searchParams.get("sort"));

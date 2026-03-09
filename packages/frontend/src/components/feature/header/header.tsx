@@ -47,7 +47,7 @@ const Header = ({ tags }: Props) => {
 	return (
 		<div
 			ref={headerRef}
-			className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
+			className="view-transition-static-header sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
 		>
 			<div className="mx-auto flex items-center gap-3 px-5 py-2">
 				<div className="flex items-center gap-2 shrink-0">
