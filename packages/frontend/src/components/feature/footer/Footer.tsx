@@ -21,7 +21,7 @@ const FooterItemLink = ({ item }: { item: FooterItem }) => {
 		</span>
 	) : null;
 	const linkClass =
-		"inline-flex items-center gap-2 self-start text-slate-600 hover:text-slate-900 hover:underline underline-offset-4";
+		"inline-flex items-center gap-2 self-start text-slate-600 [@media(hover:hover)]:hover:text-slate-900 [@media(hover:hover)]:hover:underline underline-offset-4";
 
 	if (item.external) {
 		return (

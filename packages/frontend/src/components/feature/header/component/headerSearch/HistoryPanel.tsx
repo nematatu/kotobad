@@ -36,7 +36,7 @@ const HistoryPanel = ({
 					type="button"
 					onMouseDown={(event) => event.preventDefault()}
 					onClick={onClear}
-					className="text-slate-500 hover:text-slate-700"
+					className="text-slate-500 [@media(hover:hover)]:hover:text-slate-700"
 				>
 					全削除
 				</button>
@@ -55,7 +55,7 @@ const HistoryPanel = ({
 							<Link
 								href={hrefBuilder(item.query)}
 								viewTransitionKey={viewTransitionKey}
-								className="min-w-0 flex-1 text-sm text-slate-900 truncate hover:underline"
+								className="min-w-0 flex-1 text-sm text-slate-900 truncate [@media(hover:hover)]:hover:underline"
 								onPointerDown={(event) => event.preventDefault()}
 								onClick={(event) => {
 									onSelect(item.query);
@@ -70,7 +70,7 @@ const HistoryPanel = ({
 								type="button"
 								onMouseDown={(event) => event.preventDefault()}
 								onClick={() => onRemove(item.query)}
-								className="text-xs text-slate-400 hover:text-slate-600"
+								className="text-xs text-slate-400 [@media(hover:hover)]:hover:text-slate-600"
 							>
 								削除
 							</button>

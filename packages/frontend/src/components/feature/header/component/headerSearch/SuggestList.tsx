@@ -20,7 +20,7 @@ const SuggestList = ({ items, query, onSelect }: Props) => {
 				<Link
 					key={thread.id}
 					href={`/threads/${thread.id}`}
-					className="flex gap-3 px-3 py-3 text-sm text-slate-900 hover:bg-slate-100 border-t border-slate-200 first:border-t-0"
+					className="flex gap-3 px-3 py-3 text-sm text-slate-900 [@media(hover:hover)]:hover:bg-slate-100 border-t border-slate-200 first:border-t-0"
 					onPointerDown={(event) => event.preventDefault()}
 					onClick={onSelect}
 				>

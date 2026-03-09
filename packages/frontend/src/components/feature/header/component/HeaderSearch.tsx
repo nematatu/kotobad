@@ -19,7 +19,7 @@ const HeaderSearch = () => {
 				href={href}
 				viewTransitionKey={viewTransitionKeys.searchPageNavigation}
 				aria-label="検索ページへ移動"
-				className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white"
+				className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-600 transition-colors [@media(hover:hover)]:hover:bg-slate-100 [@media(hover:hover)]:hover:text-slate-900 dark:text-slate-300 dark:[@media(hover:hover)]:hover:bg-slate-900 dark:[@media(hover:hover)]:hover:text-white"
 			>
 				<Search className="size-5" />
 			</Link>

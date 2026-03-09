@@ -31,7 +31,7 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="group relative z-0 flex items-start gap-4 rounded-sm border border-gray-200 bg-white p-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 has-[.thread-card-nohover:hover]:bg-white"
+						className="group relative z-0 flex items-start gap-4 rounded-sm border border-gray-200 bg-white p-4 text-gray-900 transition [@media(hover:hover)]:hover:border-gray-300 [@media(hover:hover)]:hover:bg-gray-50 [@media(hover:hover)]:has-[.thread-card-nohover:hover]:bg-white"
 					>
 						<Link
 							href={authorHref}
@@ -67,7 +67,7 @@ export const ThreadList = ({
 										<Link
 											href="/"
 											key={tag.id}
-											className="inline-flex items-center gap-1 text-xs font-semibold text-blue-400 hover:underline"
+											className="inline-flex items-center gap-1 text-xs font-semibold text-blue-400 [@media(hover:hover)]:hover:underline"
 										>
 											#{tag.name}
 										</Link>

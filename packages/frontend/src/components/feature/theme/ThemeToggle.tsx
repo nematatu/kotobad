@@ -31,7 +31,7 @@ export default function ThemeToggle({ className, showLabel = false }: Props) {
 			aria-label={`${label}に切り替える`}
 			title={`${label}に切り替える`}
 			className={cn(
-				"shrink-0 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white",
+				"shrink-0 text-slate-600 [@media(hover:hover)]:hover:text-slate-900 dark:text-slate-300 dark:[@media(hover:hover)]:hover:text-white",
 				showLabel ? "justify-start px-3" : "",
 				className,
 			)}

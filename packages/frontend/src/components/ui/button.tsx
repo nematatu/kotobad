@@ -12,17 +12,17 @@ const buttonVariants = cva(
 			variant: {
 				default: "bg-primary text-primary-foreground",
 				destructive:
-					"bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+					"bg-destructive text-white shadow-xs [@media(hover:hover)]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
 				outline:
-					"border bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+					"border bg-background [@media(hover:hover)]:hover:bg-accent [@media(hover:hover)]:hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:[@media(hover:hover)]:hover:bg-input/50",
 				secondary:
-					"bg-secondary text-secondary-foreground hover:bg-secondary/80",
+					"bg-secondary text-secondary-foreground [@media(hover:hover)]:hover:bg-secondary/80",
 				ghost:
-					"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-				link: "text-primary underline-offset-4 hover:underline",
+					"[@media(hover:hover)]:hover:bg-accent [@media(hover:hover)]:hover:text-accent-foreground dark:[@media(hover:hover)]:hover:bg-accent/50",
+				link: "text-primary underline-offset-4 [@media(hover:hover)]:hover:underline",
 				google:
-					"bg-white text-slate-700 border border-slate-300 hover:bg-surface-100 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800",
-				tag: "bg-blue-200/20 hover:bg-blue-300/40 ring-1 ring-blue-300/60 text-blue-500 text-xs transition-colors duration-150",
+					"bg-white text-slate-700 border border-slate-300 [@media(hover:hover)]:hover:bg-surface-100 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:[@media(hover:hover)]:hover:bg-slate-800",
+				tag: "bg-blue-200/20 [@media(hover:hover)]:hover:bg-blue-300/40 ring-1 ring-blue-300/60 text-blue-500 text-xs transition-colors duration-150",
 
 				...buttonColor,
 			},
@@ -38,7 +38,7 @@ const buttonVariants = cva(
 			},
 			hover: {
 				none: "",
-				brightness: "hover:brightness-110",
+				brightness: "[@media(hover:hover)]:hover:brightness-110",
 			},
 			rounded: {
 				sm: "rounded-sm",

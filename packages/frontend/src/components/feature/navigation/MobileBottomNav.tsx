@@ -30,7 +30,7 @@ const MobileBottomNav = ({ tags }: Props) => {
 					<Link
 						href="/threads"
 						viewTransitionKey={viewTransitionKeys.threadListNavigation}
-						className="flex flex-1 flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900"
+						className="flex flex-1 flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 [@media(hover:hover)]:hover:text-slate-900"
 					>
 						<Home className="h-5 w-5" />
 						<span>スレッド一覧</span>
