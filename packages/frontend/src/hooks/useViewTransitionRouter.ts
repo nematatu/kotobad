@@ -1,16 +1,37 @@
 "use client";
 
 import type { UrlObject } from "node:url";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import {
+	resolveViewTransitionBehavior,
+	type ViewTransitionDirection,
+	type ViewTransitionKey,
+	type ViewTransitionNavigationMethod,
+	type ViewTransitionTarget,
+} from "@/config/viewTransition";
 
-type NavigationDirection = "forward" | "back";
-type NavigateOptions = {
+export type ViewTransitionNavigateOptions = {
 	scroll?: boolean;
+	viewTransitionKey?: ViewTransitionKey;
+};
+
+type ViewTransitionRouter = {
+	back: (options?: ViewTransitionNavigateOptions) => void;
+	push: (
+		href: string | UrlObject,
+		options?: ViewTransitionNavigateOptions,
+	) => void;
+	refresh: () => void;
+	replace: (
+		href: string | UrlObject,
+		options?: ViewTransitionNavigateOptions,
+	) => void;
 };
 
 const ROUTE_TRANSITION_ATTRIBUTE = "data-route-transition";
 const ROUTE_TRANSITION_ID_ATTRIBUTE = "data-route-transition-id";
 const ROUTE_TRANSITION_TIMEOUT_MS = 350;
+const VIEW_TRANSITION_MOBILE_MEDIA_QUERY = "(max-width: 495px)";
 
 let transitionSequence = 0;
 const routeScrollPositions = new Map<string, number>();
@@ -24,6 +45,9 @@ let previousScrollRestoration: History["scrollRestoration"] | null = null;
 
 const prefersReducedMotion = () =>
 	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const isMobileViewport = () =>
+	window.matchMedia(VIEW_TRANSITION_MOBILE_MEDIA_QUERY).matches;
 
 type SearchParamsLike =
 	| {
@@ -39,6 +63,29 @@ export const getViewTransitionRouteKey = (
 	const search = searchParams?.toString() ?? "";
 	return `${pathname ?? ""}${search ? `?${search}` : ""}`;
 };
+
+const getCurrentNavigationTarget = (): ViewTransitionTarget => ({
+	pathname: window.location.pathname,
+	searchParams: new URLSearchParams(window.location.search),
+});
+
+const getCurrentRouteKey = () =>
+	getViewTransitionRouteKey(
+		window.location.pathname,
+		new URLSearchParams(window.location.search),
+	);
+
+const toNavigationTarget = (href: string): ViewTransitionTarget => {
+	const url = new URL(href, window.location.href);
+	return {
+		pathname: url.pathname,
+		searchParams: new URLSearchParams(url.searchParams),
+	};
+};
+
+const toNextNavigationOptions = (options?: ViewTransitionNavigateOptions) => ({
+	scroll: options?.scroll,
+});
 
 const toNavigationHref = (href: string | UrlObject) => {
 	if (typeof href === "string") {
@@ -75,6 +122,27 @@ const toNavigationHref = (href: string | UrlObject) => {
 
 	const search = params.toString();
 	return `${pathname}${search ? `?${search}` : ""}${hash}`;
+};
+
+const resolveNavigationDirection = (
+	method: ViewTransitionNavigationMethod,
+	href?: string | UrlObject,
+	viewTransitionKey?: ViewTransitionKey,
+): ReturnType<typeof resolveViewTransitionBehavior> => {
+	if (typeof window === "undefined") {
+		return {
+			enabled: true,
+			direction: method === "back" ? "back" : "forward",
+			ruleId: "server-fallback",
+		};
+	}
+
+	return resolveViewTransitionBehavior({
+		current: getCurrentNavigationTarget(),
+		next: href ? toNavigationTarget(toNavigationHref(href)) : null,
+		method,
+		key: viewTransitionKey,
+	});
 };
 
 const clearPendingCommit = (id?: string) => {
@@ -162,9 +230,14 @@ export const notifyViewTransitionRouteCommit = (routeKey?: string) => {
 
 const startRouteViewTransition = (
 	update: () => void,
-	direction: NavigationDirection,
+	direction: ViewTransitionDirection,
 ) => {
-	if (typeof document === "undefined") {
+	if (
+		typeof document === "undefined" ||
+		typeof document.startViewTransition !== "function" ||
+		prefersReducedMotion() ||
+		!isMobileViewport()
+	) {
 		update();
 		return;
 	}
@@ -183,15 +256,6 @@ const startRouteViewTransition = (
 		root.removeAttribute(ROUTE_TRANSITION_ID_ATTRIBUTE);
 	};
 
-	if (
-		typeof document.startViewTransition !== "function" ||
-		prefersReducedMotion()
-	) {
-		update();
-		cleanup();
-		return;
-	}
-
 	const transition = document.startViewTransition(async () => {
 		const committed = waitForNavigationCommit(transitionId);
 		update();
@@ -201,35 +265,74 @@ const startRouteViewTransition = (
 	transition.finished.catch(() => {}).finally(cleanup);
 };
 
-export function useViewTransitionRouter() {
+export function useViewTransitionRouter(): ViewTransitionRouter {
 	const router = useRouter();
-	const pathname = usePathname();
-	const searchParams = useSearchParams();
-	const currentRouteKey = getViewTransitionRouteKey(pathname, searchParams);
 
 	return {
-		back: () => {
+		back: (options?: ViewTransitionNavigateOptions) => {
+			const currentRouteKey = getCurrentRouteKey();
 			saveScrollPosition(currentRouteKey);
 			pendingBackScrollRestore = true;
 			enableManualScrollRestoration();
+			const behavior = resolveNavigationDirection(
+				"back",
+				undefined,
+				options?.viewTransitionKey,
+			);
+			if (!behavior.enabled) {
+				router.back();
+				return;
+			}
 			startRouteViewTransition(() => {
 				router.back();
-			}, "back");
+			}, behavior.direction);
 		},
-		push: (href: string | UrlObject, options?: NavigateOptions) => {
+		push: (
+			href: string | UrlObject,
+			options?: ViewTransitionNavigateOptions,
+		) => {
+			const currentRouteKey = getCurrentRouteKey();
 			saveScrollPosition(currentRouteKey);
+			const behavior = resolveNavigationDirection(
+				"push",
+				href,
+				options?.viewTransitionKey,
+			);
+			if (!behavior.enabled) {
+				router.push(toNavigationHref(href), toNextNavigationOptions(options));
+				return;
+			}
 			startRouteViewTransition(() => {
-				router.push(toNavigationHref(href), options);
-			}, "forward");
+				router.push(toNavigationHref(href), toNextNavigationOptions(options));
+			}, behavior.direction);
 		},
 		refresh: () => {
 			router.refresh();
 		},
-		replace: (href: string | UrlObject, options?: NavigateOptions) => {
+		replace: (
+			href: string | UrlObject,
+			options?: ViewTransitionNavigateOptions,
+		) => {
+			const currentRouteKey = getCurrentRouteKey();
 			saveScrollPosition(currentRouteKey);
+			const behavior = resolveNavigationDirection(
+				"replace",
+				href,
+				options?.viewTransitionKey,
+			);
+			if (!behavior.enabled) {
+				router.replace(
+					toNavigationHref(href),
+					toNextNavigationOptions(options),
+				);
+				return;
+			}
 			startRouteViewTransition(() => {
-				router.replace(toNavigationHref(href), options);
-			}, "forward");
+				router.replace(
+					toNavigationHref(href),
+					toNextNavigationOptions(options),
+				);
+			}, behavior.direction);
 		},
 	};
 }

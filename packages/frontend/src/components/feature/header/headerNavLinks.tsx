@@ -1,6 +1,11 @@
 import type { ActionLinkItem } from "@/components/common/button/ActionLink";
+import { viewTransitionKeys } from "@/config/viewTransition";
 
 export const headerNavLinks: ActionLinkItem[] = [
-	{ label: "スレッド一覧", href: "/threads" },
+	{
+		label: "スレッド一覧",
+		href: "/threads",
+		viewTransitionKey: viewTransitionKeys.threadListNavigation,
+	},
 	{ label: "コトバドとは", href: "/#about" },
 ];

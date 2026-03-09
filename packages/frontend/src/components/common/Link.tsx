@@ -6,6 +6,7 @@ import NextLink, {
 } from "next/link";
 import type * as React from "react";
 import { createPortal } from "react-dom";
+import type { ViewTransitionKey } from "@/config/viewTransition";
 import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 
 type LinkProps = NextLinkProps &
@@ -13,6 +14,7 @@ type LinkProps = NextLinkProps &
 		children: React.ReactNode;
 		className?: string;
 		showIndicator?: boolean;
+		viewTransitionKey?: ViewTransitionKey;
 	};
 
 function LinkIndicator() {
@@ -35,6 +37,7 @@ export function Link({
 	onNavigate,
 	replace,
 	scroll,
+	viewTransitionKey,
 	...props
 }: LinkProps) {
 	const transitionRouter = useViewTransitionRouter();
@@ -61,10 +64,10 @@ export function Link({
 
 				event.preventDefault();
 				if (replace) {
-					transitionRouter.replace(href, { scroll });
+					transitionRouter.replace(href, { scroll, viewTransitionKey });
 					return;
 				}
-				transitionRouter.push(href, { scroll });
+				transitionRouter.push(href, { scroll, viewTransitionKey });
 			}}
 		>
 			{children}

@@ -4,6 +4,7 @@ import { SiGithub, SiX } from "react-icons/si";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Link } from "@/components/common/Link";
+import { viewTransitionKeys } from "@/config/viewTransition";
 import type { FooterItem } from "./FooterItem";
 import { FOOTER_SECTIONS } from "./FooterItem";
 
@@ -52,7 +53,11 @@ const Footer = () => {
 			<div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
 				<div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:gap-x-14 lg:gap-y-10">
 					<div className="space-y-3 sm:space-y-4">
-						<Link href="/" className="inline-flex items-center gap-2">
+						<Link
+							href="/"
+							viewTransitionKey={viewTransitionKeys.homeNavigation}
+							className="inline-flex items-center gap-2"
+						>
 							<LogoIcon className="h-9 w-9 sm:h-10 sm:w-10" />
 							<LogoMojiIcon className="h-5 w-auto sm:h-6" />
 						</Link>

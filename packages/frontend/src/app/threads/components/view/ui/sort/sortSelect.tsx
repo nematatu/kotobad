@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { parseSort, sortLabel, sortOptions } from "@/app/threads/lib/sort";
+import { viewTransitionKeys } from "@/config/viewTransition";
 import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 
 export function SortSelect() {
@@ -14,7 +15,9 @@ export function SortSelect() {
 		const sort = parseSort(value);
 		const params = new URLSearchParams(searchParams);
 		params.set("sort", sort);
-		router.replace(`${pathname}?${params.toString()}`);
+		router.replace(`${pathname}?${params.toString()}`, {
+			viewTransitionKey: viewTransitionKeys.threadListQueryControls,
+		});
 	};
 
 	return (

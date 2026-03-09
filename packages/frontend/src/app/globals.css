@@ -534,19 +534,19 @@
     will-change: opacity;
   }
   .view-transition-static-background {
-    view-transition-name: page-background;
+    view-transition-name: none;
   }
   .view-transition-page-content {
-    view-transition-name: page-content;
+    view-transition-name: none;
   }
   .view-transition-static-header {
-    view-transition-name: page-header;
+    view-transition-name: none;
   }
   .view-transition-static-footer {
-    view-transition-name: page-footer;
+    view-transition-name: none;
   }
   .view-transition-static-bottom-nav {
-    view-transition-name: page-bottom-nav;
+    view-transition-name: none;
   }
   .link-progress {
     position: fixed;
@@ -609,7 +609,29 @@
   .animate-blob { animation: blob 7s infinite; }
 }
 
-@media (prefers-reduced-motion: no-preference) {
+@media (max-width: 495px) {
+  .view-transition-static-background {
+    view-transition-name: page-background;
+  }
+
+  .view-transition-page-content {
+    view-transition-name: page-content;
+  }
+
+  .view-transition-static-header {
+    view-transition-name: page-header;
+  }
+
+  .view-transition-static-footer {
+    view-transition-name: page-footer;
+  }
+
+  .view-transition-static-bottom-nav {
+    view-transition-name: page-bottom-nav;
+  }
+}
+
+@media (max-width: 495px) and (prefers-reduced-motion: no-preference) {
   ::view-transition-group(root),
   ::view-transition-image-pair(root) {
     animation: none;

@@ -1,4 +1,5 @@
 import { Link } from "@/components/common/Link";
+import type { ViewTransitionKey } from "@/config/viewTransition";
 import { cn } from "@/lib/utils";
 
 export type ActionLinkItem = {
@@ -7,6 +8,7 @@ export type ActionLinkItem = {
 	badge?: React.ReactNode;
 	icon?: React.ComponentType<{ className?: string }>;
 	tone?: "default" | "accent";
+	viewTransitionKey?: ViewTransitionKey;
 };
 
 type Variant = "header" | "menu";
@@ -42,6 +44,7 @@ const ActionLink = ({
 	return (
 		<Link
 			href={item.href}
+			viewTransitionKey={item.viewTransitionKey}
 			{...linkProps}
 			showIndicator={variant !== "menu"}
 			className={cn(

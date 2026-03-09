@@ -5,6 +5,7 @@ import { Home, Plus } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Link } from "@/components/common/Link";
 import CreateThreadDialog from "@/components/feature/header/component/createThreadDialog";
+import { viewTransitionKeys } from "@/config/viewTransition";
 
 type Props = {
 	tags: TagType[];
@@ -22,6 +23,7 @@ const MobileBottomNav = ({ tags }: Props) => {
 			<div className="mx-auto flex max-w-6xl items-center px-6 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
 				<Link
 					href="/threads"
+					viewTransitionKey={viewTransitionKeys.threadListNavigation}
 					className="flex flex-1 flex-col items-center justify-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-900"
 				>
 					<Home className="h-5 w-5" />
