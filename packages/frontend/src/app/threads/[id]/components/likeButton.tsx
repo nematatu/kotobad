@@ -39,6 +39,8 @@ export function LikeButton({
 	initialLikedByMe,
 	size = "default",
 }: Props) {
+	const compactHeartViewportSizePx = 18;
+	const compactHeartPlayerSizePx = 50;
 	const controllerRef = useRef<ThreadHeartLottieController | null>(null);
 	const likedByMeRef = useRef(initialLikedByMe);
 	const [likeCount, setLikeCount] = useState(initialLikeCount);
@@ -120,7 +122,7 @@ export function LikeButton({
 	const isCompact = size === "compact";
 	const compactButtonClass = cn(
 		THREAD_LIST_META_CHIP_CLASS,
-		"min-h-0 appearance-none border-0 bg-gray-100 text-[10px] shadow-none transition-transform duration-50 hover:bg-gray-100 hover:text-gray-800 active:scale-95 cursor-pointer",
+		"min-h-0 appearance-none overflow-visible border-0 bg-gray-100 text-[10px] shadow-none transition-transform duration-50 hover:bg-gray-100 hover:text-gray-800 active:scale-95 cursor-pointer",
 	);
 
 	if (isCompact) {
@@ -132,10 +134,20 @@ export function LikeButton({
 				aria-label={likedByMe ? "いいねを解除" : "いいねする"}
 				className={compactButtonClass}
 			>
-				<span className="relative inline-flex h-3 w-3 items-center justify-center overflow-visible shrink-0">
+				<span
+					className="relative inline-flex items-center justify-center overflow-visible shrink-0"
+					style={{
+						width: compactHeartViewportSizePx,
+						height: compactHeartViewportSizePx,
+					}}
+				>
 					<ThreadHeartLottiePlayer
 						onReadyAction={onReadyAction}
-						className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[3.2]"
+						className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full"
+						style={{
+							width: compactHeartPlayerSizePx,
+							height: compactHeartPlayerSizePx,
+						}}
 					/>
 				</span>
 				<span className="whitespace-nowrap text-[10px] font-semibold leading-none">

@@ -1,7 +1,13 @@
 "use client";
 
 import { Player } from "@lottiefiles/react-lottie-player";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+	type CSSProperties,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+} from "react";
 import animationData from "@/assets/lottie/test-like2.json";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +20,14 @@ export type ThreadHeartLottieController = {
 type Props = {
 	onReadyAction?: (controller: ThreadHeartLottieController | null) => void;
 	className?: string;
+	style?: CSSProperties;
 };
 
-export function ThreadHeartLottiePlayer({ onReadyAction, className }: Props) {
+export function ThreadHeartLottiePlayer({
+	onReadyAction,
+	className,
+	style,
+}: Props) {
 	const playerRef = useRef<Player>(null);
 	const controllerRef = useRef<ThreadHeartLottieController | null>(null);
 	const hasNotifiedReadyRef = useRef(false);
@@ -79,7 +90,13 @@ export function ThreadHeartLottiePlayer({ onReadyAction, className }: Props) {
 			speed={1.9}
 			keepLastFrame
 			className={cn("h-full w-full", className)}
-			style={{ width: "100%", height: "100%", margin: 0, overflow: "visible" }}
+			style={{
+				width: "100%",
+				height: "100%",
+				margin: 0,
+				overflow: "visible",
+				...style,
+			}}
 			onEvent={(event) => {
 				if (
 					(event === "instanceSaved" || event === "ready") &&
