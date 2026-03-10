@@ -63,13 +63,13 @@ export default function UpdatesPage() {
 		<div className="relative min-h-full">
 			<div
 				aria-hidden="true"
-				className="pointer-events-none fixed right-10 bottom-0 z-0 rotate-[-10deg] opacity-20"
+				className="pointer-events-none fixed right-0 bottom-32 sm:bottom-12 z-0 rotate-[-10deg] opacity-20"
 			>
-				<LogoStickerIcon className="h-16 sm:h-67" />
+				<LogoStickerIcon className="h-26 sm:h-47" />
 			</div>
-			<div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10 sm:pt-26">
+			<div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10 pt-20 sm:pt-26">
 				<div className="relative space-y-14">
-					<h1 className="text-center text-4xl font-bold tracking-[.11em] text-slate-950 dark:text-slate-50">
+					<h1 className="text-center text-2xl sm:text-4xl font-bold tracking-[.11em] text-slate-950 dark:text-slate-50">
 						お知らせと更新情報
 					</h1>
 
