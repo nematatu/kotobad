@@ -16,4 +16,8 @@ export const CreateDeveloperRoadmapItemSchema = z.object({
 	status: DeveloperRoadmapStatusSchema,
 });
 
+export const UpdateDeveloperRoadmapStatusSchema = z.object({
+	status: DeveloperRoadmapStatusSchema,
+});
+
 export const DeveloperRoadmapListSchema = z.array(DeveloperRoadmapItemSchema);

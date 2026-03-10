@@ -4,6 +4,7 @@ import type {
 	DeveloperRoadmapItemSchema,
 	DeveloperRoadmapListSchema,
 	DeveloperRoadmapStatusSchema,
+	UpdateDeveloperRoadmapStatusSchema,
 } from "../schemas/developerRoadmap";
 
 export type DeveloperRoadmapStatusType = z.infer<
@@ -16,6 +17,10 @@ export type DeveloperRoadmapItemType = z.infer<
 
 export type CreateDeveloperRoadmapItemType = z.infer<
 	typeof CreateDeveloperRoadmapItemSchema
+>;
+
+export type UpdateDeveloperRoadmapStatusType = z.infer<
+	typeof UpdateDeveloperRoadmapStatusSchema
 >;
 
 export type DeveloperRoadmapListType = z.infer<

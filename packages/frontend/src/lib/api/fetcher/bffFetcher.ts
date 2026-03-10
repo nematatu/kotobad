@@ -1,5 +1,5 @@
 import "server-only";
-import { cookies } from "next/headers";
+import { cookies, headers as nextHeaders } from "next/headers";
 import { apiUrlMap } from "../url/BaseBffUrl";
 
 type FetchArgs = Parameters<typeof fetch>;
@@ -26,11 +26,32 @@ export async function BffFetcherRaw(
 	const mergeHeaders = toHeaders(headers);
 
 	if (!skipCookie) {
-		// Cookie を付与する場合のみ cookies() を呼ぶ。静的化を阻害しないように分岐。
+		// Cookie と request 由来の origin は、認証付きリクエストでのみ付与する。
 		const cookieStore = await cookies();
 		const cookieHeader = cookieStore.toString();
 		if (!mergeHeaders.has("cookie") && cookieHeader) {
 			mergeHeaders.set("cookie", cookieHeader);
+		}
+
+		if (!mergeHeaders.has("origin")) {
+			const requestHeaders = await nextHeaders();
+			const requestOrigin = requestHeaders.get("origin");
+
+			if (requestOrigin) {
+				mergeHeaders.set("origin", requestOrigin);
+			} else {
+				const host = requestHeaders.get("host");
+				const forwardedProto = requestHeaders.get("x-forwarded-proto");
+				const proto =
+					forwardedProto ??
+					(host && /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)
+						? "http"
+						: "https");
+
+				if (host) {
+					mergeHeaders.set("origin", `${proto}://${host}`);
+				}
+			}
 		}
 	}
 

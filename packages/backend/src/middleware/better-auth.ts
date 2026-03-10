@@ -8,9 +8,15 @@ export const betterAuthMiddleware = createMiddleware<AppEnvironment>(
 	async (c, next) => {
 		const auth = createAuth({ env: c.env, restRequest: c.req.raw });
 
-		const session = await auth.api.getSession({
-			headers: c.req.raw.headers,
-		});
+		const session = await auth.api
+			.getSession({
+				headers: c.req.raw.headers,
+			})
+			.catch((error) => {
+				console.error("Failed to resolve better-auth session", error);
+				return null;
+			});
+
 		if (!session?.user) {
 			return c.json({ error: "Unauthorized" }, 401);
 		}

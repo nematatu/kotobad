@@ -1,8 +1,7 @@
 import LogoStickerIcon from "@/assets/logo/logo-sticker.svg";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { CreateDeveloperNoteForm } from "./components/CreateDeveloperNoteForm";
+import { DeveloperRoadmapList } from "./components/DeveloperRoadmapList";
 import { getDeveloperNotes } from "./lib/getDeveloperNotes";
 import { getDeveloperRoadmap } from "./lib/getDeveloperRoadmap";
 
@@ -23,30 +22,6 @@ const formatDottedDate = (value: string) => {
 
 	return formatter.format(date).replaceAll("/", ".");
 };
-
-const ROADMAP_CARD_CLASS = {
-	wip: "bg-[#ffffff] text-[#6f767a]",
-	todo: "bg-[#ffffff] text-[#6f767a]",
-	done: "bg-[rgba(255,255,255,0.68)] text-[#6f767a] [background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.75)_0,rgba(255,255,255,0.75)_6px,transparent_6px,transparent_12px)]",
-} as const;
-
-const ROADMAP_FLOATING_BADGE_META = {
-	wip: {
-		label: "WIP",
-		color: "violet" as const,
-		className: "-top-4 right-3 rotate-[4deg]",
-	},
-	todo: {
-		label: "todo",
-		color: "emerald" as const,
-		className: "-bottom-4 right-3",
-	},
-	done: {
-		label: "done",
-		color: "amber" as const,
-		className: "-bottom-4 right-3",
-	},
-} as const;
 
 export default async function DeveloperNotesPage() {
 	const [{ notes, canCreate }, roadmapItems] = await Promise.all([
@@ -90,35 +65,7 @@ export default async function DeveloperNotesPage() {
 								</h2>
 							</div>
 
-							<div className="mt-6 flex flex-wrap items-start gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-7">
-								{roadmapItems.map((item) => {
-									const badgeMeta = ROADMAP_FLOATING_BADGE_META[item.status];
-
-									return (
-										<article
-											key={item.id}
-											className={cn(
-												"relative rounded-[12px] px-5 py-3 shadow-none",
-												ROADMAP_CARD_CLASS[item.status],
-											)}
-										>
-											<h3 className="text-[15px] leading-[1.45] font-normal tracking-tight text-inherit">
-												{item.title}
-											</h3>
-											<Badge
-												variant="dot"
-												color={badgeMeta.color}
-												className={cn(
-													"absolute px-[10px] py-[4px] text-[11px] font-bold tracking-[0.04em]",
-													badgeMeta.className,
-												)}
-											>
-												{badgeMeta.label}
-											</Badge>
-										</article>
-									);
-								})}
-							</div>
+							<DeveloperRoadmapList items={roadmapItems} canEdit={canCreate} />
 						</div>
 					</section>
 
