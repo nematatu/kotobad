@@ -1,5 +1,4 @@
 export { metadata, viewport } from "@/lib/config/metadata/metadata";
-import "zenn-content-css";
 import "./globals.css";
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import Image from "next/image";

@@ -75,15 +75,15 @@
 		"react-hook-form": "^7.71.1",
 		"react-icons": "^5.5.0",
 		"react-lottie": "^1.2.10",
+		"react-markdown": "^10.1.0",
 		"react-resizable-panels": "^3.0.6",
 		"recharts": "2.15.4",
+		"remark-gfm": "^4.0.1",
 		"sonner": "^2.0.7",
 		"swr": "^2.4.0",
 		"tailwind-merge": "^3.4.0",
 		"tailwindcss-animate": "^1.0.7",
 		"vaul": "^1.1.2",
-		"zenn-content-css": "^0.4.6",
-		"zenn-markdown-html": "^0.4.6",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
