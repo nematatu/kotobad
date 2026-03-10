@@ -109,9 +109,6 @@ export default function UpdatesPage() {
 														{item.title}
 													</h3>
 												</div>
-												<p className="max-w-3xl text-[16px] leading-8 text-slate-600 dark:text-slate-300">
-													{item.summary}
-												</p>
 												{item.detailPage ? (
 													<Link
 														href={`/updates/${item.detailPage.slug}`}
