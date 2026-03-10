@@ -187,6 +187,15 @@
   color-scheme: dark;
 }
 
+.znc h1,
+.znc h2,
+.znc h3,
+.znc h4,
+.znc h5,
+.znc h6 {
+  font-weight: 700;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
