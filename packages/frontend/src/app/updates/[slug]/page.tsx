@@ -57,7 +57,7 @@ export default async function UpdateDetailPage({ params }: Props) {
 				className="relative mx-auto w-full max-w-3xl overflow-hidden border-b border-slate-200/80 scroll-mt-[calc(var(--header-height,0px)+1rem)]"
 			>
 				<div className="relative z-10 px-4 pt-20 pb-6 sm:px-0 sm:pb-10 sm:pt-26">
-					<h1 className="text-xl font-black tracking-wide text-slate-950 dark:text-slate-50 sm:text-3xl">
+					<h1 className="text-xl font-black tracking-[0.1em] text-slate-950 dark:text-slate-50 sm:text-3xl">
 						{update.title}
 					</h1>
 				</div>
@@ -77,14 +77,14 @@ export default async function UpdateDetailPage({ params }: Props) {
 				<article className="mt-6 space-y-8 rounded-[28px] bg-white px-5 py-6  dark:bg-slate-900 sm:px-8 sm:py-8">
 					{update.detailPage.sections.map((section) => (
 						<section key={section.title} className="space-y-3">
-							<h2 className="text-[18px] font-bold tracking-tight text-slate-950 dark:text-slate-50">
+							<h2 className="text-[18px] font-bold tracking-widest text-slate-950 dark:text-slate-50">
 								{section.title}
 							</h2>
 							<div className="space-y-3">
 								{section.paragraphs.map((paragraph) => (
 									<p
 										key={`${section.title}-${paragraph}`}
-										className="text-[15px] leading-7 text-slate-600 dark:text-slate-300"
+										className="text-[15px] leading-7 tracking-wide text-slate-600 dark:text-slate-300"
 									>
 										{paragraph}
 									</p>

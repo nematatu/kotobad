@@ -21,10 +21,9 @@ const UPDATE_TIMELINE_BADGE_CLASS: Record<
 	keyof typeof PRODUCT_UPDATE_CATEGORY_META,
 	string
 > = {
-	new: "bg-sky-500 text-white dark:bg-sky-400 dark:text-slate-950",
-	improvement:
-		"bg-emerald-500 text-white dark:bg-emerald-400 dark:text-slate-950",
-	fix: "bg-amber-500 text-white dark:bg-amber-400 dark:text-slate-950",
+	new: "bg-sky-500 text-white dark:bg-sky-400",
+	improvement: "bg-emerald-500 text-white dark:bg-emerald-400",
+	fix: "bg-amber-500 text-white dark:bg-amber-400",
 };
 
 export default function UpdatesPage() {
@@ -66,15 +65,15 @@ export default function UpdatesPage() {
 									<div className="hidden space-y-3 pt-1 sm:block">
 										<span
 											className={cn(
-												"inline-flex min-w-[40px] items-center justify-center rounded-lg px-4 py-2 text-[14px] font-bold",
+												"inline-flex min-w-[40px] items-center justify-center rounded-lg px-4 py-2 text-[14px] font-bold dark:text-slate-700 tracking-[0.1em]",
 												UPDATE_TIMELINE_BADGE_CLASS[item.category],
 											)}
 										>
 											{meta.label}
 										</span>
-										<time className="block text-[12px] font-medium tracking-[0.08em] text-slate-400 dark:text-slate-500">
+										<span className="block text-[12px] font-medium tracking-[0.1em] text-slate-400">
 											{formatDottedDate(item.date)}
-										</time>
+										</span>
 									</div>
 
 									<div className="relative flex justify-center">
@@ -100,7 +99,7 @@ export default function UpdatesPage() {
 												</time>
 											</div>
 											<div className="flex items-start gap-3">
-												<h3 className="text-[18px] leading-[1.55] font-bold tracking-tight text-slate-950 dark:text-slate-50 sm:leading-[1.35]">
+												<h3 className="text-[18px] leading-[1.55] font-bold text-slate-950 dark:text-slate-50 sm:leading-[1.35] tracking-[0.1em] ">
 													{item.title}
 												</h3>
 											</div>
