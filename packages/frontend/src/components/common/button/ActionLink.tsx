@@ -25,7 +25,7 @@ type Props = {
 const variantClasses: Record<Variant, string> = {
 	header:
 		"inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-gray-100 md:text-sm",
-	menu: "inline-flex self-start items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100",
+	menu: "inline-flex self-start items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors",
 };
 
 const toneClasses = {
