@@ -9,6 +9,7 @@ import {
 	uniqueIndex,
   check
 } from "drizzle-orm/sqlite-core";
+import type { DeveloperNoteStatusType } from "@kotobad/shared/src/types/developerNote";
 import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import { user } from "./better-auth.schema";
 
@@ -218,17 +219,44 @@ export const threadLikes = sqliteTable("thread_likes", {
 
 export const threadTags = sqliteTable("thread_tag", {
 	threadId: integer("thread_id")
-		.notNull()
-		.references(() => threads.id, {onDelete: "cascade"}),
+			.notNull()
+			.references(() => threads.id, {onDelete: "cascade"}),
 	tagId: integer("tag_id")
-		.notNull()
-		.references(() => tags.id, {onDelete: "cascade"}),
-}, (t) => ({
-        ThreadTagUnique: uniqueIndex("thread_tag_unique").on(t.threadId, t.tagId),
-        threadIdIdx: index("thread_tag_idx").on(t.threadId),
-        tagIdIdx: index("tag_idx").on(t.tagId),
-    })
-)
+			.notNull()
+			.references(() => tags.id, {onDelete: "cascade"}),
+	}, (t) => ({
+	        ThreadTagUnique: uniqueIndex("thread_tag_unique").on(t.threadId, t.tagId),
+	        threadIdIdx: index("thread_tag_idx").on(t.threadId),
+	        tagIdIdx: index("tag_idx").on(t.tagId),
+	    })
+	)
+
+export const developerNotes = sqliteTable(
+	"developer_notes",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		content: text("content").notNull(),
+		status: text("status").$type<DeveloperNoteStatusType>().notNull(),
+		authorId: text("author_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+		updatedAt: timestamp("updated_at").$onUpdate(
+			() => sql`(strftime('%s', 'now'))`,
+		),
+	},
+	(t) => [
+		index("developer_notes_created_at_idx").on(t.createdAt),
+		index("developer_notes_author_idx").on(t.authorId),
+		index("developer_notes_status_idx").on(t.status),
+			check(
+				"developer_notes_status_check",
+				sql`${t.status} IN ('wip', 'todo', 'done')`,
+			),
+		],
+	)
 
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
@@ -287,7 +315,15 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 export const usersRelations = relations(user, ({ many }) => ({
 	posts: many(posts),
 	threads: many(threads),
-  threadLikes: many(threadLikes),
+	  threadLikes: many(threadLikes),
+	developerNotes: many(developerNotes),
+}));
+
+export const developerNotesRelations = relations(developerNotes, ({ one }) => ({
+	author: one(user, {
+		fields: [developerNotes.authorId],
+		references: [user.id],
+	}),
 }));
 
 export const reactionsRelations = relations(reactions, ({ many }) => ({

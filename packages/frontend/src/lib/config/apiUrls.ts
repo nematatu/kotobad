@@ -3,9 +3,11 @@ import { getApiBaseUrl } from "../api/url/BaseUrl";
 export const API_PATH = {
 	ME: "better-auth/get-session",
 	GET_ALL_THREADS: "bbs/threads",
+	GET_ALL_DEVELOPER_NOTES: "bbs/developer-notes",
 	SEARCH_THREADS: "bbs/threads/search",
 	GET_THREAD_BY_ID: "bbs/threads/",
 	CREATE_THREAD: "bbs/threads/create",
+	CREATE_DEVELOPER_NOTE: "bbs/developer-notes/create",
 	CREATE_POST: "bbs/posts/create",
 	GET_POSTS_BY_THREADID: "bbs/posts/byThreadId/",
 	GET_USER_PROFILE_BY_ID: "bbs/users/",

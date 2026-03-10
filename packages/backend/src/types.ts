@@ -14,6 +14,7 @@ export type Bindings = {
 	ALLOWED_ORIGINS?: string;
 	ALLOW_CF_PAGES_PREVIEW?: string;
 	CF_PAGES_PREVIEW_SUFFIX?: string;
+	DEVELOPER_NOTE_AUTHOR_IDS?: string;
 	GOOGLE_CLIENT_ID: string;
 	GOOGLE_CLIENT_SECRET: string;
 	KOTOBAD_BUCKET: R2Bucket;

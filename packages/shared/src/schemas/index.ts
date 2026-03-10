@@ -1,3 +1,4 @@
+export * as BaseDeveloperNoteSchema from "./developerNote";
 export * as BaseErrorSchema from "./error";
 export * as BasePostSchema from "./post";
 export * as BaseReactionSchema from "./reaction";
