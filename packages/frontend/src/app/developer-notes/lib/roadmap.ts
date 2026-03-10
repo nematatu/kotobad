@@ -1,10 +1,6 @@
-import type { DeveloperNoteStatusType } from "@kotobad/shared/src/types/developerNote";
+import { DeveloperRoadmapListSchema } from "@kotobad/shared/src/schemas/developerRoadmap";
 
-export const DEVELOPER_NOTE_ROADMAP_ITEMS: Array<{
-	title: string;
-	summary: string;
-	status: DeveloperNoteStatusType;
-}> = [
+export const DEVELOPER_ROADMAP_ITEMS = DeveloperRoadmapListSchema.parse([
 	{
 		title: "検索結果の情報密度",
 		summary:
@@ -40,4 +36,4 @@ export const DEVELOPER_NOTE_ROADMAP_ITEMS: Array<{
 			"進捗メモを changelog のように積み上げる見た目と基本導線を用意しました。",
 		status: "done",
 	},
-];
+]);

@@ -7,7 +7,7 @@ import {
 	DEVELOPER_NOTE_KIND_META,
 	DEVELOPER_NOTE_STATUS_META,
 } from "./lib/meta";
-import { DEVELOPER_NOTE_ROADMAP_ITEMS } from "./lib/roadmap";
+import { DEVELOPER_ROADMAP_ITEMS } from "./lib/roadmap";
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +87,7 @@ export default async function DeveloperNotesPage() {
 							</div>
 
 							<div className="mt-6 flex flex-wrap items-start gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-7">
-								{DEVELOPER_NOTE_ROADMAP_ITEMS.map((item) => {
+								{DEVELOPER_ROADMAP_ITEMS.map((item) => {
 									const badgeMeta = ROADMAP_FLOATING_BADGE_META[item.status];
 
 									return (
