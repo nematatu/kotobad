@@ -81,7 +81,7 @@ export const posts = sqliteTable(
 		),
 		threadId: integer("thread_id")
 			.notNull()
-			.references(() => threads.id),
+			.references(() => threads.id, { onDelete: "cascade" }),
 		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id),
