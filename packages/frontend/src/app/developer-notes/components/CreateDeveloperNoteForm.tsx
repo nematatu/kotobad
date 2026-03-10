@@ -5,7 +5,7 @@ import type {
 	CreateDeveloperRoadmapItemType,
 	DeveloperRoadmapStatusType,
 } from "@kotobad/shared/src/types/developerRoadmap";
-import { PencilLine } from "lucide-react";
+import { CheckCheck, Clock3, ListTodo, PencilLine } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -19,6 +19,12 @@ import {
 	FormItem,
 	FormMessage,
 } from "@/components/ui/form";
+import {
+	SubtleTab,
+	SubtleTabItem,
+	SubtleTabPanel,
+} from "@/components/ui/subtle-tab";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	BffFetcher,
@@ -37,25 +43,17 @@ const FORM_MODE_META: Record<
 	FormMode,
 	{
 		label: string;
-		selectedClass: string;
-		idleClass: string;
 		placeholder: string;
 		successMessage: string;
 	}
 > = {
 	note: {
 		label: "ボヤキ",
-		selectedClass: "",
-		idleClass: "",
 		placeholder: "ボヤき...",
 		successMessage: "ボヤキを投稿しました",
 	},
 	roadmap: {
 		label: "ロードマップ",
-		selectedClass:
-			"border-sky-300 bg-sky-100 text-sky-700 shadow-[0_8px_20px_rgba(14,165,233,0.18)] dark:border-sky-400/40 dark:bg-sky-500/20 dark:text-sky-100",
-		idleClass:
-			"border-slate-200 bg-white/80 text-slate-500 hover:border-sky-200 hover:text-sky-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-sky-400/30 dark:hover:text-sky-200",
 		placeholder: "ロードマップに追加する項目...",
 		successMessage: "ロードマップに追加しました",
 	},
@@ -65,30 +63,24 @@ const ROADMAP_STATUS_META: Record<
 	DeveloperRoadmapStatusType,
 	{
 		label: string;
-		selectedClass: string;
-		idleClass: string;
+		description: string;
+		icon: typeof Clock3;
 	}
 > = {
 	wip: {
 		label: "WIP",
-		selectedClass:
-			"border-sky-300 bg-sky-100 text-sky-700 shadow-[0_8px_20px_rgba(14,165,233,0.18)] dark:border-sky-400/40 dark:bg-sky-500/20 dark:text-sky-100",
-		idleClass:
-			"border-slate-200 bg-white/80 text-slate-500 hover:border-sky-200 hover:text-sky-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-sky-400/30 dark:hover:text-sky-200",
+		description: "いま進めている項目",
+		icon: Clock3,
 	},
 	todo: {
 		label: "Todo",
-		selectedClass:
-			"border-emerald-300 bg-emerald-100 text-emerald-700 shadow-[0_8px_20px_rgba(16,185,129,0.18)] dark:border-emerald-400/40 dark:bg-emerald-500/20 dark:text-emerald-100",
-		idleClass:
-			"border-slate-200 bg-white/80 text-slate-500 hover:border-emerald-200 hover:text-emerald-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-emerald-400/30 dark:hover:text-emerald-200",
+		description: "次に着手したい項目",
+		icon: ListTodo,
 	},
 	done: {
 		label: "Done",
-		selectedClass:
-			"border-amber-300 bg-amber-100 text-amber-700 shadow-[0_8px_20px_rgba(245,158,11,0.18)] dark:border-amber-400/40 dark:bg-amber-500/20 dark:text-amber-100",
-		idleClass:
-			"border-slate-200 bg-white/80 text-slate-500 hover:border-amber-200 hover:text-amber-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:border-amber-400/30 dark:hover:text-amber-200",
+		description: "完了済みの項目",
+		icon: CheckCheck,
 	},
 };
 
@@ -97,26 +89,6 @@ const ROADMAP_STATUS_ORDER: DeveloperRoadmapStatusType[] = [
 	"todo",
 	"done",
 ];
-
-const getErrorMessage = (error: unknown) => {
-	if (!(error instanceof Error)) {
-		return "不明なエラーが発生しました";
-	}
-
-	const fetchError = error as BffFetcherError;
-	if (fetchError.body) {
-		try {
-			const parsed = JSON.parse(fetchError.body) as { error?: string };
-			if (parsed.error) {
-				return parsed.error;
-			}
-		} catch {
-			return error.message;
-		}
-	}
-
-	return error.message;
-};
 
 export function CreateDeveloperNoteForm() {
 	const router = useRouter();
@@ -133,6 +105,10 @@ export function CreateDeveloperNoteForm() {
 	const statusValue = form.watch("status");
 	const isRoadmapMode = mode === "roadmap";
 	const isSubmitDisabled = !contentValue?.trim();
+	const selectedStatusIndex = Math.max(
+		ROADMAP_STATUS_ORDER.indexOf(statusValue),
+		0,
+	);
 
 	const handleSubmit = async (values: DeveloperNoteFormValues) => {
 		setSubmitError(null);
@@ -174,17 +150,13 @@ export function CreateDeveloperNoteForm() {
 			if (fetchError.status === 401) {
 				return;
 			}
-
-			const message = getErrorMessage(error);
-			setSubmitError(message);
-			toast.error(message);
 		}
 	};
 
 	return (
 		<section
 			aria-labelledby="create-developer-note-title"
-			className="rounded-[28px] border border-slate-200/80 bg-white/88 px-5 py-5 shadow-[0_12px_26px_rgba(148,163,184,0.14)] backdrop-blur md:px-6 md:py-6 dark:border-slate-800 dark:bg-slate-900/72"
+			className="rounded-[28px] border border-slate-200/80 bg-white/88 px-5 py-5 md:px-6 md:py-6 dark:border-slate-800 dark:bg-slate-900/72"
 		>
 			<Form {...form}>
 				<form
@@ -192,24 +164,38 @@ export function CreateDeveloperNoteForm() {
 					className="mt-5 space-y-5"
 				>
 					<FormItem>
-						<div className="flex flex-wrap gap-2">
-							{(Object.keys(FORM_MODE_META) as FormMode[]).map((entryMode) => {
-								const meta = FORM_MODE_META[entryMode];
-
-								return (
-									<button
-										key={entryMode}
-										type="button"
-										onClick={() => setMode(entryMode)}
-										className={cn(
-											"inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-bold tracking-[0.12em] transition-colors",
-											mode === entryMode ? meta.selectedClass : meta.idleClass,
-										)}
-									>
-										<span>{meta.label}</span>
-									</button>
-								);
-							})}
+						<div className="flex items-center gap-3">
+							<button
+								type="button"
+								onClick={() => setMode("note")}
+								className={cn(
+									"text-[13px] font-bold tracking-[0.12em] transition-colors",
+									mode === "note"
+										? "text-slate-950 dark:text-slate-50"
+										: "text-slate-400 dark:text-slate-500",
+								)}
+							>
+								{FORM_MODE_META.note.label}
+							</button>
+							<Switch
+								checked={isRoadmapMode}
+								onCheckedChange={(checked) =>
+									setMode(checked ? "roadmap" : "note")
+								}
+								aria-label="投稿種別の切り替え"
+							/>
+							<button
+								type="button"
+								onClick={() => setMode("roadmap")}
+								className={cn(
+									"text-[13px] font-bold tracking-[0.12em] transition-colors",
+									mode === "roadmap"
+										? "text-slate-950 dark:text-slate-50"
+										: "text-slate-400 dark:text-slate-500",
+								)}
+							>
+								{FORM_MODE_META.roadmap.label}
+							</button>
 						</div>
 					</FormItem>
 
@@ -219,32 +205,49 @@ export function CreateDeveloperNoteForm() {
 							name="status"
 							render={() => (
 								<FormItem>
-									<div className="flex flex-wrap gap-2">
-										{ROADMAP_STATUS_ORDER.map((status) => {
+									<SubtleTab
+										idPrefix="developer-roadmap-status"
+										selectedIndex={selectedStatusIndex}
+										onSelect={(index) =>
+											form.setValue(
+												"status",
+												ROADMAP_STATUS_ORDER[index] ?? "wip",
+												{
+													shouldDirty: true,
+													shouldValidate: true,
+												},
+											)
+										}
+										className="w-fit rounded-full border border-slate-200 bg-white/80 px-1.5 py-1 dark:border-slate-700 dark:bg-slate-900/70"
+									>
+										{ROADMAP_STATUS_ORDER.map((status, index) => {
 											const meta = ROADMAP_STATUS_META[status];
 
 											return (
-												<button
+												<SubtleTabItem
 													key={status}
-													type="button"
-													onClick={() =>
-														form.setValue("status", status, {
-															shouldDirty: true,
-															shouldValidate: true,
-														})
-													}
-													className={cn(
-														"inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-bold tracking-[0.12em] transition-colors",
-														statusValue === status
-															? meta.selectedClass
-															: meta.idleClass,
-													)}
-												>
-													<span>{meta.label}</span>
-												</button>
+													index={index}
+													icon={meta.icon}
+													label={meta.label}
+												/>
 											);
 										})}
-									</div>
+									</SubtleTab>
+									{ROADMAP_STATUS_ORDER.map((status, index) => {
+										const meta = ROADMAP_STATUS_META[status];
+
+										return (
+											<SubtleTabPanel
+												key={status}
+												index={index}
+												selectedIndex={selectedStatusIndex}
+												idPrefix="developer-roadmap-status"
+												className="mt-3 px-2 text-[13px] leading-6 text-slate-500 dark:text-slate-300"
+											>
+												<p>{meta.description}</p>
+											</SubtleTabPanel>
+										);
+									})}
 									<FormMessage />
 								</FormItem>
 							)}
@@ -264,7 +267,7 @@ export function CreateDeveloperNoteForm() {
 										<Textarea
 											{...field}
 											{...form.register("content", {
-												required: "空文字では投稿できません",
+												required: "",
 												maxLength: {
 													value: 4000,
 													message: "4000文字以内で入力してください",

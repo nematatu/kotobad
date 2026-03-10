@@ -1,5 +1,6 @@
 import LogoStickerIcon from "@/assets/logo/logo-sticker.svg";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CreateDeveloperNoteForm } from "./components/CreateDeveloperNoteForm";
 import { getDeveloperNotes } from "./lib/getDeveloperNotes";
@@ -32,15 +33,18 @@ const ROADMAP_CARD_CLASS = {
 const ROADMAP_FLOATING_BADGE_META = {
 	wip: {
 		label: "WIP",
-		className: "-top-4 right-3 rotate-[4deg] bg-[#ffffff] text-[#32a8f8]",
+		color: "violet" as const,
+		className: "-top-4 right-3 rotate-[4deg]",
 	},
 	todo: {
 		label: "todo",
-		className: "-bottom-4 right-3 bg-[#b1bec6] text-white",
+		color: "emerald" as const,
+		className: "-bottom-4 right-3",
 	},
 	done: {
 		label: "done",
-		className: "-bottom-4 right-3 bg-[#b1bec6] text-white",
+		color: "amber" as const,
+		className: "-bottom-4 right-3",
 	},
 } as const;
 
@@ -65,6 +69,7 @@ export default async function DeveloperNotesPage() {
 						<h1 className="text-2xl font-black tracking-[0.12em] text-slate-950 dark:text-slate-50 sm:text-4xl">
 							開発者のボヤキ
 						</h1>
+
 						<p className="text-[15px] leading-8 text-slate-500 dark:text-slate-300">
 							開発中に考えたこと、次やることなど
 						</p>
@@ -100,14 +105,16 @@ export default async function DeveloperNotesPage() {
 											<h3 className="text-[15px] leading-[1.45] font-normal tracking-tight text-inherit">
 												{item.title}
 											</h3>
-											<span
+											<Badge
+												variant="dot"
+												color={badgeMeta.color}
 												className={cn(
-													"absolute inline-flex rounded-[11px] px-[10px] py-[4px] text-[11px] font-bold tracking-[0.04em]",
+													"absolute px-[10px] py-[4px] text-[11px] font-bold tracking-[0.04em]",
 													badgeMeta.className,
 												)}
 											>
 												{badgeMeta.label}
-											</span>
+											</Badge>
 										</article>
 									);
 								})}
@@ -125,7 +132,7 @@ export default async function DeveloperNotesPage() {
 
 							<div className="space-y-10 sm:space-y-12">
 								{notes.length === 0 ? (
-									<section className="rounded-[28px] border border-dashed border-slate-200 bg-white/60 px-6 py-12 text-center shadow-[0_12px_26px_rgba(148,163,184,0.1)] dark:shadow-none dark:border-slate-700 dark:bg-slate-900/50">
+									<section className="rounded-[28px] border border-dashed border-slate-200 bg-white/60 px-6 py-12 text-center dark:border-slate-700 dark:bg-slate-900/50">
 										<p className="text-[12px] font-black tracking-[0.28em] text-slate-400 dark:text-slate-500">
 											EMPTY
 										</p>
@@ -145,13 +152,13 @@ export default async function DeveloperNotesPage() {
 												<AuthorAvatar
 													name={note.author.name}
 													image={note.author.image}
-													className="h-11 w-11 border border-slate-200 bg-white shadow-[0_10px_24px_rgba(148,163,184,0.18)] dark:border-slate-700 dark:bg-slate-900"
+													className="h-11 w-11 border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
 													fallbackClassName="bg-sky-500 text-sm font-black text-white"
 												/>
 											</div>
 
 											<div className="min-w-0 flex-1">
-												<div className="relative max-w-[44rem] rounded-[24px] bg-white px-5 py-4 shadow-[0_14px_30px_rgba(148,163,184,0.14)] before:absolute before:top-5 before:left-[-6px] before:h-4 before:w-4 before:rotate-45 before:bg-white before:content-[''] sm:px-6 sm:py-5 dark:bg-slate-900 dark:before:bg-slate-900">
+												<div className="relative max-w-[44rem] rounded-[24px] bg-white px-5 py-4 sm:px-6 sm:py-5 dark:bg-slate-900">
 													<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
 														<p className="text-[13px] font-bold tracking-[0.06em] text-slate-700 dark:text-slate-200">
 															{note.author.name}
