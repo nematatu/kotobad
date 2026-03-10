@@ -84,7 +84,7 @@ export default async function UpdateDetailPage({ params }: Props) {
 								{section.paragraphs.map((paragraph) => (
 									<p
 										key={`${section.title}-${paragraph}`}
-										className="text-[15px] leading-7 tracking-wide text-slate-600 dark:text-slate-300"
+										className="text-md leading-7 tracking-wide text-slate-600 dark:text-slate-300"
 									>
 										{paragraph}
 									</p>

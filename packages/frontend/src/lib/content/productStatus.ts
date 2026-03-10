@@ -53,9 +53,9 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
 					],
 				},
 				{
-					title: "使いやすさの調整",
+					title: "ハイライト表示",
 					paragraphs: [
-						"検索語は結果一覧のタイトル内でハイライト表示し、どのスレッドが一致しているのかを見分けやすくしました。",
+						"検索クエリをハイライト表示し、一致部分を分かりやすくしました。",
 					],
 				},
 			],
@@ -64,6 +64,28 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
 	{
 		date: "2026-03-09",
 		title: "モバイル端末の画面遷移にViewTransitionを適用しました",
+		category: "new",
+	},
+	{
+		date: "2026-03-08",
+		title: "ポストのリアルタイム更新に対応しました",
+		detailPage: {
+			slug: "post-realtime-update",
+			sections: [
+				{
+					title: "",
+					paragraphs: [
+						"スレッドを開いたままにしておくと、自動でポストを更新して表示してくれます。",
+					],
+				},
+				{
+					title: "技術",
+					paragraphs: [
+						"Cloudflare の Durable Objects と WebSockets を使って実装しました",
+					],
+				},
+			],
+		},
 		category: "new",
 	},
 	{
