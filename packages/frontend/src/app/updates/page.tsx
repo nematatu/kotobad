@@ -61,7 +61,7 @@ export default function UpdatesPage() {
 							return (
 								<article
 									key={`${item.date}-${item.title}`}
-									className="grid gap-4 md:grid-cols-[148px_28px_minmax(0,1fr)] md:gap-8"
+									className="grid gap-4 md:grid-cols-[88px_28px_minmax(0,1fr)] md:gap-8"
 								>
 									<div className="hidden space-y-3 pt-1 md:block">
 										<span
@@ -78,16 +78,13 @@ export default function UpdatesPage() {
 									</div>
 
 									<div className="relative hidden justify-center md:flex">
-										<Sparkles className="mt-1 hidden h-5 w-5 shrink-0 fill-current text-amber-400 md:block" />
+										<Sparkles className="hidden h-5 w-5 shrink-0 fill-current text-amber-400 md:block" />
 										{index < PRODUCT_UPDATES.length - 1 ? (
 											<span className="absolute top-7 bottom-[-3.2rem] w-px bg-slate-200 dark:bg-slate-800" />
 										) : null}
 									</div>
 
 									<div className="relative rounded-[26px] border border-slate-200/80 bg-white/88 px-5 py-5 md:border-none md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none dark:border-slate-800 dark:bg-slate-900/72 md:dark:bg-transparent">
-										<span className="absolute top-5 bottom-5 left-4 w-px bg-slate-200 md:hidden dark:bg-slate-800" />
-										<span className="absolute left-[9px] top-6 h-4 w-4 rounded-full border-[3px] border-slate-300 bg-white md:hidden dark:border-slate-600 dark:bg-slate-950" />
-
 										<div className="pl-8 md:pl-0">
 											<div className="flex flex-wrap items-center gap-3 md:hidden">
 												<span

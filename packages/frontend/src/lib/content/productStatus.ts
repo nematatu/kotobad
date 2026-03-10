@@ -14,7 +14,6 @@ export type ProductUpdate = {
 	date: string;
 	title: string;
 	category: ProductUpdateCategory;
-	important?: boolean;
 	detailPage?: ProductUpdateDetailPage;
 };
 
@@ -44,7 +43,6 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
 		date: "2026-03-10",
 		title: "スレッド検索ページを作りました",
 		category: "new",
-		important: true,
 		detailPage: {
 			slug: "thread-search-page",
 			sections: [
@@ -65,25 +63,15 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
 	},
 	{
 		date: "2026-03-09",
+		title: "モバイル端末の画面遷移にViewTransitionを適用しました",
+		category: "new",
+	},
+	{
+		date: "2026-03-09",
 		title: "ダークモードに対応しました",
 		category: "new",
 	},
 ];
-
-export const PRODUCT_UPDATE_FILTERS = [
-	{ key: "all", label: "すべて" },
-	{ key: "feature", label: "機能追加" },
-	{ key: "improvement", label: "改善" },
-	{ key: "fix", label: "修正" },
-] as const;
-
-export type ProductUpdateFilter =
-	(typeof PRODUCT_UPDATE_FILTERS)[number]["key"];
-
-export const isProductUpdateFilter = (
-	value: string | undefined,
-): value is ProductUpdateFilter =>
-	PRODUCT_UPDATE_FILTERS.some((filter) => filter.key === value);
 
 export const PRODUCT_UPDATE_DETAIL_SLUGS = PRODUCT_UPDATES.flatMap((update) =>
 	update.detailPage ? [update.detailPage.slug] : [],
