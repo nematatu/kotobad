@@ -9,8 +9,8 @@ import {
 	type ReactNode,
 	useCallback,
 	useContext,
-	useEffect,
 	useId,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from "react";
@@ -69,9 +69,10 @@ const SubtleTab = forwardRef<HTMLDivElement, SubtleTabProps>(
 			measureItems: measureTabs,
 		} = useProximityHover(containerRef, { axis: "x" });
 
-		useEffect(() => {
+		// biome-ignore lint/correctness/useExhaustiveDependencies: generated tab component intentionally re-measures when children change.
+		useLayoutEffect(() => {
 			measureTabs();
-		}, [measureTabs]);
+		}, [measureTabs, children]);
 
 		// Wrap handlers to track isMouseInside
 		const handleMouseMove = useCallback(
@@ -266,7 +267,7 @@ const SubtleTabItem = forwardRef<HTMLButtonElement, SubtleTabItemProps>(
 		const { registerTab, hoveredIndex, selectedIndex, onSelect, idPrefix } =
 			useSubtleTab();
 
-		useEffect(() => {
+		useLayoutEffect(() => {
 			registerTab(index, internalRef.current);
 			return () => registerTab(index, null);
 		}, [index, registerTab]);
