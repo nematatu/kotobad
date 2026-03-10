@@ -1,13 +1,7 @@
 export type ProductUpdateCategory = "new" | "improvement" | "fix";
 
-export type ProductUpdateDetailSection = {
-	title: string;
-	paragraphs: string[];
-};
-
 export type ProductUpdateDetailPage = {
 	slug: string;
-	sections: ProductUpdateDetailSection[];
 };
 
 export type ProductUpdate = {
@@ -45,20 +39,6 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
 		category: "new",
 		detailPage: {
 			slug: "thread-search-page",
-			sections: [
-				{
-					title: "検索ページ",
-					paragraphs: [
-						"ヘッダーの検索アイコンから検索ページへ移動でき、リアルタイム検索を行うことができます。",
-					],
-				},
-				{
-					title: "ハイライト表示",
-					paragraphs: [
-						"検索クエリをハイライト表示し、一致部分を分かりやすくしました。",
-					],
-				},
-			],
 		},
 	},
 	{
@@ -71,20 +51,6 @@ export const PRODUCT_UPDATES: ProductUpdate[] = [
 		title: "ポストのリアルタイム更新に対応しました",
 		detailPage: {
 			slug: "post-realtime-update",
-			sections: [
-				{
-					title: "",
-					paragraphs: [
-						"スレッドを開いたままにしておくと、自動でポストを更新して表示してくれます。",
-					],
-				},
-				{
-					title: "技術",
-					paragraphs: [
-						"Cloudflare の Durable Objects と WebSockets を使って実装しました",
-					],
-				},
-			],
 		},
 		category: "new",
 	},

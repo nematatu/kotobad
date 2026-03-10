@@ -2,11 +2,13 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import LogoStickerIcon from "@/assets/logo/logo-sticker.svg";
+import { MarkdownContent } from "@/components/common/MarkdownContent";
 import {
 	getProductUpdateBySlug,
 	PRODUCT_UPDATE_CATEGORY_META,
 	PRODUCT_UPDATE_DETAIL_SLUGS,
 } from "@/lib/content/productStatus";
+import { getProductUpdateDetailMarkdown } from "@/lib/content/productUpdateDetail";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -30,8 +32,9 @@ export function generateStaticParams() {
 export default async function UpdateDetailPage({ params }: Props) {
 	const { slug } = await params;
 	const update = getProductUpdateBySlug(slug);
+	const markdown = await getProductUpdateDetailMarkdown(slug);
 
-	if (!update?.detailPage) {
+	if (!update?.detailPage || !markdown) {
 		return notFound();
 	}
 
@@ -75,23 +78,7 @@ export default async function UpdateDetailPage({ params }: Props) {
 			</section>
 			<div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-10">
 				<article className="mt-6 space-y-8 rounded-[28px] bg-white px-5 py-6  dark:bg-slate-900 sm:px-8 sm:py-8">
-					{update.detailPage.sections.map((section) => (
-						<section key={section.title} className="space-y-3">
-							<h2 className="text-[18px] font-bold tracking-widest text-slate-950 dark:text-slate-50">
-								{section.title}
-							</h2>
-							<div className="space-y-3">
-								{section.paragraphs.map((paragraph) => (
-									<p
-										key={`${section.title}-${paragraph}`}
-										className="text-md leading-7 tracking-wide text-slate-600 dark:text-slate-300"
-									>
-										{paragraph}
-									</p>
-								))}
-							</div>
-						</section>
-					))}
+					<MarkdownContent markdown={markdown} />
 				</article>
 			</div>
 		</div>

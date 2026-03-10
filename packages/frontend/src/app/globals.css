@@ -167,6 +167,26 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.dark .znc {
+  --c-bg-base: var(--c-dark-blue-1100);
+  --c-bg-dim: var(--c-dark-blue-900);
+  --c-bg-warning: #39352c;
+  --c-bg-warning-icon: #e5a21a;
+  --c-bg-alert: #311818;
+  --c-bg-alert-icon: #c63939;
+  --c-bg-code: var(--c-dark-gray-1000);
+  --c-bg-code-block: #1a2638;
+  --c-bg-image: #fff;
+  --c-border: var(--c-dark-gray-1000);
+  --c-border-emphasis: var(--c-dark-gray-900);
+  --c-text-subtle: var(--c-gray-600);
+  --c-text-link: var(--c-blue-500);
+}
+
+.dark .znc .zenn-embedded iframe {
+  color-scheme: dark;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
