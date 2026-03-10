@@ -9,10 +9,7 @@ import {
 	uniqueIndex,
   check
 } from "drizzle-orm/sqlite-core";
-import type {
-	DeveloperNoteKindType,
-	DeveloperNoteStatusType,
-} from "@kotobad/shared/src/types/developerNote";
+import type { DeveloperRoadmapStatusType } from "@kotobad/shared/src/types/developerRoadmap";
 import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import { user } from "./better-auth.schema";
 
@@ -239,8 +236,6 @@ export const developerNotes = sqliteTable(
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		content: text("content").notNull(),
-		status: text("status").$type<DeveloperNoteStatusType>().notNull(),
-		kind: text("kind").$type<DeveloperNoteKindType>().notNull(),
 		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
@@ -254,18 +249,32 @@ export const developerNotes = sqliteTable(
 	(t) => [
 		index("developer_notes_created_at_idx").on(t.createdAt),
 		index("developer_notes_author_idx").on(t.authorId),
-		index("developer_notes_kind_idx").on(t.kind),
-		index("developer_notes_status_idx").on(t.status),
-			check(
-				"developer_notes_status_check",
-				sql`${t.status} IN ('wip', 'todo', 'done')`,
-			),
-			check(
-				"developer_notes_kind_check",
-				sql`${t.kind} IN ('log', 'note')`,
-			),
-		],
-	)
+	],
+);
+
+export const developerRoadmapItems = sqliteTable(
+	"developer_roadmap_items",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		title: text("title").notNull(),
+		status: text("status").$type<DeveloperRoadmapStatusType>().notNull(),
+		sortOrder: integer("sort_order").notNull().default(0),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+		updatedAt: timestamp("updated_at").$onUpdate(
+			() => sql`(strftime('%s', 'now'))`,
+		),
+	},
+	(t) => [
+		index("developer_roadmap_items_status_idx").on(t.status),
+		index("developer_roadmap_items_sort_order_idx").on(t.status, t.sortOrder),
+		check(
+			"developer_roadmap_items_status_check",
+			sql`${t.status} IN ('wip', 'todo', 'done')`,
+		),
+	],
+)
 
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);

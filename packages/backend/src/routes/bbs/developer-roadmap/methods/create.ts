@@ -2,35 +2,35 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq } from "drizzle-orm";
-import { developerNotes } from "../../../../../drizzle/schema";
+import { developerRoadmapItems } from "../../../../../drizzle/schema";
 import {
-	OpenAPICreateDeveloperNoteSchema,
-	OpenAPIDeveloperNoteSchema,
-} from "../../../../models/developerNotes";
+	OpenAPICreateDeveloperRoadmapItemSchema,
+	OpenAPIDeveloperRoadmapItemSchema,
+} from "../../../../models/developerRoadmap";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import type { AppEnvironment } from "../../../../types";
-import { canCreateDeveloperNote } from "./config";
-import { toDeveloperNoteResponse } from "./transform";
+import { canCreateDeveloperNote } from "../../developer-notes/methods/config";
+import { toDeveloperRoadmapResponse } from "./transform";
 
-export const createDeveloperNoteRoute = createRoute({
+export const createDeveloperRoadmapRoute = createRoute({
 	method: "post",
 	path: "/create",
-	description: "開発者のボヤキを投稿",
+	description: "開発者ロードマップ項目を投稿",
 	request: {
 		body: {
 			content: {
 				"application/json": {
-					schema: OpenAPICreateDeveloperNoteSchema,
+					schema: OpenAPICreateDeveloperRoadmapItemSchema,
 				},
 			},
 		},
 	},
 	responses: {
 		201: {
-			description: "作成されたボヤキ",
+			description: "作成されたロードマップ項目",
 			content: {
 				"application/json": {
-					schema: OpenAPIDeveloperNoteSchema,
+					schema: OpenAPIDeveloperRoadmapItemSchema,
 				},
 			},
 		},
@@ -72,8 +72,8 @@ export const createDeveloperNoteRoute = createRoute({
 	},
 });
 
-export const createDeveloperNoteRouter: RouteHandler<
-	typeof createDeveloperNoteRoute,
+export const createDeveloperRoadmapRouter: RouteHandler<
+	typeof createDeveloperRoadmapRoute,
 	AppEnvironment
 > = async (c) => {
 	const db = c.get("db");
@@ -83,7 +83,7 @@ export const createDeveloperNoteRouter: RouteHandler<
 		return c.json({ error: "Forbidden" }, 403);
 	}
 
-	let validatedData: z.infer<typeof OpenAPICreateDeveloperNoteSchema>;
+	let validatedData: z.infer<typeof OpenAPICreateDeveloperRoadmapItemSchema>;
 	try {
 		validatedData = c.req.valid("json");
 	} catch (error: unknown) {
@@ -96,43 +96,46 @@ export const createDeveloperNoteRouter: RouteHandler<
 	}
 
 	try {
-		const result = await db
-			.insert(developerNotes)
-			.values({
-				content: validatedData.content,
-				authorId: user.id,
-			})
-			.returning({ id: developerNotes.id });
-
-		const newDeveloperNoteId = result[0]?.id;
-
-		if (!newDeveloperNoteId) {
-			return c.json(
-				{ error: "Failed to create developer note", message: "" },
-				500,
-			);
-		}
-
-		const createdNote = await db.query.developerNotes.findFirst({
-			where: eq(developerNotes.id, newDeveloperNoteId),
-			with: {
-				author: {
-					columns: {
-						name: true,
-						image: true,
-					},
-				},
-			},
+		const lastItemInStatus = await db.query.developerRoadmapItems.findFirst({
+			where: eq(developerRoadmapItems.status, validatedData.status),
+			orderBy: (table, { desc }) => [desc(table.sortOrder), desc(table.id)],
 		});
 
-		if (!createdNote) {
+		const sortOrder = (lastItemInStatus?.sortOrder ?? -1) + 1;
+
+		const result = await db
+			.insert(developerRoadmapItems)
+			.values({
+				title: validatedData.title,
+				status: validatedData.status,
+				sortOrder,
+			})
+			.returning({ id: developerRoadmapItems.id });
+
+		const newItemId = result[0]?.id;
+
+		if (!newItemId) {
 			return c.json(
-				{ error: "Developer note not found after creation", message: "" },
+				{ error: "Failed to create developer roadmap item", message: "" },
 				500,
 			);
 		}
 
-		return c.json(toDeveloperNoteResponse(createdNote), 201);
+		const createdItem = await db.query.developerRoadmapItems.findFirst({
+			where: eq(developerRoadmapItems.id, newItemId),
+		});
+
+		if (!createdItem) {
+			return c.json(
+				{
+					error: "Developer roadmap item not found after creation",
+					message: "",
+				},
+				500,
+			);
+		}
+
+		return c.json(toDeveloperRoadmapResponse(createdItem), 201);
 	} catch (error: unknown) {
 		return c.json(
 			{

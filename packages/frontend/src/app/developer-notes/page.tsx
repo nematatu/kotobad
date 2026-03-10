@@ -3,11 +3,7 @@ import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { cn } from "@/lib/utils";
 import { CreateDeveloperNoteForm } from "./components/CreateDeveloperNoteForm";
 import { getDeveloperNotes } from "./lib/getDeveloperNotes";
-import {
-	DEVELOPER_NOTE_KIND_META,
-	DEVELOPER_NOTE_STATUS_META,
-} from "./lib/meta";
-import { DEVELOPER_ROADMAP_ITEMS } from "./lib/roadmap";
+import { getDeveloperRoadmap } from "./lib/getDeveloperRoadmap";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +45,10 @@ const ROADMAP_FLOATING_BADGE_META = {
 } as const;
 
 export default async function DeveloperNotesPage() {
-	const { notes, canCreate } = await getDeveloperNotes();
+	const [{ notes, canCreate }, roadmapItems] = await Promise.all([
+		getDeveloperNotes(),
+		getDeveloperRoadmap(),
+	]);
 
 	return (
 		<div className="relative min-h-screen bg-[#f8fbff] dark:bg-[#0f172a]">
@@ -67,7 +66,7 @@ export default async function DeveloperNotesPage() {
 							開発者のボヤキ
 						</h1>
 						<p className="text-[15px] leading-8 text-slate-500 dark:text-slate-300">
-							今作っているもの、次に手を付けたいもの、途中で考えたことを、そのまま積んでいくページです。
+							開発中に考えたこと、次やることなど
 						</p>
 					</div>
 				</div>
@@ -87,13 +86,12 @@ export default async function DeveloperNotesPage() {
 							</div>
 
 							<div className="mt-6 flex flex-wrap items-start gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-7">
-								{DEVELOPER_ROADMAP_ITEMS.map((item) => {
+								{roadmapItems.map((item) => {
 									const badgeMeta = ROADMAP_FLOATING_BADGE_META[item.status];
 
 									return (
 										<article
-											key={`${item.status}-${item.title}`}
-											title={item.summary}
+											key={item.id}
 											className={cn(
 												"relative rounded-[12px] px-5 py-3 shadow-none",
 												ROADMAP_CARD_CLASS[item.status],
@@ -121,16 +119,13 @@ export default async function DeveloperNotesPage() {
 						id="developer-notes"
 						className="scroll-mt-[calc(var(--header-height,0px)+1rem)]"
 					>
+						<div className="mb-8 border-b border-slate-200" />
 						<div className="mx-auto max-w-3xl space-y-10 sm:space-y-12">
-							<h2 className="text-[24px] font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-[30px]">
-								下では、開発者がそのまま喋っている形で並べます
-							</h2>
-
 							{canCreate ? <CreateDeveloperNoteForm /> : null}
 
 							<div className="space-y-10 sm:space-y-12">
 								{notes.length === 0 ? (
-									<section className="rounded-[28px] border border-dashed border-slate-200 bg-white/60 px-6 py-12 text-center shadow-[0_12px_26px_rgba(148,163,184,0.1)] dark:border-slate-700 dark:bg-slate-900/50">
+									<section className="rounded-[28px] border border-dashed border-slate-200 bg-white/60 px-6 py-12 text-center shadow-[0_12px_26px_rgba(148,163,184,0.1)] dark:shadow-none dark:border-slate-700 dark:bg-slate-900/50">
 										<p className="text-[12px] font-black tracking-[0.28em] text-slate-400 dark:text-slate-500">
 											EMPTY
 										</p>
@@ -141,9 +136,6 @@ export default async function DeveloperNotesPage() {
 								) : null}
 
 								{notes.map((note) => {
-									const statusMeta = DEVELOPER_NOTE_STATUS_META[note.status];
-									const kindMeta = DEVELOPER_NOTE_KIND_META[note.kind];
-
 									return (
 										<article
 											key={note.id}
@@ -160,29 +152,13 @@ export default async function DeveloperNotesPage() {
 
 											<div className="min-w-0 flex-1">
 												<div className="relative max-w-[44rem] rounded-[24px] bg-white px-5 py-4 shadow-[0_14px_30px_rgba(148,163,184,0.14)] before:absolute before:top-5 before:left-[-6px] before:h-4 before:w-4 before:rotate-45 before:bg-white before:content-[''] sm:px-6 sm:py-5 dark:bg-slate-900 dark:before:bg-slate-900">
-													<div className="flex flex-wrap items-center gap-2">
-														<span
-															className={cn(
-																"inline-flex rounded-full border px-3 py-1 text-[11px] font-black tracking-[0.12em]",
-																kindMeta.badgeClass,
-															)}
-														>
-															{kindMeta.label}
-														</span>
-														<span
-															className={cn(
-																"inline-flex min-w-[72px] items-center justify-center rounded-lg px-3 py-1.5 text-[12px] font-bold tracking-[0.12em]",
-																statusMeta.badgeClass,
-															)}
-														>
-															{statusMeta.label}
-														</span>
+													<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+														<p className="text-[13px] font-bold tracking-[0.06em] text-slate-700 dark:text-slate-200">
+															{note.author.name}
+														</p>
 														<time className="text-[12px] font-medium tracking-[0.08em] text-slate-400 dark:text-slate-500">
 															{formatDottedDate(note.createdAt)}
 														</time>
-														<span className="text-[12px] text-slate-400 dark:text-slate-500">
-															{note.author.name}
-														</span>
 													</div>
 													<p className="mt-3 whitespace-pre-wrap break-words text-[15px] leading-8 text-slate-700 dark:text-slate-200">
 														{note.content}

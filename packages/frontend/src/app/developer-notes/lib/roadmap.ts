@@ -1,39 +1,52 @@
 import { DeveloperRoadmapListSchema } from "@kotobad/shared/src/schemas/developerRoadmap";
 
-export const DEVELOPER_ROADMAP_ITEMS = DeveloperRoadmapListSchema.parse([
+export const MOCK_DEVELOPER_ROADMAP_ITEMS = DeveloperRoadmapListSchema.parse([
 	{
+		id: 2000,
 		title: "検索結果の情報密度",
-		summary:
-			"タイトルとタグの見え方を再調整して、探したい話題へ早く届く形に寄せています。",
 		status: "wip",
+		sortOrder: 0,
+		createdAt: "2026-03-10T10:20:00.000Z",
+		updatedAt: null,
 	},
 	{
+		id: 2001,
 		title: "ボヤキページの運用",
-		summary:
-			"ロードマップと作業ログを分けつつ、雑感も追えるように表示の軸を整理しています。",
 		status: "wip",
+		sortOrder: 1,
+		createdAt: "2026-03-10T09:10:00.000Z",
+		updatedAt: null,
 	},
 	{
+		id: 2002,
 		title: "通知導線の見直し",
-		summary: "どこで更新に気づけるかを整理して、迷わず追えるようにしたいです。",
 		status: "todo",
+		sortOrder: 0,
+		createdAt: "2026-03-09T18:00:00.000Z",
+		updatedAt: null,
 	},
 	{
+		id: 2003,
 		title: "モバイル遷移の改善",
-		summary:
-			"タップ後の気持ちよさと、情報の切り替わり方を細かく詰める予定です。",
 		status: "todo",
+		sortOrder: 1,
+		createdAt: "2026-03-09T17:50:00.000Z",
+		updatedAt: null,
 	},
 	{
+		id: 2004,
 		title: "Markdown 詳細ページ",
-		summary:
-			"画像や GIF を置ける土台を先に整え、更新ごとの説明を書きやすくしました。",
 		status: "done",
+		sortOrder: 0,
+		createdAt: "2026-03-09T15:10:00.000Z",
+		updatedAt: "2026-03-09T16:00:00.000Z",
 	},
 	{
+		id: 2005,
 		title: "開発タイムライン",
-		summary:
-			"進捗メモを changelog のように積み上げる見た目と基本導線を用意しました。",
 		status: "done",
+		sortOrder: 1,
+		createdAt: "2026-03-09T13:00:00.000Z",
+		updatedAt: null,
 	},
 ]);

@@ -120,6 +120,20 @@
       "when": 1773134989744,
       "tag": "0016_many_payback",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1773147444525,
+      "tag": "0017_slimy_overlord",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1773147629392,
+      "tag": "0018_tearful_grey_gargoyle",
+      "breakpoints": true
     }
   ]
 }
