@@ -100,6 +100,7 @@ export const createDeveloperNoteRouter: RouteHandler<
 			.insert(developerNotes)
 			.values({
 				content: validatedData.content,
+				kind: validatedData.kind,
 				status: validatedData.status,
 				authorId: user.id,
 			})

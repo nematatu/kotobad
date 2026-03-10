@@ -2,6 +2,7 @@
 
 import type {
 	CreateDeveloperNoteType,
+	DeveloperNoteKindType,
 	DeveloperNoteStatusType,
 } from "@kotobad/shared/src/types/developerNote";
 import { PencilLine } from "lucide-react";
@@ -25,6 +26,8 @@ import {
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { cn } from "@/lib/utils";
 import {
+	DEVELOPER_NOTE_KIND_META,
+	DEVELOPER_NOTE_KIND_ORDER,
 	DEVELOPER_NOTE_STATUS_META,
 	DEVELOPER_NOTE_STATUS_ORDER,
 } from "../lib/meta";
@@ -55,17 +58,30 @@ export function CreateDeveloperNoteForm() {
 	const form = useForm<CreateDeveloperNoteType>({
 		defaultValues: {
 			content: "",
+			kind: "log",
 			status: "wip",
 		},
 	});
 
 	const contentValue = form.watch("content");
+	const kindValue = form.watch("kind");
 	const statusValue = form.watch("status");
 	const isSubmitDisabled = !contentValue?.trim();
+	const kindOptions = DEVELOPER_NOTE_KIND_ORDER.map((kind) => ({
+		kind,
+		meta: DEVELOPER_NOTE_KIND_META[kind],
+	}));
 	const statusOptions = DEVELOPER_NOTE_STATUS_ORDER.map((status) => ({
 		status,
 		meta: DEVELOPER_NOTE_STATUS_META[status],
 	}));
+
+	const handleSelectKind = (kind: DeveloperNoteKindType) => {
+		form.setValue("kind", kind, {
+			shouldDirty: true,
+			shouldValidate: true,
+		});
+	};
 
 	const handleSelectStatus = (status: DeveloperNoteStatusType) => {
 		form.setValue("status", status, {
@@ -87,6 +103,7 @@ export function CreateDeveloperNoteForm() {
 
 			form.reset({
 				content: "",
+				kind: "log",
 				status: "wip",
 			});
 			toast.success("ボヤキを投稿しました");
@@ -119,7 +136,7 @@ export function CreateDeveloperNoteForm() {
 					今やっていることを投げる
 				</h2>
 				<p className="text-[14px] leading-7 text-slate-500 dark:text-slate-300">
-					進行中の作業、これからやること、終わった作業メモをそのまま流し込みます。
+					進捗ログと雑感メモを、あとから見返しやすい形でそのまま積みます。
 				</p>
 			</div>
 
@@ -128,6 +145,36 @@ export function CreateDeveloperNoteForm() {
 					onSubmit={form.handleSubmit(handleSubmit)}
 					className="mt-5 space-y-5"
 				>
+					<FormField
+						control={form.control}
+						name="kind"
+						render={() => (
+							<FormItem>
+								<div className="flex flex-wrap gap-2">
+									{kindOptions.map(({ kind, meta }) => (
+										<button
+											key={kind}
+											type="button"
+											onClick={() => handleSelectKind(kind)}
+											className={cn(
+												"inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-bold tracking-[0.12em] transition-colors",
+												kindValue === kind
+													? meta.selectedClass
+													: meta.idleClass,
+											)}
+										>
+											<span>{meta.label}</span>
+											<span className="text-[11px] font-medium tracking-normal opacity-75">
+												{meta.description}
+											</span>
+										</button>
+									))}
+								</div>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
 					<FormField
 						control={form.control}
 						name="status"
@@ -186,7 +233,7 @@ export function CreateDeveloperNoteForm() {
 													form.handleSubmit(handleSubmit)();
 												}
 											}}
-											placeholder="例: 検索結果の並び順を再調整中。次は通知まわりの導線を整理したい。"
+											placeholder="例: 検索結果の並び順を再調整中。雑感なら NOTE、進捗なら LOG として残します。"
 											className="min-h-[168px] resize-none rounded-[24px] border-slate-200 bg-white/70 px-5 py-4 text-[15px] leading-8 text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-50"
 										/>
 									</FormControl>

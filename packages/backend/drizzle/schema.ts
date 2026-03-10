@@ -9,7 +9,10 @@ import {
 	uniqueIndex,
   check
 } from "drizzle-orm/sqlite-core";
-import type { DeveloperNoteStatusType } from "@kotobad/shared/src/types/developerNote";
+import type {
+	DeveloperNoteKindType,
+	DeveloperNoteStatusType,
+} from "@kotobad/shared/src/types/developerNote";
 import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import { user } from "./better-auth.schema";
 
@@ -237,6 +240,7 @@ export const developerNotes = sqliteTable(
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		content: text("content").notNull(),
 		status: text("status").$type<DeveloperNoteStatusType>().notNull(),
+		kind: text("kind").$type<DeveloperNoteKindType>().notNull(),
 		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
@@ -250,10 +254,15 @@ export const developerNotes = sqliteTable(
 	(t) => [
 		index("developer_notes_created_at_idx").on(t.createdAt),
 		index("developer_notes_author_idx").on(t.authorId),
+		index("developer_notes_kind_idx").on(t.kind),
 		index("developer_notes_status_idx").on(t.status),
 			check(
 				"developer_notes_status_check",
 				sql`${t.status} IN ('wip', 'todo', 'done')`,
+			),
+			check(
+				"developer_notes_kind_check",
+				sql`${t.kind} IN ('log', 'note')`,
 			),
 		],
 	)
