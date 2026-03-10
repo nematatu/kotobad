@@ -2,7 +2,6 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import LogoStickerIcon from "@/assets/logo/logo-sticker.svg";
-import ActionLink from "@/components/common/button/ActionLink";
 import {
 	getProductUpdateBySlug,
 	PRODUCT_UPDATE_CATEGORY_META,
@@ -46,39 +45,35 @@ export default async function UpdateDetailPage({ params }: Props) {
 			>
 				<LogoStickerIcon className="h-26 sm:h-47" />
 			</div>
-			<ActionLink
-				item={{
-					label: "更新情報へ戻る",
-					href: "/updates",
-					icon: () => <ArrowLeft className="h-4 w-4" />,
-				}}
-				variant="menu"
-				className="absolute left-4 top-4 inline-flex items-center gap-2 text-sm font-bold text-slate-500 "
-			></ActionLink>
+			<Link
+				href="/updates"
+				className="fixed left-4 top-[calc(var(--header-height,0px)+0.75rem)] z-[60] inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100 sm:absolute sm:top-4 sm:z-10"
+			>
+				<ArrowLeft className="h-4 w-4" />
+				更新情報へ戻る
+			</Link>
 			<section
 				id="overview"
 				className="relative mx-auto w-full max-w-3xl overflow-hidden border-b border-slate-200/80 scroll-mt-[calc(var(--header-height,0px)+1rem)]"
 			>
-				<div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-18 sm:pt-26">
-					<div className="mx-auto max-w-3xl space-y-4 text-center sm:space-y-5">
-						<h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-4xl">
-							{update.title}
-						</h1>
-					</div>
+				<div className="relative z-10 px-4 pt-20 pb-6 sm:px-0 sm:pb-10 sm:pt-26">
+					<h1 className="text-xl font-black tracking-wide text-slate-950 dark:text-slate-50 sm:text-3xl">
+						{update.title}
+					</h1>
 				</div>
-			</section>
-			<div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-10">
-				<div className="flex flex-wrap pl-3 items-center gap-3 text-sm font-medium text-slate-500 dark:text-slate-300">
+				<div className="flex flex-wrap pl-5 sm:pl-0 pb-2 items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-300">
 					<span>{update.date}</span>
 					<span
 						className={cn(
-							"inline-flex min-w-[50px] items-center justify-center rounded-lg text-[14px] px-2 py-1 font-bold",
+							"inline-flex min-w-[30px] items-center justify-center rounded-lg text-xs px-2 py-1 font-bold",
 							UPDATE_TIMELINE_BADGE_CLASS[update.category],
 						)}
 					>
 						{meta.label}
 					</span>
 				</div>
+			</section>
+			<div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-10">
 				<article className="mt-6 space-y-8 rounded-[28px] bg-white px-5 py-6  dark:bg-slate-900 sm:px-8 sm:py-8">
 					{update.detailPage.sections.map((section) => (
 						<section key={section.title} className="space-y-3">
