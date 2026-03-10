@@ -32,7 +32,7 @@ export function generateStaticParams() {
 export default async function UpdateDetailPage({ params }: Props) {
 	const { slug } = await params;
 	const update = getProductUpdateBySlug(slug);
-	const markdown = await getProductUpdateDetailMarkdown(slug);
+	const markdown = getProductUpdateDetailMarkdown(slug);
 
 	if (!update?.detailPage || !markdown) {
 		return notFound();

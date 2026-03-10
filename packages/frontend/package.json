@@ -3,8 +3,9 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbopack",
-		"build": "next build",
+		"generate:product-update-markdown": "bun ./scripts/generate-product-update-markdown.ts",
+		"dev": "bun run generate:product-update-markdown && next dev --turbopack",
+		"build": "bun run generate:product-update-markdown && next build",
 		"start": "next start",
 		"lint": "next lint",
 		"cf:build": "opennextjs-cloudflare build",
