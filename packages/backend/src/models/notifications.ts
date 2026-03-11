@@ -1,16 +1,21 @@
 import { BaseNotificationSchema } from "@kotobad/shared/src/schemas";
 
-export const OpenAPIPostListSchema =
+export const OpenAPINotificationListSchema =
 	BaseNotificationSchema.NotificationListSchema.openapi(
 		"NotificationListSchema",
 	);
 
-export const OpenAPIPostUnreadCountSchema =
+export const OpenAPINotificationUnreadCountSchema =
 	BaseNotificationSchema.NotificationUnreadCountSchema.openapi(
 		"NotificationUnreadCountSchema",
 	);
 
-export const OpenAPIPostItemSchema =
+export const OpenAPINotificationItemSchema =
 	BaseNotificationSchema.NotificationItemSchema.openapi(
 		"NotificationItemSchema",
+	);
+
+export const OpenAPINotificationReadAllResponseSchema =
+	BaseNotificationSchema.NotificationReadAllResponseSchema.openapi(
+		"NotificationReadAllResponseSchema",
 	);

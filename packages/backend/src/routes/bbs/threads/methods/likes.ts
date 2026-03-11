@@ -72,7 +72,7 @@ export const setThreadLikesRouter: RouteHandler<
 
 		const thread = await db.query.threads.findFirst({
 			where: (t, { eq }) => eq(t.id, threadId),
-			columns: { id: true },
+			columns: { id: true, authorId: true },
 		});
 
 		if (!thread) {
@@ -80,25 +80,29 @@ export const setThreadLikesRouter: RouteHandler<
 		}
 
 		if (active) {
-			Promise.all([
-				db
-					.insert(threadLikes)
-					.values({
-						threadId,
-						userId: user.id,
-					})
-					.onConflictDoNothing({
-						target: [threadLikes.threadId, threadLikes.userId],
-					}),
+			const insertedLikes = await db
+				.insert(threadLikes)
+				.values({
+					threadId,
+					userId: user.id,
+				})
+				.onConflictDoNothing({
+					target: [threadLikes.threadId, threadLikes.userId],
+				})
+				.returning({
+					threadId: threadLikes.threadId,
+				});
+
+			if (insertedLikes.length > 0) {
 				c.executionCtx.waitUntil(
 					createNotification(db, {
-						recipientUserId: String(threadId),
+						recipientUserId: thread.authorId,
 						senderUserId: user.id,
 						type: "thread_like",
 						threadId,
-					}),
-				),
-			]);
+					}).catch(console.error),
+				);
+			}
 		} else {
 			await db
 				.delete(threadLikes)

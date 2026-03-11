@@ -143,7 +143,7 @@ export const setPostReactionsRouter: RouteHandler<
 
 		const post = await db.query.posts.findFirst({
 			where: (t, { eq }) => eq(t.id, postId),
-			columns: { id: true },
+			columns: { id: true, authorId: true, threadId: true },
 		});
 
 		if (!post) {
@@ -161,31 +161,36 @@ export const setPostReactionsRouter: RouteHandler<
 		}
 
 		if (active) {
-			Promise.all([
-				await db
-					.insert(postReactions)
-					.values({
-						postId,
-						reactionId: reaction.id,
-						userId: user.id,
-					})
-					.onConflictDoNothing({
-						target: [
-							postReactions.postId,
-							postReactions.reactionId,
-							postReactions.userId,
-						],
-					}),
+			const insertedReactions = await db
+				.insert(postReactions)
+				.values({
+					postId,
+					reactionId: reaction.id,
+					userId: user.id,
+				})
+				.onConflictDoNothing({
+					target: [
+						postReactions.postId,
+						postReactions.reactionId,
+						postReactions.userId,
+					],
+				})
+				.returning({
+					postId: postReactions.postId,
+				});
+
+			if (insertedReactions.length > 0) {
 				c.executionCtx.waitUntil(
 					createNotification(db, {
-						recipientUserId: String(post.id),
+						recipientUserId: post.authorId,
 						senderUserId: user.id,
 						type: "post_reaction",
+						threadId: post.threadId,
 						targetPostId: post.id,
 						reactionEmoji: reaction.emoji,
-					}),
-				),
-			]);
+					}).catch(console.error),
+				);
+			}
 		} else {
 			await db
 				.delete(postReactions)

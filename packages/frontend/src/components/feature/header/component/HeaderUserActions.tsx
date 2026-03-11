@@ -5,6 +5,7 @@ import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 import type { UserState } from "@/components/feature/provider/UserProvider";
 import { UserPopover } from "@/components/feature/user/popover/UserPopover";
 import CreateThreadDialog from "./createThreadDialog";
+import { NotificationBell } from "./notification/NotificationBell";
 
 type Props = {
 	isLoading: boolean;
@@ -25,6 +26,7 @@ const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
 	if (user) {
 		return (
 			<div className="flex items-center justify-center gap-2 sm:gap-7">
+				<NotificationBell />
 				<div className="flex items-center justify-center [@media(max-width:767px)]:hidden">
 					<UserPopover />
 				</div>

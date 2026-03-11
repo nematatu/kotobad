@@ -1,22 +1,22 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { notifications } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
-import { OpenAPINotificationUnreadCountSchema } from "../../../../models/notifications";
+import { OpenAPINotificationReadAllResponseSchema } from "../../../../models/notifications";
 import type { AppEnvironment } from "../../../../types";
 
-export const getNotificationsCountRoute = createRoute({
-	method: "get",
-	path: "/count",
-	description: "未読通知件数を取得",
+export const readAllNotificationsRoute = createRoute({
+	method: "post",
+	path: "/read-all",
+	description: "通知をすべて既読にする",
 	responses: {
 		200: {
-			description: "未読通知件数",
+			description: "既読化結果",
 			content: {
 				"application/json": {
-					schema: OpenAPINotificationUnreadCountSchema,
+					schema: OpenAPINotificationReadAllResponseSchema,
 				},
 			},
 		},
@@ -39,36 +39,36 @@ export const getNotificationsCountRoute = createRoute({
 	},
 });
 
-export const getNotificationsCountRouter: RouteHandler<
-	typeof getNotificationsCountRoute,
+export const readAllNotificationsRouter: RouteHandler<
+	typeof readAllNotificationsRoute,
 	AppEnvironment
 > = async (c) => {
 	try {
 		const db = c.get("db");
-		const user = c.get("betterAuthUser");
+		const currentUser = c.get("betterAuthUser");
 
-		if (!user?.id) {
+		if (!currentUser?.id) {
 			return c.json({ error: "Unauthorized" }, 401);
 		}
 
-		const rows = await db
-			.select({
-				count: sql<number>`count(*)`,
+		await db
+			.update(notifications)
+			.set({
+				readAt: new Date(),
 			})
-			.from(notifications)
 			.where(
 				and(
-					eq(notifications.recipientUserId, user.id),
+					eq(notifications.recipientUserId, currentUser.id),
 					isNull(notifications.readAt),
 				),
 			);
 
-		return c.json({ count: rows[0]?.count ?? 0 }, 200);
+		return c.json({ success: true }, 200);
 	} catch (error: unknown) {
-		console.error("Failed to fetch notification count", error);
+		console.error("Failed to mark notifications as read", error);
 		return c.json(
 			{
-				error: "Failed to fetch notification count",
+				error: "Failed to mark notifications as read",
 				message: getErrorMessage(error),
 			},
 			500,

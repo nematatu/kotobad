@@ -291,6 +291,8 @@ export const notifications = sqliteTable("notifications", {
     targetPostId: integer("target_post_id")
         .references(() => posts.id, {onDelete: "cascade"}),
     reactionEmoji: text("reaction_emoji"),
+    sendedPostId: integer("sended_post_id")
+        .references(() => posts.id, {onDelete: "cascade"}),
     createdAt: timestamp("created_at")
         .default(sql`(strftime('%s', 'now'))`)
         .notNull(),

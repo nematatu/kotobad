@@ -11,6 +11,7 @@ export const createNotification = async (
 		threadId?: number | null;
 		targetPostId?: number | null;
 		reactionEmoji?: string | null;
+		sendedPostId?: number | null;
 	},
 ) => {
 	if (input.recipientUserId === input.senderUserId) return;
@@ -22,5 +23,6 @@ export const createNotification = async (
 		threadId: input.threadId ?? null,
 		targetPostId: input.targetPostId ?? null,
 		reactionEmoji: input.reactionEmoji ?? null,
+		sendedPostId: input.sendedPostId ?? null,
 	});
 };

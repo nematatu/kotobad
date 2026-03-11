@@ -118,24 +118,6 @@ export const createPostRouter: RouteHandler<
 			}
 		}
 
-		c.executionCtx.waitUntil(
-			(replyTarget
-				? createNotification(db, {
-						recipientUserId: replyTarget.authorId,
-						senderUserId: user.id,
-						type: "post_reply",
-						threadId: threadId,
-						targetPostId: replyToPostId,
-					})
-				: createNotification(db, {
-						recipientUserId: thread.authorId,
-						senderUserId: user.id,
-						type: "post_reply",
-						threadId: threadId,
-					})
-			).catch(console.error),
-		);
-
 		let insertedId: number | null = null;
 		let attempts = 0;
 
@@ -209,6 +191,26 @@ export const createPostRouter: RouteHandler<
 				500,
 			);
 		}
+
+		c.executionCtx.waitUntil(
+			(replyTarget
+				? createNotification(db, {
+						recipientUserId: replyTarget.authorId,
+						senderUserId: user.id,
+						type: "post_reply",
+						threadId,
+						sendedPostId: insertedId,
+						targetPostId: replyTarget.id,
+					})
+				: createNotification(db, {
+						recipientUserId: thread.authorId,
+						senderUserId: user.id,
+						type: "thread_reply",
+						threadId,
+						sendedPostId: insertedId,
+					})
+			).catch(console.error),
+		);
 
 		c.executionCtx.waitUntil(
 			publishThreadEvent(c.env, {

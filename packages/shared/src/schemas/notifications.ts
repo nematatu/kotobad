@@ -14,7 +14,6 @@ export const NotificationUnreadCountSchema = z.object({
 export const NotificationItemSchema = z.object({
 	id: z.number().int().positive(),
 	type: NotificationTypeSchema,
-	count: NotificationUnreadCountSchema,
 	message: z.string().min(1),
 	href: z.string(),
 	threadId: z.number().int().positive().nullable(),
@@ -22,11 +21,16 @@ export const NotificationItemSchema = z.object({
 	reactionEmoji: z.string().min(1).nullable(),
 	createdAt: z.string(),
 	readAt: z.string().nullable(),
+	sendedPostId: z.number().int().positive().nullable(),
 	sender: z.object({
 		id: z.string(),
-		name: z.string().nullable(),
+		name: z.string(),
 		image: z.string().nullable(),
 	}),
 });
 
 export const NotificationListSchema = z.array(NotificationItemSchema);
+
+export const NotificationReadAllResponseSchema = z.object({
+	success: z.boolean(),
+});

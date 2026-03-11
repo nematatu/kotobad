@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type {
 	NotificationItemSchema,
 	NotificationListSchema,
+	NotificationReadAllResponseSchema,
 	NotificationTypeSchema,
 	NotificationUnreadCountSchema,
 } from "../schemas/notifications";
@@ -12,3 +13,6 @@ export type NotificationUnreadCount = z.infer<
 >;
 export type NotificationType = z.infer<typeof NotificationTypeSchema>;
 export type NotificationList = z.infer<typeof NotificationListSchema>;
+export type NotificationReadAllResponse = z.infer<
+	typeof NotificationReadAllResponseSchema
+>;
