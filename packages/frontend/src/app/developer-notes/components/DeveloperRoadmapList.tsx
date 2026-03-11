@@ -85,7 +85,7 @@ const ROADMAP_STATUS_META: Record<
 };
 
 const ROADMAP_COLLAPSED_CONTAINER_CLASS =
-	"max-h-[188px] overflow-hidden pt-2 sm:max-h-[224px] sm:pt-3";
+	"max-h-[188px] overflow-hidden pt-5 sm:max-h-[224px] sm:pt-6";
 
 const sortRoadmapItems = (items: DeveloperRoadmapListType) =>
 	items.slice().sort((left, right) => {
@@ -385,7 +385,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 						index={index}
 						selectedIndex={Math.max(selectedStatusIndex, 0)}
 						idPrefix="developer-roadmap-status-view"
-						className="pt-6 sm:pt-7"
+						className="pt-5 sm:pt-7"
 					>
 						{statusItems.length > 0 ? (
 							<div className="space-y-4 sm:space-y-5">

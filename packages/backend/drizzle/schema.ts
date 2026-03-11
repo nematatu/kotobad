@@ -237,6 +237,9 @@ export const developerNotes = sqliteTable(
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		content: text("content").notNull(),
+		labelId: integer("label_id").references(() => developerNoteLabels.id, {
+			onDelete: "set null",
+		}),
 		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
@@ -250,6 +253,26 @@ export const developerNotes = sqliteTable(
 	(t) => [
 		index("developer_notes_created_at_idx").on(t.createdAt),
 		index("developer_notes_author_idx").on(t.authorId),
+		index("developer_notes_label_idx").on(t.labelId),
+	],
+);
+
+export const developerNoteLabels = sqliteTable(
+	"developer_note_labels",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		code: text("code").notNull().unique(),
+		name: text("name").notNull(),
+		sortOrder: integer("sort_order").notNull().default(0),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+		updatedAt: timestamp("updated_at").$onUpdate(
+			() => sql`(strftime('%s', 'now'))`,
+		),
+	},
+	(t) => [
+		index("developer_note_labels_sort_order_idx").on(t.sortOrder),
 	],
 );
 
@@ -372,7 +395,18 @@ export const developerNotesRelations = relations(developerNotes, ({ one }) => ({
 		fields: [developerNotes.authorId],
 		references: [user.id],
 	}),
+	label: one(developerNoteLabels, {
+		fields: [developerNotes.labelId],
+		references: [developerNoteLabels.id],
+	}),
 }));
+
+export const developerNoteLabelsRelations = relations(
+	developerNoteLabels,
+	({ many }) => ({
+		notes: many(developerNotes),
+	}),
+);
 
 export const reactionsRelations = relations(reactions, ({ many }) => ({
 	postReactions: many(postReactions),

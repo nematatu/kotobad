@@ -18,6 +18,18 @@ const MOCK_DEVELOPER_NOTE_RESPONSE: DeveloperNoteListType = {
 				name: "ねま",
 				image: null,
 			},
+			label: {
+				id: 1,
+				code: "resolved",
+				name: "解決済み",
+			},
+		},
+	],
+	labels: [
+		{
+			id: 1,
+			code: "resolved",
+			name: "解決済み",
 		},
 	],
 	canCreate: false,

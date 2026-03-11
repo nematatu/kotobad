@@ -49,13 +49,30 @@ export const getAllDeveloperNotesRouter: RouteHandler<
 						image: true,
 					},
 				},
+				label: {
+					columns: {
+						id: true,
+						code: true,
+						name: true,
+					},
+				},
 			},
 			orderBy: (table, { desc }) => [desc(table.createdAt), desc(table.id)],
+		});
+
+		const labels = await db.query.developerNoteLabels.findMany({
+			columns: {
+				id: true,
+				code: true,
+				name: true,
+			},
+			orderBy: (table, { asc, desc }) => [asc(table.sortOrder), desc(table.id)],
 		});
 
 		return c.json(
 			{
 				notes: notes.map(toDeveloperNoteResponse),
+				labels,
 				canCreate: canCreateDeveloperNote(c.env, viewerUserId),
 			},
 			200,

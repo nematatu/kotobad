@@ -6,6 +6,11 @@ export type DeveloperNoteQueryResult = {
 	createdAt: Date;
 	updatedAt: Date | null;
 	authorId: string;
+	label?: {
+		id: number;
+		code: string;
+		name: string;
+	} | null;
 	author?: {
 		name?: string | null;
 		image?: string | null;
@@ -25,5 +30,12 @@ export const toDeveloperNoteResponse = (
 			name: note.author?.name ?? "開発者",
 			image: note.author?.image ?? null,
 		},
+		label: note.label
+			? {
+					id: note.label.id,
+					code: note.label.code,
+					name: note.label.name,
+				}
+			: null,
 	};
 };

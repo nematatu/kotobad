@@ -2,32 +2,38 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq } from "drizzle-orm";
-import { developerNotes } from "../../../../../drizzle/schema";
 import {
-	OpenAPICreateDeveloperNoteSchema,
+	developerNoteLabels,
+	developerNotes,
+} from "../../../../../drizzle/schema";
+import {
 	OpenAPIDeveloperNoteSchema,
+	OpenAPIUpdateDeveloperNoteLabelSchema,
 } from "../../../../models/developerNotes";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import type { AppEnvironment } from "../../../../types";
 import { canCreateDeveloperNote } from "./config";
 import { toDeveloperNoteResponse } from "./transform";
 
-export const createDeveloperNoteRoute = createRoute({
-	method: "post",
-	path: "/create",
-	description: "開発者のボヤキを投稿",
+export const updateDeveloperNoteLabelRoute = createRoute({
+	method: "patch",
+	path: "/:id/label",
+	description: "開発者のボヤキのラベルを更新",
 	request: {
+		params: z.object({
+			id: z.string(),
+		}),
 		body: {
 			content: {
 				"application/json": {
-					schema: OpenAPICreateDeveloperNoteSchema,
+					schema: OpenAPIUpdateDeveloperNoteLabelSchema,
 				},
 			},
 		},
 	},
 	responses: {
-		201: {
-			description: "作成されたボヤキ",
+		200: {
+			description: "更新後のボヤキ",
 			content: {
 				"application/json": {
 					schema: OpenAPIDeveloperNoteSchema,
@@ -43,7 +49,15 @@ export const createDeveloperNoteRoute = createRoute({
 			},
 		},
 		403: {
-			description: "投稿権限なし",
+			description: "更新権限なし",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		404: {
+			description: "ボヤキまたはラベルが存在しない",
 			content: {
 				"application/json": {
 					schema: SimpleErrorResponse,
@@ -72,8 +86,8 @@ export const createDeveloperNoteRoute = createRoute({
 	},
 });
 
-export const createDeveloperNoteRouter: RouteHandler<
-	typeof createDeveloperNoteRoute,
+export const updateDeveloperNoteLabelRouter: RouteHandler<
+	typeof updateDeveloperNoteLabelRoute,
 	AppEnvironment
 > = async (c) => {
 	const db = c.get("db");
@@ -83,7 +97,15 @@ export const createDeveloperNoteRouter: RouteHandler<
 		return c.json({ error: "Forbidden" }, 403);
 	}
 
-	let validatedData: z.infer<typeof OpenAPICreateDeveloperNoteSchema>;
+	const noteId = Number(c.req.param("id"));
+	if (!Number.isInteger(noteId) || noteId <= 0) {
+		return c.json(
+			{ error: "Validation failed", details: "Invalid developer note id" },
+			400,
+		);
+	}
+
+	let validatedData: z.infer<typeof OpenAPIUpdateDeveloperNoteLabelSchema>;
 	try {
 		validatedData = c.req.valid("json");
 	} catch (error: unknown) {
@@ -91,30 +113,38 @@ export const createDeveloperNoteRouter: RouteHandler<
 			error instanceof z.ZodError
 				? JSON.stringify(error.issues)
 				: getErrorMessage(error);
-		console.error("Validation error:", details);
 		return c.json({ error: "Validation failed", details }, 400);
 	}
 
 	try {
-		const result = await db
-			.insert(developerNotes)
-			.values({
-				content: validatedData.content,
-				authorId: user.id,
-			})
-			.returning({ id: developerNotes.id });
-
-		const newDeveloperNoteId = result[0]?.id;
-
-		if (!newDeveloperNoteId) {
-			return c.json(
-				{ error: "Failed to create developer note", message: "" },
-				500,
-			);
+		const existingNote = await db.query.developerNotes.findFirst({
+			where: eq(developerNotes.id, noteId),
+			columns: { id: true },
+		});
+		if (!existingNote) {
+			return c.json({ error: "Developer note not found" }, 404);
 		}
 
-		const createdNote = await db.query.developerNotes.findFirst({
-			where: eq(developerNotes.id, newDeveloperNoteId),
+		if (validatedData.labelId !== null) {
+			const label = await db.query.developerNoteLabels.findFirst({
+				where: eq(developerNoteLabels.id, validatedData.labelId),
+				columns: { id: true },
+			});
+			if (!label) {
+				return c.json({ error: "Developer note label not found" }, 404);
+			}
+		}
+
+		await db
+			.update(developerNotes)
+			.set({
+				labelId: validatedData.labelId,
+				updatedAt: new Date(),
+			})
+			.where(eq(developerNotes.id, noteId));
+
+		const updatedNote = await db.query.developerNotes.findFirst({
+			where: eq(developerNotes.id, noteId),
 			with: {
 				author: {
 					columns: {
@@ -132,14 +162,14 @@ export const createDeveloperNoteRouter: RouteHandler<
 			},
 		});
 
-		if (!createdNote) {
+		if (!updatedNote) {
 			return c.json(
-				{ error: "Developer note not found after creation", message: "" },
+				{ error: "Developer note not found after update", message: "" },
 				500,
 			);
 		}
 
-		return c.json(toDeveloperNoteResponse(createdNote), 201);
+		return c.json(toDeveloperNoteResponse(updatedNote), 200);
 	} catch (error: unknown) {
 		return c.json(
 			{
