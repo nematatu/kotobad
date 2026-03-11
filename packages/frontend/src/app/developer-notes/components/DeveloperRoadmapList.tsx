@@ -27,9 +27,9 @@ const ROADMAP_STATUS_ORDER: Record<DeveloperRoadmapStatusType, number> = {
 };
 
 const ROADMAP_CARD_CLASS: Record<DeveloperRoadmapStatusType, string> = {
-	wip: "bg-[#ffffff] text-[#6f767a]",
-	todo: "bg-[#ffffff] text-[#6f767a]",
-	done: "bg-[rgba(255,255,255,0.68)] text-[#6f767a] [background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.75)_0,rgba(255,255,255,0.75)_6px,transparent_6px,transparent_12px)]",
+	wip: "bg-[#ffffff] text-[#6f767a] dark:bg-slate-800 dark:text-slate-300",
+	todo: "bg-[#ffffff] text-[#6f767a] dark:bg-slate-800 dark:text-slate-300",
+	done: "bg-[rgba(255,255,255,0.68)] text-[#6f767a] [background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.75)_0,rgba(255,255,255,0.75)_6px,transparent_6px,transparent_12px)] dark:bg-[rgba(15,23,42,0.82)] dark:text-slate-300 dark:[background-image:repeating-linear-gradient(-45deg,rgba(51,65,85,0.6)_0,rgba(51,65,85,0.6)_6px,transparent_6px,transparent_12px)]",
 };
 
 const ROADMAP_FLOATING_BADGE_META: Record<
@@ -216,7 +216,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 												className={cn(
 													"px-[10px] py-[4px] text-[11px] font-bold tracking-[0.04em]",
 													isSelected
-														? "shadow-[0_6px_16px_rgba(148,163,184,0.16)]"
+														? "shadow-[0_6px_16px_rgba(148,163,184,0.16)] dark:shadow-[0_6px_16px_rgba(2,6,23,0.38)]"
 														: "bg-white/72 dark:bg-slate-900/65",
 												)}
 											>
