@@ -34,7 +34,7 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 	if (isLoading) {
 		return (
 			<div
-				className="h-8 w-24 rounded-md bg-gray-200 animate-pulse dark:bg-slate-800"
+				className="size-8 rounded-full bg-gray-200 animate-pulse sm:size-10 dark:bg-slate-800"
 				aria-hidden="true"
 			/>
 		);
