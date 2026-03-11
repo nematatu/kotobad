@@ -37,9 +37,9 @@ export default function ThemeToggle({ className, showLabel = false }: Props) {
 			)}
 		>
 			{isDark ? (
-				<SunMedium className="size-6" />
+				<SunMedium className="size-6" strokeWidth={1.75} />
 			) : (
-				<MoonStar className="size-6" />
+				<MoonStar className="size-6" strokeWidth={1.75} />
 			)}
 			{showLabel ? <span>{label} にする</span> : null}
 		</Button>

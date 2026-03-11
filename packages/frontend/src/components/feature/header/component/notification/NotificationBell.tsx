@@ -114,7 +114,11 @@ export function NotificationBell() {
 			}}
 		>
 			<PopoverTrigger asChild>
-				<Button variant="ghost" size="icon" className="relative">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="relative text-slate-600 [@media(hover:hover)]:hover:text-slate-900 dark:text-slate-300 dark:[@media(hover:hover)]:hover:text-white"
+				>
 					<Bell className="size-5" />
 					{!isNotificationsMuted && data?.count ? (
 						<span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-rose-500 px-1 text-center text-[11px] font-bold text-white">
