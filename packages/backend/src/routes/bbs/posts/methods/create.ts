@@ -10,6 +10,7 @@ import {
 } from "../../../../models/posts";
 import { publishThreadEvent } from "../../../../realtime/thread-event";
 import type { AppEnvironment } from "../../../../types";
+import { createNotification } from "../../notifications/methods/createNotification";
 
 export const createPostRoute = createRoute({
 	method: "post",
@@ -101,18 +102,39 @@ export const createPostRouter: RouteHandler<
 			return c.json({ error: "Thread not found" }, 404);
 		}
 
+		let replyTarget: { id: number; authorId: string } | undefined;
+
 		if (replyToPostId !== null) {
-			const replyTarget = await db.query.posts.findFirst({
+			replyTarget = await db.query.posts.findFirst({
 				where: (posts, { and, eq }) =>
 					and(eq(posts.id, replyToPostId), eq(posts.threadId, threadId)),
 				columns: {
 					id: true,
+					authorId: true,
 				},
 			});
 			if (!replyTarget) {
 				return c.json({ error: "Invalid reply target post" }, 400);
 			}
 		}
+
+		c.executionCtx.waitUntil(
+			(replyTarget
+				? createNotification(db, {
+						recipientUserId: replyTarget.authorId,
+						senderUserId: user.id,
+						type: "post_reply",
+						threadId: threadId,
+						targetPotId: replyToPostId,
+					})
+				: createNotification(db, {
+						recipientUserId: thread.authorId,
+						senderUserId: user.id,
+						type: "post_reply",
+						threadId: threadId,
+					})
+			).catch(console.error),
+		);
 
 		let insertedId: number | null = null;
 		let attempts = 0;
