@@ -14,13 +14,13 @@ const buildNotificationMessage = (input: {
 }) => {
 	switch (input.type) {
 		case "thread_reply":
-			return input.postMesssage;
+			return input.postMesssage ?? "新しい投稿があります";
 		case "post_reply":
-			return input.postMesssage;
+			return input.postMesssage ?? "返信が届いています";
 		case "thread_like":
-			return "";
+			return "あなたの投稿にいいねしました";
 		case "post_reaction":
-			return input.reactionEmoji ? input.reactionEmoji : "";
+			return input.reactionEmoji ?? "リアクションしました";
 	}
 };
 
@@ -99,6 +99,7 @@ export const getNotificationsRouter: RouteHandler<
 					buildNotificationMessage({
 						type: row.type,
 						reactionEmoji: row.reactionEmoji,
+						postMesssage: row.sendedPostMessage,
 					}),
 				href: row.threadId ? `/threads/${row.threadId}` : "/threads",
 				threadId: row.threadId,

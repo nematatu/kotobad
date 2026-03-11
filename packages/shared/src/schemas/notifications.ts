@@ -14,11 +14,11 @@ export const NotificationUnreadCountSchema = z.object({
 export const NotificationItemSchema = z.object({
 	id: z.number().int().positive(),
 	type: NotificationTypeSchema,
-	message: z.string().min(1),
+	message: z.string(),
 	href: z.string(),
 	threadId: z.number().int().positive().nullable(),
 	targetPostId: z.number().int().positive().nullable(),
-	reactionEmoji: z.string().min(1).nullable(),
+	reactionEmoji: z.string().nullable(),
 	createdAt: z.string(),
 	readAt: z.string().nullable(),
 	sendedPostId: z.number().int().positive().nullable(),
