@@ -36,6 +36,9 @@ const ROADMAP_STATUS_BUTTON_ORDER: DeveloperRoadmapStatusType[] = [
 	"done",
 ];
 
+const ROADMAP_BADGE_SURFACE_CLASS =
+	"relative overflow-hidden before:pointer-events-none before:absolute before:inset-x-[1px] before:top-[1px] before:h-[48%] before:rounded-full before:bg-[linear-gradient(180deg,rgba(255,255,255,0.42)_0%,rgba(255,255,255,0.12)_62%,rgba(255,255,255,0)_100%)] before:content-[''] dark:before:inset-x-0 dark:before:top-0 dark:before:h-[62%] dark:before:bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.58)_34%,rgba(255,255,255,0.18)_62%,rgba(255,255,255,0)_100%)] after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),inset_0_-1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.08),0_6px_14px_rgba(15,23,42,0.1)] after:content-[''] dark:after:shadow-[inset_0_1px_0_rgba(255,255,255,0.86),inset_0_-1px_0_rgba(255,255,255,0.26),0_0_0_1px_rgba(255,255,255,0.44),0_0_0_2px_rgba(255,255,255,0.18),0_0_20px_rgba(255,255,255,0.28),0_8px_18px_rgba(2,6,23,0.34)]";
+
 const ROADMAP_CARD_CLASS: Record<DeveloperRoadmapStatusType, string> = {
 	wip: "border border-slate-200/80 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200",
 	todo: "border border-slate-200/80 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200",
@@ -283,6 +286,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 							<span
 								className={cn(
 									"inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black tracking-[0.1em] shadow-[0_8px_18px_rgba(15,23,42,0.12)] sm:px-3 sm:py-1.5 sm:text-[11px]",
+									ROADMAP_BADGE_SURFACE_CLASS,
 									itemStatusMeta.badgeClass,
 									isExpanded ? "scale-[1.02]" : "",
 								)}
@@ -294,6 +298,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 						<span
 							className={cn(
 								"absolute inline-flex shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-black tracking-[0.1em] shadow-[0_8px_18px_rgba(15,23,42,0.12)] sm:px-3 sm:py-1.5 sm:text-[11px]",
+								ROADMAP_BADGE_SURFACE_CLASS,
 								itemStatusMeta.badgeClass,
 								itemStatusMeta.floatingClass,
 							)}
@@ -323,6 +328,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 										<span
 											className={cn(
 												"inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black tracking-[0.1em] sm:px-3 sm:py-1.5 sm:text-[11px]",
+												ROADMAP_BADGE_SURFACE_CLASS,
 												isSelected
 													? nextStatusMeta.badgeClass
 													: nextStatusMeta.idleClass,
