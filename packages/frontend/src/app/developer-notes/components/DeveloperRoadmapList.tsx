@@ -8,7 +8,6 @@ import type {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import {
 	BffFetcher,
 	type BffFetcherError,
@@ -27,54 +26,47 @@ const ROADMAP_STATUS_ORDER: Record<DeveloperRoadmapStatusType, number> = {
 };
 
 const ROADMAP_CARD_CLASS: Record<DeveloperRoadmapStatusType, string> = {
-	wip: "bg-[#ffffff] text-[#6f767a] dark:bg-slate-800 dark:text-slate-300",
-	todo: "bg-[#ffffff] text-[#6f767a] dark:bg-slate-800 dark:text-slate-300",
-	done: "bg-[rgba(255,255,255,0.68)] text-[#6f767a] [background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,0.75)_0,rgba(255,255,255,0.75)_6px,transparent_6px,transparent_12px)] dark:bg-[rgba(15,23,42,0.82)] dark:text-slate-300 dark:[background-image:repeating-linear-gradient(-45deg,rgba(51,65,85,0.6)_0,rgba(51,65,85,0.6)_6px,transparent_6px,transparent_12px)]",
+	wip: "border border-slate-200/80 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200",
+	todo: "border border-slate-200/80 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200",
+	done: "border border-slate-200/80 bg-[rgba(255,255,255,0.78)] text-slate-700 [background-image:repeating-linear-gradient(-45deg,rgba(241,245,249,0.9)_0,rgba(241,245,249,0.9)_7px,transparent_7px,transparent_14px)] dark:border-slate-700 dark:bg-[rgba(15,23,42,0.82)] dark:text-slate-200 dark:[background-image:repeating-linear-gradient(-45deg,rgba(51,65,85,0.52)_0,rgba(51,65,85,0.52)_7px,transparent_7px,transparent_14px)]",
 };
 
-const ROADMAP_FLOATING_BADGE_META: Record<
+const ROADMAP_STATUS_META: Record<
 	DeveloperRoadmapStatusType,
 	{
+		title: string;
 		label: string;
-		color: "violet" | "emerald" | "amber";
-		className: string;
+		badgeClass: string;
+		idleClass: string;
+		floatingClass: string;
 	}
 > = {
 	wip: {
+		title: "今やっていること",
 		label: "WIP",
-		color: "violet",
-		className: "-top-4 right-3 rotate-[4deg]",
+		badgeClass:
+			"border-violet-500 bg-violet-500 text-white dark:border-violet-400 dark:bg-violet-400 dark:text-slate-950",
+		idleClass:
+			"border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-400/30 dark:bg-violet-500/15 dark:text-violet-200",
+		floatingClass: "-top-4 right-4 rotate-[5deg]",
 	},
 	todo: {
-		label: "todo",
-		color: "emerald",
-		className: "-bottom-4 right-3",
+		title: "次やること",
+		label: "TODO",
+		badgeClass:
+			"border-emerald-500 bg-emerald-500 text-white dark:border-emerald-400 dark:bg-emerald-400 dark:text-slate-950",
+		idleClass:
+			"border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-500/15 dark:text-emerald-200",
+		floatingClass: "-top-4 right-4 rotate-[-4deg]",
 	},
 	done: {
-		label: "done",
-		color: "amber",
-		className: "-bottom-4 right-3",
-	},
-};
-
-const ROADMAP_STATUS_BUTTON_META: Record<
-	DeveloperRoadmapStatusType,
-	{
-		label: string;
-		color: "violet" | "emerald" | "amber";
-	}
-> = {
-	wip: {
-		label: "WIP",
-		color: "violet",
-	},
-	todo: {
-		label: "Todo",
-		color: "emerald",
-	},
-	done: {
-		label: "Done",
-		color: "amber",
+		title: "やったこと",
+		label: "DONE",
+		badgeClass:
+			"border-amber-500 bg-amber-500 text-white dark:border-amber-400 dark:bg-amber-400 dark:text-slate-950",
+		idleClass:
+			"border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-200",
+		floatingClass: "-top-4 right-4 rotate-[4deg]",
 	},
 };
 
@@ -122,11 +114,12 @@ const getErrorMessage = (error: unknown) => {
 
 export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 	const router = useRouter();
-	const [items, setItems] = useState(initialItems);
+	const [items, setItems] = useState(() => sortRoadmapItems(initialItems));
 	const [pendingItemId, setPendingItemId] = useState<number | null>(null);
+	const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
 
 	useEffect(() => {
-		setItems(initialItems);
+		setItems(sortRoadmapItems(initialItems));
 	}, [initialItems]);
 
 	const handleStatusChange = async (
@@ -156,6 +149,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 					),
 				),
 			);
+			setExpandedItemId(null);
 			router.refresh();
 		} catch (error: unknown) {
 			toast.error(getErrorMessage(error));
@@ -164,70 +158,125 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 		}
 	};
 
+	const groupedItems = ROADMAP_STATUS_BUTTON_ORDER.map((status) => ({
+		status,
+		items: items.filter((item) => item.status === status),
+	}));
+
 	return (
-		<div className="mt-6 flex flex-wrap items-start gap-x-3 gap-y-6 sm:gap-x-4 sm:gap-y-7">
-			{items.map((item) => {
-				const badgeMeta = ROADMAP_FLOATING_BADGE_META[item.status];
-				const isPending = pendingItemId === item.id;
+		<div className="mt-8 space-y-8">
+			{groupedItems.map(({ status, items: statusItems }) => {
+				const statusMeta = ROADMAP_STATUS_META[status];
 
 				return (
-					<article
-						key={item.id}
-						className={cn(
-							"relative rounded-[12px] px-5 py-3 shadow-none transition-opacity",
-							ROADMAP_CARD_CLASS[item.status],
-							isPending ? "opacity-60" : "",
-						)}
-					>
-						<h3 className="text-[15px] leading-[1.45] font-normal tracking-tight text-inherit">
-							{item.title}
-						</h3>
-						<Badge
-							variant="dot"
-							color={badgeMeta.color}
-							className={cn(
-								"absolute px-[10px] py-[4px] text-[11px] font-bold tracking-[0.04em]",
-								badgeMeta.className,
-							)}
-						>
-							{badgeMeta.label}
-						</Badge>
+					<section key={status} className="space-y-4">
+						<div className="flex items-end justify-between gap-3">
+							<h3 className="text-[18px] font-bold tracking-tight text-slate-950 dark:text-slate-50">
+								{statusMeta.title}
+							</h3>
+						</div>
 
-						{canEdit ? (
-							<div className="mt-4 flex flex-wrap gap-2">
-								{ROADMAP_STATUS_BUTTON_ORDER.map((status) => {
-									const statusMeta = ROADMAP_STATUS_BUTTON_META[status];
-									const isSelected = item.status === status;
+						{statusItems.length > 0 ? (
+							<div className="flex flex-wrap items-start gap-3 sm:gap-4">
+								{statusItems.map((item) => {
+									const itemStatusMeta = ROADMAP_STATUS_META[item.status];
+									const isPending = pendingItemId === item.id;
+									const isExpanded = expandedItemId === item.id;
 
 									return (
-										<button
-											key={status}
-											type="button"
-											onClick={() => handleStatusChange(item, status)}
-											disabled={isPending || isSelected}
+										<article
+											key={item.id}
 											className={cn(
-												"rounded-full transition-opacity disabled:cursor-default",
-												isSelected ? "" : "opacity-70 hover:opacity-100",
+												"relative min-w-[220px] rounded-[16px] px-5 pb-4 pt-7 shadow-none transition-opacity sm:max-w-[320px]",
+												ROADMAP_CARD_CLASS[item.status],
+												isPending ? "opacity-60" : "",
 											)}
 										>
-											<Badge
-												variant="dot"
-												color={statusMeta.color}
-												className={cn(
-													"px-[10px] py-[4px] text-[11px] font-bold tracking-[0.04em]",
-													isSelected
-														? "shadow-[0_6px_16px_rgba(148,163,184,0.16)] dark:shadow-[0_6px_16px_rgba(2,6,23,0.38)]"
-														: "bg-white/72 dark:bg-slate-900/65",
-												)}
-											>
-												{statusMeta.label}
-											</Badge>
-										</button>
+											{canEdit ? (
+												<button
+													type="button"
+													onClick={() =>
+														setExpandedItemId((previousItemId) =>
+															previousItemId === item.id ? null : item.id,
+														)
+													}
+													disabled={isPending}
+													className={cn(
+														"absolute shrink-0 transition-transform",
+														itemStatusMeta.floatingClass,
+													)}
+												>
+													<span
+														className={cn(
+															"inline-flex rounded-full border px-4 py-2 text-[12px] font-black tracking-[0.1em] shadow-[0_8px_18px_rgba(15,23,42,0.12)]",
+															itemStatusMeta.badgeClass,
+															isExpanded ? "scale-[1.02]" : "",
+														)}
+													>
+														{itemStatusMeta.label}
+													</span>
+												</button>
+											) : (
+												<span
+													className={cn(
+														"absolute inline-flex shrink-0 rounded-full border px-4 py-2 text-[12px] font-black tracking-[0.1em] shadow-[0_8px_18px_rgba(15,23,42,0.12)]",
+														itemStatusMeta.badgeClass,
+														itemStatusMeta.floatingClass,
+													)}
+												>
+													{itemStatusMeta.label}
+												</span>
+											)}
+
+											<h4 className="text-[15px] leading-[1.55] font-medium tracking-tight text-inherit">
+												{item.title}
+											</h4>
+
+											{canEdit && isExpanded ? (
+												<div className="mt-4 flex flex-wrap gap-2">
+													{ROADMAP_STATUS_BUTTON_ORDER.map((nextStatus) => {
+														const nextStatusMeta =
+															ROADMAP_STATUS_META[nextStatus];
+														const isSelected = item.status === nextStatus;
+
+														return (
+															<button
+																key={nextStatus}
+																type="button"
+																onClick={() =>
+																	handleStatusChange(item, nextStatus)
+																}
+																disabled={isPending || isSelected}
+																className="rounded-full transition-opacity disabled:cursor-default"
+															>
+																<span
+																	className={cn(
+																		"inline-flex rounded-full border px-4 py-2 text-[12px] font-black tracking-[0.1em]",
+																		isSelected
+																			? nextStatusMeta.badgeClass
+																			: nextStatusMeta.idleClass,
+																		isSelected
+																			? "shadow-[0_6px_16px_rgba(148,163,184,0.16)] dark:shadow-[0_6px_16px_rgba(2,6,23,0.38)]"
+																			: "hover:opacity-90",
+																	)}
+																>
+																	{nextStatusMeta.label}
+																</span>
+															</button>
+														);
+													})}
+												</div>
+											) : null}
+										</article>
 									);
 								})}
 							</div>
-						) : null}
-					</article>
+						) : (
+							<p className="text-sm text-slate-500 dark:text-slate-400">
+								項目はありません。
+							</p>
+						)}
+					</section>
 				);
 			})}
 		</div>
