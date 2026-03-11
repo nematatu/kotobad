@@ -1,0 +1,1 @@
+ALTER TABLE `notifications` ADD `sended_post_id` integer REFERENCES posts(id);

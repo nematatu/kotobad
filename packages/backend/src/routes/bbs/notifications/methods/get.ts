@@ -9,19 +9,18 @@ import type { AppEnvironment } from "../../../../types";
 
 const buildNotificationMessage = (input: {
 	type: "thread_reply" | "post_reply" | "thread_like" | "post_reaction";
-	reactionEmoji: string | null;
+	reactionEmoji?: string | null;
+	postMesssage?: string | null;
 }) => {
 	switch (input.type) {
 		case "thread_reply":
-			return "あなたのスレッドに新しい投稿がありました";
+			return input.postMesssage;
 		case "post_reply":
-			return "あなたのポストに返信がありました";
+			return input.postMesssage;
 		case "thread_like":
-			return "あなたのスレッドにいいねが付きました";
+			return "";
 		case "post_reaction":
-			return input.reactionEmoji
-				? `あなたのポストにリアクション ${input.reactionEmoji} が付きました`
-				: "あなたのポストにリアクションが付きました";
+			return input.reactionEmoji ? input.reactionEmoji : "";
 	}
 };
 

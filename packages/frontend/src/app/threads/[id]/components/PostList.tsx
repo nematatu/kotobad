@@ -121,8 +121,12 @@ export const PostList = ({
 	const [realtimeEnterPostIds, setRealtimeEnterPostIds] = useState<number[]>(
 		[],
 	);
+	const [highlightAnimatingPostId, setHighlightAnimatingPostId] = useState<
+		number | null
+	>(null);
 	const previousVisiblePostIdsRef = useRef<number[] | null>(null);
 	const previousPostIdsRef = useRef<number[] | null>(null);
+	const previousHighlightPostIdRef = useRef<number | null>(null);
 	const { data: reactionOptions = [] } = useSWRImmutable(
 		"GET_REACTION_OPTIONS",
 		async () => {
@@ -257,6 +261,7 @@ export const PostList = ({
 		return () => window.clearTimeout(timeoutId);
 	}, [visibleFlattenedPosts]);
 
+	/* biome-ignore lint/correctness/useExhaustiveDependencies: highlighted post may appear after the initial render, so visibleFlattenedPosts is intentionally included to retry DOM lookup. */
 	useEffect(() => {
 		if (!highlightPostId) return;
 		const targetElement = document.getElementById(
@@ -264,12 +269,31 @@ export const PostList = ({
 		) as HTMLElement | null;
 		if (!targetElement) return;
 
+		if (previousHighlightPostIdRef.current === highlightPostId) {
+			return;
+		}
+
+		previousHighlightPostIdRef.current = highlightPostId;
+
 		targetElement.scrollIntoView({
 			behavior: "smooth",
 			block: "center",
 			inline: "nearest",
 		});
-	}, [highlightPostId]);
+		setHighlightAnimatingPostId(highlightPostId);
+	}, [highlightPostId, visibleFlattenedPosts]);
+
+	useEffect(() => {
+		if (!highlightAnimatingPostId) return;
+
+		const timeoutId = window.setTimeout(() => {
+			setHighlightAnimatingPostId((current) =>
+				current === highlightAnimatingPostId ? null : current,
+			);
+		}, 2200);
+
+		return () => window.clearTimeout(timeoutId);
+	}, [highlightAnimatingPostId]);
 
 	const handleReaction = async (postId: number, reactionCode: string) => {
 		const post = localPosts.find((item) => item.id === postId);
@@ -335,12 +359,16 @@ export const PostList = ({
 					: isRealtimeEnterAnimating
 						? "animate-post-realtime-rise"
 						: "";
+				const highlightAnimationClass =
+					highlightAnimatingPostId === post.id
+						? "animate-post-highlight-once"
+						: "";
 
 				return (
 					<div
 						key={post.id}
 						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400 ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${rowEnterAnimationClass}`}
+						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400 ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${rowEnterAnimationClass} ${highlightAnimationClass}`}
 						style={{
 							paddingLeft: `${16 + indent}px`,
 							animationDelay: isReplyEnterAnimating
