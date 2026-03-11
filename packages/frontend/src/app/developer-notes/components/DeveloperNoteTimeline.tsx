@@ -190,7 +190,7 @@ export function DeveloperNoteTimeline({
 													)
 												}
 												disabled={isPending}
-												className="absolute -bottom-6 right-2 cursor-pointer disabled:cursor-default"
+												className="absolute -bottom-6 -right-2 cursor-pointer disabled:cursor-default"
 											>
 												{renderNoteLabelSeal(note.label.name, "rotate-[6deg]")}
 											</button>
