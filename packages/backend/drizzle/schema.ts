@@ -12,6 +12,7 @@ import {
 import type { DeveloperRoadmapStatusType } from "@kotobad/shared/src/types/developerRoadmap";
 import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import { user } from "./better-auth.schema";
+import type { NotificationType } from "@kotobad/shared/src/types/notifications";
 
 const timestamp = customType<{ data: Date; driverData: number }>({
 	dataType() {
@@ -276,6 +277,32 @@ export const developerRoadmapItems = sqliteTable(
 	],
 )
 
+export const notifications = sqliteTable("notifications", {
+    id: integer("id").primaryKey({autoIncrement: true}), 
+    recipientUserId: text("recipient_user_id")
+        .notNull()
+        .references(() => user.id, {onDelete: "cascade"}), 
+    senderUserId: text("sender_user_id")
+        .notNull()
+        .references(() => user.id, {onDelete: "cascade"}),
+    type: text("type").$type<NotificationType>().notNull(),
+    threadId: integer("thread_id")
+        .references(() => threads.id, {onDelete: "cascade"}),
+    targetPostId: integer("target_post_id")
+        .references(() => posts.id, {onDelete: "cascade"}),
+    createdAt: timestamp("created_at")
+        .default(sql`(strftime('%s', 'now'))`)
+        .notNull(),
+    readAt: timestamp("read_at")
+}, (t) => [
+        index("notifications_recipient_idx").on(t.recipientUserId, t.createdAt),
+        index("notifications_recipient_read_at_idx").on(t.recipientUserId, t.readAt),
+        check(
+            "notifications_type_check", 
+            sql`${t.type} IN ('thread_reply', 'post_reply', 'thread_like', 'post_reaction')`, 
+        )
+    ]
+)
 export const threadIdx = index("thread_created_at_idx").on(threads.createdAt);
 export const postIdx = index("post_idx").on(posts.post);
 export const postsAuthorIdx = index("author_idx").on(posts.authorId);

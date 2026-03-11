@@ -1,6 +1,7 @@
 export * as BaseDeveloperNoteSchema from "./developerNote";
 export * as BaseDeveloperRoadmapSchema from "./developerRoadmap";
 export * as BaseErrorSchema from "./error";
+export * as BaseNotificationSchema from "./notifications";
 export * as BasePostSchema from "./post";
 export * as BaseReactionSchema from "./reaction";
 export * as BaseTagSchema from "./tag";
