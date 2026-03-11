@@ -11,6 +11,7 @@ const DEFAULT_SNAPSHOT = join(
 );
 const DEFAULT_WRANGLER_CONFIG = "wrangler.jsonc";
 const DEFAULT_WRANGLER_BIN = "wrangler";
+const DEFAULT_ASSET_FALLBACK_ORIGIN = "https://kotobad.com";
 
 const assetsDir = process.env.ASSETS_DIR ?? DEFAULT_ASSETS_DIR;
 const snapshotFile = process.env.SNAPSHOT_FILE ?? DEFAULT_SNAPSHOT;
@@ -25,6 +26,10 @@ if (!r2SnapshotBucket || !r2Key) {
 const wranglerConfig =
 	process.env.WRANGLER_CONFIG ?? DEFAULT_WRANGLER_CONFIG;
 const wranglerBin = process.env.WRANGLER_BIN ?? DEFAULT_WRANGLER_BIN;
+const assetFallbackOrigin =
+	process.env.ASSET_FALLBACK_ORIGIN ??
+	process.env.NEXT_PUBLIC_FRONTEND_URL_PRODUCT ??
+	DEFAULT_ASSET_FALLBACK_ORIGIN;
 
 const refRegex = /\/_next\/static\/[^\s"'<>]+/g;
 const isAssetRef = (ref: string) => {
@@ -131,6 +136,20 @@ const runWrangler = async (args: string[], allowFail = false) => {
 	});
 };
 
+const restoreMissingAsset = async (ref: string) => {
+	const url = new URL(ref, assetFallbackOrigin);
+	const path = toDiskPath(ref);
+	const response = await fetch(url);
+	if (!response.ok) {
+		throw new Error(`asset fetch failed: ${response.status} ${url.toString()}`);
+	}
+
+	const bytes = new Uint8Array(await response.arrayBuffer());
+	await mkdir(dirname(path), { recursive: true });
+	await Bun.write(path, bytes);
+	console.log(`Recovered missing asset: ${ref}`);
+};
+
 const fetchSnapshotFromR2 = async () => {
 	await runWrangler(
 		[
@@ -193,15 +212,33 @@ const main = async () => {
 		}
 	}
 
+	for (const ref of missing) {
+		try {
+			await restoreMissingAsset(ref);
+		} catch (error) {
+			console.warn(
+				error instanceof Error ? error.message : `asset fetch failed: ${ref}`,
+			);
+		}
+	}
+
+	const unresolvedMissing: string[] = [];
+	for (const ref of refsToCheck) {
+		const path = toDiskPath(ref);
+		if (!(await exists(path))) {
+			unresolvedMissing.push(ref);
+		}
+	}
+
   // missingが存在する
   // すなわち、前回のビルド時に参照していたassetsが、今のディレクトリに見つからなかった！
   // → 今回の変更で、削除したということ。
   // → 配信された(各端末にキャッシュされた)ファイルでは、そのassetを参照しているはず。
   // → 今の状態だと、404になり、無駄ループ的に、存在しないファイルを参照しようとしてしまう。
 
-	if (missing.length > 0) {
+	if (unresolvedMissing.length > 0) {
 		console.error("アセットが削除されました。404になる可能性があります。");
-		for (const ref of missing) {
+		for (const ref of unresolvedMissing) {
 			console.error(`- ${ref} -> ${relative(process.cwd(), toDiskPath(ref))}`);
 		}
 		throw new Error("Missing assets detected");
