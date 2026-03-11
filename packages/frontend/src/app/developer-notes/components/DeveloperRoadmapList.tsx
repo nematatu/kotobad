@@ -56,7 +56,7 @@ const ROADMAP_STATUS_META: Record<
 	}
 > = {
 	wip: {
-		title: "今やっていること",
+		title: "作業中",
 		label: "WIP",
 		badgeClass:
 			"border-violet-500 bg-violet-500 text-white dark:border-violet-400 dark:bg-violet-400 dark:text-slate-950",
@@ -86,8 +86,6 @@ const ROADMAP_STATUS_META: Record<
 
 const ROADMAP_COLLAPSED_CONTAINER_CLASS =
 	"max-h-[188px] overflow-hidden sm:max-h-[224px]";
-const ROADMAP_EXPANDED_CONTAINER_CLASS =
-	"max-h-[440px] overflow-y-auto pr-1 sm:max-h-[560px]";
 
 const sortRoadmapItems = (items: DeveloperRoadmapListType) =>
 	items.slice().sort((left, right) => {
@@ -259,12 +257,12 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 				key={item.id}
 				className={cn(
 					"w-fit max-w-full self-start min-w-[72px] sm:min-w-[80px]",
-					item.status === "done" ? "pb-4 sm:pb-5" : "pt-4 sm:pt-5",
+					item.status === "done" ? "pb-3 sm:pb-4" : "pt-3 sm:pt-4",
 				)}
 			>
 				<article
 					className={cn(
-						"relative rounded-[13px] px-3 pb-2.5 pt-5 shadow-none transition-opacity sm:rounded-[14px] sm:px-4 sm:pb-3 sm:pt-6",
+						"relative rounded-[13px] px-3 pb-2 pt-4 shadow-none transition-opacity sm:rounded-[14px] sm:px-4 sm:pb-2.5 sm:pt-5",
 						ROADMAP_CARD_CLASS[item.status],
 						isPending ? "opacity-60" : "",
 					)}
@@ -350,7 +348,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 	};
 
 	const renderRoadmapGrid = (statusItems: DeveloperRoadmapListType) => (
-		<div className="flex flex-wrap items-start gap-x-4 gap-y-5 sm:gap-x-5 sm:gap-y-6">
+		<div className="flex flex-wrap items-start gap-x-4 gap-y-4 sm:gap-x-5 sm:gap-y-5">
 			{statusItems.map((item) => renderRoadmapCard(item))}
 		</div>
 	);
@@ -397,9 +395,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 											collapsedContainerRefs.current[status] = node;
 										}}
 										className={cn(
-											isStatusExpanded
-												? ROADMAP_EXPANDED_CONTAINER_CLASS
-												: ROADMAP_COLLAPSED_CONTAINER_CLASS,
+											!isStatusExpanded && ROADMAP_COLLAPSED_CONTAINER_CLASS,
 										)}
 									>
 										{renderRoadmapGrid(statusItems)}
