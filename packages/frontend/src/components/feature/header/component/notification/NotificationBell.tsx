@@ -2,7 +2,7 @@
 
 import type { NotificationList } from "@kotobad/shared/src/types/notifications";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { Bell } from "lucide-react";
+import { Bell, BellOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { Link } from "@/components/common/Link";
@@ -13,8 +13,12 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+
+const NOTIFICATION_MUTE_STORAGE_KEY = "kotobad:notifications-muted";
+const NOTIFICATION_PANEL_MIN_HEIGHT_CLASS = "min-h-[320px]";
 
 const getNotificationSummary = (item: NotificationList[number]) => {
 	switch (item.type) {
@@ -43,17 +47,48 @@ const getNotificationPreview = (item: NotificationList[number]) => {
 
 export function NotificationBell() {
 	const [open, setOpen] = useState(false);
+	const [isNotificationsMuted, setIsNotificationsMuted] = useState(false);
 	const [cachedNotificationList, setCachedNotificationList] =
 		useState<NotificationList>([]);
-	const { data, mutate } = useSWR("notification-count", async () => {
-		const url = await getBffApiUrl("GET_NOTIFICATIONS_COUNT");
-		return BffFetcher<{ count: number }>(url);
-	});
+	const setNotificationsMuted = (nextValue: boolean) => {
+		setIsNotificationsMuted(nextValue);
+		window.localStorage.setItem(
+			NOTIFICATION_MUTE_STORAGE_KEY,
+			String(nextValue),
+		);
+	};
+	const { data, mutate } = useSWR(
+		"notification-count",
+		async () => {
+			const url = await getBffApiUrl("GET_NOTIFICATIONS_COUNT");
+			return BffFetcher<{ count: number }>(url);
+		},
+		{
+			revalidateOnFocus: false,
+			revalidateOnReconnect: false,
+		},
+	);
 	const { data: notificationList, isLoading: isNotificationsLoading } =
-		useSWR<NotificationList>(open ? "notifications" : null, async () => {
-			const url = await getBffApiUrl("GET_NOTIFICATIONS");
-			return BffFetcher<NotificationList>(url);
-		});
+		useSWR<NotificationList>(
+			open ? "notifications" : null,
+			async () => {
+				const url = await getBffApiUrl("GET_NOTIFICATIONS");
+				return BffFetcher<NotificationList>(url);
+			},
+			{
+				revalidateOnFocus: false,
+				revalidateOnReconnect: false,
+				revalidateIfStale: false,
+				dedupingInterval: 30_000,
+			},
+		);
+
+	useEffect(() => {
+		const storedValue = window.localStorage.getItem(
+			NOTIFICATION_MUTE_STORAGE_KEY,
+		);
+		setIsNotificationsMuted(storedValue === "true");
+	}, []);
 
 	useEffect(() => {
 		if (!notificationList) {
@@ -63,14 +98,16 @@ export function NotificationBell() {
 		setCachedNotificationList(notificationList);
 	}, [notificationList]);
 
-	const visibleNotificationList = notificationList ?? cachedNotificationList;
+	const visibleNotificationList = isNotificationsMuted
+		? []
+		: (notificationList ?? cachedNotificationList);
 
 	return (
 		<Popover
 			open={open}
 			onOpenChange={async (nextOpen) => {
 				setOpen(nextOpen);
-				if (!nextOpen || !data?.count) return;
+				if (!nextOpen || !data?.count || isNotificationsMuted) return;
 				const url = await getBffApiUrl("READ_ALL_NOTIFICATIONS");
 				await BffFetcher(url, { method: "POST" });
 				void mutate({ count: 0 }, false);
@@ -79,7 +116,7 @@ export function NotificationBell() {
 			<PopoverTrigger asChild>
 				<Button variant="ghost" size="icon" className="relative">
 					<Bell className="size-5" />
-					{data?.count ? (
+					{!isNotificationsMuted && data?.count ? (
 						<span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-rose-500 px-1 text-center text-[11px] font-bold text-white">
 							{data.count}
 						</span>
@@ -126,11 +163,43 @@ export function NotificationBell() {
 								</div>
 							</Link>
 						))
-					) : isNotificationsLoading ? null : (
-						<div className="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+					) : isNotificationsMuted ? (
+						<div
+							className={`flex ${NOTIFICATION_PANEL_MIN_HEIGHT_CLASS} flex-col items-center justify-center gap-3 px-3 text-center text-sm text-slate-500 dark:text-slate-400`}
+						>
+							<BellOff className="size-10 text-slate-300 dark:text-slate-700" />
+							通知を受け取らない設定です
+						</div>
+					) : isNotificationsLoading ? (
+						<div
+							className={NOTIFICATION_PANEL_MIN_HEIGHT_CLASS}
+							aria-hidden="true"
+						/>
+					) : (
+						<div
+							className={`flex ${NOTIFICATION_PANEL_MIN_HEIGHT_CLASS} flex-col items-center justify-center gap-3 px-3 text-center text-sm text-slate-500 dark:text-slate-400`}
+						>
+							<Bell className="size-10 text-slate-300 dark:text-slate-700" />
 							通知はまだありません
 						</div>
 					)}
+				</div>
+				<div className="flex items-center justify-between border-t px-4 py-3">
+					<button
+						type="button"
+						onClick={() => setNotificationsMuted(!isNotificationsMuted)}
+						className="text-left"
+					>
+						<p className="text-sm font-medium text-slate-950 dark:text-slate-50">
+							通知を受け取る
+						</p>
+					</button>
+					<Switch
+						checked={!isNotificationsMuted}
+						onCheckedChange={(checked) => setNotificationsMuted(!checked)}
+						aria-label="通知を受け取る"
+						className="data-[state=checked]:bg-sky-500 dark:data-[state=checked]:bg-sky-400"
+					/>
 				</div>
 			</PopoverContent>
 		</Popover>
