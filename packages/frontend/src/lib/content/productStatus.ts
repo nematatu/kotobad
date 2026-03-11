@@ -34,6 +34,11 @@ export const PRODUCT_UPDATE_CATEGORY_META: Record<
 
 export const PRODUCT_UPDATES: ProductUpdate[] = [
 	{
+		date: "2026-03-12",
+		title: "通知機能を作りました",
+		category: "new",
+	},
+	{
 		date: "2026-03-10",
 		title: "スレッド検索ページを作りました",
 		category: "new",
