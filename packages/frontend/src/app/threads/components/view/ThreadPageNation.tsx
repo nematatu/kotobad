@@ -1,6 +1,5 @@
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import {
 	Pagination,
 	PaginationContent,
@@ -79,62 +78,58 @@ export function ThreadPageNation({ currentPage, totalCount }: Props) {
 	const nextPage = normalizedCurrentPage + 1;
 
 	return (
-		<Card className="w-full p-2">
-			<CardContent className="p-0">
-				<Pagination>
-					<PaginationContent>
-						<PaginationItem>
+		<Pagination>
+			<PaginationContent>
+				<PaginationItem>
+					<PaginationLink
+						href={hasPrevious ? getPageHref(previousPage) : "#"}
+						aria-label="前のページへ"
+						aria-disabled={!hasPrevious}
+						tabIndex={hasPrevious ? 0 : -1}
+						className="h-8 w-8 rounded-full hover:bg-muted aria-disabled:pointer-events-none aria-disabled:opacity-40"
+					>
+						<ChevronLeftIcon className="size-4" />
+					</PaginationLink>
+				</PaginationItem>
+
+				{pageItems.map((item, index) => {
+					if (item === "ellipsis") {
+						const prevPage = pageItems[index - 1];
+						const nextPage = pageItems[index + 1];
+						const ellipsisKey = `ellipsis-${typeof prevPage === "number" ? prevPage : "start"}-${typeof nextPage === "number" ? nextPage : "end"}`;
+
+						return (
+							<PaginationItem key={ellipsisKey}>
+								<PaginationEllipsis />
+							</PaginationItem>
+						);
+					}
+
+					return (
+						<PaginationItem key={item}>
 							<PaginationLink
-								href={hasPrevious ? getPageHref(previousPage) : "#"}
-								aria-label="前のページへ"
-								aria-disabled={!hasPrevious}
-								tabIndex={hasPrevious ? 0 : -1}
-								className="h-8 w-8 rounded-full hover:bg-muted aria-disabled:pointer-events-none aria-disabled:opacity-40"
+								href={getPageHref(item)}
+								isActive={item === normalizedCurrentPage}
+								aria-label={`${item}ページへ`}
 							>
-								<ChevronLeftIcon className="size-4" />
+								{item}
 							</PaginationLink>
 						</PaginationItem>
+					);
+				})}
 
-						{pageItems.map((item, index) => {
-							if (item === "ellipsis") {
-								const prevPage = pageItems[index - 1];
-								const nextPage = pageItems[index + 1];
-								const ellipsisKey = `ellipsis-${typeof prevPage === "number" ? prevPage : "start"}-${typeof nextPage === "number" ? nextPage : "end"}`;
-
-								return (
-									<PaginationItem key={ellipsisKey}>
-										<PaginationEllipsis />
-									</PaginationItem>
-								);
-							}
-
-							return (
-								<PaginationItem key={item}>
-									<PaginationLink
-										href={getPageHref(item)}
-										isActive={item === normalizedCurrentPage}
-										aria-label={`${item}ページへ`}
-									>
-										{item}
-									</PaginationLink>
-								</PaginationItem>
-							);
-						})}
-
-						<PaginationItem>
-							<PaginationLink
-								href={hasNext ? getPageHref(nextPage) : "#"}
-								aria-label="次のページへ"
-								aria-disabled={!hasNext}
-								tabIndex={hasNext ? 0 : -1}
-								className="h-8 w-8 rounded-full hover:bg-muted aria-disabled:pointer-events-none aria-disabled:opacity-40"
-							>
-								<ChevronRightIcon className="size-4" />
-							</PaginationLink>
-						</PaginationItem>
-					</PaginationContent>
-				</Pagination>
-			</CardContent>
-		</Card>
+				<PaginationItem>
+					<PaginationLink
+						href={hasNext ? getPageHref(nextPage) : "#"}
+						aria-label="次のページへ"
+						aria-disabled={!hasNext}
+						tabIndex={hasNext ? 0 : -1}
+						className="h-8 w-8 rounded-full hover:bg-muted aria-disabled:pointer-events-none aria-disabled:opacity-40"
+					>
+						<ChevronRightIcon className="size-4" />
+					</PaginationLink>
+				</PaginationItem>
+			</PaginationContent>
+		</Pagination>
 	);
 }
