@@ -296,9 +296,6 @@ export function CreateDeveloperNoteForm() {
 					/>
 
 					<div className="flex flex-col gap-3 border-t border-slate-200/80 pt-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
-						<p className="text-[12px] text-slate-400 dark:text-slate-500">
-							Ctrl + Enter（Mac は ⌘ + Enter）で送信できます
-						</p>
 						<IconButton
 							type="submit"
 							disabled={isSubmitDisabled}
