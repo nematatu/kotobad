@@ -12,6 +12,7 @@ export const BFF_API_PATH = {
 	SET_THREAD_LIKES: "threads/api/threads/setThreadLike",
 	UPLOAD_MY_AVATAR: "threads/api/users/uploadAvatar",
 	UPDATE_MY_PROFILE: "threads/api/users/updateProfile",
+	GET_NOTIFICATIONS_COUNT: "threads/api/notifications/count",
 } as const;
 
 export type BffApiPathKey = keyof typeof BFF_API_PATH;

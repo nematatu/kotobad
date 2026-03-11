@@ -125,7 +125,7 @@ export const createPostRouter: RouteHandler<
 						senderUserId: user.id,
 						type: "post_reply",
 						threadId: threadId,
-						targetPotId: replyToPostId,
+						targetPostId: replyToPostId,
 					})
 				: createNotification(db, {
 						recipientUserId: thread.authorId,
