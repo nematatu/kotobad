@@ -256,7 +256,7 @@ const SubtleTab = forwardRef<HTMLDivElement, SubtleTabProps>(
 SubtleTab.displayName = "SubtleTab";
 
 interface SubtleTabItemProps extends HTMLAttributes<HTMLButtonElement> {
-	icon: LucideIcon;
+	icon?: LucideIcon;
 	label: string;
 	index: number;
 }
@@ -293,19 +293,22 @@ const SubtleTabItem = forwardRef<HTMLButtonElement, SubtleTabItemProps>(
 				tabIndex={selectedIndex === index ? 0 : -1}
 				onClick={() => onSelect(index)}
 				className={cn(
-					"relative z-10 flex items-center gap-2 rounded-full px-3 py-2 cursor-pointer bg-transparent border-none outline-none",
+					"relative z-10 flex items-center rounded-full px-3 py-2 cursor-pointer bg-transparent border-none outline-none",
+					Icon ? "gap-2" : "gap-0",
 					className,
 				)}
 				{...props}
 			>
-				<Icon
-					size={16}
-					strokeWidth={isActive ? 2 : 1.5}
-					className={cn(
-						"transition-[color,stroke-width] duration-80",
-						isActive ? "text-foreground" : "text-muted-foreground",
-					)}
-				/>
+				{Icon ? (
+					<Icon
+						size={16}
+						strokeWidth={isActive ? 2 : 1.5}
+						className={cn(
+							"transition-[color,stroke-width] duration-80",
+							isActive ? "text-foreground" : "text-muted-foreground",
+						)}
+					/>
+				) : null}
 				<span className="inline-grid text-[13px] whitespace-nowrap">
 					<span
 						className="col-start-1 row-start-1 invisible"

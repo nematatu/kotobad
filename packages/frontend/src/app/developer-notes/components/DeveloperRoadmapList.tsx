@@ -9,6 +9,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
+	SubtleTab,
+	SubtleTabItem,
+	SubtleTabPanel,
+} from "@/components/ui/subtle-tab";
+import {
 	BffFetcher,
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
@@ -20,8 +25,8 @@ type Props = {
 };
 
 const ROADMAP_STATUS_ORDER: Record<DeveloperRoadmapStatusType, number> = {
-	wip: 0,
-	todo: 1,
+	todo: 0,
+	wip: 1,
 	done: 2,
 };
 
@@ -71,8 +76,8 @@ const ROADMAP_STATUS_META: Record<
 };
 
 const ROADMAP_STATUS_BUTTON_ORDER: DeveloperRoadmapStatusType[] = [
-	"wip",
 	"todo",
+	"wip",
 	"done",
 ];
 
@@ -117,6 +122,8 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 	const [items, setItems] = useState(() => sortRoadmapItems(initialItems));
 	const [pendingItemId, setPendingItemId] = useState<number | null>(null);
 	const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
+	const [selectedStatus, setSelectedStatus] =
+		useState<DeveloperRoadmapStatusType>("todo");
 
 	useEffect(() => {
 		setItems(sortRoadmapItems(initialItems));
@@ -158,26 +165,46 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 		}
 	};
 
-	const groupedItems = ROADMAP_STATUS_BUTTON_ORDER.map((status) => ({
-		status,
-		items: items.filter((item) => item.status === status),
-	}));
+	const selectedStatusIndex =
+		ROADMAP_STATUS_BUTTON_ORDER.indexOf(selectedStatus);
 
 	return (
-		<div className="mt-8 space-y-8">
-			{groupedItems.map(({ status, items: statusItems }) => {
-				const statusMeta = ROADMAP_STATUS_META[status];
+		<div className="mt-8 space-y-12">
+			<SubtleTab
+				idPrefix="developer-roadmap-status-view"
+				selectedIndex={Math.max(selectedStatusIndex, 0)}
+				onSelect={(index) =>
+					setSelectedStatus(ROADMAP_STATUS_BUTTON_ORDER[index] ?? "todo")
+				}
+				className="w-fit rounded-full border border-slate-200 bg-white/80 px-2 py-1.5 dark:border-slate-700 dark:bg-slate-900/70"
+			>
+				{ROADMAP_STATUS_BUTTON_ORDER.map((status, index) => {
+					const statusMeta = ROADMAP_STATUS_META[status];
+
+					return (
+						<SubtleTabItem
+							key={status}
+							index={index}
+							label={statusMeta.title}
+							className="px-5 py-3.5 font-semibold"
+						/>
+					);
+				})}
+			</SubtleTab>
+
+			{ROADMAP_STATUS_BUTTON_ORDER.map((status, index) => {
+				const statusItems = items.filter((item) => item.status === status);
 
 				return (
-					<section key={status} className="space-y-4">
-						<div className="flex items-end justify-between gap-3">
-							<h3 className="text-[18px] font-bold tracking-tight text-slate-950 dark:text-slate-50">
-								{statusMeta.title}
-							</h3>
-						</div>
-
+					<SubtleTabPanel
+						key={status}
+						index={index}
+						selectedIndex={Math.max(selectedStatusIndex, 0)}
+						idPrefix="developer-roadmap-status-view"
+						className="pt-7"
+					>
 						{statusItems.length > 0 ? (
-							<div className="flex flex-wrap items-start gap-3 sm:gap-4">
+							<div className="flex flex-wrap items-start gap-x-4 gap-y-8 sm:gap-x-5 sm:gap-y-9">
 								{statusItems.map((item) => {
 									const itemStatusMeta = ROADMAP_STATUS_META[item.status];
 									const isPending = pendingItemId === item.id;
@@ -187,7 +214,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 										<article
 											key={item.id}
 											className={cn(
-												"relative min-w-[220px] rounded-[16px] px-5 pb-4 pt-7 shadow-none transition-opacity sm:max-w-[320px]",
+												"relative min-w-[220px] rounded-[16px] px-6 pb-5 pt-8 shadow-none transition-opacity sm:max-w-[320px]",
 												ROADMAP_CARD_CLASS[item.status],
 												isPending ? "opacity-60" : "",
 											)}
@@ -202,7 +229,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 													}
 													disabled={isPending}
 													className={cn(
-														"absolute shrink-0 transition-transform",
+														"absolute shrink-0 cursor-pointer transition-transform disabled:cursor-default",
 														itemStatusMeta.floatingClass,
 													)}
 												>
@@ -233,7 +260,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 											</h4>
 
 											{canEdit && isExpanded ? (
-												<div className="mt-4 flex flex-wrap gap-2">
+												<div className="mt-5 flex flex-wrap gap-2.5">
 													{ROADMAP_STATUS_BUTTON_ORDER.map((nextStatus) => {
 														const nextStatusMeta =
 															ROADMAP_STATUS_META[nextStatus];
@@ -247,7 +274,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 																	handleStatusChange(item, nextStatus)
 																}
 																disabled={isPending || isSelected}
-																className="rounded-full transition-opacity disabled:cursor-default"
+																className="cursor-pointer rounded-full transition-opacity disabled:cursor-default"
 															>
 																<span
 																	className={cn(
@@ -272,11 +299,11 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 								})}
 							</div>
 						) : (
-							<p className="text-sm text-slate-500 dark:text-slate-400">
+							<p className="pt-5 text-sm text-slate-500 dark:text-slate-400">
 								項目はありません。
 							</p>
 						)}
-					</section>
+					</SubtleTabPanel>
 				);
 			})}
 		</div>

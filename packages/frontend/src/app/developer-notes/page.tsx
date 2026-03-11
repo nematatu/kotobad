@@ -59,7 +59,7 @@ export default async function DeveloperNotesPage() {
 						className="scroll-mt-[calc(var(--header-height,0px)+1rem)]"
 					>
 						<div className="rounded-[36px] bg-[#ebf6ff] px-5 py-8 sm:px-8 sm:py-10 dark:border dark:border-slate-800 dark:bg-slate-900/80">
-							<div className="max-w-2xl space-y-2">
+							<div className="max-w-2xl">
 								<h2 className="text-[21px] font-bold tracking-tight text-[#080d12] dark:text-slate-50">
 									ロードマップ
 								</h2>
