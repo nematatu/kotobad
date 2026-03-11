@@ -10,6 +10,7 @@ import {
 	OpenAPISetThreadLikesSchema,
 } from "../../../../models/threads";
 import type { AppEnvironment } from "../../../../types";
+import { createNotification } from "../../notifications/methods/createNotification";
 
 export const setThreadLikesRoute = createRoute({
 	method: "post",
@@ -79,15 +80,25 @@ export const setThreadLikesRouter: RouteHandler<
 		}
 
 		if (active) {
-			await db
-				.insert(threadLikes)
-				.values({
-					threadId,
-					userId: user.id,
-				})
-				.onConflictDoNothing({
-					target: [threadLikes.threadId, threadLikes.userId],
-				});
+			Promise.all([
+				db
+					.insert(threadLikes)
+					.values({
+						threadId,
+						userId: user.id,
+					})
+					.onConflictDoNothing({
+						target: [threadLikes.threadId, threadLikes.userId],
+					}),
+				c.executionCtx.waitUntil(
+					createNotification(db, {
+						recipientUserId: String(threadId),
+						senderUserId: user.id,
+						type: "thread_like",
+						threadId,
+					}),
+				),
+			]);
 		} else {
 			await db
 				.delete(threadLikes)

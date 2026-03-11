@@ -11,6 +11,7 @@ import {
 	OpenAPIReactionOptionListSchema,
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
+import { createNotification } from "../../notifications/methods/createNotification";
 
 export const getReactionOptionsRoute = createRoute({
 	method: "get",
@@ -152,7 +153,7 @@ export const setPostReactionsRouter: RouteHandler<
 		const reaction = await db.query.reactions.findFirst({
 			where: (t, { and, eq }) =>
 				and(eq(t.code, reactionCode), eq(t.isActive, true)),
-			columns: { id: true },
+			columns: { id: true, emoji: true },
 		});
 
 		if (!reaction) {
@@ -160,20 +161,31 @@ export const setPostReactionsRouter: RouteHandler<
 		}
 
 		if (active) {
-			await db
-				.insert(postReactions)
-				.values({
-					postId,
-					reactionId: reaction.id,
-					userId: user.id,
-				})
-				.onConflictDoNothing({
-					target: [
-						postReactions.postId,
-						postReactions.reactionId,
-						postReactions.userId,
-					],
-				});
+			Promise.all([
+				await db
+					.insert(postReactions)
+					.values({
+						postId,
+						reactionId: reaction.id,
+						userId: user.id,
+					})
+					.onConflictDoNothing({
+						target: [
+							postReactions.postId,
+							postReactions.reactionId,
+							postReactions.userId,
+						],
+					}),
+				c.executionCtx.waitUntil(
+					createNotification(db, {
+						recipientUserId: String(post.id),
+						senderUserId: user.id,
+						type: "post_reaction",
+						targetPostId: post.id,
+						reactionEmoji: reaction.emoji,
+					}),
+				),
+			]);
 		} else {
 			await db
 				.delete(postReactions)

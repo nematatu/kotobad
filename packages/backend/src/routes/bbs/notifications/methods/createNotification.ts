@@ -9,7 +9,7 @@ export const createNotification = async (
 		senderUserId: string;
 		type: NotificationType;
 		threadId?: number | null;
-		targetPotId?: number | null;
+		targetPostId?: number | null;
 		reactionEmoji?: string | null;
 	},
 ) => {
@@ -20,7 +20,7 @@ export const createNotification = async (
 		senderUserId: input.senderUserId,
 		type: input.type,
 		threadId: input.threadId ?? null,
-		targetPostId: input.targetPotId ?? null,
+		targetPostId: input.targetPostId ?? null,
 		reactionEmoji: input.reactionEmoji ?? null,
 	});
 };
