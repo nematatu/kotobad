@@ -52,7 +52,10 @@ const Header = ({ tags }: Props) => {
 		>
 			<div className="mx-auto flex items-center gap-3 px-5 py-2">
 				<div className="flex items-center gap-2 shrink-0">
-					<HeaderLogo />
+					<HeaderMobileMenu links={headerNavLinks} isLoading={isLoading} />
+					<div className="hidden md:flex">
+						<HeaderLogo />
+					</div>
 				</div>
 				<HeaderNav links={headerNavLinks} />
 				<div className="ml-auto flex items-center gap-2 shrink-0">
@@ -75,7 +78,6 @@ const Header = ({ tags }: Props) => {
 						<ThemeToggle />
 					</div>
 					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
-					<HeaderMobileMenu links={headerNavLinks} isLoading={isLoading} />
 				</div>
 			</div>
 		</div>

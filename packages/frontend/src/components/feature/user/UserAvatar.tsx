@@ -6,7 +6,7 @@ export default function UserAvatar() {
 	const fallbackText =
 		user?.name?.trim().charAt(0) ?? user?.email?.trim().charAt(0) ?? "?";
 	return (
-		<Avatar className="h-8 w-8 sm:h-10 sm:w-10 bg-white border border-blue-400">
+		<Avatar className="h-8 w-8 sm:h-10 sm:w-10">
 			{user?.image && (
 				<AvatarImage
 					className="object-cover"

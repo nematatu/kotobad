@@ -17,7 +17,7 @@ export const FOOTER_SECTIONS = [
 		items: [
 			{ label: "kotobadとは", href: "/" },
 			{ label: "更新情報", href: "/updates" },
-			{ label: "開発状況", href: "/developer-notes" },
+			{ label: "開発者のボヤキ", href: "/developer-notes" },
 		],
 	},
 	{

@@ -8,6 +8,7 @@ export type ActionLinkItem = {
 	badge?: React.ReactNode;
 	icon?: React.ComponentType<{ className?: string }>;
 	tone?: "default" | "accent";
+	mobileMenuPlacement?: "default" | "bottom";
 	viewTransitionKey?: ViewTransitionKey;
 };
 
