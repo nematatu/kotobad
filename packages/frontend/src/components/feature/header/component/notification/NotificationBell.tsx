@@ -68,20 +68,20 @@ export function NotificationBell() {
 			revalidateOnReconnect: false,
 		},
 	);
-	const { data: notificationList, isLoading: isNotificationsLoading } =
-		useSWR<NotificationList>(
-			open ? "notifications" : null,
-			async () => {
-				const url = await getBffApiUrl("GET_NOTIFICATIONS");
-				return BffFetcher<NotificationList>(url);
-			},
-			{
-				revalidateOnFocus: false,
-				revalidateOnReconnect: false,
-				revalidateIfStale: false,
-				dedupingInterval: 30_000,
-			},
-		);
+	const { data: notificationList } = useSWR<NotificationList>(
+		open ? "notifications" : null,
+		async () => {
+			const url = await getBffApiUrl("GET_NOTIFICATIONS");
+			return BffFetcher<NotificationList>(url);
+		},
+		{
+			keepPreviousData: true,
+			revalidateOnFocus: false,
+			revalidateOnReconnect: false,
+			revalidateIfStale: false,
+			dedupingInterval: 30_000,
+		},
+	);
 
 	useEffect(() => {
 		const storedValue = window.localStorage.getItem(
@@ -174,11 +174,6 @@ export function NotificationBell() {
 							<BellOff className="size-10 text-slate-300 dark:text-slate-700" />
 							通知を受け取らない設定です
 						</div>
-					) : isNotificationsLoading ? (
-						<div
-							className={NOTIFICATION_PANEL_MIN_HEIGHT_CLASS}
-							aria-hidden="true"
-						/>
 					) : (
 						<div
 							className={`flex ${NOTIFICATION_PANEL_MIN_HEIGHT_CLASS} flex-col items-center justify-center gap-3 px-3 text-center text-sm text-slate-500 dark:text-slate-400`}
