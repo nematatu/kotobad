@@ -295,7 +295,7 @@ export function CreateDeveloperNoteForm() {
 						)}
 					/>
 
-					<div className="flex flex-col gap-3 border-t border-slate-200/80 pt-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+					<div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-end dark:border-slate-800">
 						<IconButton
 							type="submit"
 							disabled={isSubmitDisabled}
