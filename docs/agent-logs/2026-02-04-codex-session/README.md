@@ -112,9 +112,11 @@
 主な処理:
 - `.open-next/assets/_next/static` 配下 `.css/.js` を走査
 - 正規表現で `/_next/static/...` 参照抽出
+- 参照末尾の `)` `]` `}` `,` `;` を正規化して除去
 - `isAssetRef` で **拡張子がある参照のみ**保存（ディレクトリ除外）
 - R2 から前回スナップショット取得
-- 欠損参照があれば **ビルド失敗**
+- 欠損参照があれば fallback origin から復旧を試行
+- 復旧できない欠損参照があれば **ビルド失敗**
 
 補足:
 - `isAssetRef` は `/_next/static/media/` などの誤検知を防ぐために必要
@@ -125,6 +127,7 @@
 - `R2_KEY` **必須**（例: `ops/next-static-assets-snapshot.json`）
 - `WRANGLER_CONFIG` 任意（default: `wrangler.jsonc`）
 - `WRANGLER_BIN` 任意（default: `wrangler`）
+- `ASSET_FALLBACK_ORIGIN` 任意（未指定時は `NEXT_PUBLIC_FRONTEND_URL_PRODUCT` → `https://kotobad.com`）
 
 注意:
 - エラーメッセージに `R2_BUCKET` が残っているため文言統一が必要
@@ -183,4 +186,3 @@ M packages/frontend/package.json
 - ユーザーの強い要望（勝手にやらない/整形しない/勝手にSQLやマイグレーション作らない）厳守。
 - 中核は「R2スナップショット検証」「build command」「スクリプト修正」。
 - 変更は**最小差分**で行う。
-

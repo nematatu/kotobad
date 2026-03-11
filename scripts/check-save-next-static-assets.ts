@@ -32,9 +32,24 @@ const assetFallbackOrigin =
 	DEFAULT_ASSET_FALLBACK_ORIGIN;
 
 const refRegex = /\/_next\/static\/[^\s"'<>]+/g;
+const TRAILING_REF_CHARS = new Set([")", "]", "}", ",", ";"]);
+
+const normalizeAssetRef = (ref: string) => {
+	let normalized = ref.trim();
+	while (normalized.length > 0) {
+		const lastChar = normalized.at(-1);
+		if (!lastChar || !TRAILING_REF_CHARS.has(lastChar)) {
+			break;
+		}
+		normalized = normalized.slice(0, -1);
+	}
+	return normalized;
+};
+
 const isAssetRef = (ref: string) => {
-	if (ref.endsWith("/")) return false;
-	const last = ref.split("/").pop() ?? "";
+	const normalized = normalizeAssetRef(ref);
+	if (normalized.endsWith("/")) return false;
+	const last = normalized.split("/").pop() ?? "";
 	const q = last.indexOf("?");
 	const clean = q === -1 ? last : last.slice(0, q);
 	return clean.includes(".");
@@ -77,7 +92,7 @@ const collectRefs = async () => {
 		if (!isTextAsset(file)) continue;
 		const content = await readFile(file, "utf8");
 		for (const match of content.matchAll(refRegex)) {
-			const ref = match[0];
+			const ref = normalizeAssetRef(match[0]);
 			if (!isAssetRef(ref)) continue;
 			refs.add(ref);
 		}
@@ -111,7 +126,7 @@ const cleanupSnapshot = async () => {
 
 
 const toDiskPath = (ref: string) =>
-	join(assetsDir, ref.replace("/_next/static/", ""));
+	join(assetsDir, normalizeAssetRef(ref).replace("/_next/static/", ""));
 
 const exists = async (path: string) => {
 	try {
@@ -137,8 +152,9 @@ const runWrangler = async (args: string[], allowFail = false) => {
 };
 
 const restoreMissingAsset = async (ref: string) => {
-	const url = new URL(ref, assetFallbackOrigin);
-	const path = toDiskPath(ref);
+	const normalizedRef = normalizeAssetRef(ref);
+	const url = new URL(normalizedRef, assetFallbackOrigin);
+	const path = toDiskPath(normalizedRef);
 	const response = await fetch(url);
 	if (!response.ok) {
 		throw new Error(`asset fetch failed: ${response.status} ${url.toString()}`);
@@ -147,7 +163,7 @@ const restoreMissingAsset = async (ref: string) => {
 	const bytes = new Uint8Array(await response.arrayBuffer());
 	await mkdir(dirname(path), { recursive: true });
 	await Bun.write(path, bytes);
-	console.log(`Recovered missing asset: ${ref}`);
+	console.log(`Recovered missing asset: ${normalizedRef}`);
 };
 
 const fetchSnapshotFromR2 = async () => {
@@ -199,7 +215,9 @@ const main = async () => {
 	}
 
   // R2からロードしたスナップショットに保存されていたrefs
-	const refsToCheck = snapshot.refs.filter(isAssetRef);
+	const refsToCheck = Array.from(
+		new Set(snapshot.refs.map(normalizeAssetRef).filter(isAssetRef)),
+	);
 
 	const missing: string[] = [];
 	for (const ref of refsToCheck) {
