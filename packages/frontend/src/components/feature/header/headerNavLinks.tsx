@@ -7,6 +7,11 @@ export const headerNavLinks: ActionLinkItem[] = [
 		href: "/threads",
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,
 	},
+	{
+		label: "BWFライブデモ",
+		href: "/bwf-live-demo",
+		viewTransitionKey: viewTransitionKeys.threadListNavigation,
+	},
 	{ label: "コトバドとは", href: "/#about" },
 	{
 		label: "更新情報",
