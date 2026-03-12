@@ -167,16 +167,14 @@ export default function ThreadPageClient({
 		: "text-xs text-slate-500";
 
 	return (
-		<div className="w-full sm:max-w-5xl mx-auto flex flex-col space-y-3">
+		<div className="w-full sm:max-w-5xl mx-auto flex flex-col space-y-2">
 			<div className="w-full px-3 pt-5">
 				<div className="text-xl font-bold">
 					{isFiltering ? `「${state.activeQuery}」の検索結果` : "スレッド一覧"}
 				</div>
 			</div>
 			<div className="w-full px-3 md:px-0">
-				<div className="min-h-4">
-					{statusText ? <p className={statusClass}>{statusText}</p> : null}
-				</div>
+				{statusText ? <p className={statusClass}>{statusText}</p> : null}
 			</div>
 			<div className="space-y-3">
 				{showEmptyAll ? (

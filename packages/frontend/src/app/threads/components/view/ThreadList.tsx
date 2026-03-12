@@ -31,32 +31,17 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4  border-b border-gray-200 bg-white p-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
+						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-2 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
 					>
-						<Link
-							href={authorHref}
-							aria-label={`ユーザー: ${thread.author.name}`}
-							className="relative z-10 shrink-0"
-						>
-							<AuthorAvatar
-								name={thread.author.name}
-								image={thread.author.image}
-								className="w-7 h-7 bg-white"
-								fallbackClassName="text-xs"
-							/>
-						</Link>
-						<div className="min-w-0 flex-1 space-y-2">
+						<div className="min-w-0 flex-1 space-y-1">
+							<span className="text-xs text-gray-500">{relativeDate}</span>
 							<Link
 								href={href}
 								aria-label={`スレッド: ${thread.title}`}
 								className="block after:absolute after:inset-0 after:rounded-sm after:z-0 after:content-['']"
 							>
 								<div className="relative z-10">
-									<div className="flex gap-2 flex-wrap items-center text-xs text-gray-500">
-										<span>{thread.author.name}</span>
-										<span>{relativeDate}</span>
-									</div>
-									<h3 className="mt-1 block text-base font-bold line-clamp-2 sm:text-lg">
+									<h3 className="block font-bold line-clamp-2 sm:text-lg">
 										{highlightText(thread.title, highlightQuery)}
 									</h3>
 								</div>
@@ -86,6 +71,19 @@ export const ThreadList = ({
 										initialLikedByMe={thread.likedByMe}
 										size="compact"
 									/>
+									<Link
+										href={authorHref}
+										aria-label={`ユーザー: ${thread.author.name}`}
+										className="z-10 shrink-0 flex self-end items-center text-xs gap-1 text-gray-500 hover:text-gray-600"
+									>
+										<AuthorAvatar
+											name={thread.author.name}
+											image={thread.author.image}
+											className="w-5 h-5 bg-white"
+											fallbackClassName="text-xs"
+										/>
+										<span>{thread.author.name}</span>
+									</Link>
 								</div>
 							</div>
 						</div>
