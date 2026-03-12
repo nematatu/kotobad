@@ -10,6 +10,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://kotobad.com"),
+	title: "コトバド | バドミントン掲示板",
 	applicationName: "コトバド",
 	description: "バドミントン掲示板",
 	manifest: "/manifest.webmanifest",
