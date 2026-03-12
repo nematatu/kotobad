@@ -34,7 +34,7 @@ export const ThreadList = ({
 						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-2 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
 					>
 						<div className="min-w-0 flex-1 space-y-1">
-							<span className="text-xs text-gray-500">{relativeDate}</span>
+							<span className="text-[10px] text-gray-500">{relativeDate}</span>
 							<Link
 								href={href}
 								aria-label={`スレッド: ${thread.title}`}
@@ -74,7 +74,7 @@ export const ThreadList = ({
 									<Link
 										href={authorHref}
 										aria-label={`ユーザー: ${thread.author.name}`}
-										className="z-10 shrink-0 flex self-end items-center text-xs gap-1 text-gray-500 hover:text-gray-600"
+										className="z-10 ml-auto shrink-0 flex self-end items-center gap-1 text-[10px] text-gray-500/80 hover:text-gray-600"
 									>
 										<AuthorAvatar
 											name={thread.author.name}
