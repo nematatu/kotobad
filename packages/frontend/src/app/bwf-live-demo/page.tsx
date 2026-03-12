@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import useSWR from "swr";
 import LogoStickerIcon from "@/assets/logo/logo-sticker.svg";
 import { cn } from "@/lib/utils";
@@ -109,7 +110,18 @@ const renderGames = (match: BwfLiveMatch) => {
 	);
 };
 
-export default function BwfLiveDemoPage() {
+const BwfLiveDemoLoading = () => (
+	<section className="mx-auto max-w-3xl rounded-[28px] border border-dashed border-slate-200 bg-white/70 px-6 py-10 text-center dark:border-slate-700 dark:bg-slate-900/60">
+		<p className="text-[12px] font-black tracking-[0.28em] text-slate-400 dark:text-slate-500">
+			LOADING
+		</p>
+		<p className="mt-3 text-[15px] leading-8 text-slate-500 dark:text-slate-300">
+			BWF 公式 live matches API を取得しています。
+		</p>
+	</section>
+);
+
+function BwfLiveDemoContent() {
 	const searchParams = useSearchParams();
 	const focusedTournamentId = searchParams.get("tmtId");
 	const { data: result } = useSWR(
@@ -163,14 +175,7 @@ export default function BwfLiveDemoPage() {
 
 			<div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
 				{!result ? (
-					<section className="mx-auto max-w-3xl rounded-[28px] border border-dashed border-slate-200 bg-white/70 px-6 py-10 text-center dark:border-slate-700 dark:bg-slate-900/60">
-						<p className="text-[12px] font-black tracking-[0.28em] text-slate-400 dark:text-slate-500">
-							LOADING
-						</p>
-						<p className="mt-3 text-[15px] leading-8 text-slate-500 dark:text-slate-300">
-							BWF 公式 live matches API を取得しています。
-						</p>
-					</section>
+					<BwfLiveDemoLoading />
 				) : !result.ok ? (
 					<section className="mx-auto max-w-3xl rounded-[28px] border border-dashed border-slate-200 bg-white/70 px-6 py-10 text-center dark:border-slate-700 dark:bg-slate-900/60">
 						<p className="text-[12px] font-black tracking-[0.28em] text-slate-400 dark:text-slate-500">
@@ -318,5 +323,21 @@ export default function BwfLiveDemoPage() {
 				)}
 			</div>
 		</div>
+	);
+}
+
+export default function BwfLiveDemoPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="relative min-h-screen bg-[#f8fbff] dark:bg-[#0f172a]">
+					<div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+						<BwfLiveDemoLoading />
+					</div>
+				</div>
+			}
+		>
+			<BwfLiveDemoContent />
+		</Suspense>
 	);
 }
