@@ -23,7 +23,7 @@ export const ThreadList = ({
 	const threadList: ThreadType[] = threads;
 
 	return (
-		<div className="flex flex-col gap-3">
+		<div className="flex flex-col">
 			{threadList.map((thread) => {
 				const href = `/threads/${thread.id}`;
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
@@ -31,7 +31,7 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4 rounded-sm border border-gray-200 bg-white p-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
+						className="thread-list-card group relative z-0 flex items-start gap-4  border-b border-gray-200 bg-white p-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
 					>
 						<Link
 							href={authorHref}

@@ -167,8 +167,8 @@ export default function ThreadPageClient({
 		: "text-xs text-slate-500";
 
 	return (
-		<div className="w-full max-w-5xl mx-auto flex flex-col space-y-3">
-			<div className="w-full px-3 md:px-0 pt-5">
+		<div className="w-full sm:max-w-5xl mx-auto flex flex-col space-y-3">
+			<div className="w-full px-3 pt-5">
 				<div className="text-xl font-bold">
 					{isFiltering ? `「${state.activeQuery}」の検索結果` : "スレッド一覧"}
 				</div>
@@ -183,7 +183,7 @@ export default function ThreadPageClient({
 					<NoThread query={state.activeQuery} />
 				) : (
 					<div className="flex flex-col">
-						<div className="flex items-center justify-between">
+						<div className="px-3 flex items-center justify-between">
 							<ThreadDisplayCount
 								currentPage={currentPage}
 								totalCount={totalCount}

@@ -28,7 +28,7 @@ export default async function Page({ searchParams }: Props) {
 		: await getThreads({ currentPage, sort });
 
 	return (
-		<div className="px-2 sm:px-5">
+		<div className="sm:px-5">
 			<ThreadPageClient
 				initialThreads={threads}
 				initialQuery={isSearch ? query : ""}
