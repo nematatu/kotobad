@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { ActionLinkItem } from "@/components/common/button/ActionLink";
 import ActionLink from "@/components/common/button/ActionLink";
@@ -21,8 +22,21 @@ type Props = {
 	isLoading: boolean;
 };
 
+const isActiveHref = (pathname: string, href: string) => {
+	if (href === "/") {
+		return pathname === "/";
+	}
+
+	if (href === "/threads") {
+		return pathname === "/threads" || pathname.startsWith("/threads/");
+	}
+
+	return pathname === href || pathname.startsWith(`${href}/`);
+};
+
 const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 	const [open, setOpen] = useState(false);
+	const pathname = usePathname();
 	const { user } = useUser();
 	const primaryLinks = links.filter(
 		(item) => item.mobileMenuPlacement !== "bottom",
@@ -43,6 +57,9 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 	const profileHref = user?.id
 		? `/users/${encodeURIComponent(user.id)}`
 		: "/threads";
+	const isProfileActive = isActiveHref(pathname, profileHref);
+	const activeMenuClass =
+		"bg-[#5A86FF]/12 text-[#5A86FF] [@media(hover:hover)]:hover:!bg-[#5A86FF]/18 [@media(hover:hover)]:hover:!text-[#5A86FF] dark:bg-[#5A86FF]/22 dark:[@media(hover:hover)]:hover:!bg-[#5A86FF]/26";
 
 	return (
 		<div className="md:hidden">
@@ -66,24 +83,41 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 						<ActionLink
 							variant="menu"
 							onClick={() => setOpen(false)}
+							className={isProfileActive ? activeMenuClass : undefined}
 							item={{ href: profileHref, label: "プロフィールへ" }}
 						/>
 					</div>
 					<nav className="mt-4 flex w-full flex-col gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
-						{primaryLinks.map((item) => (
-							<SheetClose key={item.href} asChild>
-								<ActionLink item={item} variant="menu" />
-							</SheetClose>
-						))}
+						{primaryLinks.map((item) => {
+							const isActive = isActiveHref(pathname, item.href);
+
+							return (
+								<SheetClose key={item.href} asChild>
+									<ActionLink
+										item={item}
+										variant="menu"
+										className={isActive ? activeMenuClass : undefined}
+									/>
+								</SheetClose>
+							);
+						})}
 					</nav>
 					<div className="mt-auto w-full border-t border-slate-200 pt-4 dark:border-slate-800">
 						{secondaryLinks.length > 0 ? (
 							<nav className="flex w-full flex-col gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
-								{secondaryLinks.map((item) => (
-									<SheetClose key={item.href} asChild>
-										<ActionLink item={item} variant="menu" />
-									</SheetClose>
-								))}
+								{secondaryLinks.map((item) => {
+									const isActive = isActiveHref(pathname, item.href);
+
+									return (
+										<SheetClose key={item.href} asChild>
+											<ActionLink
+												item={item}
+												variant="menu"
+												className={isActive ? activeMenuClass : undefined}
+											/>
+										</SheetClose>
+									);
+								})}
 							</nav>
 						) : null}
 						<div className="mt-4 flex justify-end">
