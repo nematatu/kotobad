@@ -16,10 +16,6 @@ const MobileBottomNav = ({ tags }: Props) => {
 	const isThreadDetailPage = pathname.startsWith("/threads/");
 	const shouldShowCreateThreadButton = !isThreadDetailPage;
 
-	if (isThreadDetailPage) {
-		return null;
-	}
-
 	return (
 		<>
 			<motion.nav
