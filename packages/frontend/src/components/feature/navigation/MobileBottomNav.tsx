@@ -38,7 +38,7 @@ const MobileBottomNav = ({ tags }: Props) => {
 						<button
 							type="button"
 							aria-label="スレッドを投稿する"
-							className="route-transition-floating-action fixed bottom-30 right-4 z-[70] inline-flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white shadow-lg dark:border-slate-700 dark:bg-blue-500/95 dark:shadow-[0_18px_40px_-28px_rgba(2,6,23,0.95)] [@media(min-width:496px)]:hidden"
+							className="route-transition-floating-action fixed bottom-30 right-4 z-[70] inline-flex h-14 w-14 appearance-none items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white shadow-lg outline-none [-webkit-tap-highlight-color:transparent] focus:border-slate-200 focus:outline-none focus:ring-0 focus-visible:border-slate-200 focus-visible:outline-none focus-visible:ring-0 dark:border-slate-700 dark:bg-blue-500/95 dark:shadow-[0_18px_40px_-28px_rgba(2,6,23,0.95)] dark:focus:border-slate-700 dark:focus-visible:border-slate-700 [@media(min-width:496px)]:hidden"
 						>
 							<Plus size={24} />
 						</button>
