@@ -35,7 +35,7 @@ export function BackToThreadList() {
 			enableClickAnimation
 			onClick={onBackClick}
 			aria-label="スレッド一覧へ戻る"
-			className="route-transition-floating-action pointer-events-auto block sm:hidden fixed bottom-20 right-4 z-[70] inline-flex h-14 w-14 flex-col items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white"
+			className="route-transition-floating-action pointer-events-auto block sm:hidden fixed bottom-30 right-4 z-[70] inline-flex h-14 w-14 flex-col items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white"
 		>
 			<Undo2 size={21} />
 			<span className="text-[10px]">戻る</span>
