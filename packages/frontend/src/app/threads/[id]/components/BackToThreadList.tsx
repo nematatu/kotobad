@@ -19,6 +19,13 @@ export function BackToThreadList() {
 	}, []);
 
 	const onBackClick = () => {
+		if (window.history.length > 1) {
+			router.back({
+				viewTransitionKey: viewTransitionKeys.threadDetailBackNavigation,
+			});
+			return;
+		}
+
 		router.replace(getLastThreadListHref(), {
 			restoreScrollOnCommit: true,
 			scroll: false,
