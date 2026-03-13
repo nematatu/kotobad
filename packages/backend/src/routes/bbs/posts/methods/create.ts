@@ -138,12 +138,14 @@ export const createPostRouter: RouteHandler<
 					replyToPostId === null
 						? {
 								post: validatedData.post,
+								imageUrl: validatedData.imageUrl ?? null,
 								authorId: user.id,
 								threadId: threadId,
 								localId: nextLocalId,
 							}
 						: {
 								post: validatedData.post,
+								imageUrl: validatedData.imageUrl ?? null,
 								replyToPostId,
 								authorId: user.id,
 								threadId: threadId,

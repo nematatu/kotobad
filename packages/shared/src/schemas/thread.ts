@@ -5,6 +5,7 @@ import { TagListSchema } from "./tag";
 export const ThreadSchema = z.object({
 	id: z.number().int().positive(),
 	title: z.string().min(1),
+	imageUrl: z.string().url().nullable().optional(),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
 	postCount: z.number().int().nonnegative(),
@@ -34,6 +35,7 @@ export const SetThreadLikesResponseSchema = z.object({
 
 export const CreateThreadSchema = ThreadSchema.pick({
 	title: true,
+	imageUrl: true,
 }).extend({
 	tagIds: z.array(z.number().int().positive()).default([]),
 });

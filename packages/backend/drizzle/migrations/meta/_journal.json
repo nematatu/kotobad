@@ -176,6 +176,13 @@
       "when": 1773420946891,
       "tag": "0024_glossy_spencer_smythe",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1773440294791,
+      "tag": "0025_smiling_darkstar",
+      "breakpoints": true
     }
   ]
 }

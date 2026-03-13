@@ -18,6 +18,7 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { ThreadPostImage } from "../../components/shared/ThreadPostImage";
 import { CreatePostForm } from "./CreatePostForm";
 import type { ReplyTarget } from "./types/replyTarget";
 import { Emoji } from "./ui/emojiPicker";
@@ -427,6 +428,14 @@ export const PostList = ({
 							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words pl-2">
 								<AutoLinkText text={post.post} />
 							</span>
+							<div className="pl-2">
+								<ThreadPostImage
+									imageUrl={post.imageUrl}
+									width={1280}
+									quality={82}
+									imageClassName="max-h-96"
+								/>
+							</div>
 							{post.reactions.length > 0 && (
 								<div className="flex mt-2 flex-wrap items-center gap-2">
 									{post.reactions.map(

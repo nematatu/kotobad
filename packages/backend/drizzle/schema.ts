@@ -51,6 +51,7 @@ export const threads = sqliteTable(
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		title: text("title").notNull(),
+		imageUrl: text("image_url"),
 		createdAt: timestamp("created_at")
 			.default(sql`(strftime('%s', 'now'))`)
 			.notNull(),
@@ -75,6 +76,7 @@ export const posts = sqliteTable(
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		localId: integer("local_id").notNull(),
 		post: text("post").notNull(),
+		imageUrl: text("image_url"),
 		replyToPostId: integer("reply_to_post_id").references(
 			(): AnySQLiteColumn => posts.id,
 			{

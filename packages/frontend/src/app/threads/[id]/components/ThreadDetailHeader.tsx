@@ -1,6 +1,7 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
+import { ThreadPostImage } from "../../components/shared/ThreadPostImage";
 import { TagList } from "../../components/view/tag/tagList";
 import { LikeButton } from "./likeButton";
 
@@ -19,6 +20,13 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 			<h1 className="max-w-4xl text-left text-lg sm:text-2xl font-bold break-words">
 				<AutoLinkText text={threadHeaderData.title} />
 			</h1>
+			<ThreadPostImage
+				imageUrl={threadHeaderData.imageUrl}
+				width={1280}
+				quality={80}
+				containerClassName="max-w-4xl rounded-2xl"
+				imageClassName="max-h-[32rem]"
+			/>
 			{threadHeaderData.threadTags.length > 0 && (
 				<div className="block sm:hidden flex flex-wrap gap-2">
 					<TagList tags={threadHeaderData.threadTags} />

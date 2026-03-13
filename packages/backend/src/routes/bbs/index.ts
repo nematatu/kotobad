@@ -6,6 +6,7 @@ import { betterAuthMiddleware } from "../../middleware/better-auth";
 import type { AppEnvironment } from "../../types";
 import developerNotesRouter from "./developer-notes";
 import developerRoadmapRouter from "./developer-roadmap";
+import mediaRouter from "./media";
 import notificationsRouter from "./notifications";
 import postRouter from "./posts";
 import realtimeRouter from "./realtime";
@@ -31,9 +32,11 @@ const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/notifications/*", betterAuthMiddleware)
 	.use("/users/update", betterAuthMiddleware)
 	.use("/users/me/avatar", betterAuthMiddleware)
+	.use("/media/upload", betterAuthMiddleware)
 	.route("/notifications", notificationsRouter)
 	.route("/developer-roadmap", developerRoadmapRouter)
 	.route("/developer-notes", developerNotesRouter)
+	.route("/media", mediaRouter)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter)
 	.route("/users", userRouter)

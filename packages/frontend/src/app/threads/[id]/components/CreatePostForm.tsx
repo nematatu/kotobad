@@ -22,6 +22,8 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { ThreadPostImagePicker } from "../../components/shared/ThreadPostImagePicker";
+import { useThreadPostImageInput } from "../../lib/useThreadPostImageInput";
 import type { ReplyTarget } from "./types/replyTarget";
 
 type CreatePostFormProps = {
@@ -40,6 +42,15 @@ export const CreatePostForm = ({
 	variant = "default",
 }: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
+	const {
+		imageFile,
+		imagePreviewUrl,
+		imageInputRef,
+		selectImageAction,
+		openImageDialogAction,
+		clearImageSelectionAction,
+		uploadSelectedImageAction,
+	} = useThreadPostImageInput();
 	const { mutate } = useSWRConfig();
 	const isInline = variant === "inline";
 	const replyTargetPostId = replyTarget?.postId ?? null;
@@ -47,6 +58,7 @@ export const CreatePostForm = ({
 	const form = useForm<CreatePostType>({
 		defaultValues: {
 			post: "",
+			imageUrl: null,
 			threadId: threadId,
 			replyToPostId: null,
 		},
@@ -61,14 +73,19 @@ export const CreatePostForm = ({
 
 	const handleSubmit = async (values: CreatePostType) => {
 		try {
+			const imageUrl = await uploadSelectedImageAction("post");
 			const endpoint = await getBffApiUrl("CREATE_POST");
 			const requestBody: CreatePostType =
 				values.replyToPostId === null
 					? {
 							post: values.post,
+							imageUrl,
 							threadId: values.threadId,
 						}
-					: values;
+					: {
+							...values,
+							imageUrl,
+						};
 
 			await BffFetcher(endpoint, {
 				method: "POST",
@@ -80,9 +97,11 @@ export const CreatePostForm = ({
 			mutate(["GET_POSTS_BY_THREADID", threadId]);
 			form.reset({
 				post: "",
+				imageUrl: null,
 				threadId,
 				replyToPostId: null,
 			});
+			clearImageSelectionAction();
 			onClearReplyTargetAction?.();
 			toast.success("投稿しました!");
 			setTimeout(() => form.setFocus("post"), 1);
@@ -142,6 +161,16 @@ export const CreatePostForm = ({
 							</div>
 						</FormItem>
 					)}
+				/>
+				<ThreadPostImagePicker
+					imageInputRef={imageInputRef}
+					imagePreviewUrl={imagePreviewUrl}
+					hasImage={Boolean(imageFile)}
+					onSelectImageAction={selectImageAction}
+					onOpenImageDialogAction={openImageDialogAction}
+					onClearImageAction={clearImageSelectionAction}
+					actionsClassName="pl-10"
+					previewImageClassName="max-h-72"
 				/>
 				<div className="flex items-end justify-end gap-2">
 					{isInline ? (

@@ -6,6 +6,7 @@ export const BFF_API_PATH = {
 	CREATE_DEVELOPER_NOTE: "developer-notes/api/createNote",
 	CREATE_DEVELOPER_ROADMAP: "developer-notes/api/createRoadmap",
 	CREATE_POST: "threads/api/posts/createPost",
+	UPLOAD_IMAGE: "threads/api/media/upload",
 	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId/",
 	GET_REACTION_OPTIONS: "threads/api/posts/getReactionOptions",
 	SET_POST_REACTIONS: "threads/api/posts/setPostReaction",

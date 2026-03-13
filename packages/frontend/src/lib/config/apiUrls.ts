@@ -12,6 +12,7 @@ export const API_PATH = {
 	CREATE_DEVELOPER_NOTE: "bbs/developer-notes/create",
 	CREATE_DEVELOPER_ROADMAP: "bbs/developer-roadmap/create",
 	CREATE_POST: "bbs/posts/create",
+	UPLOAD_IMAGE: "bbs/media/upload",
 	GET_NOTIFICATIONS: "bbs/notifications",
 	GET_NOTIFICATIONS_COUNT: "bbs/notifications/count",
 	GET_POSTS_BY_THREADID: "bbs/posts/byThreadId/",

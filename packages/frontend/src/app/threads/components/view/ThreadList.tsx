@@ -10,6 +10,7 @@ import ChatIcon from "@/assets/threads/chat.svg";
 import { Link } from "@/components/common/Link";
 import { highlightText } from "@/components/feature/header/component/headerSearch/highlightText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import { ThreadPostImage } from "../shared/ThreadPostImage";
 
 type ThreadListType = {
 	threads: ThreadType[];
@@ -44,6 +45,13 @@ export const ThreadList = ({
 									<h3 className="block font-bold line-clamp-2 sm:text-lg">
 										{highlightText(thread.title, highlightQuery)}
 									</h3>
+									<ThreadPostImage
+										imageUrl={thread.imageUrl}
+										width={720}
+										quality={78}
+										containerClassName="mt-2"
+										imageClassName="max-h-72"
+									/>
 								</div>
 							</Link>
 							<div className="flex flex-col space-y-2">

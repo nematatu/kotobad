@@ -22,6 +22,8 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { useThreadPostImageInput } from "../../lib/useThreadPostImageInput";
+import { ThreadPostImagePicker } from "../shared/ThreadPostImagePicker";
 import { TagList } from "../view/tag/tagList";
 import { useTagSelection } from "../view/tag/useTagSelection";
 import { TagPickerTooltip } from "./tagPickerTooltip";
@@ -36,10 +38,20 @@ export const CreateThreadForm = ({
 	initialTags,
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
+	const {
+		imageFile,
+		imagePreviewUrl,
+		imageInputRef,
+		selectImageAction,
+		openImageDialogAction,
+		clearImageSelectionAction,
+		uploadSelectedImageAction,
+	} = useThreadPostImageInput();
 
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
+			imageUrl: null,
 			tagIds: [],
 		},
 	});
@@ -67,16 +79,21 @@ export const CreateThreadForm = ({
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
 		try {
+			const imageUrl = await uploadSelectedImageAction("thread");
 			const endpoint = await getBffApiUrl("CREATE_THREAD");
 			await BffFetcher<ThreadType>(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(values),
+				body: JSON.stringify({
+					...values,
+					imageUrl,
+				}),
 			});
 
 			onCreated();
-			form.reset({ title: "", tagIds: [] });
+			form.reset({ title: "", imageUrl: null, tagIds: [] });
 			resetTagSelection();
+			clearImageSelectionAction();
 			toast.success("投稿しました!");
 		} catch (error: unknown) {
 			const fetchError = error as BffFetcherError;
@@ -143,6 +160,17 @@ export const CreateThreadForm = ({
 							<div className="h-px w-full bg-slate-200/70" aria-hidden="true" />
 							<div className="flex flex-wrap items-start gap-3">
 								<div className="min-w-0 flex-1 space-y-3">
+									<div className="space-y-2">
+										<ThreadPostImagePicker
+											imageInputRef={imageInputRef}
+											imagePreviewUrl={imagePreviewUrl}
+											hasImage={Boolean(imageFile)}
+											onSelectImageAction={selectImageAction}
+											onOpenImageDialogAction={openImageDialogAction}
+											onClearImageAction={clearImageSelectionAction}
+											previewImageClassName="max-h-64"
+										/>
+									</div>
 									<TagList
 										tags={selectedTags}
 										onToggle={handleToggleTagFromList}

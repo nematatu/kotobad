@@ -81,13 +81,14 @@ export const createThreadRouter: RouteHandler<
 		console.error("Validation error:", details);
 		return c.json({ error: "Validation failed", details }, 400);
 	}
-	const { title, tagIds } = validatedData;
+	const { title, imageUrl, tagIds } = validatedData;
 
 	try {
 		const result = await db
 			.insert(threads)
 			.values({
 				title: title,
+				imageUrl: imageUrl ?? null,
 				authorId: user.id,
 			})
 			.returning({ id: threads.id });
