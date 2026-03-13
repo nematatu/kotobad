@@ -37,7 +37,7 @@ export default function UpdatesPage() {
 			</div>
 			<section
 				id="overview"
-				className="relative bg-gray-200/60 overflow-hidden border-b border-slate-200/80 scroll-mt-[calc(var(--header-height,0px)+1rem)]"
+				className="relative bg-gray-200/60 dark:bg-gray-800/60 overflow-hidden border-b border-slate-200/80 scroll-mt-[calc(var(--header-height,0px)+1rem)]"
 			>
 				<div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-18 sm:pt-26">
 					<div className="mx-auto max-w-3xl space-y-4 text-center sm:space-y-5">
