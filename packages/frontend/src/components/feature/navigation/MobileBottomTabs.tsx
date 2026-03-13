@@ -33,6 +33,9 @@ const isProfilePath = (pathname: string) =>
 	pathname.startsWith("/auth") ||
 	pathname.startsWith("/users/");
 
+const isThreadPath = (pathname: string) =>
+	pathname === "/threads" || /^\/threads\/[^/]+$/.test(pathname);
+
 type IndicatorRect = {
 	height: number;
 	width: number;
@@ -91,7 +94,7 @@ export function MobileBottomTabs() {
 				active: IconMessage2Filled,
 				inactive: IconMessage2,
 			},
-			isActive: pathname === "/threads",
+			isActive: isThreadPath(pathname),
 		},
 		{
 			id: "profile",

@@ -380,13 +380,9 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 				router.push(navigationHref, toNextNavigationOptions(options));
 				return;
 			}
-			startRouteViewTransition(
-				() => {
-					router.push(navigationHref, toNextNavigationOptions(options));
-				},
-				behavior.direction,
-				isThreadDetailPath(target.pathname),
-			);
+			startRouteViewTransition(() => {
+				router.push(navigationHref, toNextNavigationOptions(options));
+			}, behavior.direction);
 		},
 		refresh: () => {
 			router.refresh();
@@ -412,13 +408,9 @@ export function useViewTransitionRouter(): ViewTransitionRouter {
 				router.replace(navigationHref, toNextNavigationOptions(options));
 				return;
 			}
-			startRouteViewTransition(
-				() => {
-					router.replace(navigationHref, toNextNavigationOptions(options));
-				},
-				behavior.direction,
-				isThreadDetailPath(target.pathname),
-			);
+			startRouteViewTransition(() => {
+				router.replace(navigationHref, toNextNavigationOptions(options));
+			}, behavior.direction);
 		},
 	};
 }
