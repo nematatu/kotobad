@@ -5,6 +5,7 @@ export const DeveloperRoadmapStatusSchema = z.enum(["wip", "todo", "done"]);
 export const DeveloperRoadmapItemSchema = z.object({
 	id: z.number().int().positive(),
 	title: z.string().min(1),
+	isArchived: z.boolean().default(false),
 	status: DeveloperRoadmapStatusSchema,
 	sortOrder: z.number().int().nonnegative(),
 	createdAt: z.string(),
@@ -19,5 +20,22 @@ export const CreateDeveloperRoadmapItemSchema = z.object({
 export const UpdateDeveloperRoadmapStatusSchema = z.object({
 	status: DeveloperRoadmapStatusSchema,
 });
+
+export const UpdateDeveloperRoadmapItemSchema = z
+	.object({
+		title: z.string().trim().min(1).max(400).optional(),
+		status: DeveloperRoadmapStatusSchema.optional(),
+		isArchived: z.boolean().optional(),
+	})
+	.refine(
+		(value) =>
+			value.title !== undefined ||
+			value.status !== undefined ||
+			value.isArchived !== undefined,
+		{
+			message: "At least one field must be provided",
+			path: [],
+		},
+	);
 
 export const DeveloperRoadmapListSchema = z.array(DeveloperRoadmapItemSchema);

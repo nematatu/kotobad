@@ -305,6 +305,7 @@ export const developerRoadmapItems = sqliteTable(
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		title: text("title").notNull(),
 		status: text("status").$type<DeveloperRoadmapStatusType>().notNull(),
+		isArchived: boolean("is_archived").default(false).notNull(),
 		sortOrder: integer("sort_order").notNull().default(0),
 		createdAt: timestamp("created_at")
 			.default(sql`(strftime('%s', 'now'))`)
@@ -315,6 +316,7 @@ export const developerRoadmapItems = sqliteTable(
 	},
 	(t) => [
 		index("developer_roadmap_items_status_idx").on(t.status),
+		index("developer_roadmap_items_archived_idx").on(t.isArchived),
 		index("developer_roadmap_items_sort_order_idx").on(t.status, t.sortOrder),
 		check(
 			"developer_roadmap_items_status_check",

@@ -3,6 +3,7 @@ import type { DeveloperRoadmapItemType } from "@kotobad/shared/src/types/develop
 export type DeveloperRoadmapQueryResult = {
 	id: number;
 	title: string;
+	isArchived: boolean;
 	status: DeveloperRoadmapItemType["status"];
 	sortOrder: number;
 	createdAt: Date;
@@ -15,6 +16,7 @@ export const toDeveloperRoadmapResponse = (
 	return {
 		id: item.id,
 		title: item.title,
+		isArchived: item.isArchived,
 		status: item.status,
 		sortOrder: item.sortOrder,
 		createdAt: item.createdAt.toISOString(),

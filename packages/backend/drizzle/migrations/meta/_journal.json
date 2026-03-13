@@ -169,6 +169,13 @@
       "when": 1773417252431,
       "tag": "0023_tense_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1773420946891,
+      "tag": "0024_glossy_spencer_smythe",
+      "breakpoints": true
     }
   ]
 }

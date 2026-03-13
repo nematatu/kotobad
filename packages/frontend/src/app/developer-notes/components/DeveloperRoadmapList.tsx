@@ -4,10 +4,12 @@ import type {
 	DeveloperRoadmapItemType,
 	DeveloperRoadmapListType,
 	DeveloperRoadmapStatusType,
+	UpdateDeveloperRoadmapItemType,
 } from "@kotobad/shared/src/types/developerRoadmap";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
 	SubtleTab,
 	SubtleTabItem,
@@ -128,6 +130,9 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 	const [items, setItems] = useState(() => sortRoadmapItems(initialItems));
 	const [pendingItemId, setPendingItemId] = useState<number | null>(null);
 	const [expandedItemId, setExpandedItemId] = useState<number | null>(null);
+	const [editingItemId, setEditingItemId] = useState<number | null>(null);
+	const [editingTitle, setEditingTitle] = useState("");
+	const [showArchived, setShowArchived] = useState(false);
 	const [expandedStatusViews, setExpandedStatusViews] = useState<
 		Record<DeveloperRoadmapStatusType, boolean>
 	>({
@@ -155,6 +160,47 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 	useEffect(() => {
 		setItems(sortRoadmapItems(initialItems));
 	}, [initialItems]);
+
+	const activeItems = items.filter((item) => !item.isArchived);
+	const archivedItems = items.filter((item) => item.isArchived);
+
+	const handleRoadmapItemUpdate = async (
+		item: DeveloperRoadmapItemType,
+		values: UpdateDeveloperRoadmapItemType,
+	) => {
+		if (!canEdit || pendingItemId !== null) {
+			return;
+		}
+
+		setPendingItemId(item.id);
+
+		try {
+			const updatedItem = await BffFetcher<DeveloperRoadmapItemType>(
+				`/developer-notes/api/updateRoadmapItem/${item.id}`,
+				{
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(values),
+				},
+			);
+
+			setItems((previousItems) =>
+				sortRoadmapItems(
+					previousItems.map((previousItem) =>
+						previousItem.id === updatedItem.id ? updatedItem : previousItem,
+					),
+				),
+			);
+			setExpandedItemId(null);
+			setEditingItemId(null);
+			setEditingTitle("");
+			router.refresh();
+		} catch (error: unknown) {
+			toast.error(getErrorMessage(error));
+		} finally {
+			setPendingItemId(null);
+		}
+	};
 
 	useEffect(() => {
 		const status = selectedStatus;
@@ -216,32 +262,30 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 			return;
 		}
 
-		setPendingItemId(item.id);
+		await handleRoadmapItemUpdate(item, { status: nextStatus });
+	};
 
-		try {
-			const updatedItem = await BffFetcher<DeveloperRoadmapItemType>(
-				`/developer-notes/api/updateRoadmapStatus/${item.id}`,
-				{
-					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ status: nextStatus }),
-				},
-			);
-
-			setItems((previousItems) =>
-				sortRoadmapItems(
-					previousItems.map((previousItem) =>
-						previousItem.id === updatedItem.id ? updatedItem : previousItem,
-					),
-				),
-			);
-			setExpandedItemId(null);
-			router.refresh();
-		} catch (error: unknown) {
-			toast.error(getErrorMessage(error));
-		} finally {
-			setPendingItemId(null);
+	const handleSaveTitle = async (item: DeveloperRoadmapItemType) => {
+		const nextTitle = editingTitle.trim();
+		if (!nextTitle) {
+			toast.error("タイトルは1文字以上で入力してください");
+			return;
 		}
+
+		if (nextTitle === item.title) {
+			setEditingItemId(null);
+			setEditingTitle("");
+			return;
+		}
+
+		await handleRoadmapItemUpdate(item, { title: nextTitle });
+	};
+
+	const handleArchiveToggle = async (
+		item: DeveloperRoadmapItemType,
+		nextArchived: boolean,
+	) => {
+		await handleRoadmapItemUpdate(item, { isArchived: nextArchived });
 	};
 
 	const selectedStatusIndex =
@@ -251,6 +295,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 		const itemStatusMeta = ROADMAP_STATUS_META[item.status];
 		const isPending = pendingItemId === item.id;
 		const isExpanded = expandedItemId === item.id;
+		const isEditing = editingItemId === item.id;
 
 		return (
 			<div
@@ -305,41 +350,120 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 						</span>
 					)}
 
-					<h4 className="text-[13px] leading-[1.5] font-medium tracking-tight text-inherit sm:text-[14px]">
-						{item.title}
-					</h4>
+					{canEdit && isEditing ? (
+						<div className="mt-1">
+							<input
+								value={editingTitle}
+								onChange={(event) => setEditingTitle(event.target.value)}
+								onKeyDown={(event) => {
+									if (event.key === "Enter") {
+										event.preventDefault();
+										handleSaveTitle(item);
+									}
+									if (event.key === "Escape") {
+										event.preventDefault();
+										setEditingItemId(null);
+										setEditingTitle("");
+									}
+								}}
+								disabled={isPending}
+								className="w-full rounded-[10px] border border-slate-300 bg-white px-2.5 py-1.5 text-[13px] font-medium leading-[1.5] tracking-tight text-slate-800 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 sm:text-[14px]"
+							/>
+						</div>
+					) : (
+						<h4 className="text-[13px] leading-[1.5] font-medium tracking-tight text-inherit sm:text-[14px]">
+							{item.title}
+						</h4>
+					)}
 
 					{canEdit && isExpanded ? (
-						<div className="mt-4 flex flex-wrap gap-2">
-							{ROADMAP_STATUS_BUTTON_ORDER.map((nextStatus) => {
-								const nextStatusMeta = ROADMAP_STATUS_META[nextStatus];
-								const isSelected = item.status === nextStatus;
+						<div className="mt-4 space-y-3">
+							{!item.isArchived ? (
+								<div className="flex flex-wrap gap-2">
+									{ROADMAP_STATUS_BUTTON_ORDER.map((nextStatus) => {
+										const nextStatusMeta = ROADMAP_STATUS_META[nextStatus];
+										const isSelected = item.status === nextStatus;
 
-								return (
-									<button
-										key={nextStatus}
-										type="button"
-										onClick={() => handleStatusChange(item, nextStatus)}
-										disabled={isPending || isSelected}
-										className="cursor-pointer rounded-full transition-opacity disabled:cursor-default"
-									>
-										<span
-											className={cn(
-												"inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black tracking-[0.1em] sm:px-3 sm:py-1.5 sm:text-[11px]",
-												ROADMAP_BADGE_SURFACE_CLASS,
-												isSelected
-													? nextStatusMeta.badgeClass
-													: nextStatusMeta.idleClass,
-												isSelected
-													? "shadow-[0_6px_16px_rgba(148,163,184,0.16)] dark:shadow-[0_6px_16px_rgba(2,6,23,0.38)]"
-													: "hover:opacity-90",
-											)}
+										return (
+											<button
+												key={nextStatus}
+												type="button"
+												onClick={() => handleStatusChange(item, nextStatus)}
+												disabled={isPending || isSelected}
+												className="cursor-pointer rounded-full transition-opacity disabled:cursor-default"
+											>
+												<span
+													className={cn(
+														"inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black tracking-[0.1em] sm:px-3 sm:py-1.5 sm:text-[11px]",
+														ROADMAP_BADGE_SURFACE_CLASS,
+														isSelected
+															? nextStatusMeta.badgeClass
+															: nextStatusMeta.idleClass,
+														isSelected
+															? "shadow-[0_6px_16px_rgba(148,163,184,0.16)] dark:shadow-[0_6px_16px_rgba(2,6,23,0.38)]"
+															: "hover:opacity-90",
+													)}
+												>
+													{nextStatusMeta.label}
+												</span>
+											</button>
+										);
+									})}
+								</div>
+							) : null}
+
+							<div className="flex flex-wrap gap-2">
+								{isEditing ? (
+									<>
+										<button
+											type="button"
+											onClick={() => {
+												setEditingItemId(null);
+												setEditingTitle("");
+											}}
+											disabled={isPending}
+											className="cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-bold text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-default disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
 										>
-											{nextStatusMeta.label}
-										</span>
+											キャンセル
+										</button>
+										<Button
+											type="button"
+											onClick={() => handleSaveTitle(item)}
+											disabled={isPending}
+											variant="logo1"
+											hover="brightness"
+											rounded="full"
+											enableClickAnimation
+											className="h-auto px-3 py-1.5 text-[12px] font-bold"
+										>
+											保存
+										</Button>
+									</>
+								) : (
+									<button
+										type="button"
+										onClick={() => {
+											setEditingItemId(item.id);
+											setEditingTitle(item.title);
+										}}
+										disabled={isPending}
+										className="cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-bold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-default disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+									>
+										編集
 									</button>
-								);
-							})}
+								)}
+
+								{!isEditing ? (
+									<button
+										type="button"
+										onClick={() => handleArchiveToggle(item, !item.isArchived)}
+										disabled={isPending}
+										className="cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-bold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-default disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+									>
+										{item.isArchived ? "復元" : "アーカイブ"}
+									</button>
+								) : null}
+							</div>
 						</div>
 					) : null}
 				</article>
@@ -375,7 +499,9 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 			</SubtleTab>
 
 			{ROADMAP_STATUS_BUTTON_ORDER.map((status, index) => {
-				const statusItems = items.filter((item) => item.status === status);
+				const statusItems = activeItems.filter(
+					(item) => item.status === status,
+				);
 				const isStatusExpanded = expandedStatusViews[status];
 				const hasOverflow = hasOverflowByStatus[status];
 
@@ -444,6 +570,38 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 					</SubtleTabPanel>
 				);
 			})}
+
+			{canEdit ? (
+				<section className="space-y-3 border-t border-slate-200/80 pt-6 dark:border-slate-700/80">
+					<div className="flex items-center justify-between gap-3">
+						<p className="text-[13px] font-bold tracking-[0.08em] text-slate-500 dark:text-slate-300">
+							アーカイブ ({archivedItems.length})
+						</p>
+						<button
+							type="button"
+							onClick={() => {
+								setShowArchived((value) => !value);
+								setExpandedItemId(null);
+								setEditingItemId(null);
+								setEditingTitle("");
+							}}
+							className="inline-flex cursor-pointer rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-bold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+						>
+							{showArchived ? "非表示" : "表示"}
+						</button>
+					</div>
+
+					{showArchived ? (
+						archivedItems.length > 0 ? (
+							renderRoadmapGrid(archivedItems)
+						) : (
+							<p className="pt-1 text-sm text-slate-500 dark:text-slate-400">
+								アーカイブ項目はありません。
+							</p>
+						)
+					) : null}
+				</section>
+			) : null}
 		</div>
 	);
 }

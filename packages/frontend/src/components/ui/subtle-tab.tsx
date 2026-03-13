@@ -276,6 +276,7 @@ const SubtleTabItem = forwardRef<HTMLButtonElement, SubtleTabItemProps>(
 
 		return (
 			<button
+				type="button"
 				ref={(node) => {
 					(
 						internalRef as React.MutableRefObject<HTMLButtonElement | null>

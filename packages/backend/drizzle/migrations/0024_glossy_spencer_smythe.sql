@@ -1,0 +1,2 @@
+ALTER TABLE `developer_roadmap_items` ADD `is_archived` integer DEFAULT false NOT NULL;--> statement-breakpoint
+CREATE INDEX `developer_roadmap_items_archived_idx` ON `developer_roadmap_items` (`is_archived`);

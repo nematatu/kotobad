@@ -15,6 +15,11 @@ export const OpenAPIUpdateDeveloperRoadmapStatusSchema =
 		"UpdateDeveloperRoadmapStatusSchema",
 	);
 
+export const OpenAPIUpdateDeveloperRoadmapItemSchema =
+	BaseDeveloperRoadmapSchema.UpdateDeveloperRoadmapItemSchema.openapi(
+		"UpdateDeveloperRoadmapItemSchema",
+	);
+
 export const OpenAPIDeveloperRoadmapListSchema =
 	BaseDeveloperRoadmapSchema.DeveloperRoadmapListSchema.openapi(
 		"DeveloperRoadmapListSchema",
