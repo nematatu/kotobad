@@ -2,7 +2,6 @@ import { z } from "zod";
 
 const BWF_MATCH_CENTER_BASE_URL =
 	"https://extranet-lv.bwfbadminton.com/api/match-center";
-("https://extranet-lv.bwfbadminton.com/api/match-center/vue-current-live");
 const DEFAULT_TOURNAMENT_ID = "5623";
 
 const PlayerSchema = z.object({
@@ -68,14 +67,19 @@ const BwfLiveMatchesResponseSchema = z.object({
 	results: z.array(LiveMatchItemSchema),
 });
 
+const NullableStringFieldSchema = z
+	.union([z.string(), z.null(), z.literal(false)])
+	.optional()
+	.transform((value) => (typeof value === "string" ? value : null));
+
 const CurrentLiveTournamentSchema = z.object({
 	id: z.number(),
 	code: z.string(),
 	name: z.string(),
 	date: z.string().nullable().optional(),
 	venue_name: z.string().nullable().optional(),
-	tmtLink: z.string().nullable().optional(),
-	tmtLogo: z.string().nullable().optional(),
+	tmtLink: NullableStringFieldSchema,
+	tmtLogo: NullableStringFieldSchema,
 	category_model: z
 		.object({
 			name: z.string(),
