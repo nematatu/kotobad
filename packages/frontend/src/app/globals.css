@@ -528,7 +528,6 @@
   opacity: 0.6;
 }
 
-
 @keyframes link-indicator-bar {
   0% { width: 0%; opacity: 0.4; }
   55% { width: 90%; opacity: 0.85; }
