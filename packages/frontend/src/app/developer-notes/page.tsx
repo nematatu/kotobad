@@ -26,11 +26,11 @@ export default async function DeveloperNotesPage() {
 				<div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-18 sm:pt-26">
 					<div className="mx-auto max-w-3xl space-y-5 text-center">
 						<h1 className="text-2xl font-black tracking-[0.12em] text-slate-950 dark:text-slate-50 sm:text-4xl">
-							開発者のボヤキ
+							開発日記📚
 						</h1>
 
 						<p className="text-[15px] leading-8 text-slate-500 dark:text-slate-300">
-							開発中に考えたこと、次やることなど
+							開発ロードマップとボヤキ
 						</p>
 					</div>
 				</div>
