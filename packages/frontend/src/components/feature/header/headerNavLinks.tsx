@@ -12,7 +12,7 @@ export const headerNavLinks: ActionLinkItem[] = [
 		href: "/bwf-live-demo",
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,
 	},
-	{ label: "コトバドとは", href: "/#about" },
+	{ label: "コトバドとは", href: "/about" },
 	{
 		label: "更新情報",
 		href: "/updates",

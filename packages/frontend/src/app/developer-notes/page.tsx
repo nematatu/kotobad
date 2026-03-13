@@ -22,7 +22,7 @@ export default async function DeveloperNotesPage() {
 				<LogoStickerIcon className="h-26 sm:h-47" />
 			</div>
 
-			<section className="relative overflow-hidden border-b border-slate-200/80">
+			<section className="relative bg-gray-200/60 overflow-hidden border-b border-slate-200/80">
 				<div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-18 sm:pt-26">
 					<div className="mx-auto max-w-3xl space-y-5 text-center">
 						<h1 className="text-2xl font-black tracking-[0.12em] text-slate-950 dark:text-slate-50 sm:text-4xl">
