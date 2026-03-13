@@ -41,5 +41,8 @@
           "tag": "v1-thread-room", 
           "new_sqlite_classes": ["ThreadRoom"]
       }
-  ]
+  ],
+	"triggers": {
+		"crons": ["0 */12 * * *"]
+	}
 }

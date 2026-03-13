@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const BWF_MATCH_CENTER_BASE_URL =
 	"https://extranet-lv.bwfbadminton.com/api/match-center";
+("https://extranet-lv.bwfbadminton.com/api/match-center/vue-current-live");
 const DEFAULT_TOURNAMENT_ID = "5623";
 
 const PlayerSchema = z.object({

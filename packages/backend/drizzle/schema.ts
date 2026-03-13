@@ -218,6 +218,29 @@ export const threadLikes = sqliteTable("thread_likes", {
     })
 )
 
+export const threadTrends = sqliteTable(
+	"thread_trends",
+	{
+		threadId: integer("thread_id")
+			.primaryKey()
+			.references(() => threads.id, { onDelete: "cascade" }),
+		rank: integer("rank").notNull(),
+		scoreMilli: integer("score_milli").notNull(),
+		calculatedAt: timestamp("calculated_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+	},
+	(t) => ({
+		threadTrendsCalculatedRankIdx: index("thread_trends_calculated_rank_idx").on(
+			t.calculatedAt,
+			t.rank,
+		),
+		threadTrendsCalculatedScoreIdx: index(
+			"thread_trends_calculated_score_idx",
+		).on(t.calculatedAt, t.scoreMilli),
+	}),
+);
+
 export const threadTags = sqliteTable("thread_tag", {
 	threadId: integer("thread_id")
 			.notNull()
@@ -381,6 +404,10 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 	posts: many(posts),
 	threadTags: many(threadTags),
   likes: many(threadLikes),
+	trend: one(threadTrends, {
+		fields: [threads.id],
+		references: [threadTrends.threadId],
+	}),
 }));
 
 export const usersRelations = relations(user, ({ many }) => ({
@@ -446,6 +473,13 @@ export const threadLikesRelations = relations(threadLikes, ({ one }) => ({
 	user: one(user, {
 		fields: [threadLikes.userId],
 		references: [user.id],
+	}),
+}));
+
+export const threadTrendsRelations = relations(threadTrends, ({ one }) => ({
+	thread: one(threads, {
+		fields: [threadTrends.threadId],
+		references: [threads.id],
 	}),
 }));
 

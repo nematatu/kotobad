@@ -2,9 +2,11 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { prettyJSON } from "hono/pretty-json";
 import { ZodError } from "zod";
+import { createDb } from "./database";
 import { db } from "./middleware/db";
 import { ThreadRoom } from "./realtime/thread-room";
 import mainRouter from "./routes";
+import { refreshThreadTrends } from "./routes/bbs/threads/methods/trending";
 import type { AppEnvironment } from "./types";
 
 const app = new Hono<AppEnvironment>()
@@ -52,6 +54,27 @@ app.onError((err, c) => {
 	);
 });
 
+const worker = {
+	fetch: app.fetch,
+	async scheduled(
+		_controller: ScheduledController,
+		env: AppEnvironment["Bindings"],
+		ctx: ExecutionContext,
+	) {
+		ctx.waitUntil(
+			(async () => {
+				try {
+					const db = createDb(env);
+					const updatedCount = await refreshThreadTrends({ db });
+					console.info(`[cron] refreshThreadTrends updated=${updatedCount}`);
+				} catch (error) {
+					console.error("[cron] refreshThreadTrends failed", error);
+				}
+			})(),
+		);
+	},
+} satisfies ExportedHandler<AppEnvironment["Bindings"]>;
+
 export { ThreadRoom };
 export type AppType = typeof app;
-export default app;
+export default worker;

@@ -12,6 +12,12 @@ import {
 import type { AppEnvironment } from "../../../../types";
 import { getThreadLikeSummaryMap } from "./likes-summary";
 import { toThreadResponse } from "./transform";
+import {
+	getLatestThreadTrends,
+	refreshThreadTrends,
+	TREND_DEFAULT_LIMIT,
+	TREND_MAX_LIMIT,
+} from "./trending";
 import { resolveViewerUserId } from "./viewer-session";
 
 type ThreadWithOptionalAuthor = {
@@ -78,6 +84,12 @@ const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
 };
 
 const SortSchema = z.enum(["new", "old"]).default("new");
+const TrendLimitSchema = z.coerce
+	.number()
+	.int()
+	.min(1)
+	.max(TREND_MAX_LIMIT)
+	.default(TREND_DEFAULT_LIMIT);
 
 export const getAllThreadRoute = createRoute({
 	method: "get",
@@ -146,6 +158,36 @@ export const getThreadByIdRoute = createRoute({
 			content: {
 				"application/json": {
 					schema: SimpleErrorResponse,
+				},
+			},
+		},
+		500: {
+			description: "サーバーエラー",
+			content: {
+				"application/json": {
+					schema: ErrorResponse,
+				},
+			},
+		},
+	},
+});
+
+export const getTrendingThreadRoute = createRoute({
+	method: "get",
+	path: "/trending",
+	description:
+		"トレンドスレッドを取得（投稿数・いいね数・最新更新時刻の合成スコア）",
+	request: {
+		query: z.object({
+			limit: TrendLimitSchema,
+		}),
+	},
+	responses: {
+		200: {
+			description: "トレンドスレッドのリスト",
+			content: {
+				"application/json": {
+					schema: OpenAPIThreadListSchema,
 				},
 			},
 		},
@@ -332,6 +374,93 @@ export const getThreadByIdRouter: RouteHandler<
 		console.error(error);
 		return c.json(
 			{ error: "Failed to fetch thread", message: getErrorMessage(error) },
+			500,
+		);
+	}
+};
+
+export const getTrendingThreadRouter: RouteHandler<
+	typeof getTrendingThreadRoute,
+	AppEnvironment
+> = async (c) => {
+	try {
+		const db = c.get("db");
+		const viewerUserId = await resolveViewerUserId(c);
+		const { limit } = c.req.valid("query");
+
+		c.header("Cache-Control", "no-store");
+
+		let trendRows = await getLatestThreadTrends({
+			db,
+			limit,
+		});
+
+		if (trendRows.length === 0) {
+			await refreshThreadTrends({ db });
+			trendRows = await getLatestThreadTrends({
+				db,
+				limit,
+			});
+		}
+
+		const rankedThreadIds = trendRows.map((row) => row.threadId);
+
+		if (rankedThreadIds.length === 0) {
+			return c.json({ threads: [], totalCount: 0 }, 200);
+		}
+
+		const sourceThreads = await db.query.threads.findMany({
+			where: inArray(threads.id, rankedThreadIds),
+			with: {
+				author: {
+					columns: { name: true, image: true, bio: true },
+				},
+				threadTags: {
+					with: {
+						tags: true,
+					},
+				},
+			},
+		});
+
+		const resolvedThreads = await fillLegacyAuthorNames(db, sourceThreads);
+		const likeMap = await getThreadLikeSummaryMap({
+			db,
+			threadIds: rankedThreadIds,
+			viewerUserId,
+		});
+		const threadMap = new Map(
+			resolvedThreads.map((thread) => {
+				const like = likeMap.get(thread.id);
+				return [
+					thread.id,
+					toThreadResponse({
+						...thread,
+						likeCount: like?.likeCount ?? 0,
+						likedByMe: like?.likedByMe ?? false,
+					}),
+				];
+			}),
+		);
+		const rankedThreads = rankedThreadIds.flatMap((threadId) => {
+			const thread = threadMap.get(threadId);
+			return thread ? [thread] : [];
+		});
+
+		return c.json(
+			{
+				threads: rankedThreads,
+				totalCount: rankedThreads.length,
+			},
+			200,
+		);
+	} catch (error: unknown) {
+		console.error(error);
+		return c.json(
+			{
+				error: "Failed to fetch trending threads",
+				message: getErrorMessage(error),
+			},
 			500,
 		);
 	}

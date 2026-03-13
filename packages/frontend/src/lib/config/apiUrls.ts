@@ -3,6 +3,7 @@ import { getApiBaseUrl } from "../api/url/BaseUrl";
 export const API_PATH = {
 	ME: "better-auth/get-session",
 	GET_ALL_THREADS: "bbs/threads",
+	GET_TRENDING_THREADS: "bbs/threads/trending",
 	GET_ALL_DEVELOPER_NOTES: "bbs/developer-notes",
 	GET_ALL_DEVELOPER_ROADMAP: "bbs/developer-roadmap",
 	SEARCH_THREADS: "bbs/threads/search",
