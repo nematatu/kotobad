@@ -14,6 +14,7 @@ import {
 import { LayoutGroup, motion } from "motion/react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useUser } from "@/components/feature/provider/UserProvider";
 
 type BottomTab = {
@@ -35,6 +36,9 @@ const isProfilePath = (pathname: string) =>
 export function MobileBottomTabs() {
 	const pathname = usePathname();
 	const { user } = useUser();
+	const [optimisticActiveTabId, setOptimisticActiveTabId] = useState<
+		string | null
+	>(null);
 	const profileHref = user?.id
 		? `/users/${encodeURIComponent(user.id)}`
 		: "/auth/sign-in";
@@ -82,7 +86,14 @@ export function MobileBottomTabs() {
 		},
 	];
 
-	const activeTabId = tabs.find((tab) => tab.isActive)?.id;
+	const routeActiveTabId = tabs.find((tab) => tab.isActive)?.id ?? null;
+	const activeTabId = optimisticActiveTabId ?? routeActiveTabId;
+
+	useEffect(() => {
+		if (pathname) {
+			setOptimisticActiveTabId(null);
+		}
+	}, [pathname]);
 
 	return (
 		<div className="w-full rounded-[1.4rem] bg-white/92 p-1.5 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.45)] backdrop-blur">
@@ -97,6 +108,9 @@ export function MobileBottomTabs() {
 								href={tab.href}
 								data-checked={isActive ? "true" : "false"}
 								aria-label={tab.label}
+								onClick={() => {
+									setOptimisticActiveTabId(tab.id);
+								}}
 								className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-[1rem] px-2 py-2 text-[9px] font-semibold leading-none text-slate-500 transition-[color,transform] duration-150 ease-out active:scale-[0.94] [@media(hover:hover)]:hover:text-slate-900 data-[checked=true]:text-slate-950"
 							>
 								{isActive ? (
