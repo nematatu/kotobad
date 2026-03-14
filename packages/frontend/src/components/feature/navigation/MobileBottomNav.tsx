@@ -15,33 +15,35 @@ const MobileBottomNav = ({ tags }: Props) => {
 	const pathname = usePathname();
 	const isThreadDetailPage = pathname.startsWith("/threads/");
 	const shouldShowCreateThreadButton = !isThreadDetailPage;
+	const centerCreateAction = shouldShowCreateThreadButton ? (
+		<CreateThreadDialog
+			tags={tags}
+			className="h-full w-full"
+			trigger={
+				<button
+					type="button"
+					aria-label="スレッドを投稿する"
+					className="route-transition-floating-action group inline-flex h-full min-h-[53px] w-full touch-manipulation select-none flex-col items-center justify-center gap-1.5 rounded-[1rem] bg-blue-500/92 px-2 text-[9px] font-semibold leading-none text-white shadow-[0_12px_26px_-20px_rgba(37,99,235,1)] transition-[transform,filter,box-shadow] duration-120 ease-out active:translate-y-[1px] active:scale-[0.92] active:brightness-95 active:shadow-[0_6px_14px_-12px_rgba(37,99,235,1)] [@media(hover:hover)]:hover:brightness-110"
+				>
+					<Plus
+						size={28}
+						className="transition-transform duration-100 group-active:scale-90"
+					/>
+				</button>
+			}
+		/>
+	) : undefined;
 
 	return (
-		<>
-			<motion.nav
-				layoutRoot
-				aria-label="モバイルナビゲーション"
-				className="view-transition-static-bottom-nav fixed inset-x-0 bottom-6 z-50 [@media(min-width:496px)]:hidden"
-			>
-				<div className="mx-auto w-full px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
-					<MobileBottomTabs />
-				</div>
-			</motion.nav>
-			{shouldShowCreateThreadButton ? (
-				<CreateThreadDialog
-					tags={tags}
-					trigger={
-						<button
-							type="button"
-							aria-label="スレッドを投稿する"
-							className="route-transition-floating-action fixed bottom-30 right-4 z-[70] inline-flex h-14 w-14 appearance-none items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white shadow-lg outline-none [-webkit-tap-highlight-color:transparent] focus:border-slate-200 focus:outline-none focus:ring-0 focus-visible:border-slate-200 focus-visible:outline-none focus-visible:ring-0 dark:border-slate-700 dark:bg-blue-500/95 dark:shadow-[0_18px_40px_-28px_rgba(2,6,23,0.95)] dark:focus:border-slate-700 dark:focus-visible:border-slate-700 [@media(min-width:496px)]:hidden"
-						>
-							<Plus size={24} />
-						</button>
-					}
-				/>
-			) : null}
-		</>
+		<motion.nav
+			layoutRoot
+			aria-label="モバイルナビゲーション"
+			className="view-transition-static-bottom-nav fixed inset-x-0 bottom-6 z-50 [@media(min-width:496px)]:hidden"
+		>
+			<div className="mx-auto w-full px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]">
+				<MobileBottomTabs centerAction={centerCreateAction} />
+			</div>
+		</motion.nav>
 	);
 };
 

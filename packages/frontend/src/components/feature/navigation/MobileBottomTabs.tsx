@@ -14,6 +14,7 @@ import {
 import { motion } from "motion/react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
+import type * as React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useUser } from "@/components/feature/provider/UserProvider";
 
@@ -49,7 +50,11 @@ const indicatorTransition = {
 	duration: 0.42,
 };
 
-export function MobileBottomTabs() {
+type MobileBottomTabsProps = {
+	centerAction?: React.ReactNode;
+};
+
+export function MobileBottomTabs({ centerAction }: MobileBottomTabsProps) {
 	const pathname = usePathname();
 	const { user } = useUser();
 	const [optimisticActiveTabId, setOptimisticActiveTabId] = useState<
@@ -185,6 +190,51 @@ export function MobileBottomTabs() {
 		};
 	}, [activeTabId]);
 
+	const renderTab = (tab: BottomTab) => {
+		const isActive = activeTabId === tab.id;
+
+		return (
+			<NextLink
+				key={tab.id}
+				href={tab.href}
+				ref={(node) => {
+					tabRefs.current[tab.id] = node;
+				}}
+				data-checked={isActive ? "true" : "false"}
+				aria-label={tab.label}
+				onClick={() => {
+					setOptimisticActiveTabId(tab.id);
+				}}
+				onPointerDown={() => {
+					setPressedTabId(tab.id);
+				}}
+				className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-[1rem] px-2 py-2 text-[9px] font-semibold leading-none text-slate-500 transition-[color,transform] duration-150 ease-out active:scale-[0.94] [@media(hover:hover)]:hover:text-slate-900 data-[checked=true]:text-slate-950 dark:text-slate-400 dark:[@media(hover:hover)]:hover:text-slate-100 dark:data-[checked=true]:text-slate-50"
+			>
+				<span
+					className={`relative z-10 flex h-5 items-center justify-center transition-transform duration-150 ease-out ${
+						isActive ? "scale-[1.16]" : "scale-100"
+					}`}
+				>
+					{isActive ? (
+						<tab.icon.active className="h-6 w-6" stroke={1.9} />
+					) : (
+						<tab.icon.inactive className="h-6 w-6" stroke={1.9} />
+					)}
+				</span>
+				<span
+					className={`relative z-10 inline-flex origin-center transition-transform duration-150 ease-out ${
+						isActive ? "scale-[1.3]" : "scale-100"
+					}`}
+				>
+					{tab.label}
+				</span>
+			</NextLink>
+		);
+	};
+
+	const leadingTabs = tabs.slice(0, 2);
+	const trailingTabs = tabs.slice(2);
+
 	return (
 		<div className="w-full rounded-[1.4rem] bg-white/92 p-1.5 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.45)] backdrop-blur dark:bg-slate-950/92 dark:shadow-[0_18px_40px_-28px_rgba(2,6,23,0.95)]">
 			<div
@@ -205,47 +255,13 @@ export function MobileBottomTabs() {
 						transition={indicatorTransition}
 					/>
 				) : null}
-				{tabs.map((tab) => {
-					const isActive = activeTabId === tab.id;
-
-					return (
-						<NextLink
-							key={tab.id}
-							href={tab.href}
-							ref={(node) => {
-								tabRefs.current[tab.id] = node;
-							}}
-							data-checked={isActive ? "true" : "false"}
-							aria-label={tab.label}
-							onClick={() => {
-								setOptimisticActiveTabId(tab.id);
-							}}
-							onPointerDown={() => {
-								setPressedTabId(tab.id);
-							}}
-							className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-[1rem] px-2 py-2 text-[9px] font-semibold leading-none text-slate-500 transition-[color,transform] duration-150 ease-out active:scale-[0.94] [@media(hover:hover)]:hover:text-slate-900 data-[checked=true]:text-slate-950 dark:text-slate-400 dark:[@media(hover:hover)]:hover:text-slate-100 dark:data-[checked=true]:text-slate-50"
-						>
-							<span
-								className={`relative z-10 flex h-5 items-center justify-center transition-transform duration-150 ease-out ${
-									isActive ? "scale-[1.16]" : "scale-100"
-								}`}
-							>
-								{isActive ? (
-									<tab.icon.active className="h-6 w-6" stroke={1.9} />
-								) : (
-									<tab.icon.inactive className="h-6 w-6" stroke={1.9} />
-								)}
-							</span>
-							<span
-								className={`relative z-10 inline-flex origin-center transition-transform duration-150 ease-out ${
-									isActive ? "scale-[1.3]" : "scale-100"
-								}`}
-							>
-								{tab.label}
-							</span>
-						</NextLink>
-					);
-				})}
+				{leadingTabs.map(renderTab)}
+				{centerAction ? (
+					<div className="relative z-10 flex min-w-0 flex-1 items-stretch px-0.5">
+						{centerAction}
+					</div>
+				) : null}
+				{trailingTabs.map(renderTab)}
 			</div>
 		</div>
 	);
