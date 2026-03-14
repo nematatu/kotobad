@@ -60,7 +60,7 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-2 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
+						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
 					>
 						<div className="min-w-0 flex-1 space-y-3">
 							<div className="flex items-center gap-2 text-gray-500 hover:text-gray-600">
