@@ -2,7 +2,7 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq, sql } from "drizzle-orm";
-import { posts, threads } from "../../../../../drizzle/schema";
+import { postImages, posts, threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPICreatePostSchema,
@@ -11,6 +11,7 @@ import {
 import { publishThreadEvent } from "../../../../realtime/thread-event";
 import type { AppEnvironment } from "../../../../types";
 import { createNotification } from "../../notifications/methods/createNotification";
+import { toPostResponse } from "./transform";
 
 export const createPostRoute = createRoute({
 	method: "post",
@@ -90,6 +91,7 @@ export const createPostRouter: RouteHandler<
 		}
 
 		let { threadId } = validatedData;
+		const imageUrls = validatedData.imageUrls;
 		const replyToPostId = validatedData.replyToPostId ?? null;
 
 		threadId = Number(threadId);
@@ -138,14 +140,12 @@ export const createPostRouter: RouteHandler<
 					replyToPostId === null
 						? {
 								post: validatedData.post,
-								imageUrl: validatedData.imageUrl ?? null,
 								authorId: user.id,
 								threadId: threadId,
 								localId: nextLocalId,
 							}
 						: {
 								post: validatedData.post,
-								imageUrl: validatedData.imageUrl ?? null,
 								replyToPostId,
 								authorId: user.id,
 								threadId: threadId,
@@ -182,10 +182,29 @@ export const createPostRouter: RouteHandler<
 		if (insertedId === null) {
 			throw new Error("Failed to allocate post local id");
 		}
+		const postId = insertedId;
+
+		if (imageUrls.length > 0) {
+			await db.insert(postImages).values(
+				imageUrls.map((imageUrl, index) => ({
+					postId,
+					imageUrl,
+					sortOrder: index,
+				})),
+			);
+		}
 
 		const newPostWithAuthor = await db.query.posts.findFirst({
-			where: eq(posts.id, insertedId),
-			with: { author: true },
+			where: eq(posts.id, postId),
+			with: {
+				author: true,
+				postImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
+					},
+				},
+			},
 		});
 		if (!newPostWithAuthor) {
 			return c.json(
@@ -201,7 +220,7 @@ export const createPostRouter: RouteHandler<
 						senderUserId: user.id,
 						type: "post_reply",
 						threadId,
-						sendedPostId: insertedId,
+						sendedPostId: postId,
 						targetPostId: replyTarget.id,
 					})
 				: createNotification(db, {
@@ -209,7 +228,7 @@ export const createPostRouter: RouteHandler<
 						senderUserId: user.id,
 						type: "thread_reply",
 						threadId,
-						sendedPostId: insertedId,
+						sendedPostId: postId,
 					})
 			).catch(console.error),
 		);
@@ -218,22 +237,18 @@ export const createPostRouter: RouteHandler<
 			publishThreadEvent(c.env, {
 				type: "post.created",
 				threadId,
-				postId: insertedId,
+				postId,
 			}).catch((e) => {
 				console.error("Failed to publish thread event", e);
 			}),
 		);
 
 		return c.json(
-			{
+			toPostResponse({
 				...newPostWithAuthor,
-				author: {
-					name: newPostWithAuthor.author?.name ?? "",
-					image: newPostWithAuthor.author?.image ?? "",
-				},
 				reactions: [],
 				replyCount: 0,
-			},
+			}),
 			201,
 		);
 	} catch (error: unknown) {

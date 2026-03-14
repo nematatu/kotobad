@@ -3,7 +3,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { and, count, inArray, like } from "drizzle-orm";
-import { threads, users } from "../../../../../drizzle/schema";
+import { threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIThreadListSchema,
@@ -19,69 +19,6 @@ import {
 	TREND_MAX_LIMIT,
 } from "./trending";
 import { resolveViewerUserId } from "./viewer-session";
-
-type ThreadWithOptionalAuthor = {
-	id: number;
-	authorId: string;
-	author?: {
-		name?: string | null;
-		image?: string | null;
-		bio?: string | null;
-	} | null;
-};
-
-const fillLegacyAuthorNames = async <T extends ThreadWithOptionalAuthor>(
-	db: AppEnvironment["Variables"]["db"],
-	threads: T[],
-): Promise<T[]> => {
-	const missingThreads = threads.filter((thread) => !thread.author?.name);
-	if (missingThreads.length === 0) {
-		return threads;
-	}
-
-	const missingAuthorIds = missingThreads
-		.map((thread) => Number(thread.authorId))
-		.filter((authorId) => Number.isInteger(authorId));
-
-	if (missingAuthorIds.length === 0) {
-		throw new Error(
-			`Missing author name for threads: ${missingThreads
-				.map((thread) => thread.id)
-				.join(", ")}`,
-		);
-	}
-
-	const uniqueAuthorIds = Array.from(new Set(missingAuthorIds));
-	const legacyUsers = await db.query.users.findMany({
-		where: inArray(users.id, uniqueAuthorIds),
-		columns: { id: true, username: true },
-	});
-
-	const legacyUserMap = new Map(
-		legacyUsers.map((legacyUser) => [
-			String(legacyUser.id),
-			legacyUser.username,
-		]),
-	);
-
-	return threads.map((thread) => {
-		if (thread.author?.name) {
-			return thread;
-		}
-		const legacyName = legacyUserMap.get(String(thread.authorId));
-		if (!legacyName) {
-			throw new Error(`Missing author name for thread ${thread.id}`);
-		}
-		return {
-			...thread,
-			author: {
-				name: legacyName,
-				image: thread.author?.image ?? null,
-				bio: thread.author?.bio ?? null,
-			},
-		};
-	});
-};
 
 const SortSchema = z.enum(["new", "old"]).default("new");
 const TrendLimitSchema = z.coerce
@@ -278,6 +215,12 @@ export const getAllThreadRouter: RouteHandler<
 					author: {
 						columns: { name: true, image: true, bio: true },
 					},
+					threadImages: {
+						columns: {
+							imageUrl: true,
+							sortOrder: true,
+						},
+					},
 					threadTags: {
 						with: {
 							tags: true,
@@ -295,13 +238,12 @@ export const getAllThreadRouter: RouteHandler<
 		]);
 
 		const totalCount = totalCountResult[0]?.value ?? 0;
-		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
 		const likeMap = await getThreadLikeSummaryMap({
 			db,
-			threadIds: resolvedThreads.map((thread) => thread.id),
+			threadIds: threadsResult.map((thread) => thread.id),
 			viewerUserId,
 		});
-		const threadsResponse = resolvedThreads.map((thread) => {
+		const threadsResponse = threadsResult.map((thread) => {
 			const like = likeMap.get(thread.id);
 			return toThreadResponse({
 				...thread,
@@ -342,6 +284,12 @@ export const getThreadByIdRouter: RouteHandler<
 						bio: true,
 					},
 				},
+				threadImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
+					},
+				},
 				threadTags: {
 					with: {
 						tags: true,
@@ -355,16 +303,15 @@ export const getThreadByIdRouter: RouteHandler<
 		}
 
 		c.header("Cache-Control", "no-store");
-		const [resolvedThread] = await fillLegacyAuthorNames(db, [thread]);
 		const likeMap = await getThreadLikeSummaryMap({
 			db,
-			threadIds: [resolvedThread.id],
+			threadIds: [thread.id],
 			viewerUserId,
 		});
-		const like = likeMap.get(resolvedThread.id);
+		const like = likeMap.get(thread.id);
 		return c.json(
 			toThreadResponse({
-				...resolvedThread,
+				...thread,
 				likeCount: like?.likeCount ?? 0,
 				likedByMe: like?.likedByMe ?? false,
 			}),
@@ -415,6 +362,12 @@ export const getTrendingThreadRouter: RouteHandler<
 				author: {
 					columns: { name: true, image: true, bio: true },
 				},
+				threadImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
+					},
+				},
 				threadTags: {
 					with: {
 						tags: true,
@@ -423,14 +376,13 @@ export const getTrendingThreadRouter: RouteHandler<
 			},
 		});
 
-		const resolvedThreads = await fillLegacyAuthorNames(db, sourceThreads);
 		const likeMap = await getThreadLikeSummaryMap({
 			db,
 			threadIds: rankedThreadIds,
 			viewerUserId,
 		});
 		const threadMap = new Map(
-			resolvedThreads.map((thread) => {
+			sourceThreads.map((thread) => {
 				const like = likeMap.get(thread.id);
 				return [
 					thread.id,
@@ -509,6 +461,12 @@ export const searchThreadRouter: RouteHandler<
 							bio: true,
 						},
 					},
+					threadImages: {
+						columns: {
+							imageUrl: true,
+							sortOrder: true,
+						},
+					},
 					threadTags: {
 						with: {
 							tags: true,
@@ -525,13 +483,12 @@ export const searchThreadRouter: RouteHandler<
 			db.select({ value: count() }).from(threads).where(whereClause),
 		]);
 
-		const resolvedThreads = await fillLegacyAuthorNames(db, threadsResult);
 		const likeMap = await getThreadLikeSummaryMap({
 			db,
-			threadIds: resolvedThreads.map((thread) => thread.id),
+			threadIds: threadsResult.map((thread) => thread.id),
 			viewerUserId,
 		});
-		const threadsResponse = resolvedThreads.map((thread) =>
+		const threadsResponse = threadsResult.map((thread) =>
 			toThreadResponse({
 				...thread,
 				likeCount: likeMap.get(thread.id)?.likeCount ?? 0,

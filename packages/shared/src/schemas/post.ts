@@ -5,7 +5,7 @@ export const PostSchema = z.object({
 	id: z.number().int().positive(),
 	localId: z.number().int().positive(),
 	post: z.string().min(1),
-	imageUrl: z.string().url().nullable().optional(),
+	imageUrls: z.array(z.string().url()).max(10).default([]),
 	authorId: z.string(),
 	replyToPostId: z.number().int().nullable().optional(),
 	createdAt: z.string(),
@@ -20,7 +20,7 @@ export const PostSchema = z.object({
 
 export const CreatePostSchema = PostSchema.pick({
 	post: true,
-	imageUrl: true,
+	imageUrls: true,
 	replyToPostId: true,
 }).extend({
 	threadId: z.number().int().positive(),

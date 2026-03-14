@@ -5,7 +5,7 @@ import { TagListSchema } from "./tag";
 export const ThreadSchema = z.object({
 	id: z.number().int().positive(),
 	title: z.string().min(1),
-	imageUrl: z.string().url().nullable().optional(),
+	imageUrls: z.array(z.string().url()).max(2).default([]),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),
 	postCount: z.number().int().nonnegative(),
@@ -33,10 +33,9 @@ export const SetThreadLikesResponseSchema = z.object({
 	likedByMe: z.boolean(),
 });
 
-export const CreateThreadSchema = ThreadSchema.pick({
-	title: true,
-	imageUrl: true,
-}).extend({
+export const CreateThreadSchema = z.object({
+	title: z.string().min(1),
+	imageUrls: z.array(z.string().url()).max(2).default([]),
 	tagIds: z.array(z.number().int().positive()).default([]),
 });
 

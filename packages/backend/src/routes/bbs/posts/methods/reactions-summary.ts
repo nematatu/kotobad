@@ -1,16 +1,10 @@
-import type { PostType } from "@kotobad/shared/src/types/post";
 import type { PostReactionType } from "@kotobad/shared/src/types/reaction";
 import { asc, eq, inArray, sql } from "drizzle-orm";
 import { postReactions, reactions } from "../../../../../drizzle/schema";
 import type { AppEnvironment } from "../../../../types";
 
-type PostQueryItem = Omit<
-	PostType,
-	"reactions" | "createdAt" | "updatedAt" | "replyCount"
-> & {
-	createdAt: Date;
-	updatedAt: Date | null;
-	threadId: number;
+type PostQueryItem = {
+	id: number;
 };
 
 type props = {

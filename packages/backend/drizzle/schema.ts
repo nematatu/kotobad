@@ -51,7 +51,6 @@ export const threads = sqliteTable(
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		title: text("title").notNull(),
-		imageUrl: text("image_url"),
 		createdAt: timestamp("created_at")
 			.default(sql`(strftime('%s', 'now'))`)
 			.notNull(),
@@ -70,13 +69,36 @@ export const threads = sqliteTable(
 	}),
 );
 
+export const threadImages = sqliteTable(
+	"thread_images",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		threadId: integer("thread_id")
+			.notNull()
+			.references(() => threads.id, { onDelete: "cascade" }),
+		imageUrl: text("image_url").notNull(),
+		sortOrder: integer("sort_order").notNull().default(0),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+	},
+	(table) => ({
+		threadImagesThreadSortIdx: index("thread_images_thread_sort_idx").on(
+			table.threadId,
+			table.sortOrder,
+		),
+		threadImagesThreadSortUnique: uniqueIndex(
+			"thread_images_thread_sort_unique",
+		).on(table.threadId, table.sortOrder),
+	}),
+);
+
 export const posts = sqliteTable(
 	"posts",
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
 		localId: integer("local_id").notNull(),
 		post: text("post").notNull(),
-		imageUrl: text("image_url"),
 		replyToPostId: integer("reply_to_post_id").references(
 			(): AnySQLiteColumn => posts.id,
 			{
@@ -102,6 +124,31 @@ export const posts = sqliteTable(
 			table.localId,
 		),
 		replyToPostIdx: index("posts_reply_to_post_idx").on(table.replyToPostId),
+	}),
+);
+
+export const postImages = sqliteTable(
+	"post_images",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		postId: integer("post_id")
+			.notNull()
+			.references(() => posts.id, { onDelete: "cascade" }),
+		imageUrl: text("image_url").notNull(),
+		sortOrder: integer("sort_order").notNull().default(0),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+	},
+	(table) => ({
+		postImagesPostSortIdx: index("post_images_post_sort_idx").on(
+			table.postId,
+			table.sortOrder,
+		),
+		postImagesPostSortUnique: uniqueIndex("post_images_post_sort_unique").on(
+			table.postId,
+			table.sortOrder,
+		),
 	}),
 );
 
@@ -397,6 +444,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 	replies: many(posts, {
 		relationName: "postReplyTree",
 	}),
+	postImages: many(postImages),
 	reactions: many(postReactions),
 }));
 
@@ -406,6 +454,7 @@ export const threadsRelations = relations(threads, ({ one, many }) => ({
 		references: [user.id],
 	}),
 	posts: many(posts),
+	threadImages: many(threadImages),
 	threadTags: many(threadTags),
   likes: many(threadLikes),
 	trend: one(threadTrends, {
@@ -454,6 +503,13 @@ export const postReactionsRelations = relations(postReactions, ({ one }) => ({
 	}),
 }));
 
+export const postImagesRelations = relations(postImages, ({ one }) => ({
+	post: one(posts, {
+		fields: [postImages.postId],
+		references: [posts.id],
+	}),
+}));
+
 export const tagRelations = relations(tags, ({ many }) => ({
 	threadTags: many(threadTags),
 }));
@@ -466,6 +522,13 @@ export const threadTagRelations = relations(threadTags, ({ one }) => ({
 	tags: one(tags, {
 		fields: [threadTags.tagId],
 		references: [tags.id],
+	}),
+}));
+
+export const threadImagesRelations = relations(threadImages, ({ one }) => ({
+	thread: one(threads, {
+		fields: [threadImages.threadId],
+		references: [threads.id],
 	}),
 }));
 

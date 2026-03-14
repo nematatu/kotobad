@@ -183,6 +183,27 @@
       "when": 1773440294791,
       "tag": "0025_smiling_darkstar",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "6",
+      "when": 1773444880726,
+      "tag": "0026_loose_wonder_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "6",
+      "when": 1773445122214,
+      "tag": "0027_long_centennial",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "6",
+      "when": 1773446099806,
+      "tag": "0028_open_blockbuster",
+      "breakpoints": true
     }
   ]
 }

@@ -11,6 +11,7 @@ import {
 } from "../../../../models/posts";
 import type { AppEnvironment } from "../../../../types";
 import { getPostReactions, getPostReactionsByPost } from "./reactions-summary";
+import { toPostResponse } from "./transform";
 
 const resolveViewerUserId = async (c: {
 	env: AppEnvironment["Bindings"];
@@ -177,6 +178,12 @@ export const getPostByThreadIdRouter: RouteHandler<
 						image: true,
 					},
 				},
+				postImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
+					},
+				},
 			},
 			orderBy: (posts, { asc }) => [asc(posts.localId)],
 		});
@@ -207,11 +214,13 @@ export const getPostByThreadIdRouter: RouteHandler<
 		}
 
 		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
-		const response = posts.map((post) => ({
-			...post,
-			reactions: reactionMap.get(post.id) ?? [],
-			replyCount: replyCountMap.get(post.id) ?? 0,
-		}));
+		const response = posts.map((post) =>
+			toPostResponse({
+				...post,
+				reactions: reactionMap.get(post.id) ?? [],
+				replyCount: replyCountMap.get(post.id) ?? 0,
+			}),
+		);
 		return c.json(response, 200);
 	} catch (error: unknown) {
 		console.error(error);
@@ -240,6 +249,12 @@ export const getPostByIdRouter: RouteHandler<
 						image: true,
 					},
 				},
+				postImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
+					},
+				},
 			},
 		});
 
@@ -259,11 +274,11 @@ export const getPostByIdRouter: RouteHandler<
 			.from(postsTable)
 			.where(eq(postsTable.replyToPostId, post.id));
 
-		const response = {
+		const response = toPostResponse({
 			...post,
 			reactions: reactionMap.get(post.id) ?? [],
 			replyCount,
-		};
+		});
 		return c.json(response, 200);
 	} catch (error: unknown) {
 		console.error(error);
@@ -293,6 +308,12 @@ export const searchPostRouter: RouteHandler<
 					columns: {
 						name: true,
 						image: true,
+					},
+				},
+				postImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
 					},
 				},
 			},
@@ -328,11 +349,13 @@ export const searchPostRouter: RouteHandler<
 		}
 
 		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
-		const response = posts.map((post) => ({
-			...post,
-			reactions: reactionMap.get(post.id) ?? [],
-			replyCount: replyCountMap.get(post.id) ?? 0,
-		}));
+		const response = posts.map((post) =>
+			toPostResponse({
+				...post,
+				reactions: reactionMap.get(post.id) ?? [],
+				replyCount: replyCountMap.get(post.id) ?? 0,
+			}),
+		);
 		return c.json(response, 200);
 	} catch (error: unknown) {
 		console.error(error);

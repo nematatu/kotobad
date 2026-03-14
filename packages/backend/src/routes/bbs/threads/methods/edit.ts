@@ -116,6 +116,12 @@ export const editThreadRouter: RouteHandler<
 				author: {
 					columns: { name: true, image: true, bio: true },
 				},
+				threadImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
+					},
+				},
 				threadTags: {
 					with: {
 						tags: true,

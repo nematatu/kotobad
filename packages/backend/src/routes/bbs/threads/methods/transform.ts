@@ -1,12 +1,17 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 
-export type ThreadQueryResult = Omit<
-	ThreadType,
-	"createdAt" | "updatedAt" | "author" | "threadTags"
-> & {
+export type ThreadQueryResult = {
+	id: number;
+	title: string;
 	createdAt: Date;
 	updatedAt: Date | null;
+	postCount: number;
+	authorId: string;
+	isPinned?: boolean;
+	isClosed?: boolean;
+	likeCount: number;
+	likedByMe: boolean;
 	author: {
 		name: string;
 		image?: string | null;
@@ -17,16 +22,28 @@ export type ThreadQueryResult = Omit<
 		tagId: number;
 		tags: TagType;
 	}>;
+	threadImages?: Array<{
+		imageUrl: string;
+		sortOrder: number;
+	}>;
 };
+
 export const toThreadResponse = (thread: ThreadQueryResult): ThreadType => {
-	const threadTags = (thread.threadTags ?? []).map(
-		(threadTag) => threadTag.tags,
-	);
+	const {
+		threadTags: rawThreadTags,
+		threadImages: rawThreadImages,
+		...base
+	} = thread;
+	const threadTags = (rawThreadTags ?? []).map((threadTag) => threadTag.tags);
+	const imageUrls = (rawThreadImages ?? [])
+		.sort((a, b) => a.sortOrder - b.sortOrder)
+		.map((threadImage) => threadImage.imageUrl);
 
 	return {
-		...thread,
-		createdAt: thread.createdAt.toISOString(),
-		updatedAt: thread.updatedAt ? thread.updatedAt.toISOString() : null,
+		...base,
+		imageUrls,
+		createdAt: base.createdAt.toISOString(),
+		updatedAt: base.updatedAt ? base.updatedAt.toISOString() : null,
 		threadTags,
 	};
 };

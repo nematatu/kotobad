@@ -2,7 +2,11 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { eq } from "drizzle-orm";
-import { threads, threadTags } from "../../../../../drizzle/schema";
+import {
+	threadImages,
+	threads,
+	threadTags,
+} from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPICreateThreadSchema,
@@ -81,19 +85,29 @@ export const createThreadRouter: RouteHandler<
 		console.error("Validation error:", details);
 		return c.json({ error: "Validation failed", details }, 400);
 	}
-	const { title, imageUrl, tagIds } = validatedData;
+	const { title, imageUrls, tagIds } = validatedData;
 
 	try {
 		const result = await db
 			.insert(threads)
 			.values({
 				title: title,
-				imageUrl: imageUrl ?? null,
 				authorId: user.id,
 			})
 			.returning({ id: threads.id });
 
 		const newThreadId = result[0].id;
+
+		if (imageUrls.length > 0) {
+			await db.insert(threadImages).values(
+				imageUrls.map((imageUrl, index) => ({
+					threadId: newThreadId,
+					imageUrl,
+					sortOrder: index,
+				})),
+			);
+		}
+
 		const uniqueTagIds = Array.from(new Set(tagIds));
 
 		if (uniqueTagIds.length > 0) {
@@ -114,6 +128,12 @@ export const createThreadRouter: RouteHandler<
 				threadTags: {
 					with: {
 						tags: true,
+					},
+				},
+				threadImages: {
+					columns: {
+						imageUrl: true,
+						sortOrder: true,
 					},
 				},
 			},

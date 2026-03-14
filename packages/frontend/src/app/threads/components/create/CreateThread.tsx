@@ -39,19 +39,20 @@ export const CreateThreadForm = ({
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const {
-		imageFile,
-		imagePreviewUrl,
+		imagePreviewUrls,
+		maxImages,
 		imageInputRef,
 		selectImageAction,
 		openImageDialogAction,
 		clearImageSelectionAction,
-		uploadSelectedImageAction,
-	} = useThreadPostImageInput();
+		removeImageAtAction,
+		uploadSelectedImagesAction,
+	} = useThreadPostImageInput({ maxImages: 2 });
 
 	const form = useForm<CreateThreadType>({
 		defaultValues: {
 			title: "",
-			imageUrl: null,
+			imageUrls: [],
 			tagIds: [],
 		},
 	});
@@ -79,19 +80,19 @@ export const CreateThreadForm = ({
 	const handleSubmit = async (values: CreateThreadType) => {
 		setError(null);
 		try {
-			const imageUrl = await uploadSelectedImageAction("thread");
+			const imageUrls = await uploadSelectedImagesAction("thread");
 			const endpoint = await getBffApiUrl("CREATE_THREAD");
 			await BffFetcher<ThreadType>(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					...values,
-					imageUrl,
+					imageUrls,
 				}),
 			});
 
 			onCreated();
-			form.reset({ title: "", imageUrl: null, tagIds: [] });
+			form.reset({ title: "", imageUrls: [], tagIds: [] });
 			resetTagSelection();
 			clearImageSelectionAction();
 			toast.success("投稿しました!");
@@ -163,12 +164,13 @@ export const CreateThreadForm = ({
 									<div className="space-y-2">
 										<ThreadPostImagePicker
 											imageInputRef={imageInputRef}
-											imagePreviewUrl={imagePreviewUrl}
-											hasImage={Boolean(imageFile)}
+											imagePreviewUrls={imagePreviewUrls}
+											maxImages={maxImages}
 											onSelectImageAction={selectImageAction}
 											onOpenImageDialogAction={openImageDialogAction}
 											onClearImageAction={clearImageSelectionAction}
-											previewImageClassName="max-h-64"
+											onRemoveImageAction={removeImageAtAction}
+											previewImageClassName="h-28"
 										/>
 									</div>
 									<TagList

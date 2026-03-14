@@ -7,6 +7,12 @@ import { OpenAPIUploadImageResponseSchema } from "../../../../models/media";
 import type { AppEnvironment } from "../../../../types";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const UPLOAD_WINDOW_MS = 60 * 1000;
+const MAX_UPLOADS_PER_WINDOW = 20;
+const uploadRateLimitStore = new Map<
+	string,
+	{ startAtMs: number; count: number }
+>();
 
 const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
 	"image/jpeg": "jpg",
@@ -18,6 +24,28 @@ const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
 const toPublicImageUrl = (baseUrl: string, objectKey: string): string => {
 	const normalized = baseUrl.trim().replace(/\/+$/, "");
 	return `${normalized}/${objectKey}`;
+};
+
+const isUploadRateLimited = (userId: string): boolean => {
+	const now = Date.now();
+	const current = uploadRateLimitStore.get(userId);
+	if (!current || now - current.startAtMs >= UPLOAD_WINDOW_MS) {
+		uploadRateLimitStore.set(userId, {
+			startAtMs: now,
+			count: 1,
+		});
+		return false;
+	}
+
+	if (current.count >= MAX_UPLOADS_PER_WINDOW) {
+		return true;
+	}
+
+	uploadRateLimitStore.set(userId, {
+		startAtMs: current.startAtMs,
+		count: current.count + 1,
+	});
+	return false;
 };
 
 export const uploadImageRoute = createRoute({
@@ -61,6 +89,14 @@ export const uploadImageRoute = createRoute({
 				},
 			},
 		},
+		429: {
+			description: "レート制限",
+			content: {
+				"application/json": {
+					schema: SimpleErrorResponse,
+				},
+			},
+		},
 		500: {
 			description: "サーバーエラー",
 			content: {
@@ -77,6 +113,7 @@ export const uploadImageRouter: RouteHandler<
 	AppEnvironment
 > = async (c) => {
 	try {
+		const authUser = c.get("betterAuthUser");
 		const publicBaseUrl = c.env.R2_PUBLIC_BASE_URL;
 
 		if (!publicBaseUrl) {
@@ -86,6 +123,17 @@ export const uploadImageRouter: RouteHandler<
 					message: "R2 public base url is not configured",
 				},
 				500,
+			);
+		}
+
+		if (isUploadRateLimited(authUser.id)) {
+			return c.json(
+				{
+					error: "Too many uploads",
+					message:
+						"短時間での連続アップロードが多いため、少し待ってから再試行してください",
+				},
+				429,
 			);
 		}
 

@@ -16,62 +16,105 @@ const revokeObjectUrl = (value: string | null) => {
 	URL.revokeObjectURL(value);
 };
 
-export const useThreadPostImageInput = () => {
-	const [imageFile, setImageFile] = useState<File | null>(null);
-	const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+type UseThreadPostImageInputOptions = {
+	maxImages: number;
+};
+
+export const useThreadPostImageInput = ({
+	maxImages,
+}: UseThreadPostImageInputOptions) => {
+	const [imageFiles, setImageFiles] = useState<File[]>([]);
+	const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 	const imageInputRef = useRef<HTMLInputElement | null>(null);
 
 	useEffect(() => {
 		return () => {
-			revokeObjectUrl(imagePreviewUrl);
+			for (const previewUrl of imagePreviewUrls) {
+				revokeObjectUrl(previewUrl);
+			}
 		};
-	}, [imagePreviewUrl]);
+	}, [imagePreviewUrls]);
 
 	const clearImageSelectionAction = () => {
-		revokeObjectUrl(imagePreviewUrl);
-		setImagePreviewUrl(null);
-		setImageFile(null);
+		for (const previewUrl of imagePreviewUrls) {
+			revokeObjectUrl(previewUrl);
+		}
+		setImagePreviewUrls([]);
+		setImageFiles([]);
+	};
+
+	const removeImageAtAction = (index: number) => {
+		setImagePreviewUrls((current) => {
+			const target = current[index];
+			revokeObjectUrl(target ?? null);
+			return current.filter((_, i) => i !== index);
+		});
+		setImageFiles((current) => current.filter((_, i) => i !== index));
 	};
 
 	const selectImageAction = (event: ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
+		const files = event.target.files ? Array.from(event.target.files) : [];
 		event.target.value = "";
-		if (!file) {
+		if (files.length === 0) {
 			return;
 		}
 
-		const validation = validateThreadPostImageFile(file);
-		if (!validation.ok) {
-			toast.error(validation.message);
+		const availableSlots = Math.max(0, maxImages - imageFiles.length);
+		if (availableSlots <= 0) {
+			toast.error(`画像は最大${maxImages}枚までです`);
 			return;
 		}
 
-		const previewUrl = URL.createObjectURL(file);
-		clearImageSelectionAction();
-		setImageFile(file);
-		setImagePreviewUrl(previewUrl);
+		const nextFiles: File[] = [];
+		const nextPreviewUrls: string[] = [];
+		for (const file of files.slice(0, availableSlots)) {
+			const validation = validateThreadPostImageFile(file);
+			if (!validation.ok) {
+				toast.error(validation.message);
+				continue;
+			}
+			nextFiles.push(file);
+			nextPreviewUrls.push(URL.createObjectURL(file));
+		}
+
+		if (nextFiles.length === 0) {
+			return;
+		}
+
+		setImageFiles((current) => [...current, ...nextFiles].slice(0, maxImages));
+		setImagePreviewUrls((current) =>
+			[...current, ...nextPreviewUrls].slice(0, maxImages),
+		);
 	};
 
 	const openImageDialogAction = () => {
 		imageInputRef.current?.click();
 	};
 
-	const uploadSelectedImageAction = async (
+	const uploadSelectedImagesAction = async (
 		target: UploadImageTargetType,
-	): Promise<string | null> => {
-		if (!imageFile) {
-			return null;
+	): Promise<string[]> => {
+		if (imageFiles.length === 0) {
+			return [];
 		}
-		return uploadThreadPostImage(imageFile, target);
+
+		const uploadedUrls: string[] = [];
+		for (const imageFile of imageFiles) {
+			const uploadedUrl = await uploadThreadPostImage(imageFile, target);
+			uploadedUrls.push(uploadedUrl);
+		}
+		return uploadedUrls;
 	};
 
 	return {
-		imageFile,
-		imagePreviewUrl,
+		imageFiles,
+		imagePreviewUrls,
+		maxImages,
 		imageInputRef,
 		selectImageAction,
 		openImageDialogAction,
 		clearImageSelectionAction,
-		uploadSelectedImageAction,
+		removeImageAtAction,
+		uploadSelectedImagesAction,
 	};
 };

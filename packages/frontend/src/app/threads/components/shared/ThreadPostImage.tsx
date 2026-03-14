@@ -39,7 +39,7 @@ export const ThreadPostImage = ({
 				src={transformedUrl}
 				alt={alt}
 				loading={loading}
-				className={cn("w-full object-contain", imageClassName)}
+				className={cn("h-full w-full object-cover", imageClassName)}
 			/>
 		</div>
 	);

@@ -43,14 +43,15 @@ export const CreatePostForm = ({
 }: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const {
-		imageFile,
-		imagePreviewUrl,
+		imagePreviewUrls,
+		maxImages,
 		imageInputRef,
 		selectImageAction,
 		openImageDialogAction,
 		clearImageSelectionAction,
-		uploadSelectedImageAction,
-	} = useThreadPostImageInput();
+		removeImageAtAction,
+		uploadSelectedImagesAction,
+	} = useThreadPostImageInput({ maxImages: 1 });
 	const { mutate } = useSWRConfig();
 	const isInline = variant === "inline";
 	const replyTargetPostId = replyTarget?.postId ?? null;
@@ -58,7 +59,7 @@ export const CreatePostForm = ({
 	const form = useForm<CreatePostType>({
 		defaultValues: {
 			post: "",
-			imageUrl: null,
+			imageUrls: [],
 			threadId: threadId,
 			replyToPostId: null,
 		},
@@ -73,18 +74,18 @@ export const CreatePostForm = ({
 
 	const handleSubmit = async (values: CreatePostType) => {
 		try {
-			const imageUrl = await uploadSelectedImageAction("post");
+			const imageUrls = await uploadSelectedImagesAction("post");
 			const endpoint = await getBffApiUrl("CREATE_POST");
 			const requestBody: CreatePostType =
 				values.replyToPostId === null
 					? {
 							post: values.post,
-							imageUrl,
+							imageUrls,
 							threadId: values.threadId,
 						}
 					: {
 							...values,
-							imageUrl,
+							imageUrls,
 						};
 
 			await BffFetcher(endpoint, {
@@ -97,7 +98,7 @@ export const CreatePostForm = ({
 			mutate(["GET_POSTS_BY_THREADID", threadId]);
 			form.reset({
 				post: "",
-				imageUrl: null,
+				imageUrls: [],
 				threadId,
 				replyToPostId: null,
 			});
@@ -164,13 +165,14 @@ export const CreatePostForm = ({
 				/>
 				<ThreadPostImagePicker
 					imageInputRef={imageInputRef}
-					imagePreviewUrl={imagePreviewUrl}
-					hasImage={Boolean(imageFile)}
+					imagePreviewUrls={imagePreviewUrls}
+					maxImages={maxImages}
 					onSelectImageAction={selectImageAction}
 					onOpenImageDialogAction={openImageDialogAction}
 					onClearImageAction={clearImageSelectionAction}
+					onRemoveImageAction={removeImageAtAction}
 					actionsClassName="pl-10"
-					previewImageClassName="max-h-72"
+					previewImageClassName="h-28"
 				/>
 				<div className="flex items-end justify-end gap-2">
 					{isInline ? (

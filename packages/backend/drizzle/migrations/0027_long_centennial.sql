@@ -1,0 +1,1 @@
+ALTER TABLE `threads` DROP COLUMN `image_url`;

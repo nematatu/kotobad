@@ -29,6 +29,7 @@ export const ThreadList = ({
 				const href = `/threads/${thread.id}`;
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
+				const threadPreviewImageUrls = thread.imageUrls.slice(0, 2);
 				return (
 					<div
 						key={thread.id}
@@ -45,13 +46,26 @@ export const ThreadList = ({
 									<h3 className="block font-bold line-clamp-2 sm:text-lg">
 										{highlightText(thread.title, highlightQuery)}
 									</h3>
-									<ThreadPostImage
-										imageUrl={thread.imageUrl}
-										width={720}
-										quality={78}
-										containerClassName="mt-2"
-										imageClassName="max-h-72"
-									/>
+									{threadPreviewImageUrls.length > 0 && (
+										<div
+											className={
+												threadPreviewImageUrls.length > 1
+													? "mt-2 grid max-w-[19rem] grid-cols-2 gap-2"
+													: "mt-2 max-w-[15rem]"
+											}
+										>
+											{threadPreviewImageUrls.map((imageUrl) => (
+												<ThreadPostImage
+													key={imageUrl}
+													imageUrl={imageUrl}
+													width={720}
+													quality={78}
+													containerClassName="h-28"
+													imageClassName="h-full"
+												/>
+											))}
+										</div>
+									)}
 								</div>
 							</Link>
 							<div className="flex flex-col space-y-2">

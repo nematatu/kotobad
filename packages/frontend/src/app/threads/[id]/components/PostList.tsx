@@ -428,14 +428,28 @@ export const PostList = ({
 							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words pl-2">
 								<AutoLinkText text={post.post} />
 							</span>
-							<div className="pl-2">
-								<ThreadPostImage
-									imageUrl={post.imageUrl}
-									width={1280}
-									quality={82}
-									imageClassName="max-h-96"
-								/>
-							</div>
+							{post.imageUrls.length > 0 && (
+								<div className="pl-2">
+									<div
+										className={
+											post.imageUrls.length > 1
+												? "grid max-w-sm grid-cols-2 gap-2"
+												: "max-w-xs"
+										}
+									>
+										{post.imageUrls.slice(0, 2).map((imageUrl) => (
+											<ThreadPostImage
+												key={imageUrl}
+												imageUrl={imageUrl}
+												width={1280}
+												quality={82}
+												containerClassName="h-44"
+												imageClassName="h-full"
+											/>
+										))}
+									</div>
+								</div>
+							)}
 							{post.reactions.length > 0 && (
 								<div className="flex mt-2 flex-wrap items-center gap-2">
 									{post.reactions.map(
