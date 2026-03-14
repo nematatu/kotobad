@@ -47,7 +47,7 @@ export default async function ThreadDetailPage({
 	return (
 		<>
 			<div
-				className="hidden sm:block fixed z-40 sm:left-3"
+				className="fixed left-3 z-40"
 				style={{ top: "calc(var(--header-height, 0px) + 0.5rem)" }}
 			>
 				<BackToThreadListHeaderButton className="hover:bg-white" />
