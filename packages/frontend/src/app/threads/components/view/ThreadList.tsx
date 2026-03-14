@@ -118,7 +118,7 @@ export const ThreadList = ({
 										variant="ghost"
 										rounded="lg"
 										enableClickAnimation
-										className=" sm:hidden ml-auto shrink-0 pointer-events-auto z-10 h-[33px] w-[63px] gap-1 bg-blue-500/90 px-2 text-[13px] font-semibold text-slate-100 dark:bg-blue-500 sm:h-9 sm:w-[78px] sm:gap-1.5 sm:px-2.5 sm:text-[14px]"
+										className=" sm:hidden ml-auto shrink-0 pointer-events-auto z-10 h-[45px] w-[69px] gap-1 bg-blue-500/90 px-2 text-[13px] font-semibold text-slate-100 dark:bg-blue-500 sm:h-9 sm:w-[78px] sm:gap-1.5 sm:px-2.5 sm:text-[14px]"
 									>
 										<Link href={href} aria-label={`みる: ${thread.title}`}>
 											みる
