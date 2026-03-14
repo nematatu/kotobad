@@ -283,7 +283,7 @@ export function CreateDeveloperNoteForm() {
 												}
 											}}
 											placeholder={FORM_MODE_META[mode].placeholder}
-											className="resize-none rounded-[24px] border-slate-200 bg-white/70 px-5 py-4 text-[15px] leading-8 text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-50"
+											className="resize-none rounded-[24px] border-slate-200 bg-white/70 px-5 py-4 text-base leading-8 text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-50 sm:text-[15px]"
 										/>
 									</FormControl>
 									<FormMessage />

@@ -187,7 +187,7 @@ export const CreatePostForm = ({
 											className={cn(
 												"w-full resize-none rounded-xl text-[#111827] placeholder:text-[#6b7280] focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]",
 												isChat
-													? "min-h-[48px] bg-[#ffffff]/95 px-3 py-2 text-sm shadow-none dark:bg-[#101b2c]"
+													? "min-h-[48px] bg-[#ffffff]/95 px-3 py-2 text-base shadow-none dark:bg-[#101b2c] sm:text-sm"
 													: "border-none shadow-none",
 												isInline
 													? "min-h-[72px]"

@@ -143,7 +143,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 								maxLength={MAX_PROFILE_BIO_LENGTH}
 								rows={4}
 								placeholder="自己紹介を入力"
-								className="w-full max-w-2xl rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
+								className="w-full max-w-2xl rounded-md border border-slate-300 bg-white px-3 py-2 text-base text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 sm:text-sm"
 							/>
 							<div className="flex items-center justify-between">
 								<p className="text-xs text-slate-400">
