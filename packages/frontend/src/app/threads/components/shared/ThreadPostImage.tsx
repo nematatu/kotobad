@@ -44,15 +44,16 @@ export const ThreadPostImage = ({
 	enableZoom = false,
 }: ThreadPostImageProps) => {
 	const transformedUrl = toCfImageUrl(imageUrl, { width, quality });
+
+	if (!transformedUrl) {
+		return null;
+	}
+
 	const expandedImageUrl =
 		toCfImageUrl(imageUrl, {
 			width: MODAL_IMAGE_WIDTH,
 			quality: MODAL_IMAGE_QUALITY,
 		}) ?? transformedUrl;
-
-	if (!transformedUrl) {
-		return null;
-	}
 
 	if (!enableZoom) {
 		return (
