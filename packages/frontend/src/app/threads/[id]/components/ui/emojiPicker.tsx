@@ -112,12 +112,12 @@ export function Emoji({
 				type="button"
 				size="icon"
 				variant="outline"
-				className="group h-5 w-5 rounded-full border-0 bg-slate-100 text-slate-600 hover:bg-slate-200"
+				className="group h-5 w-5 rounded-full border-0 bg-[#eff6ff] text-[#1e3a8a] hover:bg-[#dbeafe] dark:bg-[#2a3b52] dark:text-[#dbeafe] dark:hover:bg-[#334a67]"
 				onClick={() => setIsOpen((prev) => !prev)}
 				aria-expanded={isOpen}
 				aria-label="リアクション絵文字を開く"
 				icon={
-					<SmilePlus className="h-5 w-5 text-slate-600 transition-colors group-hover:fill-yellow-300" />
+					<SmilePlus className="h-5 w-5 text-current transition-colors group-hover:fill-yellow-300" />
 				}
 			/>
 			{isOpen ? (

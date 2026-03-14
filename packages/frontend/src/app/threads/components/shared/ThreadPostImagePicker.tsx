@@ -15,6 +15,8 @@ type ThreadPostImagePickerProps = {
 	onRemoveImageAction: (index: number) => void;
 	actionsClassName?: string;
 	previewImageClassName?: string;
+	showIcons?: boolean;
+	forceLightTheme?: boolean;
 };
 
 export const ThreadPostImagePicker = ({
@@ -27,6 +29,8 @@ export const ThreadPostImagePicker = ({
 	onRemoveImageAction,
 	actionsClassName,
 	previewImageClassName,
+	showIcons = true,
+	forceLightTheme = false,
 }: ThreadPostImagePickerProps) => {
 	const hasImage = imagePreviewUrls.length > 0;
 	const canAddMore = imagePreviewUrls.length < maxImages;
@@ -46,11 +50,16 @@ export const ThreadPostImagePicker = ({
 					type="button"
 					variant="outline"
 					rounded="full"
-					className="h-8 px-3 text-xs"
+					className={cn(
+						"h-8 px-3 text-xs",
+						forceLightTheme
+							? "!border-[#d1d5db] !bg-[#ffffff] !text-[#334155] hover:!bg-[#f8fafc]"
+							: undefined,
+					)}
 					onClick={onOpenImageDialogAction}
 					disabled={!canAddMore}
 				>
-					<ImagePlus className="h-4 w-4" />
+					{showIcons ? <ImagePlus className="h-4 w-4" /> : null}
 					画像を追加 ({imagePreviewUrls.length}/{maxImages})
 				</Button>
 				{hasImage && (
@@ -58,10 +67,15 @@ export const ThreadPostImagePicker = ({
 						type="button"
 						variant="ghost"
 						rounded="full"
-						className="h-8 px-2 text-xs text-slate-600"
+						className={cn(
+							"h-8 px-2 text-xs text-slate-600",
+							forceLightTheme
+								? "!text-[#475569] hover:!bg-[#f1f5f9]"
+								: undefined,
+						)}
 						onClick={onClearImageAction}
 					>
-						<X className="h-4 w-4" />
+						{showIcons ? <X className="h-4 w-4" /> : null}
 						全削除
 					</Button>
 				)}
@@ -76,7 +90,10 @@ export const ThreadPostImagePicker = ({
 					{imagePreviewUrls.map((imagePreviewUrl, index) => (
 						<div
 							key={imagePreviewUrl}
-							className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+							className={cn(
+								"relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50",
+								forceLightTheme ? "!border-[#d1d5db] !bg-[#f8fafc]" : undefined,
+							)}
 						>
 							{/* biome-ignore lint/performance/noImgElement: blob preview image is rendered directly from File object URL. */}
 							<img
@@ -90,10 +107,13 @@ export const ThreadPostImagePicker = ({
 							<button
 								type="button"
 								onClick={() => onRemoveImageAction(index)}
-								className="absolute right-1 top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/55 text-white"
+								className={cn(
+									"absolute right-1 top-1 inline-flex items-center justify-center rounded-full bg-black/55 text-white",
+									showIcons ? "h-6 w-6" : "h-6 px-2 text-[10px] font-medium",
+								)}
 								aria-label={`画像${index + 1}を削除`}
 							>
-								<X className="h-3.5 w-3.5" />
+								{showIcons ? <X className="h-3.5 w-3.5" /> : "削除"}
 							</button>
 						</div>
 					))}

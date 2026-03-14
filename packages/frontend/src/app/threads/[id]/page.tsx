@@ -5,7 +5,6 @@ import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { TagList } from "../components/view/tag/tagList";
 import { getThreadById } from "../lib/getThreadById";
 import { BackToThreadListHeaderButton } from "./components/BackToThreadListHeaderButton";
-import { CreatePostForm } from "./components/CreatePostForm";
 import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
@@ -61,13 +60,8 @@ export default async function ThreadDetailPage({
 						<div className="min-w-0 space-y-4">
 							<ThreadPostsStream
 								threadId={threadId}
-								threadTitle={threadHeaderData.title}
-								initialPostCount={threadHeaderData.postCount}
 								highlightPostId={highlightPostId}
 							/>
-						</div>
-						<div id="thread-post-form" className="w-full">
-							<CreatePostForm threadId={threadId} />
 						</div>
 					</div>
 					<aside className="space-y-4 lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">

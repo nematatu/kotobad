@@ -7,6 +7,7 @@ export const PostSchema = z.object({
 	post: z.string().min(1),
 	imageUrls: z.array(z.string().url()).max(10).default([]),
 	authorId: z.string(),
+	isMine: z.boolean().default(false),
 	replyToPostId: z.number().int().nullable().optional(),
 	createdAt: z.string(),
 	updatedAt: z.string().nullable(),

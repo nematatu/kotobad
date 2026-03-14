@@ -8,25 +8,17 @@ import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { useThreadPostRealtime } from "../hook/useThreadPostRealtime";
 import { BackToThreadList } from "./BackToThreadList";
 import { ThreadPostsFallback } from "./fallback/ThreadPostsFallback";
-import NoPost from "./NoPost";
 import { PostList } from "./PostList";
 
 type Props = {
 	threadId: number;
-	threadTitle: string;
-	initialPostCount: number;
 	highlightPostId: number | null;
 };
 
-export const ThreadPostsStream = ({
-	threadId,
-	threadTitle,
-	initialPostCount,
-	highlightPostId,
-}: Props) => {
+export const ThreadPostsStream = ({ threadId, highlightPostId }: Props) => {
 	const swrKey = ["GET_POSTS_BY_THREADID", threadId] as const;
 
-	const { data, error, isLoading, mutate } = useSWR<PostListType>(
+	const { data, error, mutate } = useSWR<PostListType>(
 		swrKey,
 		async ([_, id]) => {
 			const baseUrl = await getBffApiUrl("GET_POSTS_BY_THREADID");
@@ -59,6 +51,8 @@ export const ThreadPostsStream = ({
 		if (postId <= latestPostIdRef.current) return;
 		queueRefresh();
 	});
+	const shouldShowFallback = typeof data === "undefined" && !error;
+
 	if (error)
 		return (
 			<div id="thread-posts-top" className="flex w-full flex-col gap-3">
@@ -71,7 +65,7 @@ export const ThreadPostsStream = ({
 				/>
 			</div>
 		);
-	if (isLoading && initialPostCount > 0)
+	if (shouldShowFallback)
 		return (
 			<div id="thread-posts-top" className="flex w-full flex-col gap-3">
 				<ThreadPostsFallback />
@@ -84,21 +78,15 @@ export const ThreadPostsStream = ({
 			</div>
 		);
 	const posts: PostListType = data ?? [];
-	const hasPosts = posts.length > 0;
 
 	return (
 		<div id="thread-posts-top" className="flex w-full flex-col gap-3">
 			<div className="w-full">
-				{hasPosts ? (
-					<PostList
-						posts={posts}
-						threadId={threadId}
-						threadTitle={threadTitle}
-						highlightPostId={highlightPostId}
-					/>
-				) : (
-					<NoPost />
-				)}
+				<PostList
+					posts={posts}
+					threadId={threadId}
+					highlightPostId={highlightPostId}
+				/>
 			</div>
 			<BackToThreadList />
 			<div id="thread-page-bottom" className="h-0 w-full" aria-hidden="true" />

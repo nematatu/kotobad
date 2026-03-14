@@ -244,11 +244,16 @@ export const createPostRouter: RouteHandler<
 		);
 
 		return c.json(
-			toPostResponse({
-				...newPostWithAuthor,
-				reactions: [],
-				replyCount: 0,
-			}),
+			toPostResponse(
+				{
+					...newPostWithAuthor,
+					reactions: [],
+					replyCount: 0,
+				},
+				{
+					viewerUserId: user.id,
+				},
+			),
 			201,
 		);
 	} catch (error: unknown) {

@@ -6,12 +6,12 @@ import {
 } from "@kotobad/shared/src/schemas/post";
 import { ReactionOptionListSchema } from "@kotobad/shared/src/schemas/reaction";
 import type { PostListType, PostType } from "@kotobad/shared/src/types/post";
-import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
+import { AnimatePresence, motion } from "framer-motion";
+import { Reply } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
-import { PostDropDownMenu } from "@/components/feature/dropDownMenu/PostDropDownMenu";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import {
 	BffFetcher,
@@ -20,14 +20,16 @@ import {
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { ThreadPostImage } from "../../components/shared/ThreadPostImage";
 import { CreatePostForm } from "./CreatePostForm";
+import { ChatPage } from "./chat/ChatPage";
+import { MessageBubble } from "./chat/MessageBubble";
+import { MessageInput } from "./chat/MessageInput";
+import { MessageList } from "./chat/MessageList";
 import type { ReplyTarget } from "./types/replyTarget";
 import { Emoji } from "./ui/emojiPicker";
-import { PostReplyButton } from "./ui/PostReplyButton";
 
 type PostListProps = {
 	posts: PostListType;
 	threadId: number;
-	threadTitle: string;
 	highlightPostId: number | null;
 	onPostedAction?: () => void;
 };
@@ -36,49 +38,119 @@ type ReactionCountProps = {
 	count: number;
 };
 
-type ReplyTreeNode = {
+type FlattenedPostItem = {
 	post: PostType;
-	children: ReplyTreeNode[];
+	depth: number;
 };
 
-const buildReplyTree = (posts: PostListType): ReplyTreeNode[] => {
-	const nodeMap = new Map<number, ReplyTreeNode>();
-	for (const post of posts) {
-		nodeMap.set(post.id, {
-			post,
-			children: [],
-		});
+const messageLayoutTransition = {
+	duration: 0.24,
+	ease: [0.22, 1, 0.36, 1] as const,
+};
+
+const chatTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
+	hour: "2-digit",
+	minute: "2-digit",
+	hour12: false,
+});
+
+const formatChatTime = (createdAt: string): string => {
+	const date = new Date(createdAt);
+	if (Number.isNaN(date.getTime())) {
+		return "";
+	}
+	return chatTimeFormatter.format(date);
+};
+
+const LARGE_LIST_DISABLE_ENTER_ANIMATION = 80;
+const LARGE_LIST_DISABLE_LAYOUT_ANIMATION = 120;
+
+const getVisibleFlattenedPosts = (
+	posts: PostListType,
+	expandedReplyPostIdSet: Set<number>,
+): FlattenedPostItem[] => {
+	if (posts.length === 0) {
+		return [];
 	}
 
-	const roots: ReplyTreeNode[] = [];
+	const nodeMap = new Map<number, PostType>();
 	for (const post of posts) {
-		const node = nodeMap.get(post.id);
-		if (!node) continue;
+		nodeMap.set(post.id, post);
+	}
 
+	const childrenByParentId = new Map<number, PostType[]>();
+	const roots: PostType[] = [];
+	for (const post of posts) {
 		const parentId = post.replyToPostId;
-		if (parentId && nodeMap.has(parentId)) {
-			nodeMap.get(parentId)?.children.push(node);
+		if (typeof parentId === "number" && nodeMap.has(parentId)) {
+			const siblings = childrenByParentId.get(parentId);
+			if (siblings) {
+				siblings.push(post);
+			} else {
+				childrenByParentId.set(parentId, [post]);
+			}
 			continue;
 		}
-		roots.push(node);
+		roots.push(post);
 	}
 
-	return roots;
-};
+	const visibleFlattened: FlattenedPostItem[] = [];
+	const stack: Array<{
+		post: PostType;
+		depth: number;
+		ancestorsExpanded: boolean;
+	}> = [];
 
-const flattenReplyTree = (
-	nodes: ReplyTreeNode[],
-	depth = 0,
-): Array<{ post: PostType; depth: number }> => {
-	const flattened: Array<{ post: PostType; depth: number }> = [];
-	for (const node of nodes) {
-		flattened.push({
-			post: node.post,
-			depth,
+	for (let index = roots.length - 1; index >= 0; index -= 1) {
+		const root = roots[index];
+		if (!root) continue;
+		stack.push({
+			post: root,
+			depth: 0,
+			ancestorsExpanded: true,
 		});
-		flattened.push(...flattenReplyTree(node.children, depth + 1));
 	}
-	return flattened;
+
+	while (stack.length > 0) {
+		const current = stack.pop();
+		if (!current) continue;
+
+		const isVisible =
+			current.depth <= 1 || (current.depth > 1 && current.ancestorsExpanded);
+		if (isVisible) {
+			visibleFlattened.push({
+				post: current.post,
+				depth: current.depth,
+			});
+		}
+
+		const children = childrenByParentId.get(current.post.id);
+		if (!children || children.length === 0) {
+			continue;
+		}
+
+		const canRevealDeeperReplies =
+			current.depth === 0
+				? true
+				: current.ancestorsExpanded &&
+					expandedReplyPostIdSet.has(current.post.id);
+
+		if (!canRevealDeeperReplies && current.depth >= 1) {
+			continue;
+		}
+
+		for (let index = children.length - 1; index >= 0; index -= 1) {
+			const child = children[index];
+			if (!child) continue;
+			stack.push({
+				post: child,
+				depth: current.depth + 1,
+				ancestorsExpanded: canRevealDeeperReplies,
+			});
+		}
+	}
+
+	return visibleFlattened;
 };
 
 const ReactionCount = ({ count }: ReactionCountProps) => {
@@ -109,7 +181,6 @@ const ReactionCount = ({ count }: ReactionCountProps) => {
 export const PostList = ({
 	posts,
 	threadId,
-	threadTitle,
 	highlightPostId,
 	onPostedAction,
 }: PostListProps) => {
@@ -139,46 +210,15 @@ export const PostList = ({
 		},
 	);
 	const reactionCodes = reactionOptions.map((item) => item.reactionCode);
-	const postByIdMap = useMemo(() => {
-		return new Map(localPosts.map((post) => [post.id, post]));
-	}, [localPosts]);
 	const postLocalIdMap = useMemo(() => {
 		return new Map(localPosts.map((post) => [post.id, post.localId]));
 	}, [localPosts]);
 	const expandedReplyPostIdSet = useMemo(() => {
 		return new Set(expandedReplyPostIds);
 	}, [expandedReplyPostIds]);
-	const flattenedPosts = useMemo(() => {
-		const tree = buildReplyTree(localPosts);
-		return flattenReplyTree(tree);
-	}, [localPosts]);
-	const postDepthById = useMemo(() => {
-		return new Map(flattenedPosts.map(({ post, depth }) => [post.id, depth]));
-	}, [flattenedPosts]);
 	const visibleFlattenedPosts = useMemo(() => {
-		return flattenedPosts.filter(({ post, depth }) => {
-			if (depth <= 1) {
-				return true;
-			}
-
-			let parentId = post.replyToPostId;
-			while (typeof parentId === "number") {
-				const parentDepth = postDepthById.get(parentId);
-				if (typeof parentDepth !== "number") {
-					return false;
-				}
-				if (parentDepth > 0 && !expandedReplyPostIdSet.has(parentId)) {
-					return false;
-				}
-				const parentPost = postByIdMap.get(parentId);
-				if (!parentPost) {
-					return false;
-				}
-				parentId = parentPost.replyToPostId ?? null;
-			}
-			return true;
-		});
-	}, [flattenedPosts, postDepthById, expandedReplyPostIdSet, postByIdMap]);
+		return getVisibleFlattenedPosts(localPosts, expandedReplyPostIdSet);
+	}, [localPosts, expandedReplyPostIdSet]);
 	const replyEnterPostIdSet = useMemo(() => {
 		return new Set(replyEnterPostIds);
 	}, [replyEnterPostIds]);
@@ -343,169 +383,284 @@ export const PostList = ({
 				: [...prev, postId],
 		);
 	};
+	const visiblePostCount = visibleFlattenedPosts.length;
+	const disableEnterAnimation =
+		visiblePostCount > LARGE_LIST_DISABLE_ENTER_ANIMATION;
+	const enableLayoutAnimation =
+		visiblePostCount <= LARGE_LIST_DISABLE_LAYOUT_ANIMATION;
 
 	return (
-		<div className="rounded-lg bg-white sm:p-2 sm:pb-4 flex flex-col">
-			{visibleFlattenedPosts.map(({ post, depth }) => {
-				const indent = Math.min(depth * 25, 84);
-				const isReplyingToThisPost = replyTarget?.postId === post.id;
-				const isRepliesExpanded = expandedReplyPostIdSet.has(post.id);
-				const isReplyEnterAnimating = replyEnterPostIdSet.has(post.id);
-				const isRealtimeEnterAnimating = realtimeEnterPostIdSet.has(post.id);
-				const replyEnterDelayMs = isReplyEnterAnimating
-					? Math.min(depth * 28, 140)
-					: 0;
-				const rowEnterAnimationClass = isReplyEnterAnimating
-					? "animate-reply-expand-down"
-					: isRealtimeEnterAnimating
-						? "animate-post-realtime-rise"
-						: "";
-				const highlightAnimationClass =
-					highlightAnimatingPostId === post.id
-						? "animate-post-highlight-once"
-						: "";
+		<ChatPage
+			header={null}
+			messageList={
+				<MessageList autoScrollKey={visiblePostCount} autoScrollEnabled={false}>
+					{visiblePostCount === 0 ? (
+						<div className="flex h-full min-h-52 items-center justify-center">
+							<p className="rounded-full bg-[#f3f4f6] px-4 py-2 text-[#4b5563] text-sm font-medium">
+								まだメッセージはありません。最初の投稿をしてみましょう。
+							</p>
+						</div>
+					) : (
+						<AnimatePresence initial={false} mode="popLayout">
+							{visibleFlattenedPosts.map(({ post, depth }) => {
+								const isReplyingToThisPost = replyTarget?.postId === post.id;
+								const isRepliesExpanded = expandedReplyPostIdSet.has(post.id);
+								const isReplyEnterAnimating = replyEnterPostIdSet.has(post.id);
+								const isRealtimeEnterAnimating = realtimeEnterPostIdSet.has(
+									post.id,
+								);
+								const shouldAnimateOnMount =
+									!disableEnterAnimation ||
+									isReplyEnterAnimating ||
+									isRealtimeEnterAnimating;
+								const enterDelayMs = shouldAnimateOnMount
+									? isReplyEnterAnimating
+										? Math.min(depth * 28, 140)
+										: isRealtimeEnterAnimating
+											? 30
+											: 0
+									: 0;
+								const isHighlighted = highlightAnimatingPostId === post.id;
+								const isMine = post.isMine;
+								const chatTime = formatChatTime(post.createdAt);
+								const selectedReactionCodes: string[] = [];
+								for (const reaction of post.reactions) {
+									if (!reaction.reactedByMe) continue;
+									selectedReactionCodes.push(reaction.reactionCode);
+								}
 
-				return (
-					<div
-						key={post.id}
-						id={`post-${post.id}`}
-						className={`scroll-mt-24 px-4 py-2 md:py-3 min-h-14 flex items-center border-b-[0.7px] border-slate-400 ${isRepliesExpanded ? "border-dashed border-b-2" : ""} ${rowEnterAnimationClass} ${highlightAnimationClass}`}
-						style={{
-							paddingLeft: `${16 + indent}px`,
-							animationDelay: isReplyEnterAnimating
-								? `${replyEnterDelayMs}ms`
-								: undefined,
-						}}
-					>
-						<div className="flex flex-col w-full space-y-2">
-							<div className="flex w-full items-center sm:text-sm whitespace-nowrap gap-2">
-								<Link
-									href={`/users/${encodeURIComponent(post.authorId)}`}
-									showIndicator={false}
-									className="inline-flex items-center gap-2"
-								>
-									<AuthorAvatar
-										name={post.author.name}
-										image={post.author.image}
-										className="h-4 w-4 md:h-7 md:w-7"
-										fallbackClassName="text-[8px]"
-									/>
-									<span className="text-xs sm:text-md text-gray-500 hover:text-blue-700 transition-colors">
-										{post.author.name}
-									</span>
-								</Link>
-								<div className="flex gap-1 md:gap-2 flex-wrap text-xs text-gray-500">
-									<span>{getRelativeDate(post.createdAt)}</span>
-								</div>
-								<Emoji
-									reactionCodes={reactionCodes}
-									selectedReactionCodes={post.reactions
-										.filter((reaction) => reaction.reactedByMe)
-										.map((reaction) => reaction.reactionCode)}
-									onReactAction={(emoji) => handleReaction(post.id, emoji)}
-								/>
-								<PostReplyButton
-									handleClick={() =>
-										setReplyTarget((current) =>
-											current?.postId === post.id
-												? null
-												: {
-														postId: post.id,
-														localId: post.localId,
-														authorName: post.author.name,
-													},
-										)
-									}
-								/>
-								<div className="ml-auto shrink-0">
-									<PostDropDownMenu
-										postId={post.id}
-										postBody={post.post}
-										threadTitle={threadTitle}
-									/>
-								</div>
-							</div>
-							<span className="block overflow-hidden text-sm line-clamp-2 sm:line-clamp-none sm:whitespace-normal break-words pl-2">
-								<AutoLinkText text={post.post} />
-							</span>
-							{post.imageUrls.length > 0 && (
-								<div className="pl-2">
-									<div
+								return (
+									<motion.div
+										key={post.id}
+										layout={enableLayoutAnimation ? "position" : false}
+										transition={
+											enableLayoutAnimation
+												? { layout: messageLayoutTransition }
+												: undefined
+										}
 										className={
-											post.imageUrls.length > 1
-												? "grid max-w-sm grid-cols-2 gap-2"
-												: "max-w-xs"
+											depth > 0 && !isMine ? "pl-2 sm:pl-4" : undefined
 										}
 									>
-										{post.imageUrls.slice(0, 2).map((imageUrl) => (
-											<ThreadPostImage
-												key={imageUrl}
-												imageUrl={imageUrl}
-												width={1280}
-												quality={82}
-												containerClassName="h-44"
-												imageClassName="h-full"
-											/>
-										))}
-									</div>
-								</div>
-							)}
-							{post.reactions.length > 0 && (
-								<div className="flex mt-2 flex-wrap items-center gap-2">
-									{post.reactions.map(
-										({ id, reactionCode, emoji, reactedByMe, count }) => {
-											const isReacted = reactedByMe;
-											return (
+										{!isMine && (
+											<Link
+												href={`/users/${encodeURIComponent(post.authorId)}`}
+												showIndicator={false}
+												className="mb-1 inline-flex max-w-[196px] items-center gap-1.5 px-1"
+											>
+												<AuthorAvatar
+													name={post.author.name}
+													image={post.author.image}
+													className="h-5 w-5 bg-white dark:bg-[#0f172a]"
+													fallbackClassName="text-[10px]"
+												/>
+												<span className="truncate text-[#4b5563] text-[11px] font-medium dark:text-[#cbd5e1]">
+													{post.author.name}
+												</span>
+											</Link>
+										)}
+										<MessageBubble
+											postId={post.id}
+											isMine={isMine}
+											isHighlighted={isHighlighted}
+											enterDelayMs={enterDelayMs}
+											animateOnMount={shouldAnimateOnMount}
+											timeLabel={chatTime}
+										>
+											<div className="space-y-2">
+												<div
+													className={
+														isMine
+															? "whitespace-pre-wrap break-words text-[#0f172a] text-sm leading-relaxed dark:text-[#e2ecff]"
+															: "whitespace-pre-wrap break-words text-[#111827] text-sm leading-relaxed dark:text-[#e5e7eb]"
+													}
+												>
+													<AutoLinkText
+														text={post.post}
+														linkClassName={
+															isMine
+																? "text-[#1d4f91] hover:text-[#123b70] underline-blue-400/50 dark:text-[#bfdbfe] dark:hover:text-[#dbeafe]"
+																: "text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
+														}
+													/>
+												</div>
+
+												{post.imageUrls.length > 0 && (
+													<div
+														className={
+															post.imageUrls.length > 1
+																? "grid max-w-sm grid-cols-2 gap-2"
+																: "max-w-[16rem]"
+														}
+													>
+														{post.imageUrls.slice(0, 2).map((imageUrl) => (
+															<ThreadPostImage
+																key={imageUrl}
+																imageUrl={imageUrl}
+																width={1280}
+																quality={82}
+																containerClassName="h-36"
+																imageClassName="h-full"
+															/>
+														))}
+													</div>
+												)}
+											</div>
+										</MessageBubble>
+										<div
+											className={
+												isMine
+													? "mt-1 flex flex-wrap items-center justify-end gap-2 pr-1"
+													: "mt-1 flex flex-wrap items-center gap-2 pl-1"
+											}
+										>
+											<button
+												type="button"
+												className={
+													isMine
+														? "inline-flex h-6 w-6 items-center justify-center rounded-full bg-transparent p-0 text-[#1e3a8a] transition-colors duration-150 hover:bg-[#dbeafe] hover:text-[#1d4f91] dark:text-[#dbeafe] dark:hover:bg-[#31507a]"
+														: "inline-flex h-6 w-6 items-center justify-center rounded-full bg-transparent p-0 text-[#4b5563] transition-colors duration-150 hover:bg-[#e5e7eb] hover:text-[#111827] dark:text-[#cbd5e1] dark:hover:bg-[#334155]"
+												}
+												aria-label="返信する"
+												onClick={() =>
+													setReplyTarget((current) =>
+														current?.postId === post.id
+															? null
+															: {
+																	postId: post.id,
+																	localId: post.localId,
+																	authorName: post.author.name,
+																},
+													)
+												}
+											>
+												<Reply className="h-3.5 w-3.5" aria-hidden="true" />
+											</button>
+											{reactionCodes.length > 0 ? (
+												<Emoji
+													reactionCodes={reactionCodes}
+													selectedReactionCodes={selectedReactionCodes}
+													onReactAction={(reactionCode) =>
+														handleReaction(post.id, reactionCode)
+													}
+												/>
+											) : null}
+											{post.replyCount > 0 && depth > 0 && (
 												<button
 													type="button"
-													key={`${post.id}:${reactionCode}:${id}`}
-													className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-[0.3rem] md:px-[0.6rem] md:py-[0.1rem] text-sm font-bold transition-colors duration-150 animate-reaction-chip-pop ${
-														isReacted
-															? "bg-blue-300/20 hover:bg-blue-300/40 ring-1 ring-blue-400 text-blue-600"
-															: "bg-slate-300/30 text-slate-600 hover:ring-1 hover:ring-blue-300 hover:bg-blue-400/10"
-													}`}
-													onClick={() => handleReaction(post.id, reactionCode)}
-													aria-label={`${emoji} をリアクション`}
+													className={
+														isMine
+															? "cursor-pointer text-[#1e3a8a] text-[11px] underline-offset-2 hover:underline dark:text-[#dbeafe]"
+															: "cursor-pointer text-[#4b5563] text-[11px] underline-offset-2 hover:underline dark:text-[#cbd5e1]"
+													}
+													onClick={() => toggleReplies(post.id)}
 												>
-													<span>{emoji}</span>
-													<ReactionCount count={count} />
+													{isRepliesExpanded
+														? "返信を隠す"
+														: `${post.replyCount}件の返信を表示`}
 												</button>
-											);
-										},
-									)}
-								</div>
-							)}
-							{post.replyCount > 0 && depth > 0 && (
-								<div className="items-start mt-2">
-									<button
-										type="button"
-										className="text-xs text-blue-600 hover:underline cursor-pointer"
-										onClick={() => toggleReplies(post.id)}
-									>
-										{isRepliesExpanded
-											? "返信を隠す"
-											: `${post.replyCount}件の返信を表示`}
-									</button>
-								</div>
-							)}
-							{isReplyingToThisPost && (
-								<div className="mt-3">
-									<CreatePostForm
-										threadId={threadId}
-										replyTarget={replyTarget}
-										variant="inline"
-										onPostedAction={() => {
-											setReplyTarget(null);
-											onPostedAction?.();
-										}}
-										onClearReplyTargetAction={() => setReplyTarget(null)}
-									/>
-								</div>
-							)}
-						</div>
-					</div>
-				);
-			})}
-		</div>
+											)}
+										</div>
+										<AnimatePresence initial={false}>
+											{post.reactions.length > 0 ? (
+												<motion.div
+													key={`${post.id}:reactions`}
+													layout
+													initial={{ opacity: 0, height: 0, y: -4 }}
+													animate={{ opacity: 1, height: "auto", y: 0 }}
+													exit={{ opacity: 0, height: 0, y: -4 }}
+													transition={{
+														duration: 0.2,
+														ease: [0.22, 1, 0.36, 1],
+													}}
+													className={
+														isMine
+															? "mt-1 flex flex-wrap items-center justify-end gap-2 overflow-hidden pr-1"
+															: "mt-1 flex flex-wrap items-center gap-2 overflow-hidden pl-1"
+													}
+												>
+													{post.reactions.map(
+														({
+															id,
+															reactionCode,
+															emoji,
+															reactedByMe,
+															count,
+														}) => {
+															const isReacted = reactedByMe;
+															return (
+																<button
+																	type="button"
+																	key={`${post.id}:${reactionCode}:${id}`}
+																	className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold transition-colors duration-150 ${
+																		isReacted
+																			? isMine
+																				? "bg-[#dbeafe] text-[#1e3a8a] ring-1 ring-[#93c5fd] dark:bg-[#31507a] dark:text-[#dbeafe] dark:ring-[#4d77b2]"
+																				: "bg-[#06C755]/15 text-[#111827] ring-1 ring-[#06C755]/40 dark:bg-[#06C755]/25 dark:text-[#e5e7eb]"
+																			: isMine
+																				? "bg-[#eff6ff] text-[#1e3a8a] hover:bg-[#dbeafe] dark:bg-[#2a3b52] dark:text-[#dbeafe] dark:hover:bg-[#334a67]"
+																				: "bg-[#e5e7eb] text-[#374151] hover:bg-[#d1d5db] dark:bg-[#334155] dark:text-[#cbd5e1] dark:hover:bg-[#475569]"
+																	}`}
+																	onClick={() =>
+																		handleReaction(post.id, reactionCode)
+																	}
+																	aria-label={`${emoji} をリアクション`}
+																>
+																	<span>{emoji}</span>
+																	<ReactionCount count={count} />
+																</button>
+															);
+														},
+													)}
+												</motion.div>
+											) : null}
+										</AnimatePresence>
+
+										<AnimatePresence initial={false}>
+											{isReplyingToThisPost ? (
+												<motion.div
+													key={`${post.id}:reply-form`}
+													layout
+													initial={{ opacity: 0, height: 0, y: -4 }}
+													animate={{ opacity: 1, height: "auto", y: 0 }}
+													exit={{ opacity: 0, height: 0, y: -4 }}
+													transition={{
+														duration: 0.22,
+														ease: [0.22, 1, 0.36, 1],
+													}}
+													className="mt-1 overflow-hidden pt-1"
+												>
+													<CreatePostForm
+														threadId={threadId}
+														replyTarget={replyTarget}
+														variant="inline"
+														onPostedAction={() => {
+															setReplyTarget(null);
+															onPostedAction?.();
+														}}
+														onClearReplyTargetAction={() =>
+															setReplyTarget(null)
+														}
+													/>
+												</motion.div>
+											) : null}
+										</AnimatePresence>
+									</motion.div>
+								);
+							})}
+						</AnimatePresence>
+					)}
+				</MessageList>
+			}
+			messageInput={
+				<MessageInput>
+					<CreatePostForm
+						threadId={threadId}
+						variant="chat"
+						onPostedAction={onPostedAction}
+					/>
+				</MessageInput>
+			}
+		/>
 	);
 };

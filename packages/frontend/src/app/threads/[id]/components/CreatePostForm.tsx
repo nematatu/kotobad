@@ -22,6 +22,7 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
+import { cn } from "@/lib/utils";
 import { ThreadPostImagePicker } from "../../components/shared/ThreadPostImagePicker";
 import { useThreadPostImageInput } from "../../lib/useThreadPostImageInput";
 import type { ReplyTarget } from "./types/replyTarget";
@@ -31,7 +32,7 @@ type CreatePostFormProps = {
 	replyTarget?: ReplyTarget | null;
 	onPostedAction?: () => void;
 	onClearReplyTargetAction?: () => void;
-	variant?: "default" | "inline";
+	variant?: "default" | "inline" | "chat";
 };
 
 export const CreatePostForm = ({
@@ -54,6 +55,7 @@ export const CreatePostForm = ({
 	} = useThreadPostImageInput({ maxImages: 1 });
 	const { mutate } = useSWRConfig();
 	const isInline = variant === "inline";
+	const isChat = variant === "chat";
 	const replyTargetPostId = replyTarget?.postId ?? null;
 
 	const form = useForm<CreatePostType>({
@@ -129,8 +131,10 @@ export const CreatePostForm = ({
 					control={form.control}
 					name="post"
 					render={({ field }) => (
-						<FormItem className="flex gap-2">
-							<UserAvatar />
+						<FormItem
+							className={cn("flex gap-2", isChat ? "items-end" : undefined)}
+						>
+							{isChat ? null : <UserAvatar />}
 							<div className="flex min-w-0 flex-1 flex-col space-y-2">
 								<FormControl>
 									<div>
@@ -150,10 +154,24 @@ export const CreatePostForm = ({
 													form.handleSubmit(handleSubmit)();
 												}
 											}}
-											placeholder={isInline ? "返信を追加..." : "内容"}
-											className={`w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 ${
-												isInline ? "min-h-[72px]" : "sm:min-h-[84px]"
-											}`}
+											placeholder={
+												isInline
+													? "返信を追加..."
+													: isChat
+														? "メッセージを入力..."
+														: "内容"
+											}
+											className={cn(
+												"w-full resize-none rounded-xl text-[#111827] placeholder:text-[#6b7280] focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]",
+												isChat
+													? "min-h-[48px] bg-[#ffffff]/95 px-3 py-2 text-sm shadow-none dark:bg-[#101b2c]"
+													: "border-none shadow-none",
+												isInline
+													? "min-h-[72px]"
+													: isChat
+														? "max-h-32"
+														: "sm:min-h-[84px]",
+											)}
 										/>
 									</div>
 								</FormControl>
@@ -171,8 +189,9 @@ export const CreatePostForm = ({
 					onOpenImageDialogAction={openImageDialogAction}
 					onClearImageAction={clearImageSelectionAction}
 					onRemoveImageAction={removeImageAtAction}
-					actionsClassName="pl-10"
+					actionsClassName={isChat ? "pl-0" : "pl-10"}
 					previewImageClassName="h-28"
+					showIcons={!isChat}
 				/>
 				<div className="flex items-end justify-end gap-2">
 					{isInline ? (
@@ -184,17 +203,22 @@ export const CreatePostForm = ({
 						>
 							キャンセル
 						</Button>
-					) : (
+					) : isChat ? null : (
 						<p className="hidden sm:block text-neutral-400 text-xs">
 							Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
 						</p>
 					)}
 					<Button
-						className="text-white cursor-pointer bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
-						rounded="full"
+						className={cn(
+							"cursor-pointer focus:outline-none focus:ring-1 focus:ring-offset-2",
+							isChat
+								? "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-400"
+								: "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-400",
+						)}
+						rounded={isChat ? "md" : "full"}
 						type="submit"
 					>
-						{isInline ? "返信する" : "書き込む"}
+						{isInline ? "返信する" : isChat ? "送信" : "書き込む"}
 					</Button>
 				</div>
 			</form>
@@ -203,10 +227,14 @@ export const CreatePostForm = ({
 
 	if (isInline) {
 		return (
-			<div className="rounded-xl border border-slate-200 bg-white p-3">
+			<div className="rounded-xl bg-white p-3 dark:bg-[#0f172a]">
 				{formView}
 			</div>
 		);
+	}
+
+	if (isChat) {
+		return <div className="w-full">{formView}</div>;
 	}
 
 	return (

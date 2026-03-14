@@ -215,11 +215,16 @@ export const getPostByThreadIdRouter: RouteHandler<
 
 		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
 		const response = posts.map((post) =>
-			toPostResponse({
-				...post,
-				reactions: reactionMap.get(post.id) ?? [],
-				replyCount: replyCountMap.get(post.id) ?? 0,
-			}),
+			toPostResponse(
+				{
+					...post,
+					reactions: reactionMap.get(post.id) ?? [],
+					replyCount: replyCountMap.get(post.id) ?? 0,
+				},
+				{
+					viewerUserId,
+				},
+			),
 		);
 		return c.json(response, 200);
 	} catch (error: unknown) {
@@ -274,11 +279,16 @@ export const getPostByIdRouter: RouteHandler<
 			.from(postsTable)
 			.where(eq(postsTable.replyToPostId, post.id));
 
-		const response = toPostResponse({
-			...post,
-			reactions: reactionMap.get(post.id) ?? [],
-			replyCount,
-		});
+		const response = toPostResponse(
+			{
+				...post,
+				reactions: reactionMap.get(post.id) ?? [],
+				replyCount,
+			},
+			{
+				viewerUserId,
+			},
+		);
 		return c.json(response, 200);
 	} catch (error: unknown) {
 		console.error(error);
@@ -350,11 +360,16 @@ export const searchPostRouter: RouteHandler<
 
 		const reactionMap = await getPostReactions({ db, posts, viewerUserId });
 		const response = posts.map((post) =>
-			toPostResponse({
-				...post,
-				reactions: reactionMap.get(post.id) ?? [],
-				replyCount: replyCountMap.get(post.id) ?? 0,
-			}),
+			toPostResponse(
+				{
+					...post,
+					reactions: reactionMap.get(post.id) ?? [],
+					replyCount: replyCountMap.get(post.id) ?? 0,
+				},
+				{
+					viewerUserId,
+				},
+			),
 		);
 		return c.json(response, 200);
 	} catch (error: unknown) {
