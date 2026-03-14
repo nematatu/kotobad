@@ -133,14 +133,14 @@ export const ThreadPostImage = ({
 								type="button"
 								onClick={closeZoom}
 								aria-label="拡大画像を閉じる"
-								className="absolute inset-0 hidden [@media(hover:hover)]:block"
+								className="absolute inset-0 hidden [@media(hover:hover)]:block [@media(hover:hover)]:cursor-zoom-out"
 							/>
 						</div>
 						<button
 							type="button"
 							onClick={closeZoom}
 							aria-label="拡大画像を閉じる"
-							className="pointer-events-auto fixed right-4 top-[calc(env(safe-area-inset-top)+0.75rem)] h-9 w-9 rounded-full bg-white/90 p-2 text-zinc-600 shadow-md backdrop-blur [@media(hover:hover)]:hover:bg-white dark:bg-slate-900/90 dark:text-slate-200 dark:[@media(hover:hover)]:hover:bg-slate-900"
+							className="pointer-events-auto fixed right-4 top-[calc(env(safe-area-inset-top)+0.75rem)] h-9 w-9 rounded-full bg-white/90 p-2 text-zinc-600 shadow-md backdrop-blur [@media(hover:hover)]:hover:bg-white dark:bg-slate-900/90 dark:text-slate-200 dark:[@media(hover:hover)]:hover:bg-slate-900 cursor-pointer"
 						>
 							<XIcon className="h-5 w-5" />
 						</button>
