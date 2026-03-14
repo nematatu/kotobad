@@ -31,11 +31,13 @@ import { TagPickerTooltip } from "./tagPickerTooltip";
 type CreateThreadFormProps = {
 	onCreated: () => void;
 	initialTags?: TagType[];
+	autoFocusTitle?: boolean;
 };
 
 export const CreateThreadForm = ({
 	onCreated,
 	initialTags,
+	autoFocusTitle = false,
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const {
@@ -131,6 +133,7 @@ export const CreateThreadForm = ({
 											<div>
 												<Textarea
 													id="thread-title"
+													autoFocus={autoFocusTitle}
 													{...field}
 													{...form.register("title", {
 														required: "空文字は送信出来ません",

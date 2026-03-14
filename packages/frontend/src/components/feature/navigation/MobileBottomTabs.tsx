@@ -52,9 +52,13 @@ const indicatorTransition = {
 
 type MobileBottomTabsProps = {
 	centerAction?: React.ReactNode;
+	isCenterActionOpen?: boolean;
 };
 
-export function MobileBottomTabs({ centerAction }: MobileBottomTabsProps) {
+export function MobileBottomTabs({
+	centerAction,
+	isCenterActionOpen = false,
+}: MobileBottomTabsProps) {
 	const pathname = usePathname();
 	const { user } = useUser();
 	const [optimisticActiveTabId, setOptimisticActiveTabId] = useState<
@@ -208,7 +212,9 @@ export function MobileBottomTabs({ centerAction }: MobileBottomTabsProps) {
 				onPointerDown={() => {
 					setPressedTabId(tab.id);
 				}}
-				className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-[1rem] px-2 py-2 text-[9px] font-semibold leading-none text-slate-500 transition-[color,transform] duration-150 ease-out active:scale-[0.94] [@media(hover:hover)]:hover:text-slate-900 data-[checked=true]:text-slate-950 dark:text-slate-400 dark:[@media(hover:hover)]:hover:text-slate-100 dark:data-[checked=true]:text-slate-50"
+				className={`relative flex min-w-0 flex-1 flex-col items-center justify-center gap-2 rounded-[1rem] px-2 py-2 text-[9px] font-semibold leading-none text-slate-500 transition-[color,transform,opacity] duration-150 ease-out active:scale-[0.94] [@media(hover:hover)]:hover:text-slate-900 data-[checked=true]:text-slate-950 dark:text-slate-400 dark:[@media(hover:hover)]:hover:text-slate-100 dark:data-[checked=true]:text-slate-50 ${
+					isCenterActionOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+				}`}
 			>
 				<span
 					className={`relative z-10 flex h-5 items-center justify-center transition-transform duration-150 ease-out ${
@@ -236,12 +242,18 @@ export function MobileBottomTabs({ centerAction }: MobileBottomTabsProps) {
 	const trailingTabs = tabs.slice(2);
 
 	return (
-		<div className="w-full rounded-[1.4rem] bg-white/92 p-1.5 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.45)] backdrop-blur dark:bg-slate-950/92 dark:shadow-[0_18px_40px_-28px_rgba(2,6,23,0.95)]">
+		<div
+			className={`w-full rounded-[1.4rem] ${
+				isCenterActionOpen
+					? "bg-transparent p-0 shadow-none backdrop-blur-0"
+					: "bg-white/92 p-1.5 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.45)] backdrop-blur dark:bg-slate-950/92 dark:shadow-[0_18px_40px_-28px_rgba(2,6,23,0.95)]"
+			}`}
+		>
 			<div
 				ref={containerRef}
 				className="relative flex w-full items-stretch gap-1"
 			>
-				{indicatorRect ? (
+				{indicatorRect && !isCenterActionOpen ? (
 					<motion.div
 						initial={false}
 						animate={{
