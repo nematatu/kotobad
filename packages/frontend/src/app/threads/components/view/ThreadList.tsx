@@ -2,7 +2,6 @@
 
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
-import { ArrowRight } from "lucide-react";
 import {
 	LikeButton,
 	THREAD_LIST_META_CHIP_CLASS,
@@ -11,7 +10,6 @@ import ChatIcon from "@/assets/threads/chat.svg";
 import { Link } from "@/components/common/Link";
 import { highlightText } from "@/components/feature/header/component/headerSearch/highlightText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
-import { Button } from "@/components/ui/button";
 import { ThreadPostImage } from "../shared/ThreadPostImage";
 
 type ThreadListType = {
@@ -100,7 +98,7 @@ export const ThreadList = ({
 									<Link
 										href={authorHref}
 										aria-label={`ユーザー: ${thread.author.name}`}
-										className="ml-auto shrink-0 flex items-center gap-1 text-[10px] text-gray-500/80 hover:text-gray-600"
+										className="z-10 ml-auto shrink-0 flex self-end items-center gap-1 text-[10px] text-gray-500/80 hover:text-gray-600"
 									>
 										<AuthorAvatar
 											name={thread.author.name}
@@ -110,19 +108,6 @@ export const ThreadList = ({
 										/>
 										<span>{thread.author.name}</span>
 									</Link>
-
-									<Button
-										asChild
-										variant="ghost"
-										rounded="lg"
-										enableClickAnimation
-										className=" sm:hidden ml-auto shrink-0 pointer-events-auto z-10 h-[33px] w-[63px] gap-1 bg-blue-500/90 px-2 text-[13px] font-semibold text-slate-100 dark:bg-blue-500 sm:h-9 sm:w-[78px] sm:gap-1.5 sm:px-2.5 sm:text-[14px]"
-									>
-										<Link href={href} aria-label={`みる: ${thread.title}`}>
-											みる
-											<ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-										</Link>
-									</Button>
 								</div>
 							</div>
 						</div>
