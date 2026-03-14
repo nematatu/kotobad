@@ -62,8 +62,24 @@ export const ThreadList = ({
 						key={thread.id}
 						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-2 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
 					>
-						<div className="min-w-0 flex-1 space-y-1">
-							<span className="text-[10px] text-gray-500">{relativeDate}</span>
+						<div className="min-w-0 flex-1 space-y-3">
+							<div className="flex items-center gap-2 text-gray-500 hover:text-gray-600">
+								<Link
+									href={authorHref}
+									aria-label={`ユーザー: ${thread.author.name}`}
+									className="shrink-0 flex items-center gap-1 text-[10px]"
+								>
+									<AuthorAvatar
+										name={thread.author.name}
+										image={thread.author.image}
+										className="w-5 h-5 bg-white"
+										fallbackClassName="text-xs"
+									/>
+									<span>{thread.author.name}</span>
+								</Link>
+
+								<span className="text-[10px]">{relativeDate}</span>
+							</div>
 							<div className="block sm:hidden">{renderThreadSummary()}</div>
 							<Link
 								href={href}
@@ -97,20 +113,6 @@ export const ThreadList = ({
 										initialLikedByMe={thread.likedByMe}
 										size="compact"
 									/>
-									<Link
-										href={authorHref}
-										aria-label={`ユーザー: ${thread.author.name}`}
-										className="ml-auto shrink-0 flex items-center gap-1 text-[10px] text-gray-500/80 hover:text-gray-600"
-									>
-										<AuthorAvatar
-											name={thread.author.name}
-											image={thread.author.image}
-											className="w-5 h-5 bg-white"
-											fallbackClassName="text-xs"
-										/>
-										<span>{thread.author.name}</span>
-									</Link>
-
 									<Button
 										asChild
 										variant="ghost"
