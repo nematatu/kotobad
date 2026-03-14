@@ -2,7 +2,7 @@
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
@@ -43,6 +43,8 @@ export const CreatePostForm = ({
 	variant = "default",
 }: CreatePostFormProps) => {
 	const [error, setError] = useState<string | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const submitLockRef = useRef(false);
 	const {
 		imagePreviewUrls,
 		maxImages,
@@ -75,6 +77,13 @@ export const CreatePostForm = ({
 	}, [form, isInline, replyTargetPostId]);
 
 	const handleSubmit = async (values: CreatePostType) => {
+		if (submitLockRef.current) {
+			return;
+		}
+		submitLockRef.current = true;
+		setIsSubmitting(true);
+		setError(null);
+
 		try {
 			const imageUrls = await uploadSelectedImagesAction("post");
 			const endpoint = await getBffApiUrl("CREATE_POST");
@@ -112,12 +121,22 @@ export const CreatePostForm = ({
 			const fetchError = error as BffFetcherError;
 			if (fetchError.status === 401) {
 				return;
+			}
+			if (fetchError.status === 429) {
+				const message =
+					"投稿間隔が短すぎます。少し待ってから再送してください。";
+				setError(message);
+				toast.error(message);
+				return;
 			} else {
 				const message =
 					error instanceof Error ? error.message : "不明なエラーが発生しました";
 				setError(message);
 				toast.error(message);
 			}
+		} finally {
+			submitLockRef.current = false;
+			setIsSubmitting(false);
 		}
 	};
 
@@ -148,10 +167,14 @@ export const CreatePostForm = ({
 												},
 											})}
 											autoFocus={isInline && replyTargetPostId !== null}
+											disabled={isSubmitting}
 											onKeyDown={(e) => {
+												if (isSubmitting) {
+													return;
+												}
 												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
 													e.preventDefault();
-													form.handleSubmit(handleSubmit)();
+													void form.handleSubmit(handleSubmit)();
 												}
 											}}
 											placeholder={
@@ -185,6 +208,7 @@ export const CreatePostForm = ({
 					imageInputRef={imageInputRef}
 					imagePreviewUrls={imagePreviewUrls}
 					maxImages={maxImages}
+					disabled={isSubmitting}
 					onSelectImageAction={selectImageAction}
 					onOpenImageDialogAction={openImageDialogAction}
 					onClearImageAction={clearImageSelectionAction}
@@ -200,6 +224,7 @@ export const CreatePostForm = ({
 							variant="outline"
 							rounded="full"
 							onClick={onClearReplyTargetAction}
+							disabled={isSubmitting}
 						>
 							キャンセル
 						</Button>
@@ -217,8 +242,15 @@ export const CreatePostForm = ({
 						)}
 						rounded={isChat ? "md" : "full"}
 						type="submit"
+						disabled={isSubmitting}
 					>
-						{isInline ? "返信する" : isChat ? "送信" : "書き込む"}
+						{isSubmitting
+							? "送信中..."
+							: isInline
+								? "返信する"
+								: isChat
+									? "送信"
+									: "書き込む"}
 					</Button>
 				</div>
 			</form>

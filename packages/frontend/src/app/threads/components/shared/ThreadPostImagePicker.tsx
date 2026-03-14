@@ -9,6 +9,7 @@ type ThreadPostImagePickerProps = {
 	imageInputRef: RefObject<HTMLInputElement | null>;
 	imagePreviewUrls: string[];
 	maxImages: number;
+	disabled?: boolean;
 	onSelectImageAction: (event: ChangeEvent<HTMLInputElement>) => void;
 	onOpenImageDialogAction: () => void;
 	onClearImageAction: () => void;
@@ -23,6 +24,7 @@ export const ThreadPostImagePicker = ({
 	imageInputRef,
 	imagePreviewUrls,
 	maxImages,
+	disabled = false,
 	onSelectImageAction,
 	onOpenImageDialogAction,
 	onClearImageAction,
@@ -42,6 +44,7 @@ export const ThreadPostImagePicker = ({
 				type="file"
 				accept="image/jpeg,image/png,image/webp,image/avif"
 				multiple={maxImages > 1}
+				disabled={disabled}
 				onChange={onSelectImageAction}
 				className="hidden"
 			/>
@@ -57,7 +60,7 @@ export const ThreadPostImagePicker = ({
 							: undefined,
 					)}
 					onClick={onOpenImageDialogAction}
-					disabled={!canAddMore}
+					disabled={disabled || !canAddMore}
 				>
 					{showIcons ? <ImagePlus className="h-4 w-4" /> : null}
 					画像を追加 ({imagePreviewUrls.length}/{maxImages})
@@ -74,6 +77,7 @@ export const ThreadPostImagePicker = ({
 								: undefined,
 						)}
 						onClick={onClearImageAction}
+						disabled={disabled}
 					>
 						{showIcons ? <X className="h-4 w-4" /> : null}
 						全削除
@@ -107,6 +111,7 @@ export const ThreadPostImagePicker = ({
 							<button
 								type="button"
 								onClick={() => onRemoveImageAction(index)}
+								disabled={disabled}
 								className={cn(
 									"absolute right-1 top-1 inline-flex items-center justify-center rounded-full bg-black/55 text-white",
 									showIcons ? "h-6 w-6" : "h-6 px-2 text-[10px] font-medium",

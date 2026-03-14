@@ -13,6 +13,8 @@ import type { AppEnvironment } from "../../../../types";
 import { createNotification } from "../../notifications/methods/createNotification";
 import { toPostResponse } from "./transform";
 
+const POST_SUBMIT_COOLDOWN_MS = 1500;
+
 export const createPostRoute = createRoute({
 	method: "post",
 	path: "/create",
@@ -59,6 +61,14 @@ export const createPostRoute = createRoute({
 				},
 			},
 		},
+		429: {
+			description: "投稿間隔が短すぎます",
+			content: {
+				"application/json": {
+					schema: ErrorResponse,
+				},
+			},
+		},
 		500: {
 			description: "サーバーエラー",
 			content: {
@@ -102,6 +112,37 @@ export const createPostRouter: RouteHandler<
 
 		if (!thread) {
 			return c.json({ error: "Thread not found" }, 404);
+		}
+
+		const latestPostByUserInThread = await db.query.posts.findFirst({
+			where: (postTable, { and, eq }) =>
+				and(eq(postTable.threadId, threadId), eq(postTable.authorId, user.id)),
+			orderBy: (postTable, { desc }) => [
+				desc(postTable.createdAt),
+				desc(postTable.id),
+			],
+			columns: {
+				id: true,
+				createdAt: true,
+			},
+		});
+
+		if (latestPostByUserInThread) {
+			const elapsedMs =
+				Date.now() - latestPostByUserInThread.createdAt.getTime();
+			if (elapsedMs >= 0 && elapsedMs < POST_SUBMIT_COOLDOWN_MS) {
+				const retryAfterSeconds = Math.ceil(
+					(POST_SUBMIT_COOLDOWN_MS - elapsedMs) / 1000,
+				);
+				c.header("Retry-After", String(retryAfterSeconds));
+				return c.json(
+					{
+						error: "Posting too fast",
+						message: "投稿間隔が短すぎます。少し待ってから再送してください。",
+					},
+					429,
+				);
+			}
 		}
 
 		let replyTarget: { id: number; authorId: string } | undefined;
