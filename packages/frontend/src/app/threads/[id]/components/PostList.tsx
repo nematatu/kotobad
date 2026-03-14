@@ -586,6 +586,7 @@ export const PostList = ({
 																	imageUrl={imageUrl}
 																	width={1280}
 																	quality={82}
+																	enableZoom
 																	containerClassName="h-36"
 																	imageClassName="h-full"
 																/>

@@ -36,6 +36,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 							imageUrl={imageUrl}
 							width={960}
 							quality={80}
+							enableZoom
 							containerClassName="h-44 rounded-xl"
 							imageClassName="h-full"
 						/>
