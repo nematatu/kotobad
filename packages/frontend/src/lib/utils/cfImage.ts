@@ -52,7 +52,7 @@ export const toCfImageUrl = (
 	}
 
 	const directives: string[] = ["format=auto", "onerror=redirect"];
-	const quality = normalizePositiveInt(options.quality ?? 82);
+	const quality = normalizePositiveInt(options.quality);
 	const width = normalizePositiveInt(options.width);
 	const height = normalizePositiveInt(options.height);
 

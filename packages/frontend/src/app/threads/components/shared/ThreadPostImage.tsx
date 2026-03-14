@@ -10,8 +10,6 @@ type ImageSource = string | null | undefined;
 type ThreadPostImageProps = {
 	imageUrl: ImageSource;
 	alt?: string;
-	width: number;
-	quality?: number;
 	containerClassName?: string;
 	imageClassName?: string;
 	loading?: "lazy" | "eager";
@@ -21,8 +19,6 @@ type ThreadPostImageProps = {
 export const ThreadPostImage = ({
 	imageUrl,
 	alt = "",
-	width,
-	quality = 82,
 	containerClassName,
 	imageClassName,
 	loading = "lazy",
@@ -31,7 +27,7 @@ export const ThreadPostImage = ({
 	const dialogRef = useRef<HTMLDialogElement | null>(null);
 	const zoomImageRef = useRef<HTMLImageElement | null>(null);
 	const [isZoomImageReady, setIsZoomImageReady] = useState(false);
-	const transformedUrl = toCfImageUrl(imageUrl, { width, quality });
+	const transformedUrl = toCfImageUrl(imageUrl);
 
 	const openZoom = () => {
 		const dialog = dialogRef.current;

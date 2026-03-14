@@ -50,17 +50,15 @@ export const ThreadList = ({
 										<div
 											className={
 												threadPreviewImageUrls.length > 1
-													? "mt-2 grid max-w-[19rem] grid-cols-2 gap-2"
-													: "mt-2 max-w-[15rem]"
+													? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2"
+													: "mt-2 max-w-[12rem]"
 											}
 										>
 											{threadPreviewImageUrls.map((imageUrl) => (
 												<ThreadPostImage
 													key={imageUrl}
 													imageUrl={imageUrl}
-													width={720}
-													quality={78}
-													containerClassName="h-28"
+													containerClassName="h-20"
 													imageClassName="h-full"
 												/>
 											))}
