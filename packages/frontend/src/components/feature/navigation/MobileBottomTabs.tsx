@@ -15,7 +15,14 @@ import { motion } from "motion/react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { useUser } from "@/components/feature/provider/UserProvider";
 
 type BottomTab = {
@@ -74,48 +81,51 @@ export function MobileBottomTabs({
 		? `/users/${encodeURIComponent(user.id)}`
 		: "/auth/sign-in";
 
-	const tabs: BottomTab[] = [
-		{
-			id: "home",
-			label: "ホーム",
-			href: "/",
-			icon: {
-				active: IconHome2Filled,
-				inactive: IconHome2,
+	const tabs = useMemo<BottomTab[]>(
+		() => [
+			{
+				id: "home",
+				label: "ホーム",
+				href: "/",
+				icon: {
+					active: IconHome2Filled,
+					inactive: IconHome2,
+				},
+				isActive: pathname === "/",
 			},
-			isActive: pathname === "/",
-		},
-		{
-			id: "search",
-			label: "検索",
-			href: "/search",
-			icon: {
-				active: IconSearchFilled,
-				inactive: IconSearch,
+			{
+				id: "search",
+				label: "検索",
+				href: "/search",
+				icon: {
+					active: IconSearchFilled,
+					inactive: IconSearch,
+				},
+				isActive: pathname === "/search",
 			},
-			isActive: pathname === "/search",
-		},
-		{
-			id: "threads",
-			label: "スレッド",
-			href: "/threads",
-			icon: {
-				active: IconMessage2Filled,
-				inactive: IconMessage2,
+			{
+				id: "threads",
+				label: "スレッド",
+				href: "/threads",
+				icon: {
+					active: IconMessage2Filled,
+					inactive: IconMessage2,
+				},
+				isActive: isThreadPath(pathname),
 			},
-			isActive: isThreadPath(pathname),
-		},
-		{
-			id: "profile",
-			label: "プロフィール",
-			href: profileHref,
-			icon: {
-				active: IconUserFilled,
-				inactive: IconUser,
+			{
+				id: "profile",
+				label: "プロフィール",
+				href: profileHref,
+				icon: {
+					active: IconUserFilled,
+					inactive: IconUser,
+				},
+				isActive: isProfilePath(pathname),
 			},
-			isActive: isProfilePath(pathname),
-		},
-	];
+		],
+		[pathname, profileHref],
+	);
 
 	const routeActiveTabId = tabs.find((tab) => tab.isActive)?.id ?? null;
 	const activeTabId = optimisticActiveTabId ?? routeActiveTabId;
@@ -140,59 +150,52 @@ export function MobileBottomTabs({
 		};
 	}, []);
 
-	useLayoutEffect(() => {
+	const updateIndicatorRect = useCallback(() => {
 		const containerElement = containerRef.current;
 		if (!containerElement || !activeTabId) {
-			setIndicatorRect(null);
+			setIndicatorRect((current) => (current === null ? current : null));
 			return;
 		}
 
 		const activeTabElement = tabRefs.current[activeTabId];
 		if (!activeTabElement) {
-			setIndicatorRect(null);
+			setIndicatorRect((current) => (current === null ? current : null));
 			return;
 		}
 
 		const containerRect = containerElement.getBoundingClientRect();
 		const activeTabRect = activeTabElement.getBoundingClientRect();
-
-		setIndicatorRect({
+		const next = {
 			height: activeTabRect.height,
 			width: activeTabRect.width,
 			x: activeTabRect.left - containerRect.left,
 			y: activeTabRect.top - containerRect.top,
+		};
+
+		setIndicatorRect((current) => {
+			if (
+				current &&
+				current.height === next.height &&
+				current.width === next.width &&
+				current.x === next.x &&
+				current.y === next.y
+			) {
+				return current;
+			}
+			return next;
 		});
 	}, [activeTabId]);
 
+	useLayoutEffect(() => {
+		updateIndicatorRect();
+	}, [updateIndicatorRect]);
+
 	useEffect(() => {
-		const handleResize = () => {
-			const containerElement = containerRef.current;
-			if (!containerElement || !activeTabId) {
-				return;
-			}
-
-			const activeTabElement = tabRefs.current[activeTabId];
-			if (!activeTabElement) {
-				return;
-			}
-
-			const containerRect = containerElement.getBoundingClientRect();
-			const activeTabRect = activeTabElement.getBoundingClientRect();
-
-			setIndicatorRect({
-				height: activeTabRect.height,
-				width: activeTabRect.width,
-				x: activeTabRect.left - containerRect.left,
-				y: activeTabRect.top - containerRect.top,
-			});
-		};
-
-		window.addEventListener("resize", handleResize);
-
+		window.addEventListener("resize", updateIndicatorRect);
 		return () => {
-			window.removeEventListener("resize", handleResize);
+			window.removeEventListener("resize", updateIndicatorRect);
 		};
-	}, [activeTabId]);
+	}, [updateIndicatorRect]);
 
 	const renderTab = (tab: BottomTab) => {
 		const isActive = activeTabId === tab.id;

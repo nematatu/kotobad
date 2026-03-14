@@ -750,6 +750,10 @@ function useClickOutside<T extends HTMLElement = HTMLElement>(
 	isOpen: boolean,
 ) {
 	useEffect(() => {
+		if (!isOpen) {
+			return;
+		}
+
 		let startedOutsideWhileOpen = false;
 
 		const isOutside = (event: Event) => {
