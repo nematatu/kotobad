@@ -29,7 +29,7 @@ export const ThreadList = ({
 				const href = `/threads/${thread.id}`;
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
-				const threadPreviewImageUrls = thread.imageUrls.slice(0, 2);
+				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
 				return (
 					<div
 						key={thread.id}

@@ -10,7 +10,7 @@ type Props = {
 };
 
 export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
-	const threadImageUrls = threadHeaderData.imageUrls.slice(0, 2);
+	const threadImageUrls = (threadHeaderData.imageUrls ?? []).slice(0, 2);
 
 	return (
 		<div className="px-2 sm:px-0 flex flex-col justify-center space-y-4 mt-8 mb-4 sm:mb-9">
