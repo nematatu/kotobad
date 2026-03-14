@@ -32,6 +32,31 @@ export const ThreadList = ({
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
 				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
+				const renderThreadSummary = () => (
+					<div className="relative z-10">
+						<h3 className="block font-bold line-clamp-2 sm:text-lg">
+							{highlightText(thread.title, highlightQuery)}
+						</h3>
+						{threadPreviewImageUrls.length > 0 && (
+							<div
+								className={
+									threadPreviewImageUrls.length > 1
+										? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2"
+										: "mt-2 max-w-[12rem]"
+								}
+							>
+								{threadPreviewImageUrls.map((imageUrl) => (
+									<ThreadPostImage
+										key={imageUrl}
+										imageUrl={imageUrl}
+										containerClassName="h-20"
+										imageClassName="h-full"
+									/>
+								))}
+							</div>
+						)}
+					</div>
+				);
 				return (
 					<div
 						key={thread.id}
@@ -39,34 +64,13 @@ export const ThreadList = ({
 					>
 						<div className="min-w-0 flex-1 space-y-1">
 							<span className="text-[10px] text-gray-500">{relativeDate}</span>
+							<div className="block sm:hidden">{renderThreadSummary()}</div>
 							<Link
 								href={href}
 								aria-label={`スレッド: ${thread.title}`}
-								className="block after:absolute after:inset-0 after:rounded-sm after:z-0 after:content-['']"
+								className="hidden sm:block after:absolute after:inset-0 after:rounded-sm after:z-0 after:content-['']"
 							>
-								<div className="relative z-10">
-									<h3 className="block font-bold line-clamp-2 sm:text-lg">
-										{highlightText(thread.title, highlightQuery)}
-									</h3>
-									{threadPreviewImageUrls.length > 0 && (
-										<div
-											className={
-												threadPreviewImageUrls.length > 1
-													? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2"
-													: "mt-2 max-w-[12rem]"
-											}
-										>
-											{threadPreviewImageUrls.map((imageUrl) => (
-												<ThreadPostImage
-													key={imageUrl}
-													imageUrl={imageUrl}
-													containerClassName="h-20"
-													imageClassName="h-full"
-												/>
-											))}
-										</div>
-									)}
-								</div>
+								{renderThreadSummary()}
 							</Link>
 							<div className="flex flex-col space-y-2">
 								<div className="relative z-10 flex flex-wrap gap-3 self-start">
