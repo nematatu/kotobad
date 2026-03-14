@@ -24,7 +24,7 @@ const ThreadHeartLottiePlayer = dynamic(
 );
 
 export const THREAD_LIST_META_CHIP_CLASS =
-	"thread-list-meta-chip box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
+	"thread-list-meta-chip box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm bg-gray-100 px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
 
 type Props = {
 	threadId: number;
@@ -122,7 +122,7 @@ export function LikeButton({
 	const isCompact = size === "compact";
 	const compactButtonClass = cn(
 		THREAD_LIST_META_CHIP_CLASS,
-		"group/like-button min-h-0 appearance-none overflow-visible border-0 text-[10px] shadow-none hover:text-gray-800 active:scale-95 cursor-pointer",
+		"group/like-button min-h-0 appearance-none overflow-visible border-0 bg-gray-100 text-[10px] shadow-none hover:bg-gray-100 hover:text-gray-800 active:scale-95 cursor-pointer",
 	);
 
 	if (isCompact) {
