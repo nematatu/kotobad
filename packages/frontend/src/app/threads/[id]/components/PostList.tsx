@@ -7,12 +7,18 @@ import {
 import { ReactionOptionListSchema } from "@kotobad/shared/src/schemas/reaction";
 import type { PostListType, PostType } from "@kotobad/shared/src/types/post";
 import { AnimatePresence, motion } from "framer-motion";
-import { Reply } from "lucide-react";
+import { MoreHorizontal, Reply } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWRImmutable from "swr/immutable";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
+import IconButton from "@/components/common/button/IconButton";
 import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import {
 	BffFetcher,
 	type BffFetcherError,
@@ -24,6 +30,8 @@ import { ChatPage } from "./chat/ChatPage";
 import { MessageBubble } from "./chat/MessageBubble";
 import { MessageInput } from "./chat/MessageInput";
 import { MessageList } from "./chat/MessageList";
+import { MessageReaction } from "./chat/MessageReaction";
+import NoPost from "./NoPost";
 import type { ReplyTarget } from "./types/replyTarget";
 import { Emoji } from "./ui/emojiPicker";
 
@@ -32,10 +40,6 @@ type PostListProps = {
 	threadId: number;
 	highlightPostId: number | null;
 	onPostedAction?: () => void;
-};
-
-type ReactionCountProps = {
-	count: number;
 };
 
 type FlattenedPostItem = {
@@ -153,31 +157,6 @@ const getVisibleFlattenedPosts = (
 	return visibleFlattened;
 };
 
-const ReactionCount = ({ count }: ReactionCountProps) => {
-	const [isPopping, setIsPopping] = useState(false);
-	const previousCountRef = useRef(count);
-
-	useEffect(() => {
-		if (count === previousCountRef.current) return;
-		previousCountRef.current = count;
-		setIsPopping(true);
-		const timeoutId = window.setTimeout(() => {
-			setIsPopping(false);
-		}, 220);
-		return () => window.clearTimeout(timeoutId);
-	}, [count]);
-
-	return (
-		<span
-			className={`inline-block text-xs text-current ${
-				isPopping ? "animate-reaction-count-pop" : ""
-			}`}
-		>
-			{count}
-		</span>
-	);
-};
-
 export const PostList = ({
 	posts,
 	threadId,
@@ -193,6 +172,12 @@ export const PostList = ({
 	const [realtimeEnterPostIds, setRealtimeEnterPostIds] = useState<number[]>(
 		[],
 	);
+	const [openReactionPostId, setOpenReactionPostId] = useState<number | null>(
+		null,
+	);
+	const [openMobileActionPostId, setOpenMobileActionPostId] = useState<
+		number | null
+	>(null);
 	const [highlightAnimatingPostId, setHighlightAnimatingPostId] = useState<
 		number | null
 	>(null);
@@ -267,6 +252,18 @@ export const PostList = ({
 		if (postLocalIdMap.has(replyTarget.postId)) return;
 		setReplyTarget(null);
 	}, [postLocalIdMap, replyTarget]);
+
+	useEffect(() => {
+		if (openReactionPostId === null) return;
+		if (postLocalIdMap.has(openReactionPostId)) return;
+		setOpenReactionPostId(null);
+	}, [openReactionPostId, postLocalIdMap]);
+
+	useEffect(() => {
+		if (openMobileActionPostId === null) return;
+		if (postLocalIdMap.has(openMobileActionPostId)) return;
+		setOpenMobileActionPostId(null);
+	}, [openMobileActionPostId, postLocalIdMap]);
 
 	useEffect(() => {
 		const currentVisiblePostIds = visibleFlattenedPosts.map(
@@ -395,11 +392,7 @@ export const PostList = ({
 			messageList={
 				<MessageList autoScrollKey={visiblePostCount} autoScrollEnabled={false}>
 					{visiblePostCount === 0 ? (
-						<div className="flex h-full min-h-52 items-center justify-center">
-							<p className="rounded-full bg-[#f3f4f6] px-4 py-2 text-[#4b5563] text-sm font-medium">
-								まだメッセージはありません。最初の投稿をしてみましょう。
-							</p>
-						</div>
+						<NoPost />
 					) : (
 						<AnimatePresence initial={false} mode="popLayout">
 							{visibleFlattenedPosts.map(({ post, depth }) => {
@@ -422,12 +415,103 @@ export const PostList = ({
 									: 0;
 								const isHighlighted = highlightAnimatingPostId === post.id;
 								const isMine = post.isMine;
+								const isReactionPickerOpen =
+									openReactionPostId === post.id ||
+									openMobileActionPostId === post.id;
 								const chatTime = formatChatTime(post.createdAt);
 								const selectedReactionCodes: string[] = [];
 								for (const reaction of post.reactions) {
 									if (!reaction.reactedByMe) continue;
 									selectedReactionCodes.push(reaction.reactionCode);
 								}
+								const toggleReplyTarget = () => {
+									setReplyTarget((current) =>
+										current?.postId === post.id
+											? null
+											: {
+													postId: post.id,
+													localId: post.localId,
+													authorName: post.author.name,
+												},
+									);
+								};
+								const hoverActionArea = (
+									<div className="inline-flex items-center gap-1 rounded-full p-1">
+										<div className="hidden items-center gap-1 sm:inline-flex">
+											{reactionCodes.length > 0 ? (
+												<Emoji
+													reactionCodes={reactionCodes}
+													selectedReactionCodes={selectedReactionCodes}
+													onReactAction={(reactionCode) =>
+														handleReaction(post.id, reactionCode)
+													}
+													onOpenChangeAction={(isOpen) => {
+														setOpenReactionPostId((current) => {
+															if (isOpen) return post.id;
+															return current === post.id ? null : current;
+														});
+													}}
+												/>
+											) : null}
+											<button
+												type="button"
+												className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 text-[#1e3a8a] transition-colors duration-150 hover:text-[#1d4f91] dark:text-[#dbeafe] dark:hover:text-[#bfdbfe]"
+												aria-label="返信する"
+												onClick={toggleReplyTarget}
+											>
+												<Reply className="h-4 w-4" aria-hidden="true" />
+											</button>
+										</div>
+										<Popover
+											open={openMobileActionPostId === post.id}
+											onOpenChange={(open) => {
+												setOpenMobileActionPostId(open ? post.id : null);
+											}}
+										>
+											<PopoverTrigger asChild>
+												<IconButton
+													enableClickAnimation
+													type="button"
+													size="icon"
+													variant="ghost"
+													className="inline-flex h-8 w-8 rounded-full border-0 bg-transparent p-0 text-[#4b5563] hover:bg-transparent focus-visible:bg-transparent active:bg-transparent sm:hidden dark:text-[#cbd5e1] dark:hover:bg-transparent dark:focus-visible:bg-transparent"
+													aria-label="メッセージ操作メニュー"
+													icon={<MoreHorizontal className="h-4 w-4" />}
+												/>
+											</PopoverTrigger>
+											<PopoverContent
+												align={isMine ? "end" : "start"}
+												side="top"
+												sideOffset={8}
+												className="z-[130] w-auto rounded-xl border border-gray-200 bg-white/95 p-2 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/95"
+											>
+												<div className="inline-flex items-center gap-1">
+													{reactionCodes.length > 0 ? (
+														<Emoji
+															reactionCodes={reactionCodes}
+															selectedReactionCodes={selectedReactionCodes}
+															onReactAction={(reactionCode) => {
+																handleReaction(post.id, reactionCode);
+																setOpenMobileActionPostId(null);
+															}}
+														/>
+													) : null}
+													<button
+														type="button"
+														className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 text-[#1e3a8a] transition-colors duration-150 hover:text-[#1d4f91] dark:text-[#dbeafe] dark:hover:text-[#bfdbfe]"
+														aria-label="返信する"
+														onClick={() => {
+															toggleReplyTarget();
+															setOpenMobileActionPostId(null);
+														}}
+													>
+														<Reply className="h-4 w-4" aria-hidden="true" />
+													</button>
+												</div>
+											</PopoverContent>
+										</Popover>
+									</div>
+								);
 
 								return (
 									<motion.div
@@ -439,14 +523,14 @@ export const PostList = ({
 												: undefined
 										}
 										className={
-											depth > 0 && !isMine ? "pl-2 sm:pl-4" : undefined
+											depth > 0 && !isMine ? "mb-3 pl-2 sm:pl-4" : "mb-3"
 										}
 									>
 										{!isMine && (
 											<Link
 												href={`/users/${encodeURIComponent(post.authorId)}`}
 												showIndicator={false}
-												className="mb-1 inline-flex max-w-[196px] items-center gap-1.5 px-1"
+												className="mb-3 inline-flex max-w-[196px] items-center gap-3 px-1"
 											>
 												<AuthorAvatar
 													name={post.author.name}
@@ -459,192 +543,118 @@ export const PostList = ({
 												</span>
 											</Link>
 										)}
-										<MessageBubble
-											postId={post.id}
-											isMine={isMine}
-											isHighlighted={isHighlighted}
-											enterDelayMs={enterDelayMs}
-											animateOnMount={shouldAnimateOnMount}
-											timeLabel={chatTime}
-										>
-											<div className="space-y-2">
-												<div
-													className={
-														isMine
-															? "whitespace-pre-wrap break-words text-[#0f172a] text-sm leading-relaxed dark:text-[#e2ecff]"
-															: "whitespace-pre-wrap break-words text-[#111827] text-sm leading-relaxed dark:text-[#e5e7eb]"
-													}
-												>
-													<AutoLinkText
-														text={post.post}
-														linkClassName={
-															isMine
-																? "text-[#1d4f91] hover:text-[#123b70] underline-blue-400/50 dark:text-[#bfdbfe] dark:hover:text-[#dbeafe]"
-																: "text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
-														}
-													/>
-												</div>
-
-												{post.imageUrls.length > 0 && (
+										<div className={isMine ? undefined : "pl-6"}>
+											<MessageBubble
+												postId={post.id}
+												isMine={isMine}
+												isHighlighted={isHighlighted}
+												enterDelayMs={enterDelayMs}
+												animateOnMount={shouldAnimateOnMount}
+												timeLabel={chatTime}
+												reactionPicker={hoverActionArea}
+												isReactionPickerOpen={isReactionPickerOpen}
+											>
+												<div className="space-y-2">
 													<div
 														className={
-															post.imageUrls.length > 1
-																? "grid max-w-sm grid-cols-2 gap-2"
-																: "max-w-[16rem]"
+															isMine
+																? "whitespace-pre-wrap break-words text-[#0f172a] text-sm leading-relaxed dark:text-[#e2ecff]"
+																: "whitespace-pre-wrap break-words text-[#111827] text-sm leading-relaxed dark:text-[#e5e7eb]"
 														}
 													>
-														{post.imageUrls.slice(0, 2).map((imageUrl) => (
-															<ThreadPostImage
-																key={imageUrl}
-																imageUrl={imageUrl}
-																width={1280}
-																quality={82}
-																containerClassName="h-36"
-																imageClassName="h-full"
-															/>
-														))}
+														<AutoLinkText
+															text={post.post}
+															linkClassName={
+																isMine
+																	? "text-[#1d4f91] hover:text-[#123b70] underline-blue-400/50 dark:text-[#bfdbfe] dark:hover:text-[#dbeafe]"
+																	: "text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
+															}
+														/>
 													</div>
-												)}
-											</div>
-										</MessageBubble>
-										<div
-											className={
-												isMine
-													? "mt-1 flex flex-wrap items-center justify-end gap-2 pr-1"
-													: "mt-1 flex flex-wrap items-center gap-2 pl-1"
-											}
-										>
-											<button
-												type="button"
+
+													{post.imageUrls.length > 0 && (
+														<div
+															className={
+																post.imageUrls.length > 1
+																	? "grid max-w-sm grid-cols-2 gap-2"
+																	: "max-w-[16rem]"
+															}
+														>
+															{post.imageUrls.slice(0, 2).map((imageUrl) => (
+																<ThreadPostImage
+																	key={imageUrl}
+																	imageUrl={imageUrl}
+																	width={1280}
+																	quality={82}
+																	containerClassName="h-36"
+																	imageClassName="h-full"
+																/>
+															))}
+														</div>
+													)}
+												</div>
+											</MessageBubble>
+											<div
 												className={
 													isMine
-														? "inline-flex h-6 w-6 items-center justify-center rounded-full bg-transparent p-0 text-[#1e3a8a] transition-colors duration-150 hover:bg-[#dbeafe] hover:text-[#1d4f91] dark:text-[#dbeafe] dark:hover:bg-[#31507a]"
-														: "inline-flex h-6 w-6 items-center justify-center rounded-full bg-transparent p-0 text-[#4b5563] transition-colors duration-150 hover:bg-[#e5e7eb] hover:text-[#111827] dark:text-[#cbd5e1] dark:hover:bg-[#334155]"
-												}
-												aria-label="返信する"
-												onClick={() =>
-													setReplyTarget((current) =>
-														current?.postId === post.id
-															? null
-															: {
-																	postId: post.id,
-																	localId: post.localId,
-																	authorName: post.author.name,
-																},
-													)
+														? "mt-0.5 flex flex-wrap items-center justify-end gap-2 pr-1"
+														: "mt-0.5 flex flex-wrap items-center gap-2 pl-1"
 												}
 											>
-												<Reply className="h-3.5 w-3.5" aria-hidden="true" />
-											</button>
-											{reactionCodes.length > 0 ? (
-												<Emoji
-													reactionCodes={reactionCodes}
-													selectedReactionCodes={selectedReactionCodes}
+												<MessageReaction
+													postId={post.id}
+													reactions={post.reactions}
+													isMine={isMine}
 													onReactAction={(reactionCode) =>
 														handleReaction(post.id, reactionCode)
 													}
 												/>
-											) : null}
-											{post.replyCount > 0 && depth > 0 && (
-												<button
-													type="button"
-													className={
-														isMine
-															? "cursor-pointer text-[#1e3a8a] text-[11px] underline-offset-2 hover:underline dark:text-[#dbeafe]"
-															: "cursor-pointer text-[#4b5563] text-[11px] underline-offset-2 hover:underline dark:text-[#cbd5e1]"
-													}
-													onClick={() => toggleReplies(post.id)}
-												>
-													{isRepliesExpanded
-														? "返信を隠す"
-														: `${post.replyCount}件の返信を表示`}
-												</button>
-											)}
-										</div>
-										<AnimatePresence initial={false}>
-											{post.reactions.length > 0 ? (
-												<motion.div
-													key={`${post.id}:reactions`}
-													layout
-													initial={{ opacity: 0, height: 0, y: -4 }}
-													animate={{ opacity: 1, height: "auto", y: 0 }}
-													exit={{ opacity: 0, height: 0, y: -4 }}
-													transition={{
-														duration: 0.2,
-														ease: [0.22, 1, 0.36, 1],
-													}}
-													className={
-														isMine
-															? "mt-1 flex flex-wrap items-center justify-end gap-2 overflow-hidden pr-1"
-															: "mt-1 flex flex-wrap items-center gap-2 overflow-hidden pl-1"
-													}
-												>
-													{post.reactions.map(
-														({
-															id,
-															reactionCode,
-															emoji,
-															reactedByMe,
-															count,
-														}) => {
-															const isReacted = reactedByMe;
-															return (
-																<button
-																	type="button"
-																	key={`${post.id}:${reactionCode}:${id}`}
-																	className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold transition-colors duration-150 ${
-																		isReacted
-																			? isMine
-																				? "bg-[#dbeafe] text-[#1e3a8a] ring-1 ring-[#93c5fd] dark:bg-[#31507a] dark:text-[#dbeafe] dark:ring-[#4d77b2]"
-																				: "bg-[#06C755]/15 text-[#111827] ring-1 ring-[#06C755]/40 dark:bg-[#06C755]/25 dark:text-[#e5e7eb]"
-																			: isMine
-																				? "bg-[#eff6ff] text-[#1e3a8a] hover:bg-[#dbeafe] dark:bg-[#2a3b52] dark:text-[#dbeafe] dark:hover:bg-[#334a67]"
-																				: "bg-[#e5e7eb] text-[#374151] hover:bg-[#d1d5db] dark:bg-[#334155] dark:text-[#cbd5e1] dark:hover:bg-[#475569]"
-																	}`}
-																	onClick={() =>
-																		handleReaction(post.id, reactionCode)
-																	}
-																	aria-label={`${emoji} をリアクション`}
-																>
-																	<span>{emoji}</span>
-																	<ReactionCount count={count} />
-																</button>
-															);
-														},
-													)}
-												</motion.div>
-											) : null}
-										</AnimatePresence>
-
-										<AnimatePresence initial={false}>
-											{isReplyingToThisPost ? (
-												<motion.div
-													key={`${post.id}:reply-form`}
-													layout
-													initial={{ opacity: 0, height: 0, y: -4 }}
-													animate={{ opacity: 1, height: "auto", y: 0 }}
-													exit={{ opacity: 0, height: 0, y: -4 }}
-													transition={{
-														duration: 0.22,
-														ease: [0.22, 1, 0.36, 1],
-													}}
-													className="mt-1 overflow-hidden pt-1"
-												>
-													<CreatePostForm
-														threadId={threadId}
-														replyTarget={replyTarget}
-														variant="inline"
-														onPostedAction={() => {
-															setReplyTarget(null);
-															onPostedAction?.();
-														}}
-														onClearReplyTargetAction={() =>
-															setReplyTarget(null)
+												{post.replyCount > 0 && depth > 0 && (
+													<button
+														type="button"
+														className={
+															isMine
+																? "cursor-pointer text-[#1e3a8a] text-[11px] underline-offset-2 hover:underline dark:text-[#dbeafe]"
+																: "cursor-pointer text-[#4b5563] text-[11px] underline-offset-2 hover:underline dark:text-[#cbd5e1]"
 														}
-													/>
-												</motion.div>
-											) : null}
-										</AnimatePresence>
+														onClick={() => toggleReplies(post.id)}
+													>
+														{isRepliesExpanded
+															? "返信を隠す"
+															: `${post.replyCount}件の返信を表示`}
+													</button>
+												)}
+											</div>
+											<AnimatePresence initial={false}>
+												{isReplyingToThisPost ? (
+													<motion.div
+														key={`${post.id}:reply-form`}
+														layout
+														initial={{ opacity: 0, height: 0, y: -4 }}
+														animate={{ opacity: 1, height: "auto", y: 0 }}
+														exit={{ opacity: 0, height: 0, y: -4 }}
+														transition={{
+															duration: 0.22,
+															ease: [0.22, 1, 0.36, 1],
+														}}
+														className="mt-1 overflow-hidden pt-1"
+													>
+														<CreatePostForm
+															threadId={threadId}
+															replyTarget={replyTarget}
+															variant="inline"
+															onPostedAction={() => {
+																setReplyTarget(null);
+																onPostedAction?.();
+															}}
+															onClearReplyTargetAction={() =>
+																setReplyTarget(null)
+															}
+														/>
+													</motion.div>
+												) : null}
+											</AnimatePresence>
+										</div>
 									</motion.div>
 								);
 							})}
