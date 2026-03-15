@@ -11,6 +11,7 @@ type ThreadPostImageProps = {
 	imageUrl: ImageSource;
 	alt?: string;
 	containerClassName?: string;
+	imageClassName?: string;
 	loading?: "lazy" | "eager";
 	enableZoom?: boolean;
 };
@@ -19,6 +20,7 @@ export const ThreadPostImage = ({
 	imageUrl,
 	alt = "",
 	containerClassName,
+	imageClassName,
 	loading = "lazy",
 	enableZoom = false,
 }: ThreadPostImageProps) => {
@@ -58,7 +60,7 @@ export const ThreadPostImage = ({
 					src={transformedUrl}
 					alt={alt}
 					loading={loading}
-					className={"h-full w-full object-cover"}
+					className={cn("h-full w-full object-cover", imageClassName)}
 				/>
 			</div>
 		);
@@ -80,7 +82,7 @@ export const ThreadPostImage = ({
 					src={transformedUrl}
 					alt={alt}
 					loading={loading}
-					className={"h-full w-full object-cover"}
+					className={cn("h-full w-full object-cover", imageClassName)}
 				/>
 			</button>
 			<dialog
