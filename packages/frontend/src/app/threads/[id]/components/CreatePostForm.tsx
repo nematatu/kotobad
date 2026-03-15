@@ -23,7 +23,10 @@ import {
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { cn } from "@/lib/utils";
-import { ThreadPostImagePicker } from "../../components/shared/ThreadPostImagePicker";
+import {
+	ThreadPostImagePicker,
+	ThreadPostImagePreviewGrid,
+} from "../../components/shared/ThreadPostImagePicker";
 import { useThreadPostImageInput } from "../../lib/useThreadPostImageInput";
 import type { ReplyTarget } from "./types/replyTarget";
 
@@ -58,6 +61,7 @@ export const CreatePostForm = ({
 	const { mutate } = useSWRConfig();
 	const isInline = variant === "inline";
 	const isChat = variant === "chat";
+	const isThreadLike = !isChat;
 	const replyTargetPostId = replyTarget?.postId ?? null;
 
 	const form = useForm<CreatePostType>({
@@ -158,6 +162,7 @@ export const CreatePostForm = ({
 								<FormControl>
 									<div>
 										<Textarea
+											rows={1}
 											{...field}
 											{...form.register("post", {
 												required: "空文字は送信できません",
@@ -168,6 +173,11 @@ export const CreatePostForm = ({
 											})}
 											autoFocus={isInline && replyTargetPostId !== null}
 											disabled={isSubmitting}
+											onInput={(event) => {
+												const element = event.currentTarget;
+												element.style.height = "0px";
+												element.style.height = `${element.scrollHeight}px`;
+											}}
 											onKeyDown={(e) => {
 												if (isSubmitting) {
 													return;
@@ -185,21 +195,24 @@ export const CreatePostForm = ({
 														: "内容"
 											}
 											className={cn(
-												"w-full resize-none rounded-xl text-[#111827] placeholder:text-[#6b7280] focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]",
+												"w-full resize-none rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0",
 												isChat
 													? "min-h-[48px] bg-[#ffffff]/95 px-3 py-2 text-base shadow-none dark:bg-[#101b2c] sm:text-sm"
-													: "border-none shadow-none",
-												isInline
-													? "min-h-[72px]"
-													: isChat
-														? "max-h-32"
-														: "sm:min-h-[84px]",
+													: "min-h-10 overflow-hidden border-none py-2 text-slate-900 shadow-none placeholder:text-slate-400 dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]",
+												isChat ? "max-h-32" : undefined,
 											)}
 										/>
 									</div>
 								</FormControl>
 								<FormMessage />
 								{error && <p className="text-red-500 text-sm">{error}</p>}
+								{isThreadLike && (
+									<ThreadPostImagePreviewGrid
+										imagePreviewUrls={imagePreviewUrls}
+										onRemoveImageAction={removeImageAtAction}
+										disabled={isSubmitting}
+									/>
+								)}
 							</div>
 						</FormItem>
 					)}
@@ -215,7 +228,8 @@ export const CreatePostForm = ({
 					onRemoveImageAction={removeImageAtAction}
 					actionsClassName={isChat ? "pl-0" : "pl-10"}
 					previewImageClassName="h-28"
-					showIcons={!isChat}
+					showIcons
+					showPreview={isChat}
 				/>
 				<div className="flex items-end justify-end gap-2">
 					{isInline ? (

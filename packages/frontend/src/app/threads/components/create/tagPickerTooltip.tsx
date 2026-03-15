@@ -51,7 +51,7 @@ export function TagPickerTooltip({
 			</TooltipProvider>
 			<PopoverContent
 				align="start"
-				className="w-[360px] rounded-xl border-0 bg-white p-4"
+				className="z-[220] w-[360px] rounded-xl border-0 bg-white p-4"
 				side="bottom"
 				sideOffset={8}
 			>
