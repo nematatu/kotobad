@@ -3,6 +3,7 @@
 import { Undo2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useThreadBottomComposer } from "@/components/feature/provider/ThreadBottomComposerProvider";
 import { Button } from "@/components/ui/button";
 import { viewTransitionKeys } from "@/config/viewTransition";
 import {
@@ -13,6 +14,7 @@ import {
 export function BackToThreadList() {
 	const router = useViewTransitionRouter();
 	const [mounted, setMounted] = useState(false);
+	const { isExpanded: isComposerExpanded } = useThreadBottomComposer();
 
 	useEffect(() => {
 		setMounted(true);
@@ -42,7 +44,9 @@ export function BackToThreadList() {
 			enableClickAnimation
 			onClick={onBackClick}
 			aria-label="スレッド一覧へ戻る"
-			className="route-transition-floating-action pointer-events-auto block sm:hidden fixed bottom-30 right-4 z-[70] inline-flex h-14 w-14 flex-col items-center justify-center rounded-full border border-slate-200 bg-blue-500/90 text-white"
+			className={`route-transition-floating-action pointer-events-auto block sm:hidden fixed right-4 z-[70] inline-flex h-14 w-14 flex-col items-center justify-center rounded-full bg-gray-300/90 text-gray-900 dark:bg-gray-500 dark:text-white ${
+				isComposerExpanded ? "bottom-55" : "bottom-30"
+			}`}
 		>
 			<Undo2 size={21} />
 			<span className="text-[10px]">戻る</span>

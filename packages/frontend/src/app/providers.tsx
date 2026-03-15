@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { Link as TransitionLink } from "@/components/common/Link";
 import PwaPullToRefresh from "@/components/feature/navigation/PwaPullToRefresh";
 import ViewTransitionStateSync from "@/components/feature/navigation/ViewTransitionStateSync";
+import { ThreadBottomComposerProvider } from "@/components/feature/provider/ThreadBottomComposerProvider";
 import { UserProvider } from "@/components/feature/provider/UserProvider";
 import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 import { authClient } from "@/lib/auth/auth-client";
@@ -38,11 +39,13 @@ export function Providers({ children }: { children: ReactNode }) {
 				social={{ providers: ["google"] }}
 			>
 				<UserProvider>
-					<Suspense fallback={null}>
-						<ViewTransitionStateSync />
-					</Suspense>
-					<PwaPullToRefresh />
-					{children}
+					<ThreadBottomComposerProvider>
+						<Suspense fallback={null}>
+							<ViewTransitionStateSync />
+						</Suspense>
+						<PwaPullToRefresh />
+						{children}
+					</ThreadBottomComposerProvider>
 				</UserProvider>
 			</AuthUIProvider>
 		</ThemeProvider>

@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import IconButton from "@/components/common/button/IconButton";
+import { useThreadBottomComposer } from "@/components/feature/provider/ThreadBottomComposerProvider";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,6 +65,7 @@ export const CreatePostForm = ({
 	const isBottomNav = variant === "bottomNav";
 	const isThreadLike = !isChat;
 	const replyTargetPostId = replyTarget?.postId ?? null;
+	const { setIsExpanded } = useThreadBottomComposer();
 
 	const form = useForm<CreatePostType>({
 		defaultValues: {
@@ -80,6 +82,17 @@ export const CreatePostForm = ({
 		const timeoutId = window.setTimeout(() => form.setFocus("post"), 1);
 		return () => window.clearTimeout(timeoutId);
 	}, [form, isInline, replyTargetPostId]);
+
+	useEffect(() => {
+		if (!isBottomNav) {
+			return;
+		}
+		const expanded = imagePreviewUrls.length > 0;
+		setIsExpanded(expanded);
+		return () => {
+			setIsExpanded(false);
+		};
+	}, [imagePreviewUrls.length, isBottomNav, setIsExpanded]);
 
 	const handleSubmit = async (values: CreatePostType) => {
 		if (submitLockRef.current) {
@@ -156,7 +169,7 @@ export const CreatePostForm = ({
 					name="post"
 					render={({ field }) => (
 						<FormItem
-							className={cn("flex gap-2", isChat ? "items-end" : undefined)}
+							className={cn("flex gap-2", isChat ? "items-center" : undefined)}
 						>
 							{isChat ? null : <UserAvatar />}
 							<div className="flex min-w-0 flex-1 flex-col space-y-2">
@@ -232,7 +245,7 @@ export const CreatePostForm = ({
 					showIcons
 					showPreview={isChat}
 				/>
-				<div className="flex items-end justify-end gap-2">
+				<div className="flex items-center justify-end gap-2">
 					{isInline ? (
 						<Button
 							type="button"
@@ -275,7 +288,12 @@ export const CreatePostForm = ({
 	const bottomNavFormView = (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-1.5">
-				<div className="flex items-end gap-1.5">
+				<ThreadPostImagePreviewGrid
+					imagePreviewUrls={imagePreviewUrls}
+					onRemoveImageAction={removeImageAtAction}
+					disabled={isSubmitting}
+				/>
+				<div className="flex items-center gap-1.5">
 					<ThreadPostImagePicker
 						imageInputRef={imageInputRef}
 						imagePreviewUrls={imagePreviewUrls}
@@ -337,11 +355,6 @@ export const CreatePostForm = ({
 						{isSubmitting ? "送信中" : "送信"}
 					</Button>
 				</div>
-				<ThreadPostImagePreviewGrid
-					imagePreviewUrls={imagePreviewUrls}
-					onRemoveImageAction={removeImageAtAction}
-					disabled={isSubmitting}
-				/>
 				{error && <p className="text-xs text-red-500">{error}</p>}
 			</form>
 		</Form>
