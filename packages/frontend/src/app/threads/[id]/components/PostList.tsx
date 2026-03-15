@@ -52,18 +52,33 @@ const messageLayoutTransition = {
 	ease: [0.22, 1, 0.36, 1] as const,
 };
 
-const chatTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
+const chatDateTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
+	year: "numeric",
+	month: "2-digit",
+	day: "2-digit",
 	hour: "2-digit",
 	minute: "2-digit",
 	hour12: false,
 });
 
-const formatChatTime = (createdAt: string): string => {
+const ONE_HOUR_SECONDS = 60 * 60;
+
+const formatChatTime = (createdAt: string, nowMs: number): string => {
 	const date = new Date(createdAt);
 	if (Number.isNaN(date.getTime())) {
 		return "";
 	}
-	return chatTimeFormatter.format(date);
+
+	const diffSeconds = Math.floor((nowMs - date.getTime()) / 1000);
+	if (diffSeconds >= 0 && diffSeconds < 60) {
+		return `${diffSeconds}秒前`;
+	}
+
+	if (diffSeconds >= 60 && diffSeconds < ONE_HOUR_SECONDS) {
+		return `${Math.floor(diffSeconds / 60)}分前`;
+	}
+
+	return chatDateTimeFormatter.format(date);
 };
 
 const LARGE_LIST_DISABLE_ENTER_ANIMATION = 80;
@@ -385,6 +400,7 @@ export const PostList = ({
 		visiblePostCount > LARGE_LIST_DISABLE_ENTER_ANIMATION;
 	const enableLayoutAnimation =
 		visiblePostCount <= LARGE_LIST_DISABLE_LAYOUT_ANIMATION;
+	const nowMs = Date.now();
 
 	return (
 		<ChatPage
@@ -418,7 +434,7 @@ export const PostList = ({
 								const isReactionPickerOpen =
 									openReactionPostId === post.id ||
 									openMobileActionPostId === post.id;
-								const chatTime = formatChatTime(post.createdAt);
+								const chatTime = formatChatTime(post.createdAt, nowMs);
 								const selectedReactionCodes: string[] = [];
 								for (const reaction of post.reactions) {
 									if (!reaction.reactedByMe) continue;
@@ -474,7 +490,7 @@ export const PostList = ({
 													type="button"
 													size="icon"
 													variant="ghost"
-													className="inline-flex h-8 w-8 rounded-full border-0 bg-transparent p-0 text-[#4b5563] hover:bg-transparent focus-visible:bg-transparent active:bg-transparent sm:hidden dark:text-[#cbd5e1] dark:hover:bg-transparent dark:focus-visible:bg-transparent"
+													className="inline-flex h-8 w-8 rounded-full border-0 bg-transparent p-0 text-[#6b7280] hover:bg-transparent focus-visible:bg-transparent active:bg-transparent sm:hidden dark:text-[#94a3b8] dark:hover:bg-transparent dark:focus-visible:bg-transparent"
 													aria-label="メッセージ操作メニュー"
 													icon={<MoreHorizontal className="h-4 w-4" />}
 												/>
@@ -483,13 +499,15 @@ export const PostList = ({
 												align={isMine ? "end" : "start"}
 												side="top"
 												sideOffset={8}
-												className="z-[130] w-auto rounded-xl border border-gray-200 bg-white/95 p-2 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/95"
+												className="z-[130] w-[12.5rem] rounded-xl border border-gray-200 bg-white/95 p-2 shadow-lg backdrop-blur-sm dark:border-[#334155] dark:bg-[#0f172a]/95"
 											>
-												<div className="inline-flex items-center gap-1">
+												<div className="flex flex-col gap-1">
 													{reactionCodes.length > 0 ? (
 														<Emoji
 															reactionCodes={reactionCodes}
 															selectedReactionCodes={selectedReactionCodes}
+															triggerLabel="リアクション"
+															triggerClassName="inline-flex w-full items-center justify-start gap-2 rounded-lg px-2 py-1.5 text-[12px] font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
 															onReactAction={(reactionCode) => {
 																handleReaction(post.id, reactionCode);
 																setOpenMobileActionPostId(null);
@@ -498,15 +516,18 @@ export const PostList = ({
 													) : null}
 													<button
 														type="button"
-														className="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 text-[#1e3a8a] transition-colors duration-150 hover:text-[#1d4f91] dark:text-[#dbeafe] dark:hover:text-[#bfdbfe]"
-														aria-label="返信する"
+														className="inline-flex items-center justify-start gap-2 rounded-lg px-2 py-1.5 text-[12px] font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
 														onClick={() => {
 															toggleReplyTarget();
 															setOpenMobileActionPostId(null);
 														}}
 													>
-														<Reply className="h-4 w-4" aria-hidden="true" />
+														<Reply className="h-3.5 w-3.5" aria-hidden="true" />
+														返信
 													</button>
+													<div className="mt-1 rounded-lg border-t border-slate-200 px-2 py-2 text-[11px] text-slate-700 dark:border-slate-700 dark:text-slate-200">
+														<p>{chatTime || "-"}</p>
+													</div>
 												</div>
 											</PopoverContent>
 										</Popover>
@@ -550,7 +571,6 @@ export const PostList = ({
 												isHighlighted={isHighlighted}
 												enterDelayMs={enterDelayMs}
 												animateOnMount={shouldAnimateOnMount}
-												timeLabel={chatTime}
 												reactionPicker={hoverActionArea}
 												isReactionPickerOpen={isReactionPickerOpen}
 											>

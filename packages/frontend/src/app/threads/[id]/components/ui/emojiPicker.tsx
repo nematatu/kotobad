@@ -5,12 +5,15 @@ import { SmilePlus } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import IconButton from "@/components/common/button/IconButton";
+import { cn } from "@/lib/utils";
 
 type EmojiProps = {
 	onReactAction: (emoji: string) => void;
 	reactionCodes: string[];
 	selectedReactionCodes: string[];
 	onOpenChangeAction?: (isOpen: boolean) => void;
+	triggerLabel?: string;
+	triggerClassName?: string;
 };
 
 type PickerPosition = {
@@ -29,6 +32,8 @@ export function Emoji({
 	reactionCodes,
 	selectedReactionCodes,
 	onOpenChangeAction,
+	triggerLabel,
+	triggerClassName,
 }: EmojiProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const rootRef = useRef<HTMLDivElement | null>(null);
@@ -208,32 +213,51 @@ export function Emoji({
 	}, [isOpen, getPickerButtons]);
 
 	return (
-		<div ref={rootRef} className="relative inline-flex w-fit">
-			<IconButton
-				enableClickAnimation
-				type="button"
-				size="icon"
-				variant="outline"
-				className="group h-8 w-8 rounded-full border-0 p-0 text-[#1e3a8a] dark:text-[#dbeafe]"
-				onClick={() => setIsOpen((prev) => !prev)}
-				aria-expanded={isOpen}
-				aria-label="リアクション絵文字を開く"
-				icon={
-					<SmilePlus className="h-4 w-4 text-current transition-colors group-hover:fill-yellow-300" />
-				}
-			/>
+		<div
+			ref={rootRef}
+			className={cn("relative inline-flex", triggerLabel ? "w-full" : "w-fit")}
+		>
+			{triggerLabel ? (
+				<button
+					type="button"
+					onClick={() => setIsOpen((prev) => !prev)}
+					aria-expanded={isOpen}
+					aria-label="リアクション絵文字を開く"
+					className={
+						triggerClassName ??
+						"inline-flex items-center justify-start gap-2 rounded-lg px-2 py-1.5 text-[12px] font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+					}
+				>
+					<SmilePlus className="h-3.5 w-3.5" aria-hidden="true" />
+					{triggerLabel}
+				</button>
+			) : (
+				<IconButton
+					enableClickAnimation
+					type="button"
+					size="icon"
+					variant="outline"
+					className="group h-8 w-8 rounded-full border-0 p-0 text-[#1e3a8a] dark:text-[#dbeafe]"
+					onClick={() => setIsOpen((prev) => !prev)}
+					aria-expanded={isOpen}
+					aria-label="リアクション絵文字を開く"
+					icon={
+						<SmilePlus className="h-4 w-4 text-current transition-colors group-hover:fill-yellow-300" />
+					}
+				/>
+			)}
 			{isOpen
 				? createPortal(
 						<>
 							<button
 								type="button"
-								className="fixed inset-0 z-[60] animate-fade-in"
+								className="fixed inset-0 z-[180] animate-fade-in"
 								aria-label="リアクション絵文字を閉じる"
 								onClick={() => setIsOpen(false)}
 							/>
 							<div
 								ref={pickerRef}
-								className="fixed z-[70] origin-center"
+								className="fixed z-[190] origin-center"
 								style={{
 									top: pickerPosition?.top ?? VIEWPORT_PADDING_PX,
 									left: pickerPosition?.left ?? VIEWPORT_PADDING_PX,
