@@ -28,9 +28,25 @@ export default async function RootLayout({
 				<meta name="apple-mobile-web-app-title" content="Kotobad" />
 				<meta name="theme-color" content="#0f172a" />
 				<link rel="apple-touch-icon" href="/pwa-192x192.png" />
+				<style nonce="pwa-splash">{`
+					#initial-splash {
+						background-color: #0f172a;
+						position: fixed;
+						inset: 0;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						z-index: 9999;
+					}
+				`}</style>
 			</head>
 			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
-				<div id="initial-splash" className="initial-splash" aria-hidden="true">
+				<div
+					id="initial-splash"
+					className="initial-splash"
+					aria-hidden="true"
+					style={{ backgroundColor: "#0f172a" }}
+				>
 					<div className="initial-splash__art">
 						<Image
 							src="/assets/logo/logo.svg"
