@@ -59,12 +59,9 @@ export function MobileBottomCreateThreadMorph({
 					}`}
 				>
 					<Plus
-						size={18}
+						size={28}
 						className="transition-transform duration-100 group-active:scale-90"
 					/>
-					<span className="transition-transform duration-100 group-active:scale-95">
-						投稿
-					</span>
 				</button>
 			</FamilyDrawerTrigger>
 			<FamilyDrawerPortal>

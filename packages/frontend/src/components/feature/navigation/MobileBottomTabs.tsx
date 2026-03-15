@@ -230,13 +230,7 @@ export function MobileBottomTabs({
 						<tab.icon.inactive className="h-6 w-6" stroke={1.9} />
 					)}
 				</span>
-				<span
-					className={`relative z-10 inline-flex origin-center transition-transform duration-150 ease-out ${
-						isActive ? "scale-[1.3]" : "scale-100"
-					}`}
-				>
-					{tab.label}
-				</span>
+				<span className="sr-only">{tab.label}</span>
 			</NextLink>
 		);
 	};
