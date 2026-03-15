@@ -321,7 +321,7 @@ export const CreatePostForm = ({
 												}
 											}}
 											placeholder="返信を入力..."
-											className="max-h-24 min-h-9 w-full overflow-hidden rounded-lg border-none bg-white/90 px-2 py-2 text-sm text-[#111827] shadow-none placeholder:text-[#6b7280] focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#101b2c] dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]"
+											className="max-h-24 min-h-9 w-full overflow-hidden rounded-lg border-none bg-white/90 px-2 py-2 text-base text-[#111827] shadow-none placeholder:text-[#6b7280] focus-visible:ring-0 focus-visible:ring-offset-0 md:text-sm dark:bg-[#101b2c] dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]"
 										/>
 									</FormControl>
 								</FormItem>
