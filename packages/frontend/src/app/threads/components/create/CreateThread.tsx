@@ -148,7 +148,7 @@ export const CreateThreadForm = ({
 															form.handleSubmit(handleSubmit)();
 														}
 													}}
-													placeholder="今なにしてる？"
+													placeholder="例: 〇〇の試合について"
 													className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
 												/>
 											</div>
