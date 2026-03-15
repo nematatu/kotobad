@@ -8,6 +8,11 @@ export const headerNavLinks: ActionLinkItem[] = [
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,
 	},
 	{
+		label: "検索",
+		href: "/search",
+		viewTransitionKey: viewTransitionKeys.searchPageNavigation,
+	},
+	{
 		label: "BWFライブデモ",
 		href: "/bwf-live-demo",
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,

@@ -7,6 +7,7 @@ import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
 import HeaderNav from "./component/HeaderNav";
+import HeaderSearch from "./component/HeaderSearch";
 import HeaderUserActions from "./component/HeaderUserActions";
 import { headerNavLinks } from "./headerNavLinks";
 
@@ -56,6 +57,9 @@ const Header = ({ tags }: Props) => {
 					</div>
 				</div>
 				<HeaderNav links={headerNavLinks} />
+				<div className="hidden md:flex shrink-0">
+					<HeaderSearch />
+				</div>
 				<div className="ml-auto flex items-center gap-2 shrink-0">
 					<div className="hidden [@media(min-width:496px)]:block">
 						<ThemeToggle />
