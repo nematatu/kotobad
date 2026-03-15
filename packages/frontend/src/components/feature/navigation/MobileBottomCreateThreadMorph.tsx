@@ -1,9 +1,9 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Drawer } from "vaul";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import {
@@ -45,6 +45,18 @@ export function MobileBottomCreateThreadMorph({
 		handleOpenChange(false);
 	}, [handleOpenChange, router]);
 
+	useEffect(() => {
+		const body = document.body;
+		if (isOpen) {
+			body.dataset.createThreadDrawerOpen = "true";
+		} else {
+			delete body.dataset.createThreadDrawerOpen;
+		}
+		return () => {
+			delete body.dataset.createThreadDrawerOpen;
+		};
+	}, [isOpen]);
+
 	return (
 		<FamilyDrawerRoot open={isOpen} onOpenChange={handleOpenChange}>
 			<FamilyDrawerTrigger asChild>
@@ -70,24 +82,21 @@ export function MobileBottomCreateThreadMorph({
 					<div
 						className={`flex ${DRAWER_HEIGHT_CLS} w-[min(96vw,460px)] flex-col overflow-hidden rounded-[1rem] border border-slate-200/80 bg-white/95 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.55)] dark:border-slate-700 dark:bg-slate-950/95 dark:shadow-[0_20px_42px_-30px_rgba(2,6,23,0.95)]`}
 					>
-						<Drawer.Title className="sr-only">新規スレッドを作成</Drawer.Title>
-						<header className="flex items-center justify-between border-b border-slate-200/80 px-3 py-2 dark:border-slate-700">
-							<div className="min-w-0">
-								<p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-									新規スレッドを作成
-								</p>
-								<p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
-									今の気持ちや話題をシェアしましょう
-								</p>
-							</div>
+						<Drawer.Title className="sr-only">スレッドを作成</Drawer.Title>
+						<header className="relative flex items-center justify-center border-b border-slate-200/80 px-3 py-3 dark:border-slate-700">
 							<button
 								type="button"
 								aria-label="スレッド作成を閉じる"
 								onClick={closeSurface}
-								className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 transition-colors [@media(hover:hover)]:hover:bg-slate-100 [@media(hover:hover)]:hover:text-slate-700 dark:text-slate-300 dark:[@media(hover:hover)]:hover:bg-slate-800 dark:[@media(hover:hover)]:hover:text-slate-100"
+								className="absolute left-3 inline-flex items-center text-left text-slate-500 transition-colors dark:text-slate-300"
 							>
-								<X className="h-4 w-4" />
+								<p>キャンセル</p>
 							</button>
+							<div className="min-w-0 text-center">
+								<p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+									スレッドを作成
+								</p>
+							</div>
 						</header>
 						<div className="min-h-0 overflow-y-auto">
 							<CreateThreadForm
