@@ -18,7 +18,7 @@ const MobileBottomNav = ({ tags }: Props) => {
 	const centerCreateAction = isThreadDetailPage ? undefined : (
 		<MobileBottomCreateThreadMorph
 			tags={tags}
-			onOpenStateChange={setIsCreateSurfaceOpen}
+			onOpenStateChangeAction={setIsCreateSurfaceOpen}
 		/>
 	);
 
