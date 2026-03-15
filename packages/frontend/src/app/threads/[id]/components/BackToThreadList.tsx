@@ -44,8 +44,8 @@ export function BackToThreadList() {
 			enableClickAnimation
 			onClick={onBackClick}
 			aria-label="スレッド一覧へ戻る"
-			className={`route-transition-floating-action pointer-events-auto block sm:hidden fixed right-4 z-[70] inline-flex h-14 w-14 flex-col items-center justify-center rounded-full bg-gray-300/90 text-gray-900 dark:bg-gray-500 dark:text-white ${
-				isComposerExpanded ? "bottom-55" : "bottom-30"
+			className={`route-transition-floating-action pointer-events-auto block sm:hidden fixed bottom-30 right-4 z-[70] inline-flex h-14 w-14 transform-gpu flex-col items-center justify-center rounded-full bg-gray-300/90 text-gray-900 transition-transform duration-200 ease-out motion-reduce:transition-none dark:bg-gray-500 dark:text-white ${
+				isComposerExpanded ? "-translate-y-25" : "translate-y-0"
 			}`}
 		>
 			<Undo2 size={21} />
