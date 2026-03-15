@@ -12,6 +12,7 @@ import { Link } from "@/components/common/Link";
 import { highlightText } from "@/components/feature/header/component/headerSearch/highlightText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
+import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
 import { ThreadPostImage } from "../shared/ThreadPostImage";
 
 type ThreadListType = {
@@ -24,6 +25,7 @@ export const ThreadList = ({
 	highlightQuery = "",
 }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
+	const router = useViewTransitionRouter();
 
 	return (
 		<div className="flex flex-col">
@@ -32,34 +34,65 @@ export const ThreadList = ({
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
 				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
-				const renderThreadSummary = () => (
-					<div className="relative z-10">
-						<h3 className="block font-bold line-clamp-2 sm:text-lg">
-							{highlightText(thread.title, highlightQuery)}
-						</h3>
-						{threadPreviewImageUrls.length > 0 && (
-							<div
-								className={
-									threadPreviewImageUrls.length > 1
-										? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2"
-										: "mt-2 max-w-[12rem]"
-								}
-							>
-								{threadPreviewImageUrls.map((imageUrl) => (
-									<ThreadPostImage
-										key={imageUrl}
-										imageUrl={imageUrl}
-										containerClassName="w-[7rem] rounded-lg"
-									/>
-								))}
-							</div>
-						)}
-					</div>
+				const renderThreadTitle = () => (
+					<h3 className="block font-bold line-clamp-2 sm:text-lg">
+						{highlightText(thread.title, highlightQuery)}
+					</h3>
 				);
+				const renderThreadImages = () =>
+					threadPreviewImageUrls.length > 0 ? (
+						<div
+							className={
+								threadPreviewImageUrls.length > 1
+									? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2"
+									: "mt-2 max-w-[12rem]"
+							}
+						>
+							{threadPreviewImageUrls.map((imageUrl) => (
+								<ThreadPostImage
+									key={imageUrl}
+									imageUrl={imageUrl}
+									enableZoom
+									containerClassName="w-[7rem] rounded-lg"
+								/>
+							))}
+						</div>
+					) : null;
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
+						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 sm:cursor-pointer"
+						role="link"
+						tabIndex={0}
+						aria-label={`スレッドへ移動: ${thread.title}`}
+						onClick={(event) => {
+							if (!window.matchMedia("(min-width: 496px)").matches) {
+								return;
+							}
+							const target = event.target as HTMLElement;
+							if (
+								target.closest("a, button, [data-no-card-link='true']") !== null
+							) {
+								return;
+							}
+							router.push(href);
+						}}
+						onKeyDown={(event) => {
+							if (!window.matchMedia("(min-width: 496px)").matches) {
+								return;
+							}
+							if (event.key !== "Enter" && event.key !== " ") {
+								return;
+							}
+							const target = event.target as HTMLElement;
+							if (
+								target.closest("a, button, [data-no-card-link='true']") !== null
+							) {
+								return;
+							}
+							event.preventDefault();
+							router.push(href);
+						}}
 					>
 						<div className="min-w-0 flex-1 space-y-3">
 							<div className="flex items-center gap-2 text-gray-500 hover:text-gray-600">
@@ -79,14 +112,25 @@ export const ThreadList = ({
 
 								<span className="text-[10px]">{relativeDate}</span>
 							</div>
-							<div className="block sm:hidden">{renderThreadSummary()}</div>
+							<div className="block sm:hidden">
+								<div className="relative z-10">
+									{renderThreadTitle()}
+									{renderThreadImages()}
+								</div>
+							</div>
 							<Link
 								href={href}
 								aria-label={`スレッド: ${thread.title}`}
-								className="hidden sm:block after:absolute after:inset-0 after:rounded-sm after:z-0 after:content-['']"
+								className="hidden sm:block"
 							>
-								{renderThreadSummary()}
+								{renderThreadTitle()}
 							</Link>
+							<div
+								className="hidden sm:block relative z-10"
+								data-no-card-link="true"
+							>
+								{renderThreadImages()}
+							</div>
 							<div className="flex flex-col space-y-2">
 								<div className="relative z-10 flex flex-wrap gap-3 self-start">
 									{thread.threadTags?.map((tag) => (
