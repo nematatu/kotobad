@@ -20,7 +20,11 @@ export default async function RootLayout({
 	const tags: TagType[] = await getTags();
 
 	return (
-		<html lang="ja" suppressHydrationWarning>
+		<html
+			lang="ja"
+			suppressHydrationWarning
+			style={{ backgroundColor: "#0f172a" }}
+		>
 			<head>
 				<script src="/theme-init.js" />
 				<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -28,6 +32,48 @@ export default async function RootLayout({
 				<meta name="apple-mobile-web-app-title" content="Kotobad" />
 				<meta name="theme-color" content="#0f172a" />
 				<link rel="apple-touch-icon" href="/pwa-192x192.png" />
+				<link
+					rel="apple-touch-startup-image"
+					href="/pwa-512x512.png"
+					media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+				/>
+				<link
+					rel="apple-touch-startup-image"
+					href="/pwa-512x512.png"
+					media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+				/>
+				<link
+					rel="apple-touch-startup-image"
+					href="/pwa-512x512.png"
+					media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+				/>
+				<link
+					rel="apple-touch-startup-image"
+					href="/pwa-512x512.png"
+					media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+				/>
+				<link
+					rel="apple-touch-startup-image"
+					href="/pwa-512x512.png"
+					media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+				/>
+				<link
+					rel="apple-touch-startup-image"
+					href="/pwa-512x512.png"
+					media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+				/>
+				<link
+					rel="preload"
+					as="image"
+					href="/assets/logo/logo.svg"
+					type="image/svg+xml"
+				/>
+				<link
+					rel="preload"
+					as="image"
+					href="/assets/logo/logo-moji.svg"
+					type="image/svg+xml"
+				/>
 				<style nonce="pwa-splash">{`
 					#initial-splash {
 						background-color: #0f172a;
@@ -40,7 +86,10 @@ export default async function RootLayout({
 					}
 				`}</style>
 			</head>
-			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
+			<body
+				className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900"
+				style={{ backgroundColor: "#0f172a" }}
+			>
 				<div
 					id="initial-splash"
 					className="initial-splash"
