@@ -35,7 +35,7 @@ type CreatePostFormProps = {
 	replyTarget?: ReplyTarget | null;
 	onPostedAction?: () => void;
 	onClearReplyTargetAction?: () => void;
-	variant?: "default" | "inline" | "chat";
+	variant?: "default" | "inline" | "chat" | "bottomNav";
 };
 
 export const CreatePostForm = ({
@@ -61,6 +61,7 @@ export const CreatePostForm = ({
 	const { mutate } = useSWRConfig();
 	const isInline = variant === "inline";
 	const isChat = variant === "chat";
+	const isBottomNav = variant === "bottomNav";
 	const isThreadLike = !isChat;
 	const replyTargetPostId = replyTarget?.postId ?? null;
 
@@ -271,6 +272,81 @@ export const CreatePostForm = ({
 		</Form>
 	);
 
+	const bottomNavFormView = (
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-1.5">
+				<div className="flex items-end gap-1.5">
+					<ThreadPostImagePicker
+						imageInputRef={imageInputRef}
+						imagePreviewUrls={imagePreviewUrls}
+						maxImages={maxImages}
+						disabled={isSubmitting}
+						onSelectImageAction={selectImageAction}
+						onOpenImageDialogAction={openImageDialogAction}
+						onClearImageAction={clearImageSelectionAction}
+						onRemoveImageAction={removeImageAtAction}
+						actionsClassName="shrink-0"
+						showPreview={false}
+					/>
+					<div className="min-w-0 flex-1">
+						<FormField
+							control={form.control}
+							name="post"
+							render={({ field }) => (
+								<FormItem>
+									<FormControl>
+										<Textarea
+											rows={1}
+											{...field}
+											{...form.register("post", {
+												required: "空文字は送信できません",
+												maxLength: {
+													value: 80,
+													message: "80文字以内で入力してください",
+												},
+											})}
+											disabled={isSubmitting}
+											onInput={(event) => {
+												const element = event.currentTarget;
+												element.style.height = "0px";
+												element.style.height = `${element.scrollHeight}px`;
+											}}
+											onKeyDown={(e) => {
+												if (isSubmitting) {
+													return;
+												}
+												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+													e.preventDefault();
+													void form.handleSubmit(handleSubmit)();
+												}
+											}}
+											placeholder="返信を入力..."
+											className="max-h-24 min-h-9 w-full overflow-hidden rounded-lg border-none bg-white/90 px-2 py-2 text-sm text-[#111827] shadow-none placeholder:text-[#6b7280] focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-[#101b2c] dark:text-[#e5e7eb] dark:placeholder:text-[#94a3b8]"
+										/>
+									</FormControl>
+								</FormItem>
+							)}
+						/>
+					</div>
+					<Button
+						className="h-9 shrink-0 bg-blue-500 px-3 text-white hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
+						rounded="full"
+						type="submit"
+						disabled={isSubmitting}
+					>
+						{isSubmitting ? "送信中" : "送信"}
+					</Button>
+				</div>
+				<ThreadPostImagePreviewGrid
+					imagePreviewUrls={imagePreviewUrls}
+					onRemoveImageAction={removeImageAtAction}
+					disabled={isSubmitting}
+				/>
+				{error && <p className="text-xs text-red-500">{error}</p>}
+			</form>
+		</Form>
+	);
+
 	if (isInline) {
 		return (
 			<div className="rounded-xl bg-white p-3 dark:bg-[#0f172a]">
@@ -281,6 +357,10 @@ export const CreatePostForm = ({
 
 	if (isChat) {
 		return <div className="w-full">{formView}</div>;
+	}
+
+	if (isBottomNav) {
+		return <div className="w-full">{bottomNavFormView}</div>;
 	}
 
 	return (

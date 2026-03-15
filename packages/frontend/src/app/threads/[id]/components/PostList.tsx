@@ -693,7 +693,7 @@ export const PostList = ({
 				</MessageList>
 			}
 			messageInput={
-				<MessageInput>
+				<MessageInput className="hidden [@media(min-width:496px)]:block">
 					<CreatePostForm
 						threadId={threadId}
 						variant="chat"
