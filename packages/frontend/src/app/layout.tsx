@@ -20,11 +20,7 @@ export default async function RootLayout({
 	const tags: TagType[] = await getTags();
 
 	return (
-		<html
-			lang="ja"
-			suppressHydrationWarning
-			style={{ backgroundColor: "#0f172a" }}
-		>
+		<html lang="ja" suppressHydrationWarning>
 			<head>
 				<script src="/theme-init.js" />
 				<meta name="apple-mobile-web-app-capable" content="yes" />
@@ -86,10 +82,7 @@ export default async function RootLayout({
 					}
 				`}</style>
 			</head>
-			<body
-				className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900"
-				style={{ backgroundColor: "#0f172a" }}
-			>
+			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
 				<div
 					id="initial-splash"
 					className="initial-splash"
