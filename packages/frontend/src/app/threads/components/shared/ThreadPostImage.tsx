@@ -11,7 +11,6 @@ type ThreadPostImageProps = {
 	imageUrl: ImageSource;
 	alt?: string;
 	containerClassName?: string;
-	imageClassName?: string;
 	loading?: "lazy" | "eager";
 	enableZoom?: boolean;
 };
@@ -20,7 +19,6 @@ export const ThreadPostImage = ({
 	imageUrl,
 	alt = "",
 	containerClassName,
-	imageClassName,
 	loading = "lazy",
 	enableZoom = false,
 }: ThreadPostImageProps) => {
@@ -54,18 +52,13 @@ export const ThreadPostImage = ({
 
 	if (!enableZoom) {
 		return (
-			<div
-				className={cn(
-					"overflow-hidden rounded-xl border border-slate-200 bg-slate-50",
-					containerClassName,
-				)}
-			>
+			<div className={cn("overflow-hidden bg-slate-50", containerClassName)}>
 				{/* biome-ignore lint/performance/noImgElement: Cloudflare Image Transform URL is already optimized for delivery. */}
 				<img
 					src={transformedUrl}
 					alt={alt}
 					loading={loading}
-					className={cn("h-full w-full object-cover", imageClassName)}
+					className={"h-full w-full object-cover"}
 				/>
 			</div>
 		);
@@ -87,7 +80,7 @@ export const ThreadPostImage = ({
 					src={transformedUrl}
 					alt={alt}
 					loading={loading}
-					className={cn("h-full w-full object-cover", imageClassName)}
+					className={"h-full w-full object-cover"}
 				/>
 			</button>
 			<dialog

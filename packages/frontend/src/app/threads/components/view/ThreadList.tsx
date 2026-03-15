@@ -49,8 +49,7 @@ export const ThreadList = ({
 									<ThreadPostImage
 										key={imageUrl}
 										imageUrl={imageUrl}
-										containerClassName="h-20"
-										imageClassName="h-full"
+										containerClassName="w-[7rem] rounded-lg"
 									/>
 								))}
 							</div>
