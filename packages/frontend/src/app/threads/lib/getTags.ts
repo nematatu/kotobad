@@ -12,7 +12,8 @@ export async function getTags(): Promise<TagListType> {
 	try {
 		raw = await BffFetcher<TagListType>(targetUrl, {
 			method: "GET",
-			cache: "no-store",
+			cache: "force-cache",
+			next: { revalidate: 300 },
 			skipCookie: true,
 		});
 	} catch (error: unknown) {

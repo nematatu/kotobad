@@ -1,7 +1,7 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import ThemeToggle from "@/components/feature/theme/ThemeToggle";
 import { useUser } from "../provider/UserProvider";
 import HeaderLogo from "./component/HeaderLogo";
@@ -62,7 +62,9 @@ const Header = ({ tags }: Props) => {
 						<ThemeToggle />
 					</div>
 					<div className="hidden md:flex">
-						<HeaderSearch />
+						<Suspense fallback={null}>
+							<HeaderSearch />
+						</Suspense>
 					</div>
 					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
 				</div>
