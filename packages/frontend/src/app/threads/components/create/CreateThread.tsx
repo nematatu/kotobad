@@ -134,6 +134,7 @@ export const CreateThreadForm = ({
 												<Textarea
 													id="thread-title"
 													autoFocus={autoFocusTitle}
+													rows={1}
 													{...field}
 													{...form.register("title", {
 														required: "空文字は送信出来ません",
@@ -142,6 +143,11 @@ export const CreateThreadForm = ({
 															message: "80文字以内で入力してください",
 														},
 													})}
+													onInput={(event) => {
+														const element = event.currentTarget;
+														element.style.height = "0px";
+														element.style.height = `${element.scrollHeight}px`;
+													}}
 													onKeyDown={(e) => {
 														if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
 															e.preventDefault();
@@ -149,7 +155,7 @@ export const CreateThreadForm = ({
 														}
 													}}
 													placeholder="例: 〇〇の試合について"
-													className="w-full border-none resize-none rounded-xl text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:min-h-[84px]"
+													className="min-h-10 w-full overflow-hidden border-none resize-none rounded-xl py-2 text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0"
 												/>
 											</div>
 										</FormControl>
