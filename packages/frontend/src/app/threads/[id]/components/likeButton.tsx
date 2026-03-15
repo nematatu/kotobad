@@ -39,7 +39,7 @@ export function LikeButton({
 	initialLikedByMe,
 	size = "default",
 }: Props) {
-	const compactHeartViewportSizePx = 31;
+	const compactHeartViewportSizePx = 19;
 	const compactHeartPlayerSizePx = 61;
 	const controllerRef = useRef<ThreadHeartLottieController | null>(null);
 	const likedByMeRef = useRef(initialLikedByMe);
