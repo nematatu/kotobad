@@ -674,16 +674,6 @@
     opacity: 0;
   }
 
-  html[data-route-transition] .route-transition-floating-action {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  html[data-route-transition] nav[aria-label="モバイルナビゲーション"] button[aria-label="スレッドを投稿する"] {
-    opacity: 0;
-    pointer-events: none;
-  }
-
   html[data-route-hide-bottom-nav="true"] nav[aria-label="モバイルナビゲーション"] {
     display: none;
   }
