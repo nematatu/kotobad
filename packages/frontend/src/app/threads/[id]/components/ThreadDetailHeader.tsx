@@ -1,6 +1,8 @@
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
+import { Link } from "@/components/common/Link";
+import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { ThreadPostImage } from "../../components/shared/ThreadPostImage";
 import { TagList } from "../../components/view/tag/tagList";
 import { LikeButton } from "./likeButton";
@@ -22,6 +24,22 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 			<h1 className="max-w-4xl text-left text-lg sm:text-2xl font-bold break-words">
 				<AutoLinkText text={threadHeaderData.title} />
 			</h1>
+			<Link
+				href={`/users/${encodeURIComponent(threadHeaderData.authorId)}`}
+				showIndicator={false}
+				className="inline-flex w-fit items-center gap-2 text-xs text-slate-500 sm:hidden"
+			>
+				by
+				<div className="flex items-center gap-1">
+					<AuthorAvatar
+						name={threadHeaderData.author.name}
+						image={threadHeaderData.author.image}
+						className="h-5 w-5 bg-white"
+						fallbackClassName="text-[10px]"
+					/>
+					{threadHeaderData.author.name}
+				</div>
+			</Link>
 			{threadImageUrls.length > 0 && (
 				<div
 					className={

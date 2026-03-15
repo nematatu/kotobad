@@ -79,7 +79,9 @@ export default async function ThreadDetailPage({
 								)}
 							</div>
 						</div>
-						<ThreadAuthorPanel thread={threadHeaderData} />
+						<div className="hidden sm:block">
+							<ThreadAuthorPanel thread={threadHeaderData} />
+						</div>
 					</aside>
 				</div>
 			</div>
