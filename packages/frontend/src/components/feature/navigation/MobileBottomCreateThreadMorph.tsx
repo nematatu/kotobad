@@ -30,7 +30,6 @@ export function MobileBottomCreateThreadMorph({
 }: Props) {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
-	const [formRenderKey, setFormRenderKey] = useState(0);
 	const [fixedDrawerHeight, setFixedDrawerHeight] = useState<number | null>(
 		null,
 	);
@@ -48,7 +47,6 @@ export function MobileBottomCreateThreadMorph({
 				const viewportHeight =
 					window.visualViewport?.height ?? window.innerHeight;
 				setFixedDrawerHeight(resolveDrawerHeight(viewportHeight));
-				setFormRenderKey((prev) => prev + 1);
 			} else {
 				setFixedDrawerHeight(null);
 			}
@@ -77,6 +75,19 @@ export function MobileBottomCreateThreadMorph({
 		return () => {
 			delete body.dataset.createThreadDrawerOpen;
 		};
+	}, [isOpen]);
+
+	useEffect(() => {
+		if (!isOpen) {
+			return;
+		}
+		const focusTimeoutId = window.setTimeout(() => {
+			const titleField = document.getElementById("thread-title");
+			if (titleField instanceof HTMLTextAreaElement) {
+				titleField.focus({ preventScroll: true });
+			}
+		}, 220);
+		return () => window.clearTimeout(focusTimeoutId);
 	}, [isOpen]);
 
 	return (
@@ -132,8 +143,6 @@ export function MobileBottomCreateThreadMorph({
 							</header>
 							<div className="min-h-0 overflow-y-auto">
 								<CreateThreadForm
-									key={formRenderKey}
-									autoFocusTitle
 									initialTags={tags}
 									onCreated={handleCreated}
 								/>
