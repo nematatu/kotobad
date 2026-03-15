@@ -105,7 +105,7 @@ export default function ThreadSearchForm({ initialQuery, sort }: Props) {
 					autoFocus
 					value={query}
 					onChange={(event) => setQuery(event.target.value)}
-					placeholder="スレッドを検索..."
+					placeholder="キーワードを入力..."
 					className="w-full pl-9 pr-10 focus:border-slate-400 focus:ring-0 focus-visible:border-slate-400 focus-visible:ring-0 [&::-webkit-search-cancel-button]:appearance-none"
 				/>
 				<button

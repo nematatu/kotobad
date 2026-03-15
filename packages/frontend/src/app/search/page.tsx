@@ -45,10 +45,6 @@ export default async function SearchPage({ searchParams }: Props) {
 						<h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">
 							検索
 						</h1>
-						<p className="text-xs text-slate-500 dark:text-slate-400">
-							{HEADER_SEARCH_CONFIG.MIN_QUERY_CHARS}
-							文字以上でスレッドを検索できます
-						</p>
 					</div>
 				</div>
 
