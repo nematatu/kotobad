@@ -68,6 +68,10 @@ export default function PwaPullToRefresh() {
 			if (isRefreshingRef.current) {
 				return;
 			}
+			if (document.body.dataset.createThreadDrawerOpen === "true") {
+				resetPull();
+				return;
+			}
 			if (event.touches.length !== 1) {
 				resetPull();
 				return;
