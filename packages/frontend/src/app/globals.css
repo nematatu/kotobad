@@ -833,6 +833,11 @@
   pointer-events: none;
   animation: splash-fade 220ms ease forwards;
 }
+@media (display-mode: standalone) {
+  .initial-splash {
+    display: none !important;
+  }
+}
 @keyframes splash-fade {
   from {
     opacity: 1;
