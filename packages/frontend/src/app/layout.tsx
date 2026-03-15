@@ -6,7 +6,7 @@ import { getTags } from "@/app/threads/lib/getTags";
 import PwaRegister from "@/components/common/PwaRegister";
 import SplashGate from "@/components/common/SplashGate";
 import AuthRequiredModal from "@/components/feature/auth/AuthRequiredModal";
-import Footer from "@/components/feature/footer/Footer";
+import ConditionalFooter from "@/components/feature/footer/ConditionalFooter";
 import Header from "@/components/feature/header/header";
 import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
 import { Toaster } from "@/components/ui/sonner";
@@ -137,7 +137,7 @@ export default async function RootLayout({
 						<main className="view-transition-page-content flex-1 min-h-screen pb-16 mb-8 [@media(min-width:496px)]:pb-0">
 							{children}
 						</main>
-						<Footer />
+						<ConditionalFooter />
 						<MobileBottomNav tags={tags} />
 					</div>
 				</Providers>
