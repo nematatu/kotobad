@@ -34,26 +34,23 @@ export function MobileBottomCreateThreadMorph({
 		null,
 	);
 
-	const resolveDrawerHeight = useCallback((viewportHeight: number) => {
-		return Math.max(
-			MIN_DRAWER_HEIGHT,
-			Math.min(MAX_DRAWER_HEIGHT, viewportHeight - DRAWER_VERTICAL_MARGIN),
-		);
-	}, []);
-
 	const handleOpenChange = useCallback(
 		(open: boolean) => {
 			if (open) {
 				const viewportHeight =
 					window.visualViewport?.height ?? window.innerHeight;
-				setFixedDrawerHeight(resolveDrawerHeight(viewportHeight));
+				const nextHeight = Math.max(
+					MIN_DRAWER_HEIGHT,
+					Math.min(MAX_DRAWER_HEIGHT, viewportHeight - DRAWER_VERTICAL_MARGIN),
+				);
+				setFixedDrawerHeight(nextHeight);
 			} else {
 				setFixedDrawerHeight(null);
 			}
 			setIsOpen(open);
 			onOpenStateChangeAction?.(open);
 		},
-		[onOpenStateChangeAction, resolveDrawerHeight],
+		[onOpenStateChangeAction],
 	);
 
 	const closeSurface = useCallback(() => {
@@ -75,19 +72,6 @@ export function MobileBottomCreateThreadMorph({
 		return () => {
 			delete body.dataset.createThreadDrawerOpen;
 		};
-	}, [isOpen]);
-
-	useEffect(() => {
-		if (!isOpen) {
-			return;
-		}
-		const focusTimeoutId = window.setTimeout(() => {
-			const titleField = document.getElementById("thread-title");
-			if (titleField instanceof HTMLTextAreaElement) {
-				titleField.focus({ preventScroll: true });
-			}
-		}, 220);
-		return () => window.clearTimeout(focusTimeoutId);
 	}, [isOpen]);
 
 	return (
@@ -143,6 +127,7 @@ export function MobileBottomCreateThreadMorph({
 							</header>
 							<div className="min-h-0 overflow-y-auto">
 								<CreateThreadForm
+									autoFocusTitle
 									initialTags={tags}
 									onCreated={handleCreated}
 								/>
