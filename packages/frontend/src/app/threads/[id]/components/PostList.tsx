@@ -6,6 +6,7 @@ import {
 } from "@kotobad/shared/src/schemas/post";
 import { ReactionOptionListSchema } from "@kotobad/shared/src/schemas/reaction";
 import type { PostListType, PostType } from "@kotobad/shared/src/types/post";
+import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { AnimatePresence, motion } from "framer-motion";
 import { MoreHorizontal, Reply } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -435,6 +436,7 @@ export const PostList = ({
 									openReactionPostId === post.id ||
 									openMobileActionPostId === post.id;
 								const chatTime = formatChatTime(post.createdAt, nowMs);
+								const relativeChatTime = getRelativeDate(post.createdAt);
 								const selectedReactionCodes: string[] = [];
 								for (const reaction of post.reactions) {
 									if (!reaction.reactedByMe) continue;
@@ -611,6 +613,15 @@ export const PostList = ({
 															))}
 														</div>
 													)}
+													<p
+														className={
+															isMine
+																? "pt-0.5 text-right text-[10px] leading-none tabular-nums text-[#1e3a8a] dark:text-[#bfdbfe]"
+																: "pt-0.5 text-left text-[10px] leading-none tabular-nums text-[#6b7280] dark:text-[#94a3b8]"
+														}
+													>
+														{relativeChatTime}
+													</p>
 												</div>
 											</MessageBubble>
 											<div
