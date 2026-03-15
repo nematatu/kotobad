@@ -88,7 +88,7 @@ export const ThreadPostImage = ({
 			<dialog
 				ref={dialogRef}
 				onClose={() => setIsZoomImageReady(false)}
-				className="m-0 h-dvh max-h-none w-screen max-w-none border-none bg-transparent p-0 outline-none [@media(hover:hover)]:m-auto [&::backdrop]:bg-black/95 [&::backdrop]:backdrop-blur-[1px]"
+				className="m-0 h-dvh max-h-none w-screen max-w-none border-none bg-transparent p-0 outline-none [@media(hover:hover)]:m-auto [&::backdrop]:bg-black/75 [&::backdrop]:backdrop-blur-[1px]"
 			>
 				<div className="relative h-full w-full">
 					<button
@@ -97,8 +97,8 @@ export const ThreadPostImage = ({
 						aria-label="拡大画像を閉じる"
 						className="absolute inset-0 h-full w-full"
 					/>
-					<div className="pointer-events-none relative flex h-full w-full items-center justify-center ">
-						<div className="pointer-events-auto relative w-auto max-w-[min(92vw,1200px)] text-left">
+					<div className="pointer-events-none relative flex h-full w-full items-center justify-center p-0 sm:p-6">
+						<div className="pointer-events-auto relative h-auto w-full max-w-full text-left sm:max-w-[90vw] lg:h-[90vh]">
 							{/* biome-ignore lint/performance/noImgElement: Cloudflare Image Transform URL is already optimized for delivery. */}
 							<img
 								ref={zoomImageRef}
@@ -110,7 +110,7 @@ export const ThreadPostImage = ({
 								onLoad={() => setIsZoomImageReady(true)}
 								onError={() => setIsZoomImageReady(true)}
 								className={cn(
-									"mx-auto h-auto w-auto max-h-[calc(100dvh-6rem)] max-w-full rounded-[4px] object-contain transition-opacity sm:max-h-[calc(100dvh-8rem)] [@media(hover:hover)]:cursor-zoom-out",
+									"h-auto w-full max-w-full rounded-[4px] object-contain transition-opacity sm:max-w-[90vw] lg:h-[90vh] [@media(hover:hover)]:cursor-zoom-out",
 									isZoomImageReady ? "opacity-100" : "opacity-0",
 								)}
 								style={{ transitionDuration: "100ms" }}
