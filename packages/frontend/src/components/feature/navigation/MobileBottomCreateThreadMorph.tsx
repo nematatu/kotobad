@@ -23,7 +23,7 @@ type Props = {
 
 const CREATE_TRIGGER_CLASSNAME =
 	"route-transition-floating-action group inline-flex h-full min-h-[53px] w-full touch-manipulation select-none flex-col items-center justify-center gap-1.5 rounded-[1rem] bg-blue-500/92 px-2 text-[9px] font-semibold leading-none text-white shadow-[0_12px_26px_-20px_rgba(37,99,235,1)] transition-[transform,filter,box-shadow] duration-120 ease-out active:translate-y-[1px] active:scale-[0.92] active:brightness-95 active:shadow-[0_6px_14px_-12px_rgba(37,99,235,1)] [@media(hover:hover)]:hover:brightness-110";
-const DRAWER_HEIGHT_CLS = "h-[min(90vh,calc(100vh-1.5rem))]";
+const DRAWER_HEIGHT_CLS = "h-[620px]";
 
 export function MobileBottomCreateThreadMorph({
 	tags,
