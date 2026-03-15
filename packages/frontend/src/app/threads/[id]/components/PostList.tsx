@@ -599,7 +599,7 @@ export const PostList = ({
 															className={
 																post.imageUrls.length > 1
 																	? "grid max-w-sm grid-cols-2 gap-2"
-																	: "max-w-[14rem]"
+																	: "max-w-[16rem]"
 															}
 														>
 															{post.imageUrls.slice(0, 2).map((imageUrl) => (
@@ -607,8 +607,8 @@ export const PostList = ({
 																	key={imageUrl}
 																	imageUrl={imageUrl}
 																	enableZoom
-																	containerClassName="rounded-lg bg-slate-50"
-																	imageClassName="h-auto max-h-36 w-full object-contain"
+																	containerClassName="h-36"
+																	imageClassName="h-full"
 																/>
 															))}
 														</div>
