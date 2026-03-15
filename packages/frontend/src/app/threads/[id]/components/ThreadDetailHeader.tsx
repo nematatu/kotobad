@@ -35,8 +35,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 							key={imageUrl}
 							imageUrl={imageUrl}
 							enableZoom
-							containerClassName="h-[8rem] rounded-lg"
-							imageClassName="h-full"
+							containerClassName="h-[11rem] rounded-lg"
 						/>
 					))}
 				</div>
