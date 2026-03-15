@@ -14,7 +14,7 @@ const HeaderSearch = () => {
 			: "/search";
 
 	return (
-		<div className="flex flex-1 min-w-0 items-center justify-end [@media(min-width:496px)]:justify-start">
+		<div className="flex min-w-0 items-center justify-end">
 			<Link
 				href={href}
 				viewTransitionKey={viewTransitionKeys.searchPageNavigation}

@@ -57,12 +57,12 @@ const Header = ({ tags }: Props) => {
 					</div>
 				</div>
 				<HeaderNav links={headerNavLinks} />
-				<div className="hidden md:flex shrink-0">
-					<HeaderSearch />
-				</div>
 				<div className="ml-auto flex items-center gap-2 shrink-0">
 					<div className="hidden [@media(min-width:496px)]:block">
 						<ThemeToggle />
+					</div>
+					<div className="hidden md:flex">
+						<HeaderSearch />
 					</div>
 					<HeaderUserActions isLoading={isLoading} user={user} tags={tags} />
 				</div>
