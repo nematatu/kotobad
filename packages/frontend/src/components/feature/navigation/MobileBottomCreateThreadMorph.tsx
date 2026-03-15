@@ -3,7 +3,7 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Drawer } from "vaul";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import {
@@ -15,16 +15,16 @@ import {
 
 type Props = {
 	tags: TagType[];
-	onOpenStateChangeAction?: (open: boolean) => void;
+	onOpenStateChange?: (open: boolean) => void;
 };
 
 const CREATE_TRIGGER_CLASSNAME =
 	"route-transition-floating-action group inline-flex h-full min-h-[53px] w-full touch-manipulation select-none flex-col items-center justify-center gap-1.5 rounded-[1rem] bg-blue-500/92 px-2 text-[9px] font-semibold leading-none text-white shadow-[0_12px_26px_-20px_rgba(37,99,235,1)] transition-[transform,filter,box-shadow] duration-120 ease-out active:translate-y-[1px] active:scale-[0.92] active:brightness-95 active:shadow-[0_6px_14px_-12px_rgba(37,99,235,1)] [@media(hover:hover)]:hover:brightness-110";
-const DRAWER_HEIGHT_CLS = "min-h-[780px]";
+const DRAWER_HEIGHT_CLS = "h-[620px] min-h-[620px] max-h-[620px]";
 
 export function MobileBottomCreateThreadMorph({
 	tags,
-	onOpenStateChangeAction,
+	onOpenStateChange,
 }: Props) {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
@@ -32,9 +32,9 @@ export function MobileBottomCreateThreadMorph({
 	const handleOpenChange = useCallback(
 		(open: boolean) => {
 			setIsOpen(open);
-			onOpenStateChangeAction?.(open);
+			onOpenStateChange?.(open);
 		},
-		[onOpenStateChangeAction],
+		[onOpenStateChange],
 	);
 
 	const closeSurface = useCallback(() => {
@@ -44,19 +44,6 @@ export function MobileBottomCreateThreadMorph({
 		router.refresh();
 		handleOpenChange(false);
 	}, [handleOpenChange, router]);
-
-	useEffect(() => {
-		const body = document.body;
-		if (isOpen) {
-			body.dataset.createThreadDrawerOpen = "true";
-		} else {
-			delete body.dataset.createThreadDrawerOpen;
-		}
-
-		return () => {
-			delete body.dataset.createThreadDrawerOpen;
-		};
-	}, [isOpen]);
 
 	return (
 		<FamilyDrawerRoot open={isOpen} onOpenChange={handleOpenChange}>
@@ -77,7 +64,7 @@ export function MobileBottomCreateThreadMorph({
 			<FamilyDrawerPortal>
 				<FamilyDrawerOverlay
 					onClick={closeSurface}
-					className="z-[180] bg-black/85 backdrop-blur-[1px]"
+					className="z-[180] bg-black/45 backdrop-blur-[1px]"
 				/>
 				<Drawer.Content className="fixed inset-x-2 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-[190] mx-auto w-[min(96vw,460px)] overflow-hidden rounded-[1rem] bg-transparent outline-none">
 					<div

@@ -63,15 +63,9 @@ export default function PwaPullToRefresh() {
 			setIsReady(false);
 			setIsVisible(false);
 		};
-		const isPullToRefreshBlocked = () =>
-			document.body.dataset.createThreadDrawerOpen === "true";
 
 		const onTouchStart = (event: TouchEvent) => {
 			if (isRefreshingRef.current) {
-				return;
-			}
-			if (isPullToRefreshBlocked()) {
-				resetPull();
 				return;
 			}
 			if (event.touches.length !== 1) {
@@ -97,10 +91,6 @@ export default function PwaPullToRefresh() {
 			if (!isTrackingRef.current || isRefreshingRef.current) {
 				return;
 			}
-			if (isPullToRefreshBlocked()) {
-				resetPull();
-				return;
-			}
 			if (event.touches.length !== 1) {
 				resetPull();
 				return;
@@ -122,10 +112,6 @@ export default function PwaPullToRefresh() {
 
 		const onTouchEnd = () => {
 			if (!isTrackingRef.current || isRefreshingRef.current) {
-				resetPull();
-				return;
-			}
-			if (isPullToRefreshBlocked()) {
 				resetPull();
 				return;
 			}
