@@ -23,7 +23,10 @@ import {
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { useThreadPostImageInput } from "../../lib/useThreadPostImageInput";
-import { ThreadPostImagePicker } from "../shared/ThreadPostImagePicker";
+import {
+	ThreadPostImagePicker,
+	ThreadPostImagePreviewGrid,
+} from "../shared/ThreadPostImagePicker";
 import { TagList } from "../view/tag/tagList";
 import { useTagSelection } from "../view/tag/useTagSelection";
 import { TagPickerTooltip } from "./tagPickerTooltip";
@@ -161,6 +164,10 @@ export const CreateThreadForm = ({
 										</FormControl>
 										<FormMessage />
 										{error && <p className="text-red-500">{error}</p>}
+										<ThreadPostImagePreviewGrid
+											imagePreviewUrls={imagePreviewUrls}
+											onRemoveImageAction={removeImageAtAction}
+										/>
 									</div>
 								</FormItem>
 							)}
@@ -168,49 +175,44 @@ export const CreateThreadForm = ({
 
 						<div className="space-y-3">
 							<div className="h-px w-full bg-slate-200/70" aria-hidden="true" />
-							<div className="flex flex-wrap items-start gap-3">
-								<div className="min-w-0 flex-1 space-y-3">
-									<div className="space-y-2">
+							<div className="min-w-0 flex-1 space-y-3">
+								<TagList
+									tags={selectedTags}
+									onToggle={handleToggleTagFromList}
+								/>
+								<div className="flex justify-between">
+									<div className="flex">
 										<ThreadPostImagePicker
 											imageInputRef={imageInputRef}
 											imagePreviewUrls={imagePreviewUrls}
 											maxImages={maxImages}
 											onSelectImageAction={selectImageAction}
 											onOpenImageDialogAction={openImageDialogAction}
-											onClearImageAction={clearImageSelectionAction}
 											onRemoveImageAction={removeImageAtAction}
-											previewImageClassName="h-28"
+											showPreview={false}
 										/>
-									</div>
-									<TagList
-										tags={selectedTags}
-										onToggle={handleToggleTagFromList}
-									/>
-									<div className="flex justify-between">
 										<TagPickerTooltip
 											onSelect={handleSelectTag}
 											tags={tags}
 											selectedTagIds={selectedTagIds}
 										/>
+									</div>
 
-										<div className="flex space-x-3 items-end">
-											<p className="hidden sm:block text-neutral-400 text-xs">
-												Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-											</p>
-											<IconButton
-												hover="brightness"
-												icon={<PencilLine />}
-												variant="logo1"
-												enableClickAnimation
-												rounded="full"
-												type="submit"
-												disabled={
-													isSubmitDisabled || form.formState.isSubmitting
-												}
-											>
-												<span className="text-md">投稿</span>
-											</IconButton>
-										</div>
+									<div className="flex space-x-3 items-end">
+										<p className="hidden sm:block text-neutral-400 text-xs">
+											Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
+										</p>
+										<IconButton
+											hover="brightness"
+											icon={<PencilLine />}
+											variant="logo1"
+											enableClickAnimation
+											rounded="full"
+											type="submit"
+											disabled={isSubmitDisabled || form.formState.isSubmitting}
+										>
+											<span className="text-md">投稿</span>
+										</IconButton>
 									</div>
 								</div>
 							</div>

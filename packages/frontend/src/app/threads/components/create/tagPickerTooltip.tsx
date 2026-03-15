@@ -38,8 +38,8 @@ export function TagPickerTooltip({
 								enableClickAnimation
 								type="button"
 								size="icon"
-								variant="outline"
-								className="group h-10 w-10 rounded-full border-0 bg-slate-100 text-slate-600 hover:bg-slate-200"
+								variant="ghost"
+								className="group h-10 w-10 rounded-full border-0 text-slate-600 hover:bg-slate-200"
 								icon={
 									<SmilePlus className="h-5 w-5 text-slate-600 transition-colors group-hover:fill-yellow-300" />
 								}
