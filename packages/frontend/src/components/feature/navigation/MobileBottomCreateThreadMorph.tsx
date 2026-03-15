@@ -3,7 +3,7 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Drawer } from "vaul";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
 import {
@@ -30,33 +30,12 @@ export function MobileBottomCreateThreadMorph({
 }: Props) {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useState(false);
-	const focusRetryTimeoutRef = useRef<number | null>(null);
 	const [fixedDrawerHeight, setFixedDrawerHeight] = useState<number | null>(
 		null,
 	);
 
-	const clearFocusRetryTimeout = useCallback(() => {
-		if (focusRetryTimeoutRef.current === null) {
-			return;
-		}
-		window.clearTimeout(focusRetryTimeoutRef.current);
-		focusRetryTimeoutRef.current = null;
-	}, []);
-
-	const focusTitleField = useCallback(() => {
-		const titleField = document.getElementById("thread-title");
-		if (!(titleField instanceof HTMLTextAreaElement)) {
-			return;
-		}
-
-		titleField.focus({ preventScroll: true });
-		const cursorPosition = titleField.value.length;
-		titleField.setSelectionRange(cursorPosition, cursorPosition);
-	}, []);
-
 	const handleOpenChange = useCallback(
 		(open: boolean) => {
-			clearFocusRetryTimeout();
 			if (open) {
 				const viewportHeight =
 					window.visualViewport?.height ?? window.innerHeight;
@@ -71,7 +50,7 @@ export function MobileBottomCreateThreadMorph({
 			setIsOpen(open);
 			onOpenStateChangeAction?.(open);
 		},
-		[clearFocusRetryTimeout, onOpenStateChangeAction],
+		[onOpenStateChangeAction],
 	);
 
 	const closeSurface = useCallback(() => {
@@ -92,9 +71,8 @@ export function MobileBottomCreateThreadMorph({
 
 		return () => {
 			delete body.dataset.createThreadDrawerOpen;
-			clearFocusRetryTimeout();
 		};
-	}, [clearFocusRetryTimeout, isOpen]);
+	}, [isOpen]);
 
 	return (
 		<FamilyDrawerRoot open={isOpen} onOpenChange={handleOpenChange}>
@@ -117,19 +95,7 @@ export function MobileBottomCreateThreadMorph({
 					onClick={closeSurface}
 					className="z-[180] bg-black/85 backdrop-blur-[1px]"
 				/>
-				<Drawer.Content
-					className="fixed inset-x-0 bottom-0 z-[190] h-[100lvh] bg-transparent outline-none pointer-events-none"
-					onOpenAutoFocus={(event) => {
-						event.preventDefault();
-						clearFocusRetryTimeout();
-						focusTitleField();
-						window.requestAnimationFrame(focusTitleField);
-						focusRetryTimeoutRef.current = window.setTimeout(
-							focusTitleField,
-							120,
-						);
-					}}
-				>
+				<Drawer.Content className="fixed inset-x-0 bottom-0 z-[190] h-[100lvh] bg-transparent outline-none pointer-events-none">
 					<div className="pointer-events-auto absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)]">
 						<div
 							className="flex w-full flex-col overflow-hidden rounded-[1rem] border border-slate-200/80 bg-white/95 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.55)] dark:border-slate-700 dark:bg-slate-950/95 dark:shadow-[0_20px_42px_-30px_rgba(2,6,23,0.95)]"
