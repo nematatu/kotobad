@@ -70,22 +70,10 @@ export const CreateThreadForm = ({
 		if (!autoFocusTitle) {
 			return;
 		}
-
-		let retryTimeoutId: number | null = null;
-		const rafId = window.requestAnimationFrame(() => {
+		const timeoutId = window.setTimeout(() => {
 			titleTextareaRef.current?.focus({ preventScroll: true });
-			// iOS/PWA では初回 focus が取りこぼされることがあるため短時間で 1 回だけ再試行する
-			retryTimeoutId = window.setTimeout(() => {
-				titleTextareaRef.current?.focus({ preventScroll: true });
-			}, 60);
-		});
-
-		return () => {
-			window.cancelAnimationFrame(rafId);
-			if (retryTimeoutId !== null) {
-				window.clearTimeout(retryTimeoutId);
-			}
-		};
+		}, 280);
+		return () => window.clearTimeout(timeoutId);
 	}, [autoFocusTitle]);
 
 	const handleSelectTag = (id: number, isSelected: boolean) => {
