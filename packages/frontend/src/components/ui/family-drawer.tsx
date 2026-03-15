@@ -129,7 +129,11 @@ function FamilyDrawerRoot({
 
 	return (
 		<FamilyDrawerContext.Provider value={contextValue}>
-			<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
+			<Drawer.Root
+				open={isOpen}
+				onOpenChange={setIsOpen}
+				repositionInputs={false}
+			>
 				{children}
 			</Drawer.Root>
 		</FamilyDrawerContext.Provider>
