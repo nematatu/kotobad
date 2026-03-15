@@ -4,7 +4,7 @@ import type {
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
 import { PencilLine } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import IconButton from "@/components/common/button/IconButton";
@@ -40,6 +40,7 @@ export const CreateThreadForm = ({
 	autoFocusTitle = false,
 }: CreateThreadFormProps) => {
 	const [error, setError] = useState<string | null>(null);
+	const titleTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 	const {
 		imagePreviewUrls,
 		maxImages,
@@ -64,6 +65,16 @@ export const CreateThreadForm = ({
 	const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
 	const titleValue = form.watch("title");
 	const isSubmitDisabled = !titleValue?.trim();
+
+	useEffect(() => {
+		if (!autoFocusTitle) {
+			return;
+		}
+		const timeoutId = window.setTimeout(() => {
+			titleTextareaRef.current?.focus({ preventScroll: true });
+		}, 280);
+		return () => window.clearTimeout(timeoutId);
+	}, [autoFocusTitle]);
 
 	const handleSelectTag = (id: number, isSelected: boolean) => {
 		const next = isSelected
@@ -133,7 +144,6 @@ export const CreateThreadForm = ({
 											<div>
 												<Textarea
 													id="thread-title"
-													autoFocus={autoFocusTitle}
 													{...field}
 													{...form.register("title", {
 														required: "空文字は送信出来ません",
@@ -142,6 +152,10 @@ export const CreateThreadForm = ({
 															message: "80文字以内で入力してください",
 														},
 													})}
+													ref={(element) => {
+														titleTextareaRef.current = element;
+														field.ref(element);
+													}}
 													onKeyDown={(e) => {
 														if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
 															e.preventDefault();
