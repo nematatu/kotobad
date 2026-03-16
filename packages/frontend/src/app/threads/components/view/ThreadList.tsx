@@ -66,9 +66,6 @@ export const ThreadList = ({
 						tabIndex={0}
 						aria-label={`スレッドへ移動: ${thread.title}`}
 						onClick={(event) => {
-							if (!window.matchMedia("(min-width: 496px)").matches) {
-								return;
-							}
 							const target = event.target as HTMLElement;
 							if (
 								target.closest("a, button, [data-no-card-link='true']") !== null
@@ -78,9 +75,6 @@ export const ThreadList = ({
 							router.push(href);
 						}}
 						onKeyDown={(event) => {
-							if (!window.matchMedia("(min-width: 496px)").matches) {
-								return;
-							}
 							if (event.key !== "Enter" && event.key !== " ") {
 								return;
 							}
