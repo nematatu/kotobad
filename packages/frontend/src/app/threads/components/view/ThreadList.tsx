@@ -119,10 +119,7 @@ export const ThreadList = ({
 							>
 								{renderThreadTitle()}
 							</Link>
-							<div
-								className="hidden sm:block relative z-10"
-								data-no-card-link="true"
-							>
+							<div className="hidden sm:block relative z-10">
 								{renderThreadImages()}
 							</div>
 							<div className="flex flex-col space-y-2">
