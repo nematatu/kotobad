@@ -24,7 +24,7 @@ const ThreadHeartLottiePlayer = dynamic(
 );
 
 export const THREAD_LIST_META_CHIP_CLASS =
-	"thread-list-meta-chip box-border inline-flex h-[20px] flex-none items-center justify-center gap-[5px] rounded-sm px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
+	"thread-list-meta-chip box-border border bg-gray-100 hover:bg-gray-200 hover:border-gray-300 p-9 rounded-xl inline-flex h-[25px] flex-none items-center justify-center gap-[5px] px-2 py-0 align-middle text-gray-800 font-semibold leading-none pointer-events-auto";
 
 type Props = {
 	threadId: number;
@@ -122,7 +122,7 @@ export function LikeButton({
 	const isCompact = size === "compact";
 	const compactButtonClass = cn(
 		THREAD_LIST_META_CHIP_CLASS,
-		"group/like-button min-h-0 appearance-none overflow-visible border-0 text-[10px] shadow-none hover:text-gray-800 active:scale-95 cursor-pointer",
+		"group/like-button min-h-0 appearance-none overflow-visible text-[10px] shadow-none hover:text-gray-800 active:scale-95 cursor-pointer",
 	);
 
 	if (isCompact) {
@@ -160,11 +160,12 @@ export function LikeButton({
 	return (
 		<Button
 			variant="outline"
+			rounded="full"
 			enableClickAnimation
 			onClick={onLikeClick}
 			aria-pressed={likedByMe}
 			aria-label={likedByMe ? "いいねを解除" : "いいねする"}
-			className="group/like-button inline-flex h-auto items-center gap-1.5 px-2 py-1 text-xs sm:text-sm"
+			className={`${cn(compactButtonClass, "group/like-button  h-auto text-xs sm:text-sm")} `}
 		>
 			<span className="relative inline-flex size-8 items-center justify-center shrink-0 transition-transform duration-100 sm:size-9 [@media(hover:hover)]:group-hover/like-button:scale-110">
 				<ThreadHeartLottiePlayer
