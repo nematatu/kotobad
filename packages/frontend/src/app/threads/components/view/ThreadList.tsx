@@ -61,7 +61,7 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 sm:cursor-pointer"
+						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 sm:cursor-pointer pointer-events-none sm:pointer-events-auto"
 						role="link"
 						tabIndex={0}
 						aria-label={`スレッドへ移動: ${thread.title}`}
@@ -93,7 +93,7 @@ export const ThreadList = ({
 								<Link
 									href={authorHref}
 									aria-label={`ユーザー: ${thread.author.name}`}
-									className="shrink-0 flex items-center gap-1 text-[10px]"
+									className="shrink-0 flex items-center gap-1 text-[10px] pointer-events-auto"
 								>
 									<AuthorAvatar
 										name={thread.author.name}
