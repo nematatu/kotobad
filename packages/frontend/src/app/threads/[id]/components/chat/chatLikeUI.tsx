@@ -16,12 +16,12 @@ import {
 } from "@/components/ui/popover";
 import { ThreadPostImage } from "../../../components/shared/ThreadPostImage";
 import { CreatePostForm } from "../CreatePostForm";
+import NoPost from "../fallback/NoPost";
 import {
 	formatChatTime,
 	getSelectedReactionCodes,
 	messageLayoutTransition,
 } from "../lib/postListViewHelpers";
-import NoPost from "../NoPost";
 import { PostReplyInlineForm } from "../PostReplyInlineForm";
 import type { FlattenedPostItem } from "../types/flattenedPostItem";
 import type { ReplyTarget } from "../types/replyTarget";
