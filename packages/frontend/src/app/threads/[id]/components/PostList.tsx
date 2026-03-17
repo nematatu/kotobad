@@ -445,6 +445,8 @@ export const PostList = ({
 									: 0;
 								const isHighlighted = highlightAnimatingPostId === post.id;
 								const relativeChatTime = getRelativeDate(post.createdAt);
+								const threadDepthIndentPx =
+									depth > 0 ? Math.min(depth, 8) * 22 : 0;
 								const selectedReactionCodes: string[] = [];
 								for (const reaction of post.reactions) {
 									if (!reaction.reactedByMe) continue;
@@ -485,15 +487,18 @@ export const PostList = ({
 										className={cn(
 											"relative px-3 py-3 sm:px-4",
 											index > 0
-												? "border-slate-100 border-t dark:border-slate-800"
+												? "border-slate-300 border-t dark:border-slate-800"
 												: undefined,
-											depth > 0
-												? "ml-3 border-slate-200 pl-3 sm:ml-6 sm:pl-4 dark:border-slate-700"
-												: undefined,
+											depth > 0 ? "border-0" : undefined,
 											isHighlighted
 												? "bg-amber-50/70 dark:bg-amber-500/10"
 												: undefined,
 										)}
+										style={
+											threadDepthIndentPx > 0
+												? { marginInlineStart: `${threadDepthIndentPx}px` }
+												: undefined
+										}
 									>
 										<div className="flex items-start">
 											<div className="min-w-0 flex-1">
@@ -506,7 +511,7 @@ export const PostList = ({
 														<AuthorAvatar
 															name={post.author.name}
 															image={post.author.image}
-															className="h-7 w-7 bg-white dark:bg-[#0f172a]"
+															className={`${depth > 0 ? "h-5 w-5" : "h-7 w-7"} bg-white dark:bg-[#0f172a]`}
 															fallbackClassName="text-[11px]"
 														/>
 														<span>{post.author.name}</span>
@@ -584,7 +589,6 @@ export const PostList = ({
 															onClick={toggleReplyTarget}
 														>
 															<Reply aria-hidden="true" />
-															返信する
 														</Button>
 														{reactionCodes.length > 0 ? (
 															<Emoji
