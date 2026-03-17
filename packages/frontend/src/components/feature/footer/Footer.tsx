@@ -16,7 +16,7 @@ const FooterItemLink = ({ item }: { item: FooterItem }) => {
 			<SiX className="h-3.5 w-3.5 text-slate-500" />
 		) : null;
 	const badge = item.badge ? (
-		<span className="rounded border border-blue-400 px-1.5 py-[1px] text-[10px] font-semibold text-blue-500">
+		<span className="rounded border border-blue-500 px-1.5 py-[1px] text-[10px] font-semibold text-blue-700 dark:border-blue-400 dark:text-blue-300">
 			{item.badge}
 		</span>
 	) : null;
@@ -56,6 +56,7 @@ const Footer = () => {
 						<Link
 							href="/"
 							viewTransitionKey={viewTransitionKeys.homeNavigation}
+							aria-label="ホームへ移動"
 							className="inline-flex items-center gap-2"
 						>
 							<LogoIcon className="h-9 w-9 sm:h-10 sm:w-10" />
@@ -89,7 +90,7 @@ const Footer = () => {
 				</div>
 			</div>
 			<div className="border-t border-slate-200 bg-surface-50">
-				<div className="mx-auto max-w-6xl px-4 py-3 text-xs text-slate-500 sm:px-6 sm:py-4">
+				<div className="mx-auto max-w-6xl px-4 py-3 text-xs text-slate-600 dark:text-slate-300 sm:px-6 sm:py-4">
 					© 2026 kotobad
 				</div>
 			</div>

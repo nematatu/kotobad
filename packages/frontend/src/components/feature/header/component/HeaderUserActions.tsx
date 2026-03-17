@@ -22,7 +22,7 @@ const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
 			>
 				<div className="size-8 rounded-full bg-gray-200 animate-pulse sm:size-9 dark:bg-slate-800" />
 				<div className="hidden rounded-full bg-gray-200 animate-pulse [@media(min-width:496px)]:block [@media(min-width:496px)]:size-9 dark:bg-slate-800" />
-				<div className="hidden h-9 w-28 rounded-full bg-gray-200 animate-pulse md:block dark:bg-slate-800" />
+				<div className="hidden h-9 w-36 rounded-full bg-gray-200 animate-pulse md:block dark:bg-slate-800" />
 			</div>
 		);
 	}

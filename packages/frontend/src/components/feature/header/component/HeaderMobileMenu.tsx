@@ -69,6 +69,7 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 						enableClickAnimation
 						variant="ghost"
 						size="icon"
+						aria-label="メニューを開く"
 						className="relative size-8 rounded-full bg-transparent p-0 sm:size-10"
 					>
 						<UserAvatar />

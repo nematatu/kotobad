@@ -11,7 +11,7 @@ export default function GoogleOAuth() {
 	const [loading, setLoading] = useState(false);
 
 	return (
-		<div className="grid">
+		<div className="grid min-w-[8.75rem]">
 			<Button
 				variant="google"
 				className={cn("w-full")}
@@ -33,7 +33,7 @@ export default function GoogleOAuth() {
 					);
 				}}
 			>
-				<GoogleIcon className="w-10 h-10" />
+				<GoogleIcon className="h-4 w-4" />
 				<div className="relative flex w-full justify-center">
 					<p
 						className={cn(

@@ -40,6 +40,12 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	},
 };
 
+const CF_IMAGE_ALLOWED_SOURCE_PREFIXES = [
+	"https://kotobad.com/",
+	"https://www.kotobad.com/",
+	"https://kotobad-bucket.kotobad.com/",
+];
+
 const normalizePositiveInt = (value?: number): number | null => {
 	if (!value || !Number.isFinite(value)) {
 		return null;
@@ -59,6 +65,16 @@ const shouldUseCfImageTransform = () => {
 	return explicit === "true" || explicit === "1";
 };
 
+const canApplyCfImageTransform = (sourceUrl: string) => {
+	if (sourceUrl.startsWith("/")) {
+		return true;
+	}
+
+	return CF_IMAGE_ALLOWED_SOURCE_PREFIXES.some((prefix) =>
+		sourceUrl.startsWith(prefix),
+	);
+};
+
 export const toCfImageUrl = (
 	sourceUrl: string | null | undefined,
 	options: CfImageOptions = {},
@@ -76,6 +92,10 @@ export const toCfImageUrl = (
 	}
 
 	if (!shouldUseCfImageTransform()) {
+		return sourceUrl;
+	}
+
+	if (!canApplyCfImageTransform(sourceUrl)) {
 		return sourceUrl;
 	}
 

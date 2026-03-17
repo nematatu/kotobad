@@ -49,7 +49,7 @@ const Header = ({ tags }: Props) => {
 			ref={headerRef}
 			className="view-transition-static-header sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
 		>
-			<div className="mx-auto flex items-center gap-3 px-5 py-2">
+			<div className="mx-auto flex min-h-12 items-center gap-3 px-5 py-2 sm:min-h-14">
 				<div className="flex items-center gap-2 shrink-0">
 					<HeaderMobileMenu links={headerNavLinks} isLoading={isLoading} />
 					<div className="hidden md:flex">

@@ -34,6 +34,10 @@ export const ThreadList = ({
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
 				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
+				const previewImageContainerClassName =
+					threadPreviewImageUrls.length > 1
+						? "w-[7rem] rounded-lg aspect-square"
+						: "w-[7rem] rounded-lg aspect-[4/3]";
 				const renderThreadTitle = () => (
 					<h3 className="block font-bold line-clamp-2 sm:text-lg">
 						{highlightText(thread.title, highlightQuery)}
@@ -55,7 +59,7 @@ export const ThreadList = ({
 										key={imageUrl}
 										imageUrl={imageUrl}
 										thumbnailPreset="threadList"
-										containerClassName="w-[7rem] rounded-lg"
+										containerClassName={previewImageContainerClassName}
 										loading={isTopLcpCandidate ? "eager" : "lazy"}
 										fetchPriority={isTopLcpCandidate ? "high" : undefined}
 									/>
@@ -98,7 +102,7 @@ export const ThreadList = ({
 								<Link
 									href={authorHref}
 									aria-label={`ユーザー: ${thread.author.name}`}
-									className="shrink-0 flex items-center gap-1 text-[10px] pointer-events-auto"
+									className="shrink-0 inline-flex min-h-7 items-center gap-1 rounded px-1 text-xs leading-none pointer-events-auto"
 								>
 									<AuthorAvatar
 										name={thread.author.name}
@@ -109,7 +113,7 @@ export const ThreadList = ({
 									<span>{thread.author.name}</span>
 								</Link>
 
-								<span className="text-[10px]">{relativeDate}</span>
+								<span className="text-xs">{relativeDate}</span>
 							</div>
 							<div className="relative z-10">
 								<div className="block sm:hidden">{renderThreadTitle()}</div>
@@ -128,7 +132,7 @@ export const ThreadList = ({
 										<Link
 											href="/"
 											key={tag.id}
-											className="thread-list-tag-link inline-flex items-center gap-1 text-xs font-semibold text-blue-400 hover:underline"
+											className="thread-list-tag-link inline-flex items-center gap-1 text-xs font-semibold text-blue-600 [@media(hover:hover)]:hover:underline"
 										>
 											#{tag.name}
 										</Link>

@@ -10,6 +10,7 @@ const HeaderLogo = () => {
 		<Link
 			href="/"
 			viewTransitionKey={viewTransitionKeys.homeNavigation}
+			aria-label="ホームへ移動"
 			className="group flex items-center gap-2 px-2"
 		>
 			<span className="inline-flex transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110 motion-reduce:group-hover:[animation:none]">

@@ -1,8 +1,8 @@
 "use client";
 
 import { MoonStar, SunMedium } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useTheme } from "@/components/feature/theme/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
