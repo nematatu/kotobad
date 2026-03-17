@@ -4,7 +4,6 @@ import type { TagType } from "@kotobad/shared/src/types/tag";
 import Image from "next/image";
 import { getTags } from "@/app/threads/lib/getTags";
 import PwaRegister from "@/components/common/PwaRegister";
-import SplashGate from "@/components/common/SplashGate";
 import AuthRequiredModal from "@/components/feature/auth/AuthRequiredModal";
 import ConditionalFooter from "@/components/feature/footer/ConditionalFooter";
 import Header from "@/components/feature/header/header";
@@ -58,56 +57,8 @@ export default async function RootLayout({
 					href="/startup/startup-1284x2778.png"
 					media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
 				/>
-				<link
-					rel="preload"
-					as="image"
-					href="/assets/logo/logo.svg"
-					type="image/svg+xml"
-				/>
-				<link
-					rel="preload"
-					as="image"
-					href="/assets/logo/logo-moji.svg"
-					type="image/svg+xml"
-				/>
-				<style nonce="pwa-splash">{`
-					#initial-splash {
-						background-color: #0f172a;
-						position: fixed;
-						inset: 0;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-						z-index: 9999;
-					}
-				`}</style>
 			</head>
 			<body className="min-h-screen bg-[#F0F0F0] dark:bg-slate-900">
-				<div
-					id="initial-splash"
-					className="initial-splash"
-					aria-hidden="true"
-					style={{ backgroundColor: "#0f172a" }}
-				>
-					<div className="initial-splash__art">
-						<Image
-							src="/assets/logo/logo.svg"
-							alt="Kotobad logo symbol"
-							className="initial-splash__logo initial-splash__logo--symbol"
-							width={220}
-							height={220}
-							priority
-						/>
-						<Image
-							src="/assets/logo/logo-moji.svg"
-							alt=""
-							className="initial-splash__logo initial-splash__logo--text"
-							width={180}
-							height={60}
-							priority
-						/>
-					</div>
-				</div>
 				<div
 					className="view-transition-static-background pointer-events-none fixed inset-0"
 					style={{ zIndex: -1 }}
@@ -124,7 +75,6 @@ export default async function RootLayout({
 
 				<Providers>
 					<PwaRegister />
-					<SplashGate />
 					<div className="relative flex min-h-screen flex-col pb-[calc(env(safe-area-inset-bottom)+5rem)] [@media(min-width:496px)]:pb-0">
 						<div
 							id="page-top-anchor"
