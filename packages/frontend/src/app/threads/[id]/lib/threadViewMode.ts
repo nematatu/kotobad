@@ -11,7 +11,7 @@ export const parseThreadViewMode = (
 	value: string | null | undefined,
 ): ThreadViewMode => {
 	if (value && isThreadViewMode(value)) return value;
-	return "chat";
+	return "thread";
 };
 
 export const threadViewModeLabel: Record<ThreadViewMode, string> = {
