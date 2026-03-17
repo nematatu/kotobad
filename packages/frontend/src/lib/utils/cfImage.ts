@@ -19,8 +19,8 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 		fit: "cover",
 	},
 	threadList: {
-		width: 320,
-		quality: 64,
+		width: 220,
+		quality: 60,
 		fit: "cover",
 	},
 	zoom: {

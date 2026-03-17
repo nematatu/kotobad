@@ -57,6 +57,7 @@ export const ThreadList = ({
 										thumbnailPreset="threadList"
 										containerClassName="w-[7rem] rounded-lg"
 										loading={isTopLcpCandidate ? "eager" : "lazy"}
+										fetchPriority={isTopLcpCandidate ? "high" : undefined}
 									/>
 								);
 							})}

@@ -3,9 +3,14 @@
 import { XIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { type CfImagePreset, toPresetCfImageUrl } from "@/lib/utils/cfImage";
+import {
+	CF_IMAGE_PRESET_OPTIONS,
+	toCfImageUrl,
+	toPresetCfImageUrl,
+} from "@/lib/utils/cfImage";
 
 type ImageSource = string | null | undefined;
+type ThreadPostThumbnailPreset = "post" | "threadList";
 
 type ThreadPostImageProps = {
 	imageUrl: ImageSource;
@@ -13,7 +18,8 @@ type ThreadPostImageProps = {
 	containerClassName?: string;
 	imageClassName?: string;
 	loading?: "lazy" | "eager";
-	thumbnailPreset?: CfImagePreset;
+	fetchPriority?: "high" | "low";
+	thumbnailPreset?: ThreadPostThumbnailPreset;
 };
 
 export const ThreadPostImage = ({
@@ -22,6 +28,7 @@ export const ThreadPostImage = ({
 	containerClassName,
 	imageClassName,
 	loading = "lazy",
+	fetchPriority,
 	thumbnailPreset = "post",
 }: ThreadPostImageProps) => {
 	const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -50,6 +57,22 @@ export const ThreadPostImage = ({
 		return null;
 	}
 	const zoomImageUrl = toPresetCfImageUrl(imageUrl, "zoom") ?? transformedUrl;
+	const thumbnailWidths =
+		thumbnailPreset === "threadList" ? [160, 220, 320] : [280, 420, 560];
+	const thumbnailSrcSet = thumbnailWidths
+		.map((width) => {
+			const url = toCfImageUrl(imageUrl, {
+				...CF_IMAGE_PRESET_OPTIONS[thumbnailPreset],
+				width,
+			});
+			return url ? `${url} ${width}w` : null;
+		})
+		.filter((entry): entry is string => entry !== null)
+		.join(", ");
+	const thumbnailSizes =
+		thumbnailPreset === "threadList"
+			? "(max-width: 640px) 110px, 130px"
+			: "(max-width: 640px) 256px, 288px";
 
 	return (
 		<>
@@ -67,6 +90,9 @@ export const ThreadPostImage = ({
 					src={transformedUrl}
 					alt={alt}
 					loading={loading}
+					fetchPriority={fetchPriority}
+					srcSet={thumbnailSrcSet || undefined}
+					sizes={thumbnailSizes}
 					className={cn("h-full w-full object-cover", imageClassName)}
 				/>
 			</button>

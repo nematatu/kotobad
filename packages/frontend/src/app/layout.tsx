@@ -11,6 +11,9 @@ import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "./providers";
 
+const THEME_INIT_INLINE_SCRIPT =
+	'(()=>{const k="kotobad-theme";try{const s=window.localStorage.getItem(k);const d=window.matchMedia("(prefers-color-scheme: dark)").matches;const t=s==="light"||s==="dark"?s:d?"dark":"light";document.documentElement.classList.remove("light","dark");document.documentElement.classList.add(t);document.documentElement.style.colorScheme=t;}catch{}})();';
+
 export default async function RootLayout({
 	children,
 }: Readonly<{
@@ -21,7 +24,7 @@ export default async function RootLayout({
 	return (
 		<html lang="ja" suppressHydrationWarning>
 			<head>
-				<script src="/theme-init.js" />
+				<script>{THEME_INIT_INLINE_SCRIPT}</script>
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 				<meta name="apple-mobile-web-app-title" content="Kotobad" />
