@@ -4,6 +4,7 @@ import type { PostType } from "@kotobad/shared/src/types/post";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { AnimatePresence, motion } from "framer-motion";
 import { Reply } from "lucide-react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
@@ -38,6 +39,225 @@ type ThreadPostListViewProps = {
 	onReactAction: (postId: number, reactionCode: string) => void;
 };
 
+type ConnectorSegment =
+	| {
+			type: "line";
+			x1: number;
+			y1: number;
+			x2: number;
+			y2: number;
+	  }
+	| {
+			type: "path";
+			d: string;
+	  };
+
+const collectPostDepthMaps = (visibleFlattenedPosts: FlattenedPostItem[]) => {
+	const postById = new Map<number, PostType>();
+	const depthByPostId = new Map<number, number>();
+	for (const { post, depth } of visibleFlattenedPosts) {
+		postById.set(post.id, post);
+		depthByPostId.set(post.id, depth);
+	}
+	return { postById, depthByPostId };
+};
+
+const collectAncestorPosts = (
+	post: PostType,
+	postById: Map<number, PostType>,
+	depthByPostId: Map<number, number>,
+) => {
+	const ancestorPosts: Array<{ id: number; depth: number }> = [];
+	let parentPostId =
+		typeof post.replyToPostId === "number" ? post.replyToPostId : null;
+	while (typeof parentPostId === "number") {
+		const ancestorDepth = depthByPostId.get(parentPostId);
+		if (typeof ancestorDepth !== "number") break;
+		ancestorPosts.push({ id: parentPostId, depth: ancestorDepth });
+		const ancestorPost = postById.get(parentPostId);
+		parentPostId =
+			ancestorPost && typeof ancestorPost.replyToPostId === "number"
+				? ancestorPost.replyToPostId
+				: null;
+	}
+	return ancestorPosts;
+};
+
+const buildConnectorSegmentsByPostId = (
+	visibleFlattenedPosts: FlattenedPostItem[],
+	articleElementByPostId: Map<number, HTMLElement>,
+	avatarAnchorByPostId: Map<number, HTMLElement>,
+) => {
+	const { postById, depthByPostId } = collectPostDepthMaps(
+		visibleFlattenedPosts,
+	);
+	const nextConnectorSegmentsByPostId: Record<number, ConnectorSegment[]> = {};
+
+	for (let index = 0; index < visibleFlattenedPosts.length; index += 1) {
+		const currentItem = visibleFlattenedPosts[index];
+		if (!currentItem) continue;
+
+		const { post, depth } = currentItem;
+		const articleElement = articleElementByPostId.get(post.id);
+		const avatarAnchorElement = avatarAnchorByPostId.get(post.id);
+		if (!articleElement || !avatarAnchorElement) continue;
+
+		const articleRect = articleElement.getBoundingClientRect();
+		const avatarRect = avatarAnchorElement.getBoundingClientRect();
+		const avatarCenterX =
+			avatarRect.left + avatarRect.width / 2 - articleRect.left;
+		const avatarCenterY =
+			avatarRect.top + avatarRect.height / 2 - articleRect.top;
+		const articleHeight = articleRect.height;
+		const nextDepth = visibleFlattenedPosts[index + 1]?.depth ?? -1;
+		const hasVisibleChild = nextDepth > depth;
+
+		const connectorSegments: ConnectorSegment[] = [];
+		const ancestorPosts = collectAncestorPosts(post, postById, depthByPostId);
+
+		for (const ancestorPost of ancestorPosts) {
+			if (ancestorPost.depth >= depth - 1) continue;
+			const ancestorAvatarElement = avatarAnchorByPostId.get(ancestorPost.id);
+			if (!ancestorAvatarElement) continue;
+			const ancestorAvatarRect = ancestorAvatarElement.getBoundingClientRect();
+			const ancestorCenterX =
+				ancestorAvatarRect.left +
+				ancestorAvatarRect.width / 2 -
+				articleRect.left;
+			const shouldContinueAncestorConnector = nextDepth > ancestorPost.depth;
+			connectorSegments.push({
+				type: "line",
+				x1: ancestorCenterX,
+				y1: 0,
+				x2: ancestorCenterX,
+				y2: shouldContinueAncestorConnector ? articleHeight : avatarCenterY,
+			});
+		}
+
+		const parentInfo = ancestorPosts.find((ancestorPost) => {
+			return ancestorPost.depth === depth - 1;
+		});
+		if (parentInfo) {
+			const parentAvatarElement = avatarAnchorByPostId.get(parentInfo.id);
+			if (parentAvatarElement) {
+				const parentAvatarRect = parentAvatarElement.getBoundingClientRect();
+				const parentCenterX =
+					parentAvatarRect.left + parentAvatarRect.width / 2 - articleRect.left;
+				const elbowWidth = avatarCenterX - parentCenterX;
+				const elbowRadius = Math.min(8, Math.max(0, elbowWidth));
+				const elbowVerticalEnd = Math.max(0, avatarCenterY - elbowRadius);
+				connectorSegments.push({
+					type: "path",
+					d: `M ${parentCenterX} 0 V ${elbowVerticalEnd} Q ${parentCenterX} ${avatarCenterY} ${
+						parentCenterX + elbowRadius
+					} ${avatarCenterY} H ${avatarCenterX}`,
+				});
+
+				if (nextDepth >= depth) {
+					connectorSegments.push({
+						type: "line",
+						x1: parentCenterX,
+						y1: avatarCenterY,
+						x2: parentCenterX,
+						y2: articleHeight,
+					});
+				}
+			}
+		}
+
+		if (hasVisibleChild) {
+			connectorSegments.push({
+				type: "line",
+				x1: avatarCenterX,
+				y1: avatarCenterY,
+				x2: avatarCenterX,
+				y2: articleHeight,
+			});
+		}
+
+		nextConnectorSegmentsByPostId[post.id] = connectorSegments;
+	}
+
+	return nextConnectorSegmentsByPostId;
+};
+
+const isSameConnectorSegment = (
+	currentSegment: ConnectorSegment,
+	nextSegment: ConnectorSegment,
+) => {
+	if (currentSegment.type === "path" && nextSegment.type === "path") {
+		return currentSegment.d === nextSegment.d;
+	}
+	if (currentSegment.type !== "line" || nextSegment.type !== "line") {
+		return false;
+	}
+	return (
+		currentSegment.x1 === nextSegment.x1 &&
+		currentSegment.y1 === nextSegment.y1 &&
+		currentSegment.x2 === nextSegment.x2 &&
+		currentSegment.y2 === nextSegment.y2
+	);
+};
+
+const isSameConnectorSegmentMap = (
+	currentConnectorSegmentsByPostId: Record<number, ConnectorSegment[]>,
+	nextConnectorSegmentsByPostId: Record<number, ConnectorSegment[]>,
+) => {
+	const currentPostIds = Object.keys(currentConnectorSegmentsByPostId);
+	const nextPostIds = Object.keys(nextConnectorSegmentsByPostId);
+	if (currentPostIds.length !== nextPostIds.length) {
+		return false;
+	}
+
+	for (const postIdKey of nextPostIds) {
+		const postId = Number(postIdKey);
+		const currentSegments = currentConnectorSegmentsByPostId[postId] ?? [];
+		const nextSegments = nextConnectorSegmentsByPostId[postId] ?? [];
+		if (currentSegments.length !== nextSegments.length) {
+			return false;
+		}
+
+		for (let index = 0; index < nextSegments.length; index += 1) {
+			const currentSegment = currentSegments[index];
+			const nextSegment = nextSegments[index];
+			if (!currentSegment || !nextSegment) {
+				return false;
+			}
+			if (!isSameConnectorSegment(currentSegment, nextSegment)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+};
+
+const renderConnectorSegment = (segment: ConnectorSegment, key: string) => {
+	switch (segment.type) {
+		case "line":
+			return (
+				<line
+					key={key}
+					x1={segment.x1}
+					y1={segment.y1}
+					x2={segment.x2}
+					y2={segment.y2}
+					className="stroke-slate-300 dark:stroke-slate-700"
+					strokeWidth={1}
+				/>
+			);
+		case "path":
+			return (
+				<path
+					key={key}
+					d={segment.d}
+					className="fill-none stroke-slate-300 dark:stroke-slate-700"
+					strokeWidth={1}
+				/>
+			);
+	}
+};
+
 export const ThreadPostListView = ({
 	threadId,
 	visibleFlattenedPosts,
@@ -55,6 +275,65 @@ export const ThreadPostListView = ({
 	onReactAction,
 }: ThreadPostListViewProps) => {
 	const visiblePostCount = visibleFlattenedPosts.length;
+	const articleElementByPostIdRef = useRef(new Map<number, HTMLElement>());
+	const avatarAnchorByPostIdRef = useRef(new Map<number, HTMLElement>());
+	const [connectorSegmentsByPostId, setConnectorSegmentsByPostId] = useState<
+		Record<number, ConnectorSegment[]>
+	>({});
+
+	const setArticleElement = useCallback(
+		(postId: number, element: HTMLElement | null) => {
+			if (element) {
+				articleElementByPostIdRef.current.set(postId, element);
+				return;
+			}
+			articleElementByPostIdRef.current.delete(postId);
+		},
+		[],
+	);
+
+	const setAvatarAnchorElement = useCallback(
+		(postId: number, element: HTMLElement | null) => {
+			if (element) {
+				avatarAnchorByPostIdRef.current.set(postId, element);
+				return;
+			}
+			avatarAnchorByPostIdRef.current.delete(postId);
+		},
+		[],
+	);
+
+	const recalculateConnectorSegments = useCallback(() => {
+		const nextConnectorSegmentsByPostId = buildConnectorSegmentsByPostId(
+			visibleFlattenedPosts,
+			articleElementByPostIdRef.current,
+			avatarAnchorByPostIdRef.current,
+		);
+		setConnectorSegmentsByPostId((currentConnectorSegmentsByPostId) => {
+			if (
+				isSameConnectorSegmentMap(
+					currentConnectorSegmentsByPostId,
+					nextConnectorSegmentsByPostId,
+				)
+			) {
+				return currentConnectorSegmentsByPostId;
+			}
+			return nextConnectorSegmentsByPostId;
+		});
+	}, [visibleFlattenedPosts]);
+
+	useLayoutEffect(() => {
+		let frameId = window.requestAnimationFrame(recalculateConnectorSegments);
+		const handleResize = () => {
+			window.cancelAnimationFrame(frameId);
+			frameId = window.requestAnimationFrame(recalculateConnectorSegments);
+		};
+		window.addEventListener("resize", handleResize);
+		return () => {
+			window.cancelAnimationFrame(frameId);
+			window.removeEventListener("resize", handleResize);
+		};
+	}, [recalculateConnectorSegments]);
 
 	return (
 		<div className="space-y-3">
@@ -91,6 +370,8 @@ export const ThreadPostListView = ({
 							const threadDepthIndentPx =
 								depth > 0 ? Math.min(depth, 8) * 22 : 0;
 							const selectedReactionCodes = getSelectedReactionCodes(post);
+							const connectorSegments =
+								connectorSegmentsByPostId[post.id] ?? [];
 
 							return (
 								<motion.article
@@ -125,7 +406,23 @@ export const ThreadPostListView = ({
 											? { marginInlineStart: `${threadDepthIndentPx}px` }
 											: undefined
 									}
+									ref={(element) => {
+										setArticleElement(post.id, element);
+									}}
 								>
+									{connectorSegments.length > 0 ? (
+										<svg
+											aria-hidden="true"
+											className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+										>
+											{connectorSegments.map((segment, segmentIndex) =>
+												renderConnectorSegment(
+													segment,
+													`connector:${post.id}:${segmentIndex}`,
+												),
+											)}
+										</svg>
+									) : null}
 									<div className="flex items-start">
 										<div className="min-w-0 flex-1">
 											<div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-600 dark:text-slate-50">
@@ -134,12 +431,19 @@ export const ThreadPostListView = ({
 													showIndicator={false}
 													className="inline-flex max-w-[220px] items-center gap-1.5"
 												>
-													<AuthorAvatar
-														name={post.author.name}
-														image={post.author.image}
-														className={`${depth > 0 ? "h-5 w-5" : "h-7 w-7"} bg-white dark:bg-[#0f172a]`}
-														fallbackClassName="text-[11px]"
-													/>
+													<span
+														ref={(element) => {
+															setAvatarAnchorElement(post.id, element);
+														}}
+														className="relative inline-flex shrink-0"
+													>
+														<AuthorAvatar
+															name={post.author.name}
+															image={post.author.image}
+															className={`${depth > 0 ? "h-5 w-5" : "h-7 w-7"} bg-white dark:bg-[#0f172a]`}
+															fallbackClassName="text-[11px]"
+														/>
+													</span>
 													<span>{post.author.name}</span>
 												</Link>
 												<span>#{post.localId}</span>
