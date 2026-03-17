@@ -8,11 +8,12 @@ import { BackToThreadListHeaderButton } from "./components/BackToThreadListHeade
 import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
+import { parseThreadViewMode } from "./lib/threadViewMode";
 export const dynamic = "force-dynamic";
 
 export type Props = {
 	params: Promise<{ id: string }>;
-	searchParams: Promise<{ postId?: string }>;
+	searchParams: Promise<{ postId?: string; view?: string }>;
 };
 
 export default async function ThreadDetailPage({
@@ -23,6 +24,7 @@ export default async function ThreadDetailPage({
 	const renderedSearchParams = await searchParams;
 	const threadId = Number(renderedparams.id);
 	const parsedHighlightPostId = Number(renderedSearchParams.postId);
+	const initialViewMode = parseThreadViewMode(renderedSearchParams.view);
 	const highlightPostId =
 		Number.isInteger(parsedHighlightPostId) && parsedHighlightPostId > 0
 			? parsedHighlightPostId
@@ -61,6 +63,7 @@ export default async function ThreadDetailPage({
 							<ThreadPostsStream
 								threadId={threadId}
 								highlightPostId={highlightPostId}
+								initialViewMode={initialViewMode}
 							/>
 						</div>
 					</div>
