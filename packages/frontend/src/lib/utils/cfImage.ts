@@ -5,7 +5,12 @@ export type CfImageOptions = {
 	fit?: "cover" | "contain" | "scale-down" | "pad";
 };
 
-export type CfImagePreset = "post" | "threadList" | "zoom";
+export type CfImagePreset =
+	| "post"
+	| "threadList"
+	| "zoom"
+	| "avatar"
+	| "tagIcon";
 
 export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	post: {
@@ -21,6 +26,16 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	zoom: {
 		width: 1800,
 		quality: 82,
+		fit: "contain",
+	},
+	avatar: {
+		width: 128,
+		quality: 72,
+		fit: "cover",
+	},
+	tagIcon: {
+		width: 96,
+		quality: 72,
 		fit: "contain",
 	},
 };

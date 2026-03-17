@@ -2,6 +2,7 @@ import type { TagType } from "@kotobad/shared/src/types/tag";
 import Image from "next/image";
 import getTagAssetsUrl from "@/lib/config/tag/getTagAssetsUrl";
 import { cn } from "@/lib/utils";
+import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
 
 const variantClasses = {
 	default: {
@@ -38,9 +39,10 @@ export default function TagIcon({
 	const imageClassName = cn(fit && "h-full w-full object-contain", className);
 
 	if (tag.iconType === "image") {
+		const tagImageUrl = getTagAssetsUrl(tag.iconValue);
 		return (
 			<Image
-				src={getTagAssetsUrl(tag.iconValue)}
+				src={toPresetCfImageUrl(tagImageUrl, "tagIcon") ?? tagImageUrl}
 				alt={tag.name}
 				width={size}
 				height={size}
