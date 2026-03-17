@@ -13,7 +13,7 @@ import {
 	threadViewModeLabel,
 } from "../lib/threadViewMode";
 import { BackToThreadList } from "./BackToThreadList";
-import { ThreadPostsFallback } from "./fallback/ThreadPostsFallback";
+import { ThreadPostsFallback } from "./fallback/ThreadPostsSkeleton";
 import { PostList } from "./PostList";
 
 type Props = {
