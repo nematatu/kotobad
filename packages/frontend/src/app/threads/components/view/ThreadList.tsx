@@ -140,8 +140,8 @@ export const ThreadList = ({
 								<div className="relative z-10 flex flex-wrap items-center gap-2 pointer-events-none">
 									<div className={THREAD_LIST_META_CHIP_CLASS}>
 										<ChatIcon
-											className="h-4 w-4 text-slate-400"
-											style={{ strokeWidth: 1.4 }}
+											className="h-4 w-4 text-[#ABBAC2]"
+											style={{ strokeWidth: 1.9 }}
 										/>
 										<span className="text-[10px] leading-none">
 											{thread.postCount}
