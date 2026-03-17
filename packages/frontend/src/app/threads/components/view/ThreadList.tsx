@@ -110,20 +110,15 @@ export const ThreadList = ({
 
 								<span className="text-[10px]">{relativeDate}</span>
 							</div>
-							<div className="block sm:hidden">
-								<div className="relative z-10">
+							<div className="relative z-10">
+								<div className="block sm:hidden">{renderThreadTitle()}</div>
+								<Link
+									href={href}
+									aria-label={`スレッド: ${thread.title}`}
+									className="hidden sm:block"
+								>
 									{renderThreadTitle()}
-									{renderThreadImages()}
-								</div>
-							</div>
-							<Link
-								href={href}
-								aria-label={`スレッド: ${thread.title}`}
-								className="hidden sm:block"
-							>
-								{renderThreadTitle()}
-							</Link>
-							<div className="hidden sm:block relative z-10">
+								</Link>
 								{renderThreadImages()}
 							</div>
 							<div className="flex flex-col space-y-2">

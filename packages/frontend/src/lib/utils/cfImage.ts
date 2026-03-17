@@ -19,8 +19,8 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 		fit: "cover",
 	},
 	threadList: {
-		width: 480,
-		quality: 70,
+		width: 320,
+		quality: 64,
 		fit: "cover",
 	},
 	zoom: {
@@ -29,13 +29,13 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 		fit: "contain",
 	},
 	avatar: {
-		width: 128,
-		quality: 72,
+		width: 96,
+		quality: 68,
 		fit: "cover",
 	},
 	tagIcon: {
-		width: 96,
-		quality: 72,
+		width: 48,
+		quality: 68,
 		fit: "contain",
 	},
 };
