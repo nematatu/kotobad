@@ -411,11 +411,11 @@ export const PostList = ({
 	if (viewMode === "thread") {
 		return (
 			<div className="space-y-3">
-				<div className="hidden [@media(min-width:496px)]:block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
 					<div className="p-4">
 						<CreatePostForm
 							threadId={threadId}
-							variant="chat"
+							variant="default"
 							onPostedAction={onPostedAction}
 						/>
 					</div>

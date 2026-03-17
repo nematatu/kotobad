@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import IconButton from "@/components/common/button/IconButton";
-import { useThreadBottomComposer } from "@/components/feature/provider/ThreadBottomComposerProvider";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,7 +64,6 @@ export const CreatePostForm = ({
 	const isBottomNav = variant === "bottomNav";
 	const isThreadLike = !isChat;
 	const replyTargetPostId = replyTarget?.postId ?? null;
-	const { setIsExpanded } = useThreadBottomComposer();
 
 	const form = useForm<CreatePostType>({
 		defaultValues: {
@@ -82,17 +80,6 @@ export const CreatePostForm = ({
 		const timeoutId = window.setTimeout(() => form.setFocus("post"), 1);
 		return () => window.clearTimeout(timeoutId);
 	}, [form, isInline, replyTargetPostId]);
-
-	useEffect(() => {
-		if (!isBottomNav) {
-			return;
-		}
-		const expanded = imagePreviewUrls.length > 0;
-		setIsExpanded(expanded);
-		return () => {
-			setIsExpanded(false);
-		};
-	}, [imagePreviewUrls.length, isBottomNav, setIsExpanded]);
 
 	const handleSubmit = async (values: CreatePostType) => {
 		if (submitLockRef.current) {
