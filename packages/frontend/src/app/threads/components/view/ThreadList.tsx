@@ -34,10 +34,8 @@ export const ThreadList = ({
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
 				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
-				const previewImageContainerClassName =
-					threadPreviewImageUrls.length > 1
-						? "w-[7rem] rounded-lg aspect-square"
-						: "w-[7rem] rounded-lg aspect-[4/3]";
+				const previewImageContainerClassName = "w-[7rem] rounded-lg";
+				const previewImageClassName = "h-auto max-h-[15rem] w-full";
 				const renderThreadTitle = () => (
 					<h3 className="block font-bold line-clamp-2 sm:text-lg">
 						{highlightText(thread.title, highlightQuery)}
@@ -60,6 +58,7 @@ export const ThreadList = ({
 										imageUrl={imageUrl}
 										thumbnailPreset="threadList"
 										containerClassName={previewImageContainerClassName}
+										imageClassName={previewImageClassName}
 										loading={isTopLcpCandidate ? "eager" : "lazy"}
 										fetchPriority={isTopLcpCandidate ? "high" : undefined}
 									/>
