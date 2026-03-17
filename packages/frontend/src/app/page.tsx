@@ -1,4 +1,4 @@
-import TrendingThreadList from "@/app/components/TrendingThreadList";
+import { ThreadList } from "@/app/threads/components/view/ThreadList";
 import { getTrendingThreads } from "@/app/threads/lib/getTrendingThreads";
 
 export default async function Page() {
@@ -10,7 +10,7 @@ export default async function Page() {
 				<h2 className="text-2xl font-bold text-slate-700">トレンド</h2>
 				{threads.length > 0 ? (
 					<div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-						<TrendingThreadList threads={threads} />
+						<ThreadList threads={threads} />
 					</div>
 				) : (
 					<div className="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-500">
