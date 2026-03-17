@@ -36,6 +36,8 @@ type CreatePostFormProps = {
 	variant?: "default" | "inline";
 };
 
+import { Kbd } from "@/components/ui/kbd";
+
 export const CreatePostForm = ({
 	threadId,
 	replyTarget = null,
@@ -149,7 +151,7 @@ export const CreatePostForm = ({
 				</div>
 				<div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-gray-50 p-2 dark:border-slate-700 dark:bg-slate-900">
 					{replyTarget && (
-						<div className="inline-flex items-center rounded-full bg-blue-100 dark:bg-slate-950 border border-blue-50 px-3 py-1.5 text-[10px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
+						<div className="inline-flex items-center rounded-full bg-blue-100 dark:bg-slate-950 border border-blue-50 px-3 py-1.5 text-[12px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
 							<span>
 								#{replyTarget.localId} {replyTarget.authorName}さんへの返信
 							</span>
@@ -162,7 +164,7 @@ export const CreatePostForm = ({
 							<FormItem className="flex-1">
 								<FormControl>
 									<Textarea
-										rows={2}
+										rows={1}
 										{...field}
 										{...form.register("post", {
 											required: "空文字は送信できません",
@@ -187,14 +189,12 @@ export const CreatePostForm = ({
 										}}
 										placeholder={placeholder}
 										className={cn(
-											"w-full resize-none border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-h-[60px] bg-transparent px-3 pt-3 text-sm text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500",
+											"min-h-[38px] w-full resize-none border-none bg-transparent px-3 py-2 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500",
 										)}
 									/>
 								</FormControl>
 								<FormMessage className="px-3 pb-1" />
-								{error && (
-									<p className="px-3 pb-1 text-sm text-red-500">{error}</p>
-								)}
+								{error && <p className="text-sm text-red-500">{error}</p>}
 							</FormItem>
 						)}
 					/>
@@ -204,7 +204,7 @@ export const CreatePostForm = ({
 							onRemoveImageAction={removeImageAtAction}
 							disabled={isSubmitting}
 						/>
-						<div className="flex items-center justify-between border-t border-slate-100 px-2 py-2 dark:border-slate-800">
+						<div className="flex items-center justify-between border-t border-slate-100 px-1 pt-2 dark:border-slate-800">
 							<ThreadPostImagePicker
 								imageInputRef={imageInputRef}
 								imagePreviewUrls={imagePreviewUrls}
@@ -220,15 +220,14 @@ export const CreatePostForm = ({
 								showPreview={false}
 							/>
 							<div className="flex items-center gap-2">
-								<p className="hidden sm:block text-neutral-400 text-xs">
-									Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-								</p>
 								<Button
 									type="button"
 									variant="outline"
 									rounded="full"
 									onClick={handleCancel}
-									disabled={isSubmitting}
+									disabled={
+										isSubmitting || (!form.getValues("post") && !isInline)
+									}
 								>
 									キャンセル
 								</Button>
@@ -239,6 +238,8 @@ export const CreatePostForm = ({
 									disabled={form.getValues("post") === "" || isSubmitting}
 								>
 									{isSubmitting ? "送信中..." : submitLabel}
+
+									<Kbd>⌘ + Enter</Kbd>
 								</Button>
 							</div>
 						</div>

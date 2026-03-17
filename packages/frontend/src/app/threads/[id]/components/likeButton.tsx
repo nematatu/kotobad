@@ -167,7 +167,7 @@ export function LikeButton({
 			onClick={onLikeClick}
 			aria-pressed={likedByMe}
 			aria-label={likedByMe ? "いいねを解除" : "いいねする"}
-			className={`${cn(compactButtonClass, "group/like-button  h-auto text-xs sm:text-sm")} `}
+			className={`${cn(compactButtonClass, "group/like-button  h-auto text-xs sm:text-sm")} ${likedByMe ? "bg-white" : ""}`}
 		>
 			<span className="relative inline-flex size-8 items-center justify-center shrink-0 transition-transform duration-100 sm:size-9 [@media(hover:hover)]:group-hover/like-button:scale-110">
 				<ThreadHeartLottiePlayer

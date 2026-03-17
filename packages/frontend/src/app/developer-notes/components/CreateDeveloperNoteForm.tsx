@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
+import { Button } from "@/components/ui/button";
 import {
 	Form,
 	FormControl,
@@ -19,6 +20,7 @@ import {
 	FormItem,
 	FormMessage,
 } from "@/components/ui/form";
+import { Kbd } from "@/components/ui/kbd";
 import {
 	SubtleTab,
 	SubtleTabItem,
@@ -296,18 +298,18 @@ export function CreateDeveloperNoteForm() {
 					/>
 
 					<div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-end dark:border-slate-800">
-						<IconButton
+						<Button
 							type="submit"
 							disabled={isSubmitDisabled}
 							hover="brightness"
-							icon={<PencilLine />}
 							variant="logo1"
 							size="lg"
 							rounded="full"
 							enableClickAnimation
 						>
 							<span className="text-md">投稿する</span>
-						</IconButton>
+							<Kbd>⌘ + Enter</Kbd>
+						</Button>
 					</div>
 				</form>
 			</Form>

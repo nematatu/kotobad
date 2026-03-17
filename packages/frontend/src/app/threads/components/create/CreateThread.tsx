@@ -16,6 +16,7 @@ import {
 	FormItem,
 	FormMessage,
 } from "@/components/ui/form";
+import { Kbd } from "@/components/ui/kbd";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	BffFetcher,
@@ -199,9 +200,6 @@ export const CreateThreadForm = ({
 									</div>
 
 									<div className="flex space-x-3 items-end">
-										<p className="hidden sm:block text-neutral-400 text-xs">
-											Ctrl + Enter (Macの場合は ⌘ + Enter)で送信できます
-										</p>
 										<IconButton
 											hover="brightness"
 											icon={<PencilLine />}
@@ -212,6 +210,7 @@ export const CreateThreadForm = ({
 											disabled={isSubmitDisabled || form.formState.isSubmitting}
 										>
 											<span className="text-md">投稿</span>
+											<Kbd>⌘ + Enter</Kbd>
 										</IconButton>
 									</div>
 								</div>
