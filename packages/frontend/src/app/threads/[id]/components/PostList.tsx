@@ -43,7 +43,6 @@ type PostListProps = {
 	posts: PostListType;
 	threadId: number;
 	highlightPostId: number | null;
-	onPostedAction?: () => void;
 	viewMode?: ThreadViewMode;
 };
 
@@ -181,7 +180,6 @@ export const PostList = ({
 	posts,
 	threadId,
 	highlightPostId,
-	onPostedAction,
 	viewMode = "chat",
 }: PostListProps) => {
 	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
@@ -413,11 +411,7 @@ export const PostList = ({
 			<div className="space-y-3">
 				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
 					<div className="p-4">
-						<CreatePostForm
-							threadId={threadId}
-							variant="default"
-							onPostedAction={onPostedAction}
-						/>
+						<CreatePostForm threadId={threadId} variant="default" />
 					</div>
 				</div>
 				{visiblePostCount === 0 ? (
@@ -635,7 +629,6 @@ export const PostList = ({
 																variant="inline"
 																onPostedAction={() => {
 																	setReplyTarget(null);
-																	onPostedAction?.();
 																}}
 																onClearReplyTargetAction={() =>
 																	setReplyTarget(null)
@@ -928,7 +921,6 @@ export const PostList = ({
 															variant="inline"
 															onPostedAction={() => {
 																setReplyTarget(null);
-																onPostedAction?.();
 															}}
 															onClearReplyTargetAction={() =>
 																setReplyTarget(null)
@@ -947,11 +939,7 @@ export const PostList = ({
 			}
 			messageInput={
 				<MessageInput className="hidden [@media(min-width:496px)]:block">
-					<CreatePostForm
-						threadId={threadId}
-						variant="chat"
-						onPostedAction={onPostedAction}
-					/>
+					<CreatePostForm threadId={threadId} />
 				</MessageInput>
 			}
 		/>

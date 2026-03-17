@@ -1,12 +1,10 @@
 "use client";
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
-import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
-import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,6 +78,18 @@ export const CreatePostForm = ({
 		const timeoutId = window.setTimeout(() => form.setFocus("post"), 1);
 		return () => window.clearTimeout(timeoutId);
 	}, [form, isInline, replyTargetPostId]);
+
+	const handleCancel = () => {
+		form.reset({
+			post: "",
+			imageUrls: [],
+			threadId,
+			replyToPostId: null,
+		});
+		clearImageSelectionAction();
+		setError(null);
+		onClearReplyTargetAction?.();
+	};
 
 	const handleSubmit = async (values: CreatePostType) => {
 		if (submitLockRef.current) return;
@@ -217,7 +227,7 @@ export const CreatePostForm = ({
 									type="button"
 									variant="outline"
 									rounded="full"
-									onClick={onClearReplyTargetAction}
+									onClick={handleCancel}
 									disabled={isSubmitting}
 								>
 									キャンセル
@@ -226,7 +236,7 @@ export const CreatePostForm = ({
 									className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
 									rounded="full"
 									type="submit"
-									disabled={isSubmitting}
+									disabled={form.getValues("post") === "" || isSubmitting}
 								>
 									{isSubmitting ? "送信中..." : submitLabel}
 								</Button>
