@@ -4,11 +4,9 @@ import type { TagType } from "@kotobad/shared/src/types/tag";
 import Image from "next/image";
 import { getTags } from "@/app/threads/lib/getTags";
 import PwaRegister from "@/components/common/PwaRegister";
-import AuthRequiredModal from "@/components/feature/auth/AuthRequiredModal";
 import ConditionalFooter from "@/components/feature/footer/ConditionalFooter";
 import Header from "@/components/feature/header/header";
-import MobileBottomNav from "@/components/feature/navigation/MobileBottomNav";
-import { Toaster } from "@/components/ui/sonner";
+import LayoutClientFeatures from "@/components/feature/layout/LayoutClientFeatures";
 import { Providers } from "./providers";
 
 const THEME_INIT_INLINE_SCRIPT =
@@ -84,14 +82,12 @@ export default async function RootLayout({
 							className="h-0 w-full"
 							aria-hidden="true"
 						/>
-						<Toaster richColors />
 						<Header tags={tags} />
-						<AuthRequiredModal />
+						<LayoutClientFeatures tags={tags} />
 						<main className="view-transition-page-content flex-1 min-h-screen pb-16 mb-8 [@media(min-width:496px)]:pb-0">
 							{children}
 						</main>
 						<ConditionalFooter />
-						<MobileBottomNav tags={tags} />
 					</div>
 				</Providers>
 			</body>

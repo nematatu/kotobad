@@ -1,6 +1,6 @@
 "use client";
 
-import { SiGithub, SiX } from "react-icons/si";
+import { Github } from "lucide-react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Link } from "@/components/common/Link";
@@ -11,9 +11,11 @@ import { FOOTER_SECTIONS } from "./FooterItem";
 const FooterItemLink = ({ item }: { item: FooterItem }) => {
 	const icon =
 		item.icon === "github" ? (
-			<SiGithub className="h-3.5 w-3.5 text-slate-500" />
+			<Github className="h-3.5 w-3.5 text-slate-500" strokeWidth={1.9} />
 		) : item.icon === "twitter" ? (
-			<SiX className="h-3.5 w-3.5 text-slate-500" />
+			<span className="inline-flex h-3.5 w-3.5 items-center justify-center text-[11px] font-semibold text-slate-500">
+				X
+			</span>
 		) : null;
 	const badge = item.badge ? (
 		<span className="rounded border border-blue-500 px-1.5 py-[1px] text-[10px] font-semibold text-blue-700 dark:border-blue-400 dark:text-blue-300">
