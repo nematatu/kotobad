@@ -150,9 +150,11 @@ export function LikeButton({
 						}}
 					/>
 				</span>
-				<span className="whitespace-nowrap text-[10px] font-semibold leading-none">
-					{likeCount}
-				</span>
+				{likeCount > 0 ? (
+					<span className="whitespace-nowrap text-[10px] font-semibold leading-none">
+						{likeCount}
+					</span>
+				) : null}
 			</button>
 		);
 	}
@@ -173,7 +175,9 @@ export function LikeButton({
 					className="pointer-events-none absolute inset-0 h-full w-full [&_*]:pointer-events-none [&_svg]:!h-full [&_svg]:!w-full [&_svg]:origin-center [&_svg]:scale-[2.1]"
 				/>
 			</span>
-			<span className="whitespace-nowrap">{likeCount}</span>
+			{likeCount > 0 ? (
+				<span className="whitespace-nowrap">{likeCount}</span>
+			) : null}
 		</Button>
 	);
 }

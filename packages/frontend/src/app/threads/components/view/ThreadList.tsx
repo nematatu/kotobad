@@ -143,9 +143,11 @@ export const ThreadList = ({
 											className="h-4 w-4 text-[#ABBAC2]"
 											style={{ strokeWidth: 1.9 }}
 										/>
-										<span className="text-[10px] leading-none">
-											{thread.postCount}
-										</span>
+										{thread.postCount > 0 && (
+											<span className="text-[10px] leading-none">
+												{thread.postCount}
+											</span>
+										)}
 									</div>
 									<LikeButton
 										threadId={thread.id}
