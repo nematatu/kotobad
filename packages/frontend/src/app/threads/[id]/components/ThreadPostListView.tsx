@@ -470,7 +470,6 @@ export const ThreadPostListView = ({
 																<ThreadPostImage
 																	key={imageUrl}
 																	imageUrl={imageUrl}
-																	enableZoom
 																	containerClassName="max-h-52 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700"
 																/>
 															))}

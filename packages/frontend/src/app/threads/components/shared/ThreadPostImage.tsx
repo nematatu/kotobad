@@ -3,7 +3,7 @@
 import { XIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { toCfImageUrl } from "@/lib/utils/cfImage";
+import { type CfImagePreset, toPresetCfImageUrl } from "@/lib/utils/cfImage";
 
 type ImageSource = string | null | undefined;
 
@@ -13,7 +13,7 @@ type ThreadPostImageProps = {
 	containerClassName?: string;
 	imageClassName?: string;
 	loading?: "lazy" | "eager";
-	enableZoom?: boolean;
+	thumbnailPreset?: CfImagePreset;
 };
 
 export const ThreadPostImage = ({
@@ -22,19 +22,18 @@ export const ThreadPostImage = ({
 	containerClassName,
 	imageClassName,
 	loading = "lazy",
-	enableZoom = false,
+	thumbnailPreset = "post",
 }: ThreadPostImageProps) => {
 	const dialogRef = useRef<HTMLDialogElement | null>(null);
 	const zoomImageRef = useRef<HTMLImageElement | null>(null);
 	const [isZoomImageReady, setIsZoomImageReady] = useState(false);
-	const transformedUrl = toCfImageUrl(imageUrl);
+	const transformedUrl = toPresetCfImageUrl(imageUrl, thumbnailPreset);
 
 	const openZoom = () => {
 		const dialog = dialogRef.current;
 		if (!dialog || dialog.open) {
 			return;
 		}
-
 		setIsZoomImageReady(zoomImageRef.current?.complete ?? false);
 		dialog.showModal();
 	};
@@ -44,27 +43,13 @@ export const ThreadPostImage = ({
 		if (!dialog || !dialog.open) {
 			return;
 		}
-
 		dialog.close();
 	};
 
 	if (!transformedUrl) {
 		return null;
 	}
-
-	if (!enableZoom) {
-		return (
-			<div className={cn("overflow-hidden bg-slate-50", containerClassName)}>
-				{/* biome-ignore lint/performance/noImgElement: Cloudflare Image Transform URL is already optimized for delivery. */}
-				<img
-					src={transformedUrl}
-					alt={alt}
-					loading={loading}
-					className={cn("h-full w-full object-cover", imageClassName)}
-				/>
-			</div>
-		);
-	}
+	const zoomImageUrl = toPresetCfImageUrl(imageUrl, "zoom") ?? transformedUrl;
 
 	return (
 		<>
@@ -87,7 +72,9 @@ export const ThreadPostImage = ({
 			</button>
 			<dialog
 				ref={dialogRef}
-				onClose={() => setIsZoomImageReady(false)}
+				onClose={() => {
+					setIsZoomImageReady(false);
+				}}
 				className="m-0 h-dvh max-h-none w-screen max-w-none border-none bg-transparent p-0 outline-none [@media(hover:hover)]:m-auto [&::backdrop]:bg-black/90 [&::backdrop]:backdrop-blur-[1px]"
 			>
 				<div className="relative h-full w-full">
@@ -102,11 +89,10 @@ export const ThreadPostImage = ({
 							{/* biome-ignore lint/performance/noImgElement: Cloudflare Image Transform URL is already optimized for delivery. */}
 							<img
 								ref={zoomImageRef}
-								src={transformedUrl}
+								src={zoomImageUrl}
 								alt={alt}
-								loading="eager"
-								decoding="sync"
-								fetchPriority="high"
+								loading="lazy"
+								decoding="async"
 								onLoad={() => setIsZoomImageReady(true)}
 								onError={() => setIsZoomImageReady(true)}
 								className={cn(

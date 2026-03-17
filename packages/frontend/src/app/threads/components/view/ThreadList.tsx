@@ -29,7 +29,7 @@ export const ThreadList = ({
 
 	return (
 		<div className="flex flex-col">
-			{threadList.map((thread) => {
+			{threadList.map((thread, threadIndex) => {
 				const href = `/threads/${thread.id}`;
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
@@ -44,18 +44,22 @@ export const ThreadList = ({
 						<div
 							className={
 								threadPreviewImageUrls.length > 1
-									? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2"
-									: "mt-2 max-w-[12rem]"
+									? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2 pointer-events-auto"
+									: "mt-2 max-w-[12rem] pointer-events-auto"
 							}
 						>
-							{threadPreviewImageUrls.map((imageUrl) => (
-								<ThreadPostImage
-									key={imageUrl}
-									imageUrl={imageUrl}
-									enableZoom
-									containerClassName="w-[7rem] rounded-lg"
-								/>
-							))}
+							{threadPreviewImageUrls.map((imageUrl, imageIndex) => {
+								const isTopLcpCandidate = threadIndex === 0 && imageIndex === 0;
+								return (
+									<ThreadPostImage
+										key={imageUrl}
+										imageUrl={imageUrl}
+										thumbnailPreset="threadList"
+										containerClassName="w-[7rem] rounded-lg"
+										loading={isTopLcpCandidate ? "eager" : "lazy"}
+									/>
+								);
+							})}
 						</div>
 					) : null;
 				return (

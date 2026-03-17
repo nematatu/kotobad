@@ -1,34 +1,47 @@
-type CfImageOptions = {
+export type CfImageOptions = {
 	width?: number;
 	height?: number;
 	quality?: number;
 	fit?: "cover" | "contain" | "scale-down" | "pad";
 };
 
-const normalizePositiveInt = (value: number | undefined): number | null => {
-	if (!Number.isFinite(value)) {
-		return null;
-	}
-	if (!value) {
+export type CfImagePreset = "post" | "threadList" | "zoom";
+
+export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
+	post: {
+		width: 560,
+		quality: 70,
+		fit: "cover",
+	},
+	threadList: {
+		width: 480,
+		quality: 70,
+		fit: "cover",
+	},
+	zoom: {
+		width: 1800,
+		quality: 82,
+		fit: "contain",
+	},
+};
+
+const normalizePositiveInt = (value?: number): number | null => {
+	if (!value || !Number.isFinite(value)) {
 		return null;
 	}
 	const rounded = Math.floor(value);
 	return rounded > 0 ? rounded : null;
 };
 
-const shouldUseCfImageTransform = (): boolean => {
+const shouldUseCfImageTransform = () => {
 	if (process.env.NODE_ENV !== "production") {
 		return false;
 	}
-
 	const explicit = process.env.NEXT_PUBLIC_CF_IMAGE_TRANSFORM;
-	if (explicit === "true" || explicit === "1") {
+	if (!explicit) {
 		return true;
 	}
-	if (explicit === "false" || explicit === "0") {
-		return false;
-	}
-	return true;
+	return explicit === "true" || explicit === "1";
 };
 
 export const toCfImageUrl = (
@@ -51,23 +64,24 @@ export const toCfImageUrl = (
 		return sourceUrl;
 	}
 
-	const directives: string[] = ["format=auto", "onerror=redirect"];
 	const quality = normalizePositiveInt(options.quality);
 	const width = normalizePositiveInt(options.width);
 	const height = normalizePositiveInt(options.height);
-
-	if (quality) {
-		directives.push(`quality=${quality}`);
-	}
-	if (width) {
-		directives.push(`width=${width}`);
-	}
-	if (height) {
-		directives.push(`height=${height}`);
-	}
-	if (options.fit) {
-		directives.push(`fit=${options.fit}`);
-	}
+	const directives = [
+		"format=auto",
+		"onerror=redirect",
+		quality ? `quality=${quality}` : null,
+		width ? `width=${width}` : null,
+		height ? `height=${height}` : null,
+		options.fit ? `fit=${options.fit}` : null,
+	].filter((directive): directive is string => directive !== null);
 
 	return `/cdn-cgi/image/${directives.join(",")}/${sourceUrl}`;
+};
+
+export const toPresetCfImageUrl = (
+	sourceUrl: string | null | undefined,
+	preset: CfImagePreset,
+) => {
+	return toCfImageUrl(sourceUrl, CF_IMAGE_PRESET_OPTIONS[preset]);
 };

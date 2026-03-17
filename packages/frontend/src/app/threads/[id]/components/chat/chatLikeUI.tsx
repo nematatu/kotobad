@@ -272,7 +272,6 @@ export const ChatLikeUI = ({
 																	<ThreadPostImage
 																		key={imageUrl}
 																		imageUrl={imageUrl}
-																		enableZoom
 																		containerClassName="h-36"
 																		imageClassName="h-full"
 																	/>

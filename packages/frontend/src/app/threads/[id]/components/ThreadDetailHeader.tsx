@@ -44,7 +44,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 				<div
 					className={
 						threadImageUrls.length > 1
-							? "grid max-w-[15rem] grid-cols-2 gap-2"
+							? "grid max-w-[20rem] grid-cols-2 gap-2"
 							: "max-w-[12rem]"
 					}
 				>
@@ -52,8 +52,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 						<ThreadPostImage
 							key={imageUrl}
 							imageUrl={imageUrl}
-							enableZoom
-							containerClassName="w-[7rem] rounded-lg"
+							containerClassName="w-[9rem] rounded-lg"
 						/>
 					))}
 				</div>
