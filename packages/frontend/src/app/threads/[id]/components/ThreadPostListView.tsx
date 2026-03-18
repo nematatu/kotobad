@@ -7,6 +7,7 @@ import { Reply } from "lucide-react";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
+import { YouTubeEmbedsFromText } from "@/components/common/YouTubeEmbedsFromText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -456,6 +457,11 @@ export const ThreadPostListView = ({
 														<AutoLinkText
 															text={post.post}
 															linkClassName="text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
+															hideYouTubeUrls
+														/>
+														<YouTubeEmbedsFromText
+															text={post.post}
+															playerClassName="max-w-[22rem]"
 														/>
 													</div>
 													{post.imageUrls.length > 0 && (

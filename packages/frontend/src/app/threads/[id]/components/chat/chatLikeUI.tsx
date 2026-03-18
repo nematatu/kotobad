@@ -7,6 +7,7 @@ import { MoreHorizontal, Reply } from "lucide-react";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import IconButton from "@/components/common/button/IconButton";
 import { Link } from "@/components/common/Link";
+import { YouTubeEmbedsFromText } from "@/components/common/YouTubeEmbedsFromText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Card } from "@/components/ui/card";
 import {
@@ -257,6 +258,11 @@ export const ChatLikeUI = ({
 																		? "text-[#1d4f91] hover:text-[#123b70] underline-blue-400/50 dark:text-[#bfdbfe] dark:hover:text-[#dbeafe]"
 																		: "text-blue-600 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200"
 																}
+																hideYouTubeUrls
+															/>
+															<YouTubeEmbedsFromText
+																text={post.post}
+																playerClassName="max-w-[22rem]"
 															/>
 														</div>
 

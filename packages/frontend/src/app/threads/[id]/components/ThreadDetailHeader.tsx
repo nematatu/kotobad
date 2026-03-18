@@ -2,6 +2,7 @@ import type { ThreadType } from "@kotobad/shared/src/types/thread";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
+import { YouTubeEmbedsFromText } from "@/components/common/YouTubeEmbedsFromText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { ThreadPostImage } from "../../components/shared/ThreadPostImage";
 import { TagList } from "../../components/view/tag/tagList";
@@ -21,9 +22,15 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 					withTime: false,
 				})}
 			</p>
-			<h1 className="max-w-4xl text-left text-lg sm:text-2xl font-bold break-words">
-				<AutoLinkText text={threadHeaderData.title} />
-			</h1>
+			<div className="max-w-4xl space-y-2">
+				<h1 className="text-left text-lg sm:text-2xl font-bold break-words">
+					<AutoLinkText text={threadHeaderData.title} hideYouTubeUrls />
+				</h1>
+				<YouTubeEmbedsFromText
+					text={threadHeaderData.title}
+					playerClassName="max-w-[22rem]"
+				/>
+			</div>
 			<Link
 				href={`/users/${encodeURIComponent(threadHeaderData.authorId)}`}
 				showIndicator={false}

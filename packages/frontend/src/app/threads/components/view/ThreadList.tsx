@@ -8,7 +8,10 @@ import {
 	THREAD_LIST_META_CHIP_CLASS,
 } from "@/app/threads/[id]/components/likeButton";
 import ChatIcon from "@/assets/threads/chat.svg";
+import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
+import { YouTubeEmbedsFromText } from "@/components/common/YouTubeEmbedsFromText";
+import { collectYouTubeUrlsFromText } from "@/components/common/youtubeUrlUtils";
 import { highlightText } from "@/components/feature/header/component/headerSearch/highlightText";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
@@ -34,11 +37,17 @@ export const ThreadList = ({
 				const authorHref = `/users/${encodeURIComponent(thread.authorId)}`;
 				const relativeDate = getRelativeDate(thread.createdAt);
 				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
+				const hasYouTubeInTitle =
+					collectYouTubeUrlsFromText(thread.title).length > 0;
 				const previewImageContainerClassName = "w-[7rem] rounded-lg";
 				const previewImageClassName = "h-auto max-h-[15rem] w-full";
 				const renderThreadTitle = () => (
 					<h3 className="block font-bold line-clamp-2 sm:text-lg">
-						{highlightText(thread.title, highlightQuery)}
+						{hasYouTubeInTitle ? (
+							<AutoLinkText text={thread.title} hideYouTubeUrls />
+						) : (
+							highlightText(thread.title, highlightQuery)
+						)}
 					</h3>
 				);
 				const renderThreadImages = () =>
@@ -115,14 +124,28 @@ export const ThreadList = ({
 								<span className="text-xs">{relativeDate}</span>
 							</div>
 							<div className="relative z-10">
-								<div className="block sm:hidden">{renderThreadTitle()}</div>
-								<Link
-									href={href}
-									aria-label={`スレッド: ${thread.title}`}
-									className="hidden sm:block"
-								>
+								<div className="block space-y-2 sm:hidden">
 									{renderThreadTitle()}
-								</Link>
+									<YouTubeEmbedsFromText
+										text={thread.title}
+										className="pointer-events-none"
+										playerClassName="max-w-[15rem]"
+									/>
+								</div>
+								<div className="hidden space-y-2 sm:block">
+									<Link
+										href={href}
+										aria-label={`スレッド: ${thread.title}`}
+										className="inline-block"
+									>
+										{renderThreadTitle()}
+									</Link>
+									<YouTubeEmbedsFromText
+										text={thread.title}
+										className="pointer-events-none"
+										playerClassName="max-w-[22rem]"
+									/>
+								</div>
 								{renderThreadImages()}
 							</div>
 							<div className="flex flex-col space-y-2">
