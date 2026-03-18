@@ -8,12 +8,14 @@ type Props = {
 	text: string;
 	className?: string;
 	playerClassName?: string;
+	playerNoCardLink?: boolean;
 };
 
 export function YouTubeEmbedsFromText({
 	text,
 	className,
 	playerClassName,
+	playerNoCardLink = false,
 }: Props) {
 	const youtubeUrls = collectYouTubeUrlsFromText(text);
 	if (youtubeUrls.length === 0) {
@@ -27,6 +29,7 @@ export function YouTubeEmbedsFromText({
 					key={youtubeUrl}
 					url={youtubeUrl}
 					className={playerClassName}
+					noCardLink={playerNoCardLink}
 				/>
 			))}
 		</div>

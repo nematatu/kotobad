@@ -210,7 +210,9 @@ export const CreateThreadForm = ({
 											disabled={isSubmitDisabled || form.formState.isSubmitting}
 										>
 											<span className="text-md">投稿</span>
-											<Kbd>⌘ + Enter</Kbd>
+											<div className="hidden md:block">
+												<Kbd>⌘ + Enter</Kbd>
+											</div>
 										</IconButton>
 									</div>
 								</div>

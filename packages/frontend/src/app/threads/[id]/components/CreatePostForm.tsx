@@ -239,7 +239,9 @@ export const CreatePostForm = ({
 								>
 									{isSubmitting ? "送信中..." : submitLabel}
 
-									<Kbd>⌘ + Enter</Kbd>
+									<div className="hidden md:block">
+										<Kbd>⌘ + Enter</Kbd>
+									</div>
 								</Button>
 							</div>
 						</div>

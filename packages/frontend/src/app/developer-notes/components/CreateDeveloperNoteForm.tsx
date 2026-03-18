@@ -308,7 +308,9 @@ export function CreateDeveloperNoteForm() {
 							enableClickAnimation
 						>
 							<span className="text-md">投稿する</span>
-							<Kbd>⌘ + Enter</Kbd>
+							<div className="hidden sm:block">
+								<Kbd>⌘ + Enter</Kbd>
+							</div>
 						</Button>
 					</div>
 				</form>

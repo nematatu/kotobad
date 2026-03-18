@@ -78,7 +78,7 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 sm:cursor-pointer pointer-events-none sm:pointer-events-auto"
+						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 sm:cursor-pointer"
 						role="link"
 						tabIndex={0}
 						aria-label={`スレッドへ移動: ${thread.title}`}
@@ -126,10 +126,11 @@ export const ThreadList = ({
 							<div className="relative z-10">
 								<div className="block space-y-2 sm:hidden">
 									{renderThreadTitle()}
-									<div data-no-card-link="true" className="pointer-events-auto">
+									<div className="pointer-events-auto">
 										<YouTubeEmbedsFromText
 											text={thread.title}
 											playerClassName="w-full sm:max-w-[22rem]"
+											playerNoCardLink
 										/>
 									</div>
 								</div>
@@ -141,10 +142,11 @@ export const ThreadList = ({
 									>
 										{renderThreadTitle()}
 									</Link>
-									<div data-no-card-link="true" className="pointer-events-auto">
+									<div className="pointer-events-auto">
 										<YouTubeEmbedsFromText
 											text={thread.title}
 											playerClassName="w-full sm:max-w-[22rem]"
+											playerNoCardLink
 										/>
 									</div>
 								</div>
