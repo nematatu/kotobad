@@ -126,11 +126,12 @@ export const ThreadList = ({
 							<div className="relative z-10">
 								<div className="block space-y-2 sm:hidden">
 									{renderThreadTitle()}
-									<YouTubeEmbedsFromText
-										text={thread.title}
-										className="pointer-events-none"
-										playerClassName="max-w-[15rem]"
-									/>
+									<div data-no-card-link="true" className="pointer-events-auto">
+										<YouTubeEmbedsFromText
+											text={thread.title}
+											playerClassName="w-full sm:max-w-[22rem]"
+										/>
+									</div>
 								</div>
 								<div className="hidden space-y-2 sm:block">
 									<Link
@@ -140,11 +141,12 @@ export const ThreadList = ({
 									>
 										{renderThreadTitle()}
 									</Link>
-									<YouTubeEmbedsFromText
-										text={thread.title}
-										className="pointer-events-none"
-										playerClassName="max-w-[22rem]"
-									/>
+									<div data-no-card-link="true" className="pointer-events-auto">
+										<YouTubeEmbedsFromText
+											text={thread.title}
+											playerClassName="w-full sm:max-w-[22rem]"
+										/>
+									</div>
 								</div>
 								{renderThreadImages()}
 							</div>
