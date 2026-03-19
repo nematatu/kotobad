@@ -8,6 +8,26 @@ type Props = {
 	hideYouTubeUrls?: boolean;
 };
 
+const pushTextWithLineBreaks = (
+	nodes: React.ReactNode[],
+	segment: string,
+	keyPrefix: string,
+) => {
+	if (segment.length === 0) {
+		return;
+	}
+
+	const lines = segment.split(/\r?\n/);
+	for (const [index, line] of lines.entries()) {
+		if (index > 0) {
+			nodes.push(<br key={`${keyPrefix}-br-${index}`} />);
+		}
+		if (line.length > 0) {
+			nodes.push(line);
+		}
+	}
+};
+
 export function AutoLinkText({
 	text,
 	linkClassName,
@@ -21,7 +41,11 @@ export function AutoLinkText({
 		const { index, matchedText, trailing, url } = match;
 		hasUrlMatch = true;
 		if (index > lastIndex) {
-			nodes.push(text.slice(lastIndex, index));
+			pushTextWithLineBreaks(
+				nodes,
+				text.slice(lastIndex, index),
+				`chunk-${keyIndex}-${lastIndex}`,
+			);
 		}
 
 		const isYouTubeUrl = normalizeYouTubeUrl(url) !== null;
@@ -44,14 +68,22 @@ export function AutoLinkText({
 		}
 
 		if (trailing.length > 0) {
-			nodes.push(trailing);
+			pushTextWithLineBreaks(
+				nodes,
+				trailing,
+				`trailing-${keyIndex}-${lastIndex}`,
+			);
 		}
 
 		lastIndex = index + matchedText.length;
 	}
 
 	if (lastIndex < text.length) {
-		nodes.push(text.slice(lastIndex));
+		pushTextWithLineBreaks(
+			nodes,
+			text.slice(lastIndex),
+			`tail-${keyIndex}-${lastIndex}`,
+		);
 	}
 
 	if (nodes.length === 0 && !hasUrlMatch) {

@@ -46,7 +46,7 @@ export const ThreadList = ({
 					"w-[9rem] sm:w-[10.5rem] aspect-[4/3] rounded-lg";
 				const previewImageClassName = "h-full w-full";
 				const renderThreadTitle = () => (
-					<h3 className="block font-bold line-clamp-2 sm:text-lg">
+					<h3 className="block font-bold line-clamp-2 whitespace-pre-line break-words sm:text-lg">
 						{hasYouTubeInTitle ? (
 							<AutoLinkText text={thread.title} hideYouTubeUrls />
 						) : (
@@ -70,6 +70,7 @@ export const ThreadList = ({
 									<ThreadPostImage
 										key={imageUrl}
 										imageUrl={imageUrl}
+										imageOrder={imageIndex + 1}
 										thumbnailPreset="threadList"
 										containerClassName={previewImageContainerClassName}
 										imageClassName={previewImageClassName}

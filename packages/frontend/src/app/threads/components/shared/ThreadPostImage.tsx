@@ -15,6 +15,7 @@ type ThreadPostThumbnailPreset = "post" | "threadList";
 type ThreadPostImageProps = {
 	imageUrl: ImageSource;
 	alt?: string;
+	imageOrder?: number;
 	containerClassName?: string;
 	imageClassName?: string;
 	loading?: "lazy" | "eager";
@@ -25,6 +26,7 @@ type ThreadPostImageProps = {
 export const ThreadPostImage = ({
 	imageUrl,
 	alt = "",
+	imageOrder = 1,
 	containerClassName,
 	imageClassName,
 	loading = "lazy",
@@ -73,6 +75,12 @@ export const ThreadPostImage = ({
 		thumbnailPreset === "threadList"
 			? "(max-width: 640px) 150px, 180px"
 			: "(max-width: 640px) 256px, 288px";
+	const maxImageCount = thumbnailPreset === "threadList" ? 2 : 1;
+	const normalizedImageOrder = Math.min(
+		Math.max(Math.floor(imageOrder), 1),
+		maxImageCount,
+	);
+	const imageCountLabel = `${normalizedImageOrder}/${maxImageCount}`;
 
 	return (
 		<>
@@ -81,7 +89,7 @@ export const ThreadPostImage = ({
 				onClick={openZoom}
 				aria-label={alt ? `${alt} を拡大表示` : "画像を拡大表示"}
 				className={cn(
-					"overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-left [@media(hover:hover)]:cursor-zoom-in",
+					"relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-left [@media(hover:hover)]:cursor-zoom-in",
 					containerClassName,
 				)}
 			>
@@ -95,6 +103,9 @@ export const ThreadPostImage = ({
 					sizes={thumbnailSizes}
 					className={cn("h-full w-full object-cover", imageClassName)}
 				/>
+				<span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[11px] font-semibold leading-none text-white shadow-sm">
+					{imageCountLabel}
+				</span>
 			</button>
 			<dialog
 				ref={dialogRef}

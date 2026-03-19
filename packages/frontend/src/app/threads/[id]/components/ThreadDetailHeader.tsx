@@ -23,7 +23,7 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 				})}
 			</p>
 			<div className="max-w-4xl space-y-2">
-				<h1 className="text-left text-lg sm:text-2xl font-bold break-words">
+				<h1 className="text-left text-lg sm:text-2xl font-bold whitespace-pre-line break-words">
 					<AutoLinkText text={threadHeaderData.title} hideYouTubeUrls />
 				</h1>
 				<YouTubeEmbedsFromText
@@ -55,10 +55,12 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 							: "max-w-[12rem]"
 					}
 				>
-					{threadImageUrls.map((imageUrl) => (
+					{threadImageUrls.map((imageUrl, imageIndex) => (
 						<ThreadPostImage
 							key={imageUrl}
 							imageUrl={imageUrl}
+							imageOrder={imageIndex + 1}
+							thumbnailPreset="threadList"
 							containerClassName="w-[9rem] rounded-lg"
 						/>
 					))}
