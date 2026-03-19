@@ -58,7 +58,7 @@ export const ThreadPostImage = ({
 	}
 	const zoomImageUrl = toPresetCfImageUrl(imageUrl, "zoom") ?? transformedUrl;
 	const thumbnailWidths =
-		thumbnailPreset === "threadList" ? [160, 220, 320] : [280, 420, 560];
+		thumbnailPreset === "threadList" ? [220, 320, 420] : [280, 420, 560];
 	const thumbnailSrcSet = thumbnailWidths
 		.map((width) => {
 			const url = toCfImageUrl(imageUrl, {
@@ -71,7 +71,7 @@ export const ThreadPostImage = ({
 		.join(", ");
 	const thumbnailSizes =
 		thumbnailPreset === "threadList"
-			? "(max-width: 640px) 110px, 130px"
+			? "(max-width: 640px) 150px, 180px"
 			: "(max-width: 640px) 256px, 288px";
 
 	return (

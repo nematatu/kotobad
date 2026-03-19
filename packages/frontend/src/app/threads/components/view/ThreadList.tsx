@@ -43,7 +43,7 @@ export const ThreadList = ({
 				const hasYouTubeInTitle =
 					collectYouTubeUrlsFromText(thread.title).length > 0;
 				const previewImageContainerClassName =
-					"w-[7rem] aspect-[4/3] rounded-lg";
+					"w-[9rem] sm:w-[10.5rem] aspect-[4/3] rounded-lg";
 				const previewImageClassName = "h-full w-full";
 				const renderThreadTitle = () => (
 					<h3 className="block font-bold line-clamp-2 sm:text-lg">
@@ -59,8 +59,8 @@ export const ThreadList = ({
 						<div
 							className={
 								threadPreviewImageUrls.length > 1
-									? "mt-2 grid max-w-[15rem] grid-cols-2 gap-2 pointer-events-auto"
-									: "mt-2 max-w-[12rem] pointer-events-auto"
+									? "mt-2 grid max-w-[19rem] sm:max-w-[22rem] grid-cols-2 gap-2 pointer-events-auto"
+									: "mt-2 max-w-[14rem] sm:max-w-[17rem] pointer-events-auto"
 							}
 						>
 							{threadPreviewImageUrls.map((imageUrl, imageIndex) => {
