@@ -17,11 +17,26 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 
 	return (
 		<div className="px-2 sm:px-0 flex flex-col justify-center space-y-4 mt-8 mb-4 sm:mb-9">
-			<p className="block sm:hidden text-gray-400 text-xs sm:text-sm">
-				{formatDate(threadHeaderData.createdAt, {
-					withTime: false,
-				})}
-			</p>
+			<div className="sm:hidden flex items-center space-x-2">
+				<Link
+					href={`/users/${encodeURIComponent(threadHeaderData.authorId)}`}
+					showIndicator={false}
+					className="inline-flex w-fit items-center gap-2 text-xs text-slate-500"
+				>
+					<AuthorAvatar
+						name={threadHeaderData.author.name}
+						image={threadHeaderData.author.image}
+						className="h-6 w-6 bg-white"
+						fallbackClassName="text-[10px]"
+					/>
+					{threadHeaderData.author.name}
+				</Link>
+				<p className="text-gray-400 text-xs md:text-sm">
+					{formatDate(threadHeaderData.createdAt, {
+						withTime: false,
+					})}
+				</p>
+			</div>
 			<div className="max-w-4xl space-y-2">
 				<h1 className="text-left text-lg sm:text-2xl font-bold whitespace-pre-line break-words">
 					<AutoLinkText text={threadHeaderData.title} hideYouTubeUrls />
@@ -31,22 +46,6 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 					playerClassName="max-w-[22rem]"
 				/>
 			</div>
-			<Link
-				href={`/users/${encodeURIComponent(threadHeaderData.authorId)}`}
-				showIndicator={false}
-				className="inline-flex w-fit items-center gap-2 text-xs text-slate-500 sm:hidden"
-			>
-				by
-				<div className="flex items-center gap-1">
-					<AuthorAvatar
-						name={threadHeaderData.author.name}
-						image={threadHeaderData.author.image}
-						className="h-5 w-5 bg-white"
-						fallbackClassName="text-[10px]"
-					/>
-					{threadHeaderData.author.name}
-				</div>
-			</Link>
 			{threadImageUrls.length > 0 && (
 				<div
 					className={
