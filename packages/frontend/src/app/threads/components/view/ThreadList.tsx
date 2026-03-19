@@ -29,6 +29,9 @@ export const ThreadList = ({
 }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
 	const router = useViewTransitionRouter();
+	const firstImageThreadIndex = threadList.findIndex(
+		(thread) => (thread.imageUrls ?? []).length > 0,
+	);
 
 	return (
 		<div className="flex flex-col">
@@ -39,8 +42,9 @@ export const ThreadList = ({
 				const threadPreviewImageUrls = (thread.imageUrls ?? []).slice(0, 2);
 				const hasYouTubeInTitle =
 					collectYouTubeUrlsFromText(thread.title).length > 0;
-				const previewImageContainerClassName = "w-[7rem] rounded-lg";
-				const previewImageClassName = "h-auto max-h-[15rem] w-full";
+				const previewImageContainerClassName =
+					"w-[7rem] aspect-[4/3] rounded-lg";
+				const previewImageClassName = "h-full w-full";
 				const renderThreadTitle = () => (
 					<h3 className="block font-bold line-clamp-2 sm:text-lg">
 						{hasYouTubeInTitle ? (
@@ -60,7 +64,8 @@ export const ThreadList = ({
 							}
 						>
 							{threadPreviewImageUrls.map((imageUrl, imageIndex) => {
-								const isTopLcpCandidate = threadIndex === 0 && imageIndex === 0;
+								const isTopLcpCandidate =
+									threadIndex === firstImageThreadIndex && imageIndex === 0;
 								return (
 									<ThreadPostImage
 										key={imageUrl}
@@ -126,13 +131,6 @@ export const ThreadList = ({
 							<div className="relative z-10">
 								<div className="block space-y-2 sm:hidden">
 									{renderThreadTitle()}
-									<div className="pointer-events-auto">
-										<YouTubeEmbedsFromText
-											text={thread.title}
-											playerClassName="w-full sm:max-w-[22rem]"
-											playerNoCardLink
-										/>
-									</div>
 								</div>
 								<div className="hidden space-y-2 sm:block">
 									<Link
@@ -142,13 +140,13 @@ export const ThreadList = ({
 									>
 										{renderThreadTitle()}
 									</Link>
-									<div className="pointer-events-auto">
-										<YouTubeEmbedsFromText
-											text={thread.title}
-											playerClassName="w-full sm:max-w-[22rem]"
-											playerNoCardLink
-										/>
-									</div>
+								</div>
+								<div className="pointer-events-auto">
+									<YouTubeEmbedsFromText
+										text={thread.title}
+										playerClassName="w-full sm:max-w-[22rem]"
+										playerNoCardLink
+									/>
 								</div>
 								{renderThreadImages()}
 							</div>

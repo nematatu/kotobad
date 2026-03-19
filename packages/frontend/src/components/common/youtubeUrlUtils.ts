@@ -90,3 +90,48 @@ export function collectYouTubeUrlsFromText(text: string): string[] {
 	const uniqueUrls = new Set(urls);
 	return [...uniqueUrls];
 }
+
+type YouTubeEmbedMeta = {
+	videoId: string;
+	startSeconds: number | null;
+	embedUrl: string;
+	thumbnailUrl: string;
+};
+
+export function toYouTubeEmbedMeta(url: string): YouTubeEmbedMeta | null {
+	const normalizedUrl = normalizeYouTubeUrl(url);
+	if (!normalizedUrl) {
+		return null;
+	}
+
+	try {
+		const parsedUrl = new URL(normalizedUrl);
+		const videoId = parsedUrl.searchParams.get("v");
+		if (!videoId || !YOUTUBE_VIDEO_ID_PATTERN.test(videoId)) {
+			return null;
+		}
+
+		const startRaw = parsedUrl.searchParams.get("start");
+		const startSeconds =
+			startRaw && /^\d+$/.test(startRaw) ? Number(startRaw) : null;
+
+		const embedUrl = new URL(
+			`https://www.youtube-nocookie.com/embed/${videoId}`,
+		);
+		embedUrl.searchParams.set("modestbranding", "1");
+		embedUrl.searchParams.set("rel", "0");
+		embedUrl.searchParams.set("playsinline", "1");
+		if (startSeconds && startSeconds > 0) {
+			embedUrl.searchParams.set("start", String(startSeconds));
+		}
+
+		return {
+			videoId,
+			startSeconds,
+			embedUrl: embedUrl.toString(),
+			thumbnailUrl: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+		};
+	} catch {
+		return null;
+	}
+}
