@@ -13,8 +13,6 @@ import {
 	type BffFetcherError,
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
-import type { ThreadViewMode } from "../lib/threadViewMode";
-import { ChatLikeUI } from "./chat/chatLikeUI";
 import { toReplyTarget } from "./lib/postListViewHelpers";
 import { ThreadPostListView } from "./ThreadPostListView";
 import type { FlattenedPostItem } from "./types/flattenedPostItem";
@@ -24,7 +22,6 @@ type PostListProps = {
 	posts: PostListType;
 	threadId: number;
 	highlightPostId: number | null;
-	viewMode?: ThreadViewMode;
 };
 
 const LARGE_LIST_DISABLE_ENTER_ANIMATION = 80;
@@ -122,7 +119,6 @@ export const PostList = ({
 	posts,
 	threadId,
 	highlightPostId,
-	viewMode = "chat",
 }: PostListProps) => {
 	const [localPosts, setLocalPosts] = useState<PostListType>(posts);
 	const [replyTarget, setReplyTarget] = useState<ReplyTarget | null>(null);
@@ -355,46 +351,14 @@ export const PostList = ({
 		setReplyTarget(null);
 	};
 
-	const handleReactionPickerOpenChange = (postId: number, isOpen: boolean) => {
-		setOpenReactionPostId((current) => {
-			if (isOpen) return postId;
-			return current === postId ? null : current;
-		});
-	};
-
-	const handleMobileActionOpenChange = (postId: number, isOpen: boolean) => {
-		setOpenMobileActionPostId(isOpen ? postId : null);
-	};
-
 	const visiblePostCount = visibleFlattenedPosts.length;
 	const disableEnterAnimation =
 		visiblePostCount > LARGE_LIST_DISABLE_ENTER_ANIMATION;
 	const enableLayoutAnimation =
 		visiblePostCount <= LARGE_LIST_DISABLE_LAYOUT_ANIMATION;
 
-	if (viewMode === "thread") {
-		return (
-			<ThreadPostListView
-				threadId={threadId}
-				visibleFlattenedPosts={visibleFlattenedPosts}
-				expandedReplyPostIdSet={expandedReplyPostIdSet}
-				replyEnterPostIdSet={replyEnterPostIdSet}
-				realtimeEnterPostIdSet={realtimeEnterPostIdSet}
-				highlightAnimatingPostId={highlightAnimatingPostId}
-				replyTarget={replyTarget}
-				reactionCodes={reactionCodes}
-				disableEnterAnimation={disableEnterAnimation}
-				enableLayoutAnimation={enableLayoutAnimation}
-				onToggleReplyTargetAction={toggleReplyTarget}
-				onClearReplyTargetAction={clearReplyTarget}
-				onToggleRepliesAction={toggleReplies}
-				onReactAction={handleReaction}
-			/>
-		);
-	}
-
 	return (
-		<ChatLikeUI
+		<ThreadPostListView
 			threadId={threadId}
 			visibleFlattenedPosts={visibleFlattenedPosts}
 			expandedReplyPostIdSet={expandedReplyPostIdSet}
@@ -405,14 +369,10 @@ export const PostList = ({
 			reactionCodes={reactionCodes}
 			disableEnterAnimation={disableEnterAnimation}
 			enableLayoutAnimation={enableLayoutAnimation}
-			openReactionPostId={openReactionPostId}
-			openMobileActionPostId={openMobileActionPostId}
 			onToggleReplyTargetAction={toggleReplyTarget}
 			onClearReplyTargetAction={clearReplyTarget}
 			onToggleRepliesAction={toggleReplies}
 			onReactAction={handleReaction}
-			onReactionPickerOpenChangeAction={handleReactionPickerOpenChange}
-			onMobileActionOpenChangeAction={handleMobileActionOpenChange}
 		/>
 	);
 };
