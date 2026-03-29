@@ -4,6 +4,7 @@ import type {
 	ThreadType,
 } from "@kotobad/shared/src/types/thread";
 import { PencilLine } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -43,6 +44,7 @@ export const CreateThreadForm = ({
 	initialTags,
 	autoFocusTitle = false,
 }: CreateThreadFormProps) => {
+	const router = useRouter();
 	const [error, setError] = useState<string | null>(null);
 	const {
 		imagePreviewUrls,
@@ -88,7 +90,7 @@ export const CreateThreadForm = ({
 		try {
 			const imageUrls = await uploadSelectedImagesAction("thread");
 			const endpoint = await getBffApiUrl("CREATE_THREAD");
-			await BffFetcher<ThreadType>(endpoint, {
+			const createdThread = await BffFetcher<ThreadType>(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -102,6 +104,7 @@ export const CreateThreadForm = ({
 			resetTagSelection();
 			clearImageSelectionAction();
 			toast.success("投稿しました!");
+			router.push(`/threads/${createdThread.id}`);
 		} catch (error: unknown) {
 			const fetchError = error as BffFetcherError;
 			if (fetchError.status === 401) {
