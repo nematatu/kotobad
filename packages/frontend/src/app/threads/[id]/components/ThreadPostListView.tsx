@@ -338,15 +338,11 @@ export const ThreadPostListView = ({
 
 	return (
 		<div className="space-y-3">
-			<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-				<div className="p-4">
-					<CreatePostForm threadId={threadId} variant="default" />
-				</div>
-			</div>
+			<CreatePostForm threadId={threadId} variant="default" />
 			{visiblePostCount === 0 ? (
 				<NoPost />
 			) : (
-				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
 					<AnimatePresence initial={false} mode="popLayout">
 						{visibleFlattenedPosts.map(({ post, depth }, index) => {
 							const isReplyingToThisPost = replyTarget?.postId === post.id;

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
+import { ImagePlus, SendHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -21,10 +22,7 @@ import {
 } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import { cn } from "@/lib/utils";
-import {
-	ThreadPostImagePicker,
-	ThreadPostImagePreviewGrid,
-} from "../../components/shared/ThreadPostImagePicker";
+import { ThreadPostImagePreviewGrid } from "../../components/shared/ThreadPostImagePicker";
 import { useThreadPostImageInput } from "../../lib/useThreadPostImageInput";
 import type { ReplyTarget } from "./types/replyTarget";
 
@@ -35,8 +33,6 @@ type CreatePostFormProps = {
 	onClearReplyTargetAction?: () => void;
 	variant?: "default" | "inline";
 };
-
-import { Kbd } from "@/components/ui/kbd";
 
 export const CreatePostForm = ({
 	threadId,
@@ -62,9 +58,6 @@ export const CreatePostForm = ({
 	const isInline = variant === "inline";
 	const replyTargetPostId = replyTarget?.postId ?? null;
 
-	const placeholder = isInline ? "返信を入力..." : "書き込み内容を入力...";
-	const submitLabel = isInline ? "返信する" : "書き込む";
-
 	const form = useForm<CreatePostType>({
 		defaultValues: {
 			post: "",
@@ -73,6 +66,9 @@ export const CreatePostForm = ({
 			replyToPostId: null,
 		},
 	});
+	const postValue = form.watch("post");
+	const isSubmitDisabled = postValue.trim().length === 0 || isSubmitting;
+	const placeholder = "チャット...";
 
 	useEffect(() => {
 		form.setValue("replyToPostId", replyTargetPostId);
@@ -80,18 +76,6 @@ export const CreatePostForm = ({
 		const timeoutId = window.setTimeout(() => form.setFocus("post"), 1);
 		return () => window.clearTimeout(timeoutId);
 	}, [form, isInline, replyTargetPostId]);
-
-	const handleCancel = () => {
-		form.reset({
-			post: "",
-			imageUrls: [],
-			threadId,
-			replyToPostId: null,
-		});
-		clearImageSelectionAction();
-		setError(null);
-		onClearReplyTargetAction?.();
-	};
 
 	const handleSubmit = async (values: CreatePostType) => {
 		if (submitLockRef.current) return;
@@ -144,108 +128,108 @@ export const CreatePostForm = ({
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(handleSubmit)}
-				className="flex gap-3 items-start"
+				className={cn("w-full", !isInline && "flex items-start gap-2")}
 			>
-				<div className="mt-1 shrink-0">
-					<UserAvatar />
-				</div>
-				<div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-gray-50 p-2 dark:border-slate-700 dark:bg-slate-900">
+				<div
+					className={cn(
+						"min-w-0 w-full rounded-2xl border border-slate-200 bg-gray-50 px-2 py-1.5 dark:border-slate-700 dark:bg-slate-900",
+						!isInline && "flex-1 rounded-full",
+					)}
+				>
 					{replyTarget && (
-						<div className="inline-flex items-center rounded-full bg-blue-100 dark:bg-slate-950 border border-blue-50 px-3 py-1.5 text-[12px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
+						<div className="mb-2 inline-flex items-center rounded-full bg-blue-100 dark:bg-slate-950 border border-blue-50 px-3 py-1.5 text-[12px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
 							<span>
 								#{replyTarget.localId} {replyTarget.authorName}さんへの返信
 							</span>
 						</div>
 					)}
-					<FormField
-						control={form.control}
-						name="post"
-						render={({ field }) => (
-							<FormItem className="flex-1">
-								<FormControl>
-									<Textarea
-										rows={1}
-										{...field}
-										{...form.register("post", {
-											required: "空文字は送信できません",
-											maxLength: {
-												value: 80,
-												message: "80文字以内で入力してください",
-											},
-										})}
-										autoFocus={isInline && replyTargetPostId !== null}
-										disabled={isSubmitting}
-										onInput={(e) => {
-											const el = e.currentTarget;
-											el.style.height = "0px";
-											el.style.height = `${el.scrollHeight}px`;
-										}}
-										onKeyDown={(e) => {
-											if (isSubmitting) return;
-											if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-												e.preventDefault();
-												void form.handleSubmit(handleSubmit)();
-											}
-										}}
-										placeholder={placeholder}
-										className={cn(
-											"min-h-[38px] w-full resize-none border-none bg-transparent px-3 py-2 text-base md:text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500",
-										)}
-									/>
-								</FormControl>
-								<FormMessage className="px-3 pb-1" />
-								{error && <p className="text-sm text-red-500">{error}</p>}
-							</FormItem>
-						)}
+					<input
+						ref={imageInputRef}
+						type="file"
+						accept="image/jpeg,image/png,image/webp,image/avif"
+						disabled={isSubmitting || imagePreviewUrls.length >= maxImages}
+						onChange={selectImageAction}
+						className="hidden"
 					/>
-					<>
-						<ThreadPostImagePreviewGrid
-							imagePreviewUrls={imagePreviewUrls}
-							onRemoveImageAction={removeImageAtAction}
-							disabled={isSubmitting}
-						/>
-						<div className="flex items-center justify-between border-t border-slate-100 px-1 pt-2 dark:border-slate-800">
-							<ThreadPostImagePicker
-								imageInputRef={imageInputRef}
-								imagePreviewUrls={imagePreviewUrls}
-								maxImages={maxImages}
-								disabled={isSubmitting}
-								onSelectImageAction={selectImageAction}
-								onOpenImageDialogAction={openImageDialogAction}
-								onClearImageAction={clearImageSelectionAction}
-								onRemoveImageAction={removeImageAtAction}
-								actionsClassName="shrink-0"
-								previewImageClassName="h-28"
-								showIcons
-								showPreview={false}
-							/>
-							<div className="flex items-center gap-2">
-								<Button
-									type="button"
-									variant="outline"
-									rounded="full"
-									onClick={handleCancel}
-									disabled={
-										isSubmitting || (!form.getValues("post") && !isInline)
-									}
-								>
-									キャンセル
-								</Button>
-								<Button
-									className="cursor-pointer bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
-									rounded="full"
-									type="submit"
-									disabled={form.getValues("post") === "" || isSubmitting}
-								>
-									{isSubmitting ? "送信中..." : submitLabel}
-
-									<div className="hidden md:block">
-										<Kbd>⌘ + Enter</Kbd>
-									</div>
-								</Button>
+					<div className="flex items-center gap-2">
+						{!isInline && (
+							<div className="mt-0.5 shrink-0">
+								<UserAvatar />
 							</div>
+						)}
+						<div className="shrink-0">
+							<Button
+								type="button"
+								variant="ghost"
+								className="h-9 w-9 p-0"
+								onClick={openImageDialogAction}
+								disabled={isSubmitting || imagePreviewUrls.length >= maxImages}
+								aria-label="画像を追加"
+							>
+								<ImagePlus className="h-4 w-4" />
+							</Button>
 						</div>
-					</>
+						<FormField
+							control={form.control}
+							name="post"
+							render={({ field }) => (
+								<FormItem className="min-w-0 flex-1">
+									<FormControl>
+										<Textarea
+											rows={1}
+											{...field}
+											{...form.register("post", {
+												required: "空文字は送信できません",
+												maxLength: {
+													value: 80,
+													message: "80文字以内で入力してください",
+												},
+											})}
+											autoFocus={isInline && replyTargetPostId !== null}
+											disabled={isSubmitting}
+											onInput={(e) => {
+												const el = e.currentTarget;
+												el.style.height = "0px";
+												el.style.height = `${el.scrollHeight}px`;
+											}}
+											onKeyDown={(e) => {
+												if (isSubmitting) return;
+												if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+													e.preventDefault();
+													void form.handleSubmit(handleSubmit)();
+												}
+											}}
+											placeholder={placeholder}
+											className={cn(
+												"min-h-[34px] w-full resize-none border-none bg-transparent px-1 py-1.5 text-base shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500",
+											)}
+										/>
+									</FormControl>
+									<FormMessage className="px-1" />
+								</FormItem>
+							)}
+						/>
+						<div className="shrink-0">
+							<Button
+								className="h-9 w-9 cursor-pointer rounded-full bg-blue-500 p-0 text-white hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
+								type="submit"
+								disabled={isSubmitDisabled}
+								aria-label={isSubmitting ? "送信中" : "書き込む"}
+							>
+								<SendHorizontal className="h-4 w-4" />
+							</Button>
+						</div>
+					</div>
+					{error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+					{imagePreviewUrls.length > 0 && (
+						<div className="mt-2 border-t border-slate-100 pt-2 dark:border-slate-800">
+							<ThreadPostImagePreviewGrid
+								imagePreviewUrls={imagePreviewUrls}
+								onRemoveImageAction={removeImageAtAction}
+								disabled={isSubmitting}
+							/>
+						</div>
+					)}
 				</div>
 			</form>
 		</Form>

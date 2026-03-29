@@ -63,14 +63,18 @@ type ThreadPostsFallbackProps = {
 
 const renderCreatePostFormSkeleton = () => {
 	return (
-		<div className="w-full rounded-2xl border border-slate-200 bg-gray-50 p-2 dark:border-slate-700 dark:bg-slate-900">
-			<Skeleton className="h-[68px] w-full rounded-lg bg-[#e5e7eb] dark:bg-[#334155]" />
-			<div className="mt-2 flex items-center justify-between border-slate-100 border-t px-2 py-2 dark:border-slate-800">
-				<Skeleton className="h-8 w-8 rounded-md bg-[#dbe4ee] dark:bg-[#334155]" />
-				<div className="flex items-center gap-2">
-					<Skeleton className="h-9 w-16 rounded-full bg-[#e2e8f0] dark:bg-[#334155]" />
-					<Skeleton className="h-9 w-20 rounded-full bg-[#bfdbfe] dark:bg-[#1e40af]" />
+		<div className="w-full min-w-0 rounded-full border border-slate-200 bg-gray-50 px-2 py-1.5 dark:border-slate-700 dark:bg-slate-900">
+			<div className="flex items-center gap-2">
+				<div className="mt-0.5 shrink-0">
+					<Skeleton className="h-7 w-7 rounded-full bg-[#dbe4ee] dark:bg-[#334155] sm:h-10 sm:w-10" />
 				</div>
+				<div className="shrink-0">
+					<div className="flex h-9 w-9 items-center justify-center rounded-md">
+						<Skeleton className="h-4 w-4 rounded-sm bg-[#dbe4ee] dark:bg-[#334155]" />
+					</div>
+				</div>
+				<Skeleton className="h-[34px] flex-1 rounded-md bg-[#e5e7eb] dark:bg-[#334155]" />
+				<Skeleton className="h-9 w-9 rounded-full bg-[#bfdbfe] dark:bg-[#1e40af]" />
 			</div>
 		</div>
 	);
@@ -82,10 +86,8 @@ export const ThreadPostsFallback = ({
 	if (viewMode === "thread") {
 		return (
 			<div className="space-y-3">
-				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-					<div className="p-4">{renderCreatePostFormSkeleton()}</div>
-				</div>
-				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+				<div className="px-4 pb-2 pt-4">{renderCreatePostFormSkeleton()}</div>
+				<div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
 					{PLACEHOLDER_THREAD_ITEMS.map((item, index) => (
 						<div
 							key={item.id}
