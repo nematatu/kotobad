@@ -57,14 +57,18 @@ const removeYouTubeUrlsFromText = (text: string): string => {
 		.replace(/\n{3,}/g, "\n\n");
 };
 
+const removeLeadingBlankLines = (text: string): string => {
+	return text.replace(/^(?:[ \t]*\r?\n)+/, "");
+};
+
 export function AutoLinkText({
 	text,
 	linkClassName,
 	hideYouTubeUrls = false,
 }: Props) {
-	const normalizedText = hideYouTubeUrls
-		? removeYouTubeUrlsFromText(text)
-		: text;
+	const normalizedText = removeLeadingBlankLines(
+		hideYouTubeUrls ? removeYouTubeUrlsFromText(text) : text,
+	);
 	const nodes: React.ReactNode[] = [];
 	let lastIndex = 0;
 	let keyIndex = 0;
