@@ -12,3 +12,6 @@
   - [画面遷移時間を短く(フェーズ1)](performance/performace-boost-faster-transition-phase1.md)
   - [スレッド詳細のSSR/CSR切り分け方針](performance/thread-detail-ssr-csr-split-2026-02-02.md)
   - [Chrome DevTools MCP計測と初期改善（2026-02-13）](performance/chrome-devtools-mcp-kotobad-2026-02-13.md)
+
+- Strategy
+  - [kotobad 価値向上戦略メモ（2026-03-29）](strategy/kotobad-value-strategy-2026-03-29.md)
