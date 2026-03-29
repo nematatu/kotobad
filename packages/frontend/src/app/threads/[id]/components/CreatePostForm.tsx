@@ -1,7 +1,7 @@
 "use client";
 
 import type { CreatePostType } from "@kotobad/shared/src/types/post";
-import { ImagePlus, SendHorizontal } from "lucide-react";
+import { ImagePlus, SendHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -124,6 +124,18 @@ export const CreatePostForm = ({
 		}
 	};
 
+	const handleInlineCancel = () => {
+		form.reset({
+			post: "",
+			imageUrls: [],
+			threadId,
+			replyToPostId: null,
+		});
+		clearImageSelectionAction();
+		setError(null);
+		onClearReplyTargetAction?.();
+	};
+
 	return (
 		<Form {...form}>
 			<form
@@ -136,11 +148,29 @@ export const CreatePostForm = ({
 						!isInline && "flex-1 rounded-full",
 					)}
 				>
-					{replyTarget && (
-						<div className="mb-2 inline-flex items-center rounded-full bg-blue-100 dark:bg-slate-950 border border-blue-50 px-3 py-1.5 text-[12px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
-							<span>
-								#{replyTarget.localId} {replyTarget.authorName}さんへの返信
-							</span>
+					{(replyTarget || isInline) && (
+						<div className="mb-2 flex items-center justify-between gap-2">
+							{replyTarget ? (
+								<div className="inline-flex items-center rounded-full border border-blue-50 bg-blue-100 px-3 py-1.5 text-[12px] text-slate-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+									<span>
+										#{replyTarget.localId} {replyTarget.authorName}さんへの返信
+									</span>
+								</div>
+							) : (
+								<span />
+							)}
+							{isInline && (
+								<Button
+									type="button"
+									variant="ghost"
+									className="h-7 w-7 p-0 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+									onClick={handleInlineCancel}
+									disabled={isSubmitting}
+									aria-label="返信フォームを閉じる"
+								>
+									<X className="h-4 w-4" />
+								</Button>
+							)}
 						</div>
 					)}
 					<input
