@@ -1,0 +1,115 @@
+:root {
+	color-scheme: light;
+}
+
+body {
+	margin: 0;
+	font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+	background: #f8fafc;
+	color: #0f172a;
+}
+
+.container {
+	padding: 20px;
+}
+
+h1,
+h2 {
+	margin: 0 0 10px;
+}
+
+.small {
+	margin: 0 0 16px;
+	font-size: 12px;
+	color: #64748b;
+}
+
+.card {
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 16px;
+	margin-bottom: 16px;
+	box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 8px;
+}
+
+input,
+button {
+	width: 100%;
+	box-sizing: border-box;
+	height: 36px;
+	border-radius: 8px;
+	border: 1px solid #cbd5e1;
+	padding: 0 10px;
+	font-size: 14px;
+}
+
+button {
+	cursor: pointer;
+	background: #1d4ed8;
+	color: #fff;
+	border: 0;
+}
+
+button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+button.secondary {
+	background: #334155;
+}
+
+button.ghost {
+	background: #e2e8f0;
+	color: #0f172a;
+}
+
+.control-end {
+	display: flex;
+	align-items: flex-end;
+}
+
+.status {
+	font-size: 13px;
+	margin: 8px 0 16px;
+	color: #334155;
+	white-space: pre-wrap;
+}
+
+.form-actions {
+	margin-top: 8px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	overflow: auto;
+	display: block;
+}
+
+thead th {
+	position: sticky;
+	top: 0;
+	background: #f1f5f9;
+	z-index: 1;
+}
+
+th,
+td {
+	border: 1px solid #e2e8f0;
+	padding: 6px;
+	text-align: left;
+	white-space: nowrap;
+	font-size: 13px;
+}
+
+td input {
+	min-width: 130px;
+}

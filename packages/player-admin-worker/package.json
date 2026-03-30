@@ -1,0 +1,24 @@
+{
+	"name": "@kotobad/player-admin-worker",
+	"type": "module",
+	"scripts": {
+		"dev": "bun run build:admin-ui && wrangler dev --ip 0.0.0.0 --port 8788 --inspector-port 9230 --persist-to ../backend/.wrangler/state",
+		"build:admin-ui": "vite build --config admin-ui/vite.config.ts",
+		"deploy": "bun run build:admin-ui && wrangler deploy --minify --env production",
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+	},
+	"dependencies": {
+		"drizzle-orm": "^0.44.7",
+		"hono": "^4.12.3",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.2",
+		"@types/react-dom": "^19.2.2",
+		"@vitejs/plugin-react": "^5.0.4",
+		"vite": "^7.1.12",
+		"wrangler": "4.63.0"
+	}
+}
