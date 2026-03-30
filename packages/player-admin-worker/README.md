@@ -17,6 +17,9 @@ bun run cf-typegen
 backend Worker と同じローカル D1 状態を参照します。
 また、起動前に Vite で `/admin` 用の UI をビルドします。
 
+`player-admin-worker` 側で `players` テーブルの自動作成は行いません。
+DBスキーマは backend 側 migration の適用を前提とします。
+
 ## API
 
 - `GET /` 管理UI（Vite）
@@ -25,6 +28,7 @@ backend Worker と同じローカル D1 状態を参照します。
 - `GET /players/:id` 詳細取得
 - `POST /players` 新規追加
 - `PATCH /players/:id` 更新
+- `POST /players/upload-image` 画像アップロード（R2保存）
 
 `/players` 配下は `PLAYER_ADMIN_API_TOKEN` を必須とし、
 `Authorization: Bearer <token>` または `x-admin-token` / `x-api-key` が必要です。
@@ -38,6 +42,7 @@ backend Worker と同じローカル D1 状態を参照します。
 - 開発環境では `http(s)://localhost` / `127.0.0.1` を追加で許可します。
 - エラー詳細（`message`）のレスポンス返却は `APP_ENV=development` のみです。
 - 管理UIはトークンを `localStorage` に保存しません（メモリのみ）。
+- 画像アップロードには `R2_PUBLIC_BASE_URL` の設定が必要です。
 
 ## UI Source
 

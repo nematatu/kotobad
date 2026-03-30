@@ -6,6 +6,8 @@ export type Player = {
 	lastFurigana: string;
 	englishFirstName: string;
 	englishLastName: string;
+	gender: "male" | "female" | null;
+	imageUrl: string | null;
 	birthPlace: string;
 	birthDate: number | null;
 };
@@ -17,6 +19,8 @@ export type PlayerPayload = {
 	lastFurigana: string;
 	englishFirstName: string;
 	englishLastName: string;
+	gender: "male" | "female" | null;
+	imageUrl: string | null;
 	birthPlace: string;
 	birthDate: string | null;
 };

@@ -1,4 +1,5 @@
 import type { Player, PlayerPayload } from "../types";
+import { optimizeImageForUpload } from "./imageOptimize";
 
 const createHeaders = (token: string, withJsonContentType = false) => {
 	const headers: Record<string, string> = {};
@@ -70,4 +71,29 @@ export const updatePlayer = async (
 	if (!response.ok) {
 		throw new Error(await parseApiError(response));
 	}
+};
+
+export const uploadPlayerImage = async (
+	token: string,
+	file: File,
+): Promise<string> => {
+	const optimizedFile = await optimizeImageForUpload(file).catch(() => file);
+	const formData = new FormData();
+	formData.set("file", optimizedFile);
+
+	const response = await fetch("/players/upload-image", {
+		method: "POST",
+		headers: createHeaders(token, false),
+		body: formData,
+	});
+
+	if (!response.ok) {
+		throw new Error(await parseApiError(response));
+	}
+
+	const json = (await response.json()) as { imageUrl?: string };
+	if (typeof json.imageUrl !== "string" || json.imageUrl.length === 0) {
+		throw new Error("imageUrl がレスポンスに含まれていません");
+	}
+	return json.imageUrl;
 };

@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { createDb, ensurePlayersTable } from "../db/client";
+import { createDb } from "../db/client";
 import { players } from "../db/schema";
 import type { AppEnv } from "../types";
 import { parsePositiveInt } from "../utils/request";
@@ -11,9 +11,46 @@ import {
 } from "../validation/player";
 
 export const playersRouter = new Hono<AppEnv>();
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
+	"image/jpeg": "jpg",
+	"image/png": "png",
+	"image/webp": "webp",
+	"image/avif": "avif",
+};
+
+const toPublicImageUrl = (
+	baseUrl: string,
+	objectKey: string,
+): { ok: true; imageUrl: string } | { ok: false; message: string } => {
+	const trimmed = baseUrl.trim();
+	if (trimmed.length === 0) {
+		return { ok: false, message: "R2_PUBLIC_BASE_URL is empty" };
+	}
+
+	try {
+		const base = new URL(trimmed.endsWith("/") ? trimmed : `${trimmed}/`);
+		if (base.protocol !== "https:" && base.protocol !== "http:") {
+			return {
+				ok: false,
+				message: "R2_PUBLIC_BASE_URL must use http or https scheme",
+			};
+		}
+		return { ok: true, imageUrl: new URL(objectKey, base).toString() };
+	} catch {
+		return {
+			ok: false,
+			message: "R2_PUBLIC_BASE_URL must be an absolute URL",
+		};
+	}
+};
+
+const pickDefined = <T extends Record<string, unknown>>(input: T): Partial<T> =>
+	Object.fromEntries(
+		Object.entries(input).filter(([, value]) => value !== undefined),
+	) as Partial<T>;
 
 playersRouter.get("/", async (c) => {
-	await ensurePlayersTable(c.env.DB);
 	const db = createDb(c.env.DB);
 	const limitQuery = c.req.query("limit");
 	const offsetQuery = c.req.query("offset");
@@ -51,8 +88,61 @@ playersRouter.get("/", async (c) => {
 	});
 });
 
+playersRouter.post("/upload-image", async (c) => {
+	const publicBaseUrl = c.env.R2_PUBLIC_BASE_URL;
+	if (!publicBaseUrl) {
+		return c.json(
+			{
+				error: "server_misconfigured",
+				message: "R2_PUBLIC_BASE_URL is not configured",
+			},
+			500,
+		);
+	}
+
+	const formData = await c.req.formData();
+	const fileEntry = formData.get("file");
+
+	if (!(fileEntry instanceof File)) {
+		return c.json({ error: "file is required" }, 400);
+	}
+
+	if (fileEntry.size <= 0) {
+		return c.json({ error: "file is empty" }, 400);
+	}
+
+	if (fileEntry.size > MAX_IMAGE_BYTES) {
+		return c.json({ error: "file size must be <= 8MB" }, 400);
+	}
+
+	const extension = MIME_TYPE_TO_EXTENSION[fileEntry.type];
+	if (!extension) {
+		return c.json({ error: "file type must be jpeg, png, webp, or avif" }, 400);
+	}
+
+	const objectKey = `player-image/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+	const fileBuffer = await fileEntry.arrayBuffer();
+	await c.env.KOTOBAD_BUCKET.put(objectKey, fileBuffer, {
+		httpMetadata: {
+			contentType: fileEntry.type,
+			cacheControl: "public, max-age=31536000, immutable",
+		},
+	});
+
+	const imageUrl = toPublicImageUrl(publicBaseUrl, objectKey);
+	if (!imageUrl.ok) {
+		return c.json(
+			{
+				error: "server_misconfigured",
+				message: imageUrl.message,
+			},
+			500,
+		);
+	}
+	return c.json({ imageUrl: imageUrl.imageUrl }, 200);
+});
+
 playersRouter.get("/:id", async (c) => {
-	await ensurePlayersTable(c.env.DB);
 	const db = createDb(c.env.DB);
 	const id = parsePositiveInt(c.req.param("id"));
 	if (!id) {
@@ -71,7 +161,6 @@ playersRouter.get("/:id", async (c) => {
 });
 
 playersRouter.post("/", async (c) => {
-	await ensurePlayersTable(c.env.DB);
 	const db = createDb(c.env.DB);
 	const body = await c.req.json().catch(() => null);
 	if (!body) {
@@ -103,6 +192,8 @@ playersRouter.post("/", async (c) => {
 			lastFurigana: parsed.data.lastFurigana,
 			englishFirstName: parsed.data.englishFirstName,
 			englishLastName: parsed.data.englishLastName,
+			gender: parsed.data.gender ?? null,
+			imageUrl: parsed.data.imageUrl ?? null,
 			birthPlace: parsed.data.birthPlace,
 			birthDate: normalizedBirthDate.value,
 		})
@@ -112,7 +203,6 @@ playersRouter.post("/", async (c) => {
 });
 
 playersRouter.patch("/:id", async (c) => {
-	await ensurePlayersTable(c.env.DB);
 	const db = createDb(c.env.DB);
 	const id = parsePositiveInt(c.req.param("id"));
 	if (!id) {
@@ -135,29 +225,22 @@ playersRouter.patch("/:id", async (c) => {
 		);
 	}
 
-	const nextValues: Partial<typeof players.$inferInsert> = {};
+	const nextValues: Partial<typeof players.$inferInsert> = pickDefined({
+		firstName: parsed.data.firstName,
+		lastName: parsed.data.lastName,
+		firstFurigana: parsed.data.firstFurigana,
+		lastFurigana: parsed.data.lastFurigana,
+		englishFirstName: parsed.data.englishFirstName,
+		englishLastName: parsed.data.englishLastName,
+		gender: Object.hasOwn(parsed.data, "gender")
+			? (parsed.data.gender ?? null)
+			: undefined,
+		imageUrl: Object.hasOwn(parsed.data, "imageUrl")
+			? (parsed.data.imageUrl ?? null)
+			: undefined,
+		birthPlace: parsed.data.birthPlace,
+	});
 
-	if (parsed.data.firstName !== undefined) {
-		nextValues.firstName = parsed.data.firstName;
-	}
-	if (parsed.data.lastName !== undefined) {
-		nextValues.lastName = parsed.data.lastName;
-	}
-	if (parsed.data.firstFurigana !== undefined) {
-		nextValues.firstFurigana = parsed.data.firstFurigana;
-	}
-	if (parsed.data.lastFurigana !== undefined) {
-		nextValues.lastFurigana = parsed.data.lastFurigana;
-	}
-	if (parsed.data.englishFirstName !== undefined) {
-		nextValues.englishFirstName = parsed.data.englishFirstName;
-	}
-	if (parsed.data.englishLastName !== undefined) {
-		nextValues.englishLastName = parsed.data.englishLastName;
-	}
-	if (parsed.data.birthPlace !== undefined) {
-		nextValues.birthPlace = parsed.data.birthPlace;
-	}
 	if (Object.hasOwn(parsed.data, "birthDate")) {
 		const normalizedBirthDate = toBirthDateEpochSeconds(parsed.data.birthDate);
 		if (!normalizedBirthDate.ok) {

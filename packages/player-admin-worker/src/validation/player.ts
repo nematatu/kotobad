@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 const stringField = z.string().trim().min(1).max(120);
+const genderField = z.enum(["male", "female"]).nullable().optional();
+const imageUrlField = z
+	.union([z.string().trim().url().max(2000), z.null()])
+	.optional();
 
 export const birthDateField = z
 	.union([
@@ -21,6 +25,8 @@ export const createPlayerSchema = z
 		lastFurigana: stringField,
 		englishFirstName: stringField,
 		englishLastName: stringField,
+		gender: genderField,
+		imageUrl: imageUrlField,
 		birthPlace: stringField,
 		birthDate: birthDateField,
 	})

@@ -73,8 +73,8 @@ export const App = () => {
 				onReload={() => void loadPlayers()}
 			/>
 			<StatusMessage message={status} />
-			<CreatePlayerForm onCreate={handleCreate} />
-			<PlayerTable players={players} onSave={handleSave} />
+			<CreatePlayerForm token={token} onCreate={handleCreate} />
+			<PlayerTable token={token} players={players} onSave={handleSave} />
 		</main>
 	);
 };
