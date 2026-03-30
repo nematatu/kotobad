@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { FaLine } from "react-icons/fa6";
 import { MdLink } from "react-icons/md";
 import { PiXLogo } from "react-icons/pi";
 import { toast } from "sonner";
@@ -54,14 +54,14 @@ export const ThreadShareButton = ({
 				onClick={copyLinkHandler}
 				className="size-8 rounded-full border border-slate-200 bg-white/90 p-0 [@media(hover:hover)]:hover:brightness-95 dark:border-slate-700 dark:bg-slate-900/80 dark:[@media(hover:hover)]:hover:brightness-110 sm:size-9"
 			>
-				<MdLink className="size-[17px] rotate-135 text-[#2563eb]" />
+				<MdLink className="size-[20px] rotate-135 text-[#2563eb]" />
 			</Button>
 			<Button
 				asChild
 				variant="ghost"
 				rounded="full"
 				enableClickAnimation
-				className="size-8 rounded-full border border-black bg-black p-0 [@media(hover:hover)]:hover:bg-black/80 dark:border-black dark:bg-black sm:size-9"
+				className="size-8  border bg-black p-0 [@media(hover:hover)]:hover:bg-black/80 dark:border-black dark:bg-black sm:size-9"
 			>
 				<a
 					href={xShareUrl}
@@ -69,7 +69,7 @@ export const ThreadShareButton = ({
 					rel="noopener noreferrer"
 					aria-label="Xで共有"
 				>
-					<PiXLogo className="size-[16px] text-white" />
+					<PiXLogo className="size-[21px] text-white" />
 				</a>
 			</Button>
 			<Button
@@ -77,7 +77,7 @@ export const ThreadShareButton = ({
 				variant="ghost"
 				rounded="full"
 				enableClickAnimation
-				className="size-8 rounded-full border border-[#10b951] bg-[#10b951] p-0 [@media(hover:hover)]:hover:bg-[#0e9f45] sm:size-9"
+				className="size-8  p-0 [@media(hover:hover)]:hover:bg-[#0e9f45] sm:size-9"
 			>
 				<a
 					href={lineShareUrl}
@@ -85,7 +85,14 @@ export const ThreadShareButton = ({
 					rel="noopener noreferrer"
 					aria-label="LINEで共有"
 				>
-					<FaLine className="size-[16px] text-white" />
+					<Image
+						src="/assets/logo/LINE_Brand_icon.png"
+						alt="LINE"
+						aria-hidden="true"
+						width={32}
+						height={32}
+						className="w-[32px] object-contain"
+					/>
 				</a>
 			</Button>
 		</div>
