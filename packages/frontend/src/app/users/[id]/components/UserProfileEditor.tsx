@@ -59,6 +59,10 @@ export function UserProfileEditor({ profile }: Props) {
 				open={isConfirmOpen}
 				onOpenChangeAction={setIsConfirmOpenAction}
 				isSavingProfile={isSavingProfile}
+				profileId={profile.id}
+				previewName={editedName}
+				previewBio={editedBio}
+				previewAvatarImage={avatarImage}
 				onConfirmAction={confirmUpdateAction}
 			/>
 		</>
