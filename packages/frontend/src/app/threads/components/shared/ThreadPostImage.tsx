@@ -26,7 +26,6 @@ type ThreadPostImageProps = {
 export const ThreadPostImage = ({
 	imageUrl,
 	alt = "",
-	imageOrder = 1,
 	containerClassName,
 	imageClassName,
 	loading = "lazy",
@@ -75,12 +74,6 @@ export const ThreadPostImage = ({
 		thumbnailPreset === "threadList"
 			? "(max-width: 640px) 150px, 180px"
 			: "(max-width: 640px) 256px, 288px";
-	const maxImageCount = thumbnailPreset === "threadList" ? 2 : 1;
-	const normalizedImageOrder = Math.min(
-		Math.max(Math.floor(imageOrder), 1),
-		maxImageCount,
-	);
-	const imageCountLabel = `${normalizedImageOrder}/${maxImageCount}`;
 
 	return (
 		<>
@@ -103,9 +96,6 @@ export const ThreadPostImage = ({
 					sizes={thumbnailSizes}
 					className={cn("h-full w-full object-cover", imageClassName)}
 				/>
-				<span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/65 px-2 py-0.5 text-[11px] font-semibold leading-none text-white shadow-sm">
-					{imageCountLabel}
-				</span>
 			</button>
 			<dialog
 				ref={dialogRef}
