@@ -40,7 +40,7 @@ DBスキーマは backend 側 migration の適用を前提とします。
 
 - CORS は `ALLOWED_ORIGINS`（カンマ区切り）に含まれる Origin のみ許可します。
 - 開発環境では `http(s)://localhost` / `127.0.0.1` を追加で許可します。
-- エラー詳細（`message`）のレスポンス返却は `APP_ENV=development` のみです。
+- エラー詳細（`message`）のレスポンス返却は `APP_ENV=production` 以外です。
 - 管理UIはトークンを `localStorage` に保存しません（メモリのみ）。
 - 画像アップロードには `R2_PUBLIC_BASE_URL` の設定が必要です。
 

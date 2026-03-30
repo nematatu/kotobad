@@ -4,6 +4,13 @@ import { epochSecondsToDateInput } from "../lib/date";
 import { buildPrefectureOptions } from "../lib/prefectures";
 import type { Player, PlayerPayload, PlayerUpdatePayload } from "../types";
 import { GenderToggleButtons } from "./GenderToggleButtons";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "./ui/dialog";
 
 type PlayerTableProps = {
 	token: string;
@@ -96,41 +103,76 @@ const buildSearchTarget = (draft: PlayerPayload) =>
 		.join(" ")
 		.toLowerCase();
 
-const PlayerRow = ({
-	playerId,
+const PlayerEditorCard = ({
 	token,
+	playerId,
 	draft,
 	onDraftFieldChange,
 	onDraftBirthDateChange,
 }: {
-	playerId: number;
 	token: string;
+	playerId: number;
+	draft: PlayerPayload;
+	onDraftFieldChange: (id: number, key: EditableField, value: string) => void;
+	onDraftBirthDateChange: (id: number, value: string) => void;
+}) => {
+	const fullName = `${draft.lastName}${draft.firstName}`.trim();
+
+	return (
+		<article className="player-editor-card">
+			<div className="player-editor-summary">
+				<div className="player-preview">
+					{draft.imageUrl ? (
+						<img
+							src={draft.imageUrl}
+							alt={`${draft.lastName}${draft.firstName}`}
+						/>
+					) : (
+						<div className="player-preview-empty">No Image</div>
+					)}
+					<div className="player-preview-name">
+						<p>{fullName.length > 0 ? fullName : "（未入力）"}</p>
+					</div>
+				</div>
+				<Dialog>
+					<DialogTrigger asChild>
+						<button type="button" className="ghost player-editor-open-button">
+							編集
+						</button>
+					</DialogTrigger>
+					<PlayerEditorModal
+						token={token}
+						playerId={playerId}
+						draft={draft}
+						onDraftFieldChange={onDraftFieldChange}
+						onDraftBirthDateChange={onDraftBirthDateChange}
+					/>
+				</Dialog>
+			</div>
+		</article>
+	);
+};
+
+const PlayerEditorModal = ({
+	token,
+	playerId,
+	draft,
+	onDraftFieldChange,
+	onDraftBirthDateChange,
+}: {
+	token: string;
+	playerId: number;
 	draft: PlayerPayload;
 	onDraftFieldChange: (id: number, key: EditableField, value: string) => void;
 	onDraftBirthDateChange: (id: number, value: string) => void;
 }) => {
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
-	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const [imageUploadError, setImageUploadError] = useState("");
+	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const birthPlaceOptions = useMemo(
 		() => buildPrefectureOptions(draft.birthPlace),
 		[draft.birthPlace],
 	);
-
-	useEffect(() => {
-		if (!isPreviewOpen) {
-			return;
-		}
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "Escape") {
-				setIsPreviewOpen(false);
-			}
-		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => {
-			window.removeEventListener("keydown", onKeyDown);
-		};
-	}, [isPreviewOpen]);
 
 	const handleImageChange = async (file: File | null) => {
 		if (!file) {
@@ -155,165 +197,172 @@ const PlayerRow = ({
 	};
 
 	return (
-		<tr>
-			<td>
-				{draft.imageUrl ? (
+		<DialogContent className="player-editor-modal-content">
+			<div className="player-editor-modal-header">
+				<DialogTitle>
+					{`${draft.lastName}${draft.firstName}`.trim() || "選手編集"}
+				</DialogTitle>
+				<DialogClose asChild>
+					<button type="button" className="ghost">
+						閉じる
+					</button>
+				</DialogClose>
+			</div>
+			<div className="player-editor-fields">
+				<label className="field">
+					<span>姓</span>
+					<input
+						value={draft.lastName}
+						onChange={(event) =>
+							onDraftFieldChange(playerId, "lastName", event.target.value)
+						}
+					/>
+				</label>
+				<label className="field">
+					<span>名</span>
+					<input
+						value={draft.firstName}
+						onChange={(event) =>
+							onDraftFieldChange(playerId, "firstName", event.target.value)
+						}
+					/>
+				</label>
+				<label className="field">
+					<span>姓フリガナ</span>
+					<input
+						value={draft.lastFurigana}
+						onChange={(event) =>
+							onDraftFieldChange(playerId, "lastFurigana", event.target.value)
+						}
+					/>
+				</label>
+				<label className="field">
+					<span>名フリガナ</span>
+					<input
+						value={draft.firstFurigana}
+						onChange={(event) =>
+							onDraftFieldChange(playerId, "firstFurigana", event.target.value)
+						}
+					/>
+				</label>
+				<label className="field">
+					<span>英字姓</span>
+					<input
+						value={draft.englishLastName}
+						onChange={(event) =>
+							onDraftFieldChange(
+								playerId,
+								"englishLastName",
+								event.target.value,
+							)
+						}
+					/>
+				</label>
+				<label className="field">
+					<span>英字名</span>
+					<input
+						value={draft.englishFirstName}
+						onChange={(event) =>
+							onDraftFieldChange(
+								playerId,
+								"englishFirstName",
+								event.target.value,
+							)
+						}
+					/>
+				</label>
+				<div className="field">
+					<span>性別</span>
+					<GenderToggleButtons
+						value={draft.gender}
+						onChange={(value) =>
+							onDraftFieldChange(playerId, "gender", value ?? "")
+						}
+					/>
+				</div>
+				<label className="field">
+					<span>出身地</span>
+					<select
+						value={draft.birthPlace}
+						onChange={(event) =>
+							onDraftFieldChange(playerId, "birthPlace", event.target.value)
+						}
+					>
+						{birthPlaceOptions.map((prefecture) => (
+							<option key={prefecture} value={prefecture}>
+								{prefecture}
+							</option>
+						))}
+					</select>
+				</label>
+				<label className="field field-full">
+					<span>生年月日</span>
+					<input
+						type="date"
+						value={draft.birthDate ?? ""}
+						onChange={(event) =>
+							onDraftBirthDateChange(playerId, event.target.value)
+						}
+					/>
+				</label>
+				<div className="field field-full">
+					<span>画像URL</span>
+					<div className="image-edit-grid">
+						<input
+							type="file"
+							accept="image/jpeg,image/png,image/webp,image/avif"
+							onChange={(event) =>
+								void handleImageChange(event.target.files?.[0] ?? null)
+							}
+						/>
+						<input type="url" value={draft.imageUrl ?? ""} readOnly />
+						{isUploadingImage ? (
+							<span className="small">アップロード中...</span>
+						) : null}
+						{imageUploadError.length > 0 ? (
+							<span className="small">失敗: {imageUploadError}</span>
+						) : null}
+						{draft.imageUrl ? (
+							<button
+								type="button"
+								className="ghost image-preview-button"
+								onClick={() => setIsPreviewOpen(true)}
+							>
+								画像を拡大
+							</button>
+						) : null}
+					</div>
+				</div>
+			</div>
+			{isPreviewOpen && draft.imageUrl ? (
+				<div
+					className="image-lightbox"
+					role="dialog"
+					aria-label="画像プレビュー"
+					aria-modal="true"
+				>
 					<button
 						type="button"
-						className="player-preview player-preview-trigger"
-						aria-label="画像を拡大表示"
-						onClick={() => setIsPreviewOpen(true)}
-					>
+						className="image-lightbox-backdrop"
+						aria-label="画像プレビューを閉じる"
+						onClick={() => setIsPreviewOpen(false)}
+					/>
+					<div className="image-lightbox-content">
+						<button
+							type="button"
+							className="image-lightbox-close"
+							onClick={() => setIsPreviewOpen(false)}
+						>
+							閉じる
+						</button>
 						<img
 							src={draft.imageUrl}
 							alt={`${draft.lastName}${draft.firstName}`}
 						/>
-						<div className="player-preview-name">
-							<p>{draft.lastName + draft.firstName}</p>
-							<p>
-								{`${draft.englishLastName} ${draft.englishFirstName}`.trim()}
-							</p>
-						</div>
-					</button>
-				) : (
-					<div className="player-preview">
-						<div className="player-preview-empty">No Image</div>
-						<div className="player-preview-name">
-							<p>{draft.lastName + draft.firstName}</p>
-							<p>
-								{`${draft.englishLastName} ${draft.englishFirstName}`.trim()}
-							</p>
-						</div>
 					</div>
-				)}
-				{isPreviewOpen && draft.imageUrl ? (
-					<div
-						className="image-lightbox"
-						role="dialog"
-						aria-label="画像プレビュー"
-						aria-modal="true"
-					>
-						<button
-							type="button"
-							className="image-lightbox-backdrop"
-							aria-label="画像プレビューを閉じる"
-							onClick={() => setIsPreviewOpen(false)}
-						/>
-						<div className="image-lightbox-content">
-							<button
-								type="button"
-								className="image-lightbox-close"
-								onClick={() => setIsPreviewOpen(false)}
-							>
-								閉じる
-							</button>
-							<img
-								src={draft.imageUrl}
-								alt={`${draft.lastName}${draft.firstName}`}
-							/>
-						</div>
-					</div>
-				) : null}
-			</td>
-			<td>{playerId}</td>
-			<td>
-				<input
-					value={draft.lastName}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "lastName", event.target.value)
-					}
-				/>
-			</td>
-			<td>
-				<input
-					value={draft.firstName}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "firstName", event.target.value)
-					}
-				/>
-			</td>
-			<td>
-				<input
-					value={draft.lastFurigana}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "lastFurigana", event.target.value)
-					}
-				/>
-			</td>
-			<td>
-				<input
-					value={draft.firstFurigana}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "firstFurigana", event.target.value)
-					}
-				/>
-			</td>
-			<td>
-				<input
-					value={draft.englishLastName}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "englishLastName", event.target.value)
-					}
-				/>
-			</td>
-			<td>
-				<input
-					value={draft.englishFirstName}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "englishFirstName", event.target.value)
-					}
-				/>
-			</td>
-			<td className="gender-cell">
-				<GenderToggleButtons
-					value={draft.gender}
-					onChange={(value) =>
-						onDraftFieldChange(playerId, "gender", value ?? "")
-					}
-				/>
-			</td>
-			<td>
-				<div style={{ display: "grid", gap: "6px", minWidth: "210px" }}>
-					<input
-						type="file"
-						accept="image/jpeg,image/png,image/webp,image/avif"
-						onChange={(event) =>
-							void handleImageChange(event.target.files?.[0] ?? null)
-						}
-					/>
-					<input type="url" value={draft.imageUrl ?? ""} readOnly />
-					{isUploadingImage ? (
-						<span className="small">アップロード中...</span>
-					) : null}
-					{imageUploadError.length > 0 ? (
-						<span className="small">失敗: {imageUploadError}</span>
-					) : null}
 				</div>
-			</td>
-			<td>
-				<select
-					value={draft.birthPlace}
-					onChange={(event) =>
-						onDraftFieldChange(playerId, "birthPlace", event.target.value)
-					}
-				>
-					{birthPlaceOptions.map((prefecture) => (
-						<option key={prefecture} value={prefecture}>
-							{prefecture}
-						</option>
-					))}
-				</select>
-			</td>
-			<td>
-				<input
-					type="date"
-					value={draft.birthDate ?? ""}
-					onChange={(event) =>
-						onDraftBirthDateChange(playerId, event.target.value)
-					}
-				/>
-			</td>
-		</tr>
+			) : null}
+		</DialogContent>
 	);
 };
 
@@ -400,6 +449,25 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 		[players, draftsById, baselineById],
 	);
 
+	const filteredPlayers = useMemo(() => {
+		const normalizedQuery = normalize(nameQuery);
+		return players.filter((player) => {
+			const draft =
+				draftsById[player.id] ??
+				baselineById[player.id] ??
+				toPlayerDraft(player);
+			const byGender =
+				genderFilter === "all" ? true : draft.gender === genderFilter;
+			if (!byGender) {
+				return false;
+			}
+			if (normalizedQuery.length === 0) {
+				return true;
+			}
+			return buildSearchTarget(draft).includes(normalizedQuery);
+		});
+	}, [genderFilter, nameQuery, players, draftsById, baselineById]);
+
 	const handleSaveAll = async () => {
 		if (dirtyIds.length === 0 || isSavingAll) {
 			return;
@@ -445,25 +513,6 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 		}
 	};
 
-	const filteredPlayers = useMemo(() => {
-		const normalizedQuery = normalize(nameQuery);
-		return players.filter((player) => {
-			const draft =
-				draftsById[player.id] ??
-				baselineById[player.id] ??
-				toPlayerDraft(player);
-			const byGender =
-				genderFilter === "all" ? true : draft.gender === genderFilter;
-			if (!byGender) {
-				return false;
-			}
-			if (normalizedQuery.length === 0) {
-				return true;
-			}
-			return buildSearchTarget(draft).includes(normalizedQuery);
-		});
-	}, [genderFilter, nameQuery, players, draftsById, baselineById]);
-
 	return (
 		<section className="card">
 			<h2>一覧 / 編集</h2>
@@ -498,36 +547,22 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 				</button>
 				{saveMessage.length > 0 ? <p className="small">{saveMessage}</p> : null}
 			</div>
-			<table>
-				<thead>
-					<tr>
-						<th>プレビュー</th>
-						<th>ID</th>
-						<th>姓</th>
-						<th>名</th>
-						<th>姓フリガナ</th>
-						<th>名フリガナ</th>
-						<th>英字姓</th>
-						<th>英字名</th>
-						<th className="gender-cell">性別</th>
-						<th>画像URL</th>
-						<th>出身地</th>
-						<th>生年月日</th>
-					</tr>
-				</thead>
-				<tbody>
-					{filteredPlayers.map((player) => (
-						<PlayerRow
-							key={player.id}
-							playerId={player.id}
-							token={token}
-							draft={getDraftById(player.id) ?? toPlayerDraft(player)}
-							onDraftFieldChange={handleDraftFieldChange}
-							onDraftBirthDateChange={handleDraftBirthDateChange}
-						/>
-					))}
-				</tbody>
-			</table>
+
+			<div className="player-grid">
+				{filteredPlayers.map((player) => (
+					<PlayerEditorCard
+						key={player.id}
+						token={token}
+						playerId={player.id}
+						draft={getDraftById(player.id) ?? toPlayerDraft(player)}
+						onDraftFieldChange={handleDraftFieldChange}
+						onDraftBirthDateChange={handleDraftBirthDateChange}
+					/>
+				))}
+			</div>
+			{filteredPlayers.length === 0 ? (
+				<p className="small">該当する選手がいません。</p>
+			) : null}
 		</section>
 	);
 };

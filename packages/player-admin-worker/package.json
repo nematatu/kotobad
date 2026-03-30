@@ -3,15 +3,16 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bun run build:admin-ui && wrangler dev --ip 0.0.0.0 --port 8788 --inspector-port 9230 --persist-to ../backend/.wrangler/state",
-		"build:admin-ui": "vite build --config admin-ui/vite.config.ts",
+		"build:admin-ui": "vite build --config admin-ui/vite.config.ts --base ./",
 		"deploy": "bun run build:admin-ui && wrangler deploy --minify --env production",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
 	},
 	"dependencies": {
+		"@radix-ui/react-dialog": "^1.1.15",
 		"drizzle-orm": "^0.44.7",
 		"hono": "^4.12.3",
-		"react": "^19.2.0",
-		"react-dom": "^19.2.0",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {

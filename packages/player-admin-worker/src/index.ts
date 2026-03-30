@@ -32,7 +32,7 @@ app.onError((error, c) => {
 	console.error(error);
 	const message =
 		error instanceof Error ? error.message : "unknown_internal_error";
-	const includeDetails = c.env.APP_ENV === "development";
+	const includeDetails = c.env.APP_ENV !== "production";
 	return c.json(
 		includeDetails
 			? { error: "internal_server_error", message }
