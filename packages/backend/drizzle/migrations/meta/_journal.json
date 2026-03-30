@@ -204,6 +204,13 @@
       "when": 1773446099806,
       "tag": "0028_open_blockbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "6",
+      "when": 1774854467281,
+      "tag": "0029_regular_moon_knight",
+      "breakpoints": true
     }
   ]
 }

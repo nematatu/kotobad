@@ -160,7 +160,7 @@ export const players = sqliteTable("players", {
 	last_furigana: text("last_furigana").notNull(),
 	englishFirstName: text("english_first_name").notNull(),
 	englishLastName: text("english_last_name").notNull(),
-	team: text("team").notNull(),
+	birthPlace: text("birth_place").notNull(),
 	birthDate: timestamp("birth_date"),
 });
 
