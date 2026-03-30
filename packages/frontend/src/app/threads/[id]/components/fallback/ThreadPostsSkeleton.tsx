@@ -5,20 +5,20 @@ const PLACEHOLDER_THREAD_ITEMS = [
 	{
 		id: "thread-skeleton-1",
 		depth: 0,
-		bodyWidthClassName: "w-[70%]",
-		subBodyWidthClassName: "w-[88%]",
+		bodyWidthClassName: "w-[86%]",
+		subBodyWidthClassName: "w-[52%]",
 	},
 	{
 		id: "thread-skeleton-2",
 		depth: 0,
-		bodyWidthClassName: "w-[62%]",
-		subBodyWidthClassName: "w-[82%]",
+		bodyWidthClassName: "w-[82%]",
+		subBodyWidthClassName: "w-[46%]",
 	},
 	{
 		id: "thread-skeleton-3",
 		depth: 1,
-		bodyWidthClassName: "w-[66%]",
-		subBodyWidthClassName: "w-[86%]",
+		bodyWidthClassName: "w-[78%]",
+		subBodyWidthClassName: "w-[42%]",
 	},
 ];
 
@@ -63,47 +63,19 @@ export const ThreadPostsFallback = () => {
 								: undefined
 						}
 					>
-						<div className="flex items-start">
-							<div className="min-w-0 flex-1">
-								<div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-									<div className="inline-flex max-w-[220px] items-center gap-1.5">
-										<Skeleton
-											className={cn(
-												item.depth > 0 ? "h-5 w-5" : "h-7 w-7",
-												"rounded-full bg-[#dbe4ee] dark:bg-[#334155]",
-											)}
-										/>
-										<Skeleton className="h-3 w-24 rounded bg-[#dbe4ee] dark:bg-[#334155]" />
-									</div>
-									<Skeleton className="h-3 w-8 rounded bg-[#dbe4ee] dark:bg-[#334155]" />
-									<Skeleton className="h-3 w-2 rounded bg-[#dbe4ee] dark:bg-[#334155]" />
-									<Skeleton className="h-3 w-10 rounded bg-[#dbe4ee] dark:bg-[#334155]" />
-								</div>
-								<div className="pl-9">
-									<div className="space-y-2">
-										<Skeleton
-											className={cn(
-												"h-4 rounded bg-[#e2e8f0] dark:bg-[#334155]",
-												item.bodyWidthClassName,
-											)}
-										/>
-										<Skeleton
-											className={cn(
-												"h-4 rounded bg-[#e2e8f0] dark:bg-[#334155]",
-												item.subBodyWidthClassName,
-											)}
-										/>
-									</div>
-									<div className="mt-2 flex flex-wrap items-center gap-1.5">
-										<Skeleton className="h-5 w-12 rounded-full bg-[#dbe4ee] dark:bg-[#334155]" />
-										<Skeleton className="h-5 w-10 rounded-full bg-[#dbe4ee] dark:bg-[#334155]" />
-									</div>
-									<div className="mt-1 flex flex-wrap items-center gap-2">
-										<Skeleton className="h-6 w-8 rounded-full bg-[#dbe4ee] dark:bg-[#334155]" />
-										<Skeleton className="h-6 w-8 rounded-full bg-[#dbe4ee] dark:bg-[#334155]" />
-									</div>
-								</div>
-							</div>
+						<div className="space-y-2">
+							<Skeleton
+								className={cn(
+									"h-4 rounded bg-[#e2e8f0] dark:bg-[#334155]",
+									item.bodyWidthClassName,
+								)}
+							/>
+							<Skeleton
+								className={cn(
+									"h-4 rounded bg-[#e2e8f0] dark:bg-[#334155]",
+									item.subBodyWidthClassName,
+								)}
+							/>
 						</div>
 					</div>
 				))}
