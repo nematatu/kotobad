@@ -18,7 +18,7 @@ export const TokenControls = ({
 			<h2>認証 / 取得</h2>
 			<div className="grid">
 				<div>
-					<label htmlFor="token">管理トークン（任意）</label>
+					<label htmlFor="token">管理トークン（必須）</label>
 					<input
 						id="token"
 						type="password"

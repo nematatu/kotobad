@@ -26,10 +26,10 @@ backend Worker と同じローカル D1 状態を参照します。
 - `POST /players` 新規追加
 - `PATCH /players/:id` 更新
 
-`PLAYER_ADMIN_API_TOKEN` を設定した場合、`/players` 配下は
-`Authorization: Bearer <token>` または `x-admin-token` / `x-api-key` が必須です。
+`/players` 配下は `PLAYER_ADMIN_API_TOKEN` を必須とし、
+`Authorization: Bearer <token>` または `x-admin-token` / `x-api-key` が必要です。
 
-本番（`APP_ENV=production`）では `PLAYER_ADMIN_API_TOKEN` 未設定時に
+`PLAYER_ADMIN_API_TOKEN` 未設定時に
 `/players` へのアクセスは `503 server_misconfigured` を返します（fail-close）。
 
 ## Security Notes

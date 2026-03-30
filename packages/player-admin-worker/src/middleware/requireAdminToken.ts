@@ -5,12 +5,8 @@ import { extractToken } from "../utils/request";
 export const requireAdminToken = createMiddleware<AppEnv>(async (c, next) => {
 	const expectedToken = c.env.PLAYER_ADMIN_API_TOKEN;
 	if (!expectedToken) {
-		if (c.env.APP_ENV === "production") {
-			console.error("PLAYER_ADMIN_API_TOKEN is not configured in production.");
-			return c.json({ error: "server_misconfigured" }, 503);
-		}
-		await next();
-		return;
+		console.error("PLAYER_ADMIN_API_TOKEN is not configured.");
+		return c.json({ error: "server_misconfigured" }, 503);
 	}
 
 	const bearerToken = extractToken(c.req.header("authorization"));
