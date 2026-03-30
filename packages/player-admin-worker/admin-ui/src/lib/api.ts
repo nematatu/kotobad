@@ -1,4 +1,4 @@
-import type { Player, PlayerPayload } from "../types";
+import type { Player, PlayerPayload, PlayerUpdatePayload } from "../types";
 import { optimizeImageForUpload } from "./imageOptimize";
 
 const createHeaders = (token: string, withJsonContentType = false) => {
@@ -17,7 +17,20 @@ const parseApiError = async (response: Response): Promise<string> => {
 		const json = (await response.json()) as {
 			error?: string;
 			message?: string;
+			issues?: Array<{ path?: Array<string | number>; message?: string }>;
 		};
+		if (Array.isArray(json.issues) && json.issues.length > 0) {
+			const firstIssue = json.issues[0];
+			const path =
+				Array.isArray(firstIssue?.path) && firstIssue.path.length > 0
+					? `${firstIssue.path.join(".")}: `
+					: "";
+			const message =
+				typeof firstIssue?.message === "string" && firstIssue.message.length > 0
+					? firstIssue.message
+					: "validation_error";
+			return `${path}${message}`;
+		}
 		if (typeof json.message === "string" && json.message.length > 0) {
 			return json.message;
 		}
@@ -61,7 +74,7 @@ export const createPlayer = async (
 export const updatePlayer = async (
 	token: string,
 	id: number,
-	payload: PlayerPayload,
+	payload: PlayerUpdatePayload,
 ): Promise<void> => {
 	const response = await fetch(`/players/${id}`, {
 		method: "PATCH",

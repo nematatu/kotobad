@@ -24,3 +24,5 @@ export type PlayerPayload = {
 	birthPlace: string;
 	birthDate: string | null;
 };
+
+export type PlayerUpdatePayload = Partial<PlayerPayload>;

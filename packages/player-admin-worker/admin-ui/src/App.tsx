@@ -4,7 +4,7 @@ import { PlayerTable } from "./components/PlayerTable";
 import { StatusMessage } from "./components/StatusMessage";
 import { TokenControls } from "./components/TokenControls";
 import { createPlayer, fetchPlayers, updatePlayer } from "./lib/api";
-import type { Player, PlayerPayload } from "./types";
+import type { Player, PlayerPayload, PlayerUpdatePayload } from "./types";
 
 export const App = () => {
 	const [token, setToken] = useState("");
@@ -42,7 +42,7 @@ export const App = () => {
 		}
 	};
 
-	const handleSave = async (id: number, payload: PlayerPayload) => {
+	const handleSave = async (id: number, payload: PlayerUpdatePayload) => {
 		setStatus(`更新中: id=${id}`);
 		try {
 			await updatePlayer(token, id, payload);

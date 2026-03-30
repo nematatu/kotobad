@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { uploadPlayerImage } from "../lib/api";
 import { epochSecondsToDateInput } from "../lib/date";
 import { buildPrefectureOptions } from "../lib/prefectures";
-import type { Player, PlayerPayload } from "../types";
+import type { Player, PlayerPayload, PlayerUpdatePayload } from "../types";
 import { GenderToggleButtons } from "./GenderToggleButtons";
 
 type PlayerTableProps = {
 	token: string;
 	players: Player[];
-	onSave: (id: number, payload: PlayerPayload) => Promise<void>;
+	onSave: (id: number, payload: PlayerUpdatePayload) => Promise<void>;
 };
 
 const fieldKeys = [
@@ -52,6 +52,37 @@ const isSameDraft = (left: PlayerPayload, right: PlayerPayload) =>
 	left.imageUrl === right.imageUrl &&
 	left.birthPlace === right.birthPlace &&
 	left.birthDate === right.birthDate;
+
+const buildUpdatePayload = (
+	baseline: PlayerPayload,
+	draft: PlayerPayload,
+): PlayerUpdatePayload => {
+	const payload: PlayerUpdatePayload = {};
+
+	if (draft.lastName !== baseline.lastName) payload.lastName = draft.lastName;
+	if (draft.firstName !== baseline.firstName)
+		payload.firstName = draft.firstName;
+	if (draft.lastFurigana !== baseline.lastFurigana) {
+		payload.lastFurigana = draft.lastFurigana;
+	}
+	if (draft.firstFurigana !== baseline.firstFurigana) {
+		payload.firstFurigana = draft.firstFurigana;
+	}
+	if (draft.englishLastName !== baseline.englishLastName) {
+		payload.englishLastName = draft.englishLastName;
+	}
+	if (draft.englishFirstName !== baseline.englishFirstName) {
+		payload.englishFirstName = draft.englishFirstName;
+	}
+	if (draft.gender !== baseline.gender) payload.gender = draft.gender;
+	if (draft.imageUrl !== baseline.imageUrl) payload.imageUrl = draft.imageUrl;
+	if (draft.birthPlace !== baseline.birthPlace)
+		payload.birthPlace = draft.birthPlace;
+	if (draft.birthDate !== baseline.birthDate)
+		payload.birthDate = draft.birthDate;
+
+	return payload;
+};
 
 const buildSearchTarget = (draft: PlayerPayload) =>
 	[
@@ -381,10 +412,15 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 			for (const id of dirtyIds) {
 				currentId = id;
 				const draft = getDraftById(id);
-				if (!draft) {
+				const baseline = baselineById[id];
+				if (!draft || !baseline) {
 					continue;
 				}
-				await onSave(id, draft);
+				const payload = buildUpdatePayload(baseline, draft);
+				if (Object.keys(payload).length === 0) {
+					continue;
+				}
+				await onSave(id, payload);
 			}
 			setBaselineById((prev) => {
 				const next = { ...prev };
