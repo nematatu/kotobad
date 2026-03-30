@@ -7,6 +7,7 @@ import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { ThreadPostImage } from "../../components/shared/ThreadPostImage";
 import { TagList } from "../../components/view/tag/tagList";
 import { LikeButton } from "./likeButton";
+import { ThreadShareButton } from "./ThreadShareButton";
 
 type Props = {
 	threadHeaderData: ThreadType;
@@ -70,12 +71,15 @@ export const ThreadDetailHeader = ({ threadHeaderData }: Props) => {
 					<TagList tags={threadHeaderData.threadTags} />
 				</div>
 			)}
-			<div className="block">
+			<div className="flex flex-wrap items-center gap-2">
 				<LikeButton
 					threadId={threadHeaderData.id}
 					initialLikeCount={threadHeaderData.likeCount}
 					initialLikedByMe={threadHeaderData.likedByMe}
 				/>
+				<div className="sm:hidden">
+					<ThreadShareButton threadTitle={threadHeaderData.title} />
+				</div>
 			</div>
 		</div>
 	);

@@ -8,6 +8,7 @@ import { BackToThreadListHeaderButton } from "./components/BackToThreadListHeade
 import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
+import { ThreadShareButton } from "./components/ThreadShareButton";
 export const dynamic = "force-dynamic";
 
 export type Props = {
@@ -67,11 +68,14 @@ export default async function ThreadDetailPage({
 					<aside className="space-y-4 lg:sticky lg:top-[calc(var(--header-height,0px)+0.75rem)]">
 						<div className="hidden sm:block rounded-lg bg-white p-3">
 							<div className="flex flex-col gap-4">
-								<p className="text-gray-400 text-xs sm:text-sm">
-									{formatDate(threadHeaderData.createdAt, {
-										withTime: false,
-									})}
-								</p>
+								<div className="flex flex-col items-start gap-2">
+									<p className="text-gray-400 text-xs sm:text-sm">
+										{formatDate(threadHeaderData.createdAt, {
+											withTime: false,
+										})}
+									</p>
+									<ThreadShareButton threadTitle={threadHeaderData.title} />
+								</div>
 								{threadHeaderData.threadTags.length > 0 && (
 									<div className="flex flex-wrap gap-2">
 										<TagList tags={threadHeaderData.threadTags} />

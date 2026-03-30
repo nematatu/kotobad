@@ -1,6 +1,7 @@
 "use client";
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
+import { useEffect, useState } from "react";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 import type { UserState } from "@/components/feature/provider/UserProvider";
 import { UserPopover } from "@/components/feature/user/popover/UserPopover";
@@ -14,7 +15,13 @@ type Props = {
 };
 
 const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
-	if (isLoading) {
+	const [isHydrated, setIsHydrated] = useState(false);
+
+	useEffect(() => {
+		setIsHydrated(true);
+	}, []);
+
+	if (!isHydrated || isLoading) {
 		return (
 			<div
 				className="flex items-center justify-center gap-2 sm:gap-7"

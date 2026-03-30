@@ -22,6 +22,7 @@ import {
 	buildPostShareUrl,
 	buildXShareUrl,
 } from "@/lib/thread/postShare";
+import { copyTextToClipboard, openShareWindow } from "@/lib/thread/shareClient";
 
 type DropDownMenuProps = {
 	postId: number;
@@ -40,23 +41,12 @@ export function PostDropDownMenu({
 		threadTitle,
 	};
 
-	const openShareWindow = (shareUrl: string) => {
-		if (typeof window === "undefined") return;
-
-		const popup = window.open(shareUrl, "_blank", "noopener,noreferrer");
-		if (popup) {
-			return;
-		}
-
-		window.location.href = shareUrl;
-	};
-
 	const urlCopyHandler = async () => {
 		if (typeof window === "undefined") return;
 
-		try {
-			const copiedUrl = buildPostShareUrl(shareInput);
-			await navigator.clipboard.writeText(copiedUrl);
+		const copiedUrl = buildPostShareUrl(shareInput);
+		const isCopied = await copyTextToClipboard(copiedUrl);
+		if (isCopied) {
 			toast.success("コピーしました", {
 				description: (
 					<a
@@ -70,9 +60,9 @@ export function PostDropDownMenu({
 					</a>
 				),
 			});
-		} catch (_e) {
-			toast.error("コピーに失敗しました");
+			return;
 		}
+		toast.error("コピーに失敗しました");
 	};
 
 	const xShareHandler = () => {

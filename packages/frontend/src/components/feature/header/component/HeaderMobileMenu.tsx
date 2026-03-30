@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ActionLinkItem } from "@/components/common/button/ActionLink";
 import ActionLink from "@/components/common/button/ActionLink";
 import ThemeToggle from "@/components/feature/theme/ThemeToggle";
@@ -36,6 +36,7 @@ const isActiveHref = (pathname: string, href: string) => {
 
 const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 	const [open, setOpen] = useState(false);
+	const [isHydrated, setIsHydrated] = useState(false);
 	const pathname = usePathname();
 	const { user } = useUser();
 	const primaryLinks = links.filter(
@@ -45,12 +46,15 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 		(item) => item.mobileMenuPlacement === "bottom",
 	);
 
-	if (isLoading) {
+	useEffect(() => {
+		setIsHydrated(true);
+	}, []);
+
+	if (!isHydrated || isLoading) {
 		return (
-			<div
-				className="size-8 rounded-full bg-gray-200 animate-pulse sm:size-10 dark:bg-slate-800"
-				aria-hidden="true"
-			/>
+			<div className="md:hidden" aria-hidden="true">
+				<div className="size-8 rounded-full bg-gray-200 animate-pulse sm:size-10 dark:bg-slate-800" />
+			</div>
 		);
 	}
 
