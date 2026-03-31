@@ -113,16 +113,6 @@ export const updateUserProfileRouter: RouteHandler<
 		const authUser = c.get("betterAuthUser");
 		const publicBaseUrl = c.env.R2_PUBLIC_BASE_URL;
 
-		if (!publicBaseUrl) {
-			return c.json(
-				{
-					error: "Failed to update profile",
-					message: "R2 public base url is not configured",
-				},
-				500,
-			);
-		}
-
 		const formData = await c.req.formData();
 		const favoritePlayerIds =
 			formData.get("favoritePlayersTouched") === "1"
@@ -199,6 +189,16 @@ export const updateUserProfileRouter: RouteHandler<
 
 		let oldImageUrlToDelete: string | null = null;
 		if (imageFile) {
+			if (!publicBaseUrl) {
+				return c.json(
+					{
+						error: "Failed to update profile",
+						message: "R2 public base url is not configured",
+					},
+					500,
+				);
+			}
+
 			const extension = MIME_TYPE_TO_EXTENSION[imageFile.type];
 			if (!extension) {
 				return c.json(
@@ -267,7 +267,7 @@ export const updateUserProfileRouter: RouteHandler<
 			}
 		}
 
-		if (oldImageUrlToDelete) {
+		if (oldImageUrlToDelete && publicBaseUrl) {
 			const oldObjectKey = toObjectKeyFromPublicAvatarUrl(
 				oldImageUrlToDelete,
 				publicBaseUrl,

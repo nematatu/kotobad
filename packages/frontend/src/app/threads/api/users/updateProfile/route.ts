@@ -5,6 +5,14 @@ import { toBffErrorPayload } from "@/lib/api/fetcher/errorPayload";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function PATCH(req: Request) {
+	return handleUpdateProfile(req);
+}
+
+export async function PUT(req: Request) {
+	return handleUpdateProfile(req);
+}
+
+const handleUpdateProfile = async (req: Request) => {
 	try {
 		const formData = await req.formData();
 		const raw = await updateMyProfile(formData);
@@ -26,7 +34,7 @@ export async function PATCH(req: Request) {
 			{ status: 500 },
 		);
 	}
-}
+};
 
 const updateMyProfile = async (formData: FormData) => {
 	const url = await getApiUrl("UPDATE_MY_PROFILE");
