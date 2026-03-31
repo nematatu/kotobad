@@ -1,7 +1,10 @@
+import type { FavoritePlayerType } from "@kotobad/shared/src/types/user";
+
 export type EditableProfile = {
 	name: string;
 	bio: string;
 	image: string | null;
+	favoritePlayers: FavoritePlayerType[];
 };
 
 export const MAX_PROFILE_NAME_LENGTH = 20;
@@ -12,25 +15,10 @@ export const toEditableProfile = (profile: {
 	name: string;
 	bio: string | null | undefined;
 	image?: string | null;
+	favoritePlayers?: FavoritePlayerType[] | null;
 }): EditableProfile => ({
 	name: profile.name,
 	bio: profile.bio ?? "",
 	image: profile.image ?? null,
+	favoritePlayers: profile.favoritePlayers ?? [],
 });
-
-export const getFetcherErrorMessage = (error: unknown): string | null => {
-	const body = (error as { body?: unknown })?.body;
-	if (typeof body !== "string") {
-		return null;
-	}
-
-	try {
-		const parsed = JSON.parse(body) as {
-			error?: string;
-			message?: string;
-		};
-		return parsed.message ?? parsed.error ?? null;
-	} catch {
-		return null;
-	}
-};

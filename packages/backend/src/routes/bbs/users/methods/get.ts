@@ -6,6 +6,10 @@ import { posts, threads } from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { OpenAPIUserProfileSchema } from "../../../../models/users";
 import type { AppEnvironment } from "../../../../types";
+import {
+	findUserFavoritePlayers,
+	toFavoritePlayersResponse,
+} from "./favoritePlayers";
 
 const MAX_RECENT_THREADS = 8;
 const MAX_RECENT_POSTS = 10;
@@ -76,48 +80,54 @@ export const getUserProfileByIdRouter: RouteHandler<
 			return c.json({ error: "User not found" }, 404);
 		}
 
-		const [threadCountRow, postCountRow, recentThreads, recentPosts] =
-			await Promise.all([
-				db
-					.select({ value: count() })
-					.from(threads)
-					.where(eq(threads.authorId, userId)),
-				db
-					.select({ value: count() })
-					.from(posts)
-					.where(eq(posts.authorId, userId)),
-				db.query.threads.findMany({
-					where: (table, { eq }) => eq(table.authorId, userId),
-					columns: {
-						id: true,
-						title: true,
-						postCount: true,
-						createdAt: true,
-					},
-					orderBy: (table, { desc }) => [desc(table.createdAt), desc(table.id)],
-					limit: MAX_RECENT_THREADS,
-				}),
-				db.query.posts.findMany({
-					where: (table, { eq }) => eq(table.authorId, userId),
-					columns: {
-						id: true,
-						threadId: true,
-						localId: true,
-						post: true,
-						createdAt: true,
-					},
-					with: {
-						threads: {
-							columns: {
-								id: true,
-								title: true,
-							},
+		const [
+			threadCountRow,
+			postCountRow,
+			recentThreads,
+			recentPosts,
+			favoritePlayers,
+		] = await Promise.all([
+			db
+				.select({ value: count() })
+				.from(threads)
+				.where(eq(threads.authorId, userId)),
+			db
+				.select({ value: count() })
+				.from(posts)
+				.where(eq(posts.authorId, userId)),
+			db.query.threads.findMany({
+				where: (table, { eq }) => eq(table.authorId, userId),
+				columns: {
+					id: true,
+					title: true,
+					postCount: true,
+					createdAt: true,
+				},
+				orderBy: (table, { desc }) => [desc(table.createdAt), desc(table.id)],
+				limit: MAX_RECENT_THREADS,
+			}),
+			db.query.posts.findMany({
+				where: (table, { eq }) => eq(table.authorId, userId),
+				columns: {
+					id: true,
+					threadId: true,
+					localId: true,
+					post: true,
+					createdAt: true,
+				},
+				with: {
+					threads: {
+						columns: {
+							id: true,
+							title: true,
 						},
 					},
-					orderBy: [desc(posts.createdAt), desc(posts.id)],
-					limit: MAX_RECENT_POSTS,
-				}),
-			]);
+				},
+				orderBy: [desc(posts.createdAt), desc(posts.id)],
+				limit: MAX_RECENT_POSTS,
+			}),
+			findUserFavoritePlayers(db, userId),
+		]);
 
 		const threadCount = threadCountRow[0]?.value ?? 0;
 		const postCount = postCountRow[0]?.value ?? 0;
@@ -127,6 +137,7 @@ export const getUserProfileByIdRouter: RouteHandler<
 			name: targetUser.name,
 			image: targetUser.image ?? null,
 			bio: targetUser.bio ?? null,
+			favoritePlayers: toFavoritePlayersResponse(favoritePlayers),
 			createdAt: targetUser.createdAt.toISOString(),
 			threadCount,
 			postCount,

@@ -1,19 +1,28 @@
 "use client";
 
-import { UpdateUserProfileResponseSchema } from "@kotobad/shared/src/schemas/user";
-import type { UserProfileType } from "@kotobad/shared/src/types/user";
+import {
+	UpdateUserProfileResponseSchema,
+	UserProfileSelectablePlayersSchema,
+} from "@kotobad/shared/src/schemas/user";
+import type {
+	FavoritePlayerType,
+	UserProfileSelectablePlayerType,
+	UserProfileType,
+} from "@kotobad/shared/src/types/user";
 import type { ChangeEvent, RefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useUser } from "@/components/feature/provider/UserProvider";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
+import { getBffErrorMessage } from "@/lib/api/fetcher/errorPayload";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 import {
 	type EditableProfile,
-	getFetcherErrorMessage,
 	MAX_AVATAR_BYTES,
 	toEditableProfile,
 } from "../lib/profileEditor";
+
+const MAX_FAVORITE_PLAYERS = 3;
 
 type UseUserProfileEditorResult = {
 	isLogin: boolean;
@@ -23,6 +32,11 @@ type UseUserProfileEditorResult = {
 	editedName: string;
 	editedBio: string;
 	avatarImage: string | null;
+	editedFavoritePlayers: FavoritePlayerType[];
+	isFavoritePlayersDialogOpen: boolean;
+	favoritePlayerOptions: UserProfileSelectablePlayerType[];
+	isLoadingFavoritePlayers: boolean;
+	favoritePlayersLoadError: string | null;
 	avatarInputRef: RefObject<HTMLInputElement | null>;
 	startEditingAction: () => void;
 	openConfirmAction: () => void;
@@ -32,6 +46,10 @@ type UseUserProfileEditorResult = {
 	changeAvatarFileAction: (event: ChangeEvent<HTMLInputElement>) => void;
 	changeEditedNameAction: (value: string) => void;
 	changeEditedBioAction: (value: string) => void;
+	setIsFavoritePlayersDialogOpenAction: (open: boolean) => void;
+	toggleFavoritePlayerAction: (player: UserProfileSelectablePlayerType) => void;
+	removeFavoritePlayerAction: (playerId: number) => void;
+	reloadFavoritePlayersAction: () => Promise<void>;
 	confirmUpdateAction: () => Promise<void>;
 };
 
@@ -39,6 +57,21 @@ const revokeObjectUrl = (objectUrl: string | null) => {
 	if (!objectUrl) return;
 	URL.revokeObjectURL(objectUrl);
 };
+
+const hasSameFavoritePlayers = (
+	left: FavoritePlayerType[],
+	right: FavoritePlayerType[],
+) =>
+	left.length === right.length &&
+	left.every((player, index) => right[index]?.id === player.id);
+
+const toFavoritePlayer = (
+	player: UserProfileSelectablePlayerType,
+): FavoritePlayerType => ({
+	id: player.id,
+	name: `${player.lastName} ${player.firstName}`,
+	imageUrl: player.imageUrl ?? null,
+});
 
 export const useUserProfileEditor = (
 	profile: UserProfileType,
@@ -55,10 +88,24 @@ export const useUserProfileEditor = (
 	const [avatarImage, setAvatarImage] = useState<string | null>(
 		savedProfile.image,
 	);
+	const [editedFavoritePlayers, setEditedFavoritePlayers] = useState<
+		FavoritePlayerType[]
+	>(savedProfile.favoritePlayers);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
 	const [isSavingProfile, setIsSavingProfile] = useState(false);
 	const previewAvatarUrlRef = useRef<string | null>(null);
 	const avatarInputRef = useRef<HTMLInputElement | null>(null);
+	const [isFavoritePlayersDialogOpen, setIsFavoritePlayersDialogOpen] =
+		useState(false);
+	const [favoritePlayerOptions, setFavoritePlayerOptions] = useState<
+		UserProfileSelectablePlayerType[]
+	>([]);
+	const [isLoadingFavoritePlayers, setIsLoadingFavoritePlayers] =
+		useState(false);
+	const [favoritePlayersLoadError, setFavoritePlayersLoadError] = useState<
+		string | null
+	>(null);
+	const hasLoadedFavoritePlayersRef = useRef(false);
 
 	const clearPreviewAvatarUrl = () => {
 		revokeObjectUrl(previewAvatarUrlRef.current);
@@ -71,9 +118,11 @@ export const useUserProfileEditor = (
 		setEditedName(nextProfile.name);
 		setEditedBio(nextProfile.bio);
 		setAvatarImage(nextProfile.image);
+		setEditedFavoritePlayers(nextProfile.favoritePlayers);
 	};
 
 	const closeEditUi = () => {
+		setIsFavoritePlayersDialogOpen(false);
 		setIsConfirmOpen(false);
 		setIsEditing(false);
 	};
@@ -87,9 +136,11 @@ export const useUserProfileEditor = (
 		setEditedName(nextSavedProfile.name);
 		setEditedBio(nextSavedProfile.bio);
 		setAvatarImage(nextSavedProfile.image);
+		setEditedFavoritePlayers(nextSavedProfile.favoritePlayers);
 		setIsSavingProfile(false);
 		setIsConfirmOpen(false);
 		setIsEditing(false);
+		setIsFavoritePlayersDialogOpen(false);
 	}, [profile]);
 
 	useEffect(() => {
@@ -98,6 +149,37 @@ export const useUserProfileEditor = (
 			previewAvatarUrlRef.current = null;
 		};
 	}, []);
+
+	const reloadFavoritePlayersAction = async () => {
+		setIsLoadingFavoritePlayers(true);
+		setFavoritePlayersLoadError(null);
+		try {
+			const endpoint = await getBffApiUrl("GET_PROFILE_PLAYERS");
+			endpoint.searchParams.set("limit", "400");
+			const raw = await BffFetcher<unknown>(endpoint, { method: "GET" });
+			const response = UserProfileSelectablePlayersSchema.parse(raw);
+			setFavoritePlayerOptions(response.players);
+			hasLoadedFavoritePlayersRef.current = true;
+		} catch (error: unknown) {
+			const message =
+				getBffErrorMessage(error) ?? "選手一覧の取得に失敗しました";
+			setFavoritePlayersLoadError(message);
+		} finally {
+			setIsLoadingFavoritePlayers(false);
+		}
+	};
+
+	const setIsFavoritePlayersDialogOpenAction = (open: boolean) => {
+		if (!isEditing || isSavingProfile) return;
+		setIsFavoritePlayersDialogOpen(open);
+		if (
+			open &&
+			!hasLoadedFavoritePlayersRef.current &&
+			!isLoadingFavoritePlayers
+		) {
+			void reloadFavoritePlayersAction();
+		}
+	};
 
 	const openAvatarFileDialogAction = () => {
 		if (!isEditing || isSavingProfile) return;
@@ -126,6 +208,34 @@ export const useUserProfileEditor = (
 		setAvatarImage(previewUrl);
 	};
 
+	const toggleFavoritePlayerAction = (
+		player: UserProfileSelectablePlayerType,
+	) => {
+		if (!isEditing || isSavingProfile) return;
+		const exists = editedFavoritePlayers.some((item) => item.id === player.id);
+		if (exists) {
+			setEditedFavoritePlayers((current) =>
+				current.filter((item) => item.id !== player.id),
+			);
+			return;
+		}
+		if (editedFavoritePlayers.length >= MAX_FAVORITE_PLAYERS) {
+			toast.error("好きな選手は3人まで選択できます");
+			return;
+		}
+		setEditedFavoritePlayers((current) => [
+			...current,
+			toFavoritePlayer(player),
+		]);
+	};
+
+	const removeFavoritePlayerAction = (playerId: number) => {
+		if (!isEditing || isSavingProfile) return;
+		setEditedFavoritePlayers((current) =>
+			current.filter((item) => item.id !== playerId),
+		);
+	};
+
 	const confirmUpdateAction = async () => {
 		if (isSavingProfile) return;
 
@@ -133,7 +243,15 @@ export const useUserProfileEditor = (
 		const hasNameChanged = trimmedName !== savedProfile.name;
 		const hasBioChanged = editedBio !== savedProfile.bio;
 		const hasImageChanged = avatarFile !== null;
-		const hasChanges = hasNameChanged || hasBioChanged || hasImageChanged;
+		const hasFavoritePlayersChanged = !hasSameFavoritePlayers(
+			editedFavoritePlayers,
+			savedProfile.favoritePlayers,
+		);
+		const hasChanges =
+			hasNameChanged ||
+			hasBioChanged ||
+			hasImageChanged ||
+			hasFavoritePlayersChanged;
 
 		if (!hasChanges) {
 			closeEditUi();
@@ -157,6 +275,12 @@ export const useUserProfileEditor = (
 			}
 			if (avatarFile) {
 				formData.append("image", avatarFile);
+			}
+			if (hasFavoritePlayersChanged) {
+				formData.append("favoritePlayersTouched", "1");
+				for (const player of editedFavoritePlayers) {
+					formData.append("favoritePlayerIds", String(player.id));
+				}
 			}
 
 			const raw = await BffFetcher<unknown>(endpoint, {
@@ -184,7 +308,7 @@ export const useUserProfileEditor = (
 			);
 		} catch (error: unknown) {
 			toast.error(
-				getFetcherErrorMessage(error) ?? "プロフィール更新に失敗しました",
+				getBffErrorMessage(error) ?? "プロフィール更新に失敗しました",
 			);
 		} finally {
 			setIsSavingProfile(false);
@@ -204,6 +328,11 @@ export const useUserProfileEditor = (
 		editedName,
 		editedBio,
 		avatarImage,
+		editedFavoritePlayers,
+		isFavoritePlayersDialogOpen,
+		favoritePlayerOptions,
+		isLoadingFavoritePlayers,
+		favoritePlayersLoadError,
 		avatarInputRef,
 		startEditingAction: () => setIsEditing(true),
 		openConfirmAction: () => setIsConfirmOpen(true),
@@ -213,6 +342,10 @@ export const useUserProfileEditor = (
 		changeAvatarFileAction,
 		changeEditedNameAction: setEditedName,
 		changeEditedBioAction: setEditedBio,
+		setIsFavoritePlayersDialogOpenAction,
+		toggleFavoritePlayerAction,
+		removeFavoritePlayerAction,
+		reloadFavoritePlayersAction,
 		confirmUpdateAction,
 	};
 };

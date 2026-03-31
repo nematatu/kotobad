@@ -1,18 +1,19 @@
 import { relations, sql } from "drizzle-orm";
 import {
 	type AnySQLiteColumn,
+	check,
 	customType,
 	index,
 	integer,
+	primaryKey,
 	sqliteTable,
 	text,
 	uniqueIndex,
-  check
 } from "drizzle-orm/sqlite-core";
 import type { DeveloperRoadmapStatusType } from "@kotobad/shared/src/types/developerRoadmap";
 import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
-import { user } from "./better-auth.schema";
 import type { NotificationType } from "@kotobad/shared/src/types/notifications";
+import { user } from "./better-auth.schema";
 
 const timestamp = customType<{ data: Date; driverData: number }>({
 	dataType() {
@@ -160,9 +161,38 @@ export const players = sqliteTable("players", {
 	last_furigana: text("last_furigana").notNull(),
 	englishFirstName: text("english_first_name").notNull(),
 	englishLastName: text("english_last_name").notNull(),
+	imageUrl: text("image_url"),
 	birthPlace: text("birth_place").notNull(),
 	birthDate: timestamp("birth_date"),
 });
+
+export const userFavoritePlayers = sqliteTable(
+	"user_favorite_players",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		playerId: integer("player_id")
+			.notNull()
+			.references(() => players.id, { onDelete: "cascade" }),
+		sortOrder: integer("sort_order").notNull(),
+		createdAt: timestamp("created_at")
+			.default(sql`(strftime('%s', 'now'))`)
+			.notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.playerId] }),
+		userSortUnique: uniqueIndex("user_favorite_players_user_sort_unique").on(
+			table.userId,
+			table.sortOrder,
+		),
+		userSortIdx: index("user_favorite_players_user_sort_idx").on(
+			table.userId,
+			table.sortOrder,
+		),
+		playerIdx: index("user_favorite_players_player_idx").on(table.playerId),
+	}),
+);
 
 export const careers = sqliteTable("careers", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
@@ -411,6 +441,7 @@ export const playerIdx = index("player_idx").on(players.id);
 export const playersRelations = relations(players, ({ many }) => ({
 	achievements: many(achievements),
 	careers: many(careers),
+	favoritedByUsers: many(userFavoritePlayers),
 }));
 
 export const achievementsRelations = relations(achievements, ({ one }) => ({
@@ -468,7 +499,22 @@ export const usersRelations = relations(user, ({ many }) => ({
 	threads: many(threads),
 	  threadLikes: many(threadLikes),
 	developerNotes: many(developerNotes),
+	favoritePlayers: many(userFavoritePlayers),
 }));
+
+export const userFavoritePlayersRelations = relations(
+	userFavoritePlayers,
+	({ one }) => ({
+		user: one(user, {
+			fields: [userFavoritePlayers.userId],
+			references: [user.id],
+		}),
+		player: one(players, {
+			fields: [userFavoritePlayers.playerId],
+			references: [players.id],
+		}),
+	}),
+);
 
 export const developerNotesRelations = relations(developerNotes, ({ one }) => ({
 	author: one(user, {

@@ -1,6 +1,7 @@
 import { UpdateUserProfileResponseSchema } from "@kotobad/shared/src/schemas/user";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { toBffErrorPayload } from "@/lib/api/fetcher/errorPayload";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function PATCH(req: Request) {
@@ -12,19 +13,10 @@ export async function PATCH(req: Request) {
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;
 		if (fetchError.status) {
-			let payload: Record<string, unknown> = {
-				error: "Failed to update profile",
-			};
-			if (fetchError.body) {
-				try {
-					const parsed = JSON.parse(fetchError.body);
-					if (parsed && typeof parsed === "object") {
-						payload = parsed as Record<string, unknown>;
-					}
-				} catch {
-					payload = { error: "Failed to update profile" };
-				}
-			}
+			const payload = toBffErrorPayload(
+				fetchError.body,
+				"Failed to update profile",
+			);
 			return NextResponse.json(payload, { status: fetchError.status });
 		}
 

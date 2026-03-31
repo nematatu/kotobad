@@ -2,14 +2,23 @@ import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute } from "@hono/zod-openapi";
 import { UpdateUserProfileSchema } from "@kotobad/shared/src/schemas/user";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
-import { eq } from "drizzle-orm";
-import { user } from "../../../../../drizzle/schema";
+import { eq, inArray } from "drizzle-orm";
+import {
+	players,
+	user,
+	userFavoritePlayers,
+} from "../../../../../drizzle/schema";
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import {
 	OpenAPIUpdateUserProfileResponseSchema,
 	OpenAPIUpdateUserProfileSchema,
 } from "../../../../models/users";
 import type { AppEnvironment } from "../../../../types";
+import {
+	findUserFavoritePlayers,
+	hasSameNumberOrder,
+	toFavoritePlayersResponse,
+} from "./favoritePlayers";
 
 const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
 	"image/jpeg": "jpg",
@@ -115,18 +124,33 @@ export const updateUserProfileRouter: RouteHandler<
 		}
 
 		const formData = await c.req.formData();
+		const favoritePlayersTouched =
+			formData.get("favoritePlayersTouched") === "1";
+		const favoritePlayerIdsInput = formData
+			.getAll("favoritePlayerIds")
+			.map((value) => String(value));
 		const parsedResult = UpdateUserProfileSchema.safeParse({
 			name: formData.has("name")
 				? String(formData.get("name") ?? "").trim()
 				: undefined,
 			bio: formData.has("bio") ? String(formData.get("bio") ?? "") : undefined,
+			favoritePlayerIds: favoritePlayersTouched
+				? favoritePlayerIdsInput
+				: undefined,
 			image: (() => {
 				const f = formData.get("image");
 				return f instanceof File && f.size > 0 ? f : undefined;
 			})(),
 		});
 		if (!parsedResult.success) {
-			return c.json({ error: "Invalid request body" }, 400);
+			const firstIssueMessage = parsedResult.error.issues[0]?.message;
+			return c.json(
+				{
+					error: "Invalid request body",
+					message: firstIssueMessage ?? "入力値が不正です",
+				},
+				400,
+			);
 		}
 		const parsed = parsedResult.data;
 		const imageFileEntry = formData.get("image");
@@ -135,17 +159,22 @@ export const updateUserProfileRouter: RouteHandler<
 				? imageFileEntry
 				: null;
 
-		const current = await db.query.user.findFirst({
-			where: (u, { eq }) => eq(u.id, authUser.id),
-			columns: { name: true, bio: true, image: true },
-		});
+		const [current, currentFavorites] = await Promise.all([
+			db.query.user.findFirst({
+				where: (u, { eq }) => eq(u.id, authUser.id),
+				columns: { name: true, bio: true, image: true },
+			}),
+			findUserFavoritePlayers(db, authUser.id),
+		]);
 
 		if (!current) return c.json({ error: "User not found" }, 404);
+		const currentFavoritePlayers = toFavoritePlayersResponse(currentFavorites);
 
 		const currentUser = {
 			name: current.name,
 			bio: current.bio ?? null,
 			image: current.image ?? null,
+			favoritePlayers: currentFavoritePlayers,
 		};
 
 		const patch: {
@@ -161,6 +190,15 @@ export const updateUserProfileRouter: RouteHandler<
 		if (parsed.bio !== undefined && parsed.bio !== current.bio) {
 			patch.bio = parsed.bio;
 		}
+
+		const currentFavoritePlayerIds = currentFavoritePlayers.map(
+			(player) => player.id,
+		);
+		const nextFavoritePlayerIds =
+			parsed.favoritePlayerIds ?? currentFavoritePlayerIds;
+		const shouldUpdateFavoritePlayers =
+			parsed.favoritePlayerIds !== undefined &&
+			!hasSameNumberOrder(currentFavoritePlayerIds, nextFavoritePlayerIds);
 
 		let oldImageUrlToDelete: string | null = null;
 		if (imageFile) {
@@ -188,7 +226,8 @@ export const updateUserProfileRouter: RouteHandler<
 			}
 		}
 
-		if (Object.keys(patch).length === 0) {
+		const shouldUpdateUser = Object.keys(patch).length > 0;
+		if (!shouldUpdateUser && !shouldUpdateFavoritePlayers) {
 			return c.json(
 				{
 					updated: false,
@@ -198,9 +237,38 @@ export const updateUserProfileRouter: RouteHandler<
 			);
 		}
 
-		patch.updatedAt = new Date();
+		if (shouldUpdateFavoritePlayers && nextFavoritePlayerIds.length > 0) {
+			const existingPlayers = await db
+				.select({ id: players.id })
+				.from(players)
+				.where(inArray(players.id, nextFavoritePlayerIds));
+			if (existingPlayers.length !== nextFavoritePlayerIds.length) {
+				return c.json(
+					{ error: "favoritePlayerIds に存在しない選手IDが含まれています" },
+					400,
+				);
+			}
+		}
 
-		await db.update(user).set(patch).where(eq(user.id, authUser.id));
+		if (shouldUpdateUser) {
+			patch.updatedAt = new Date();
+			await db.update(user).set(patch).where(eq(user.id, authUser.id));
+		}
+
+		if (shouldUpdateFavoritePlayers) {
+			await db
+				.delete(userFavoritePlayers)
+				.where(eq(userFavoritePlayers.userId, authUser.id));
+			if (nextFavoritePlayerIds.length > 0) {
+				await db.insert(userFavoritePlayers).values(
+					nextFavoritePlayerIds.map((playerId, index) => ({
+						userId: authUser.id,
+						playerId,
+						sortOrder: index,
+					})),
+				);
+			}
+		}
 
 		if (oldImageUrlToDelete) {
 			const oldObjectKey = toObjectKeyFromPublicAvatarUrl(
@@ -216,6 +284,12 @@ export const updateUserProfileRouter: RouteHandler<
 			}
 		}
 
+		const favoritePlayers = shouldUpdateFavoritePlayers
+			? toFavoritePlayersResponse(
+					await findUserFavoritePlayers(db, authUser.id),
+				)
+			: currentFavoritePlayers;
+
 		return c.json(
 			{
 				updated: true,
@@ -223,6 +297,7 @@ export const updateUserProfileRouter: RouteHandler<
 					name: patch.name ?? currentUser.name,
 					bio: patch.bio ?? currentUser.bio,
 					image: patch.image ?? currentUser.image,
+					favoritePlayers,
 				},
 			},
 			200,
@@ -230,7 +305,10 @@ export const updateUserProfileRouter: RouteHandler<
 	} catch (error: unknown) {
 		console.error(error);
 		return c.json(
-			{ error: "Failed to update profile", message: getErrorMessage(error) },
+			{
+				error: "Failed to update profile",
+				message: getErrorMessage(error),
+			},
 			500,
 		);
 	}

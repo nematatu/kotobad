@@ -1,5 +1,6 @@
 "use client";
 
+import type { FavoritePlayerType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
 import type { MouseEvent } from "react";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
@@ -21,6 +22,7 @@ type Props = {
 	previewName: string;
 	previewBio: string;
 	previewAvatarImage: string | null;
+	previewFavoritePlayers: FavoritePlayerType[];
 	onConfirmAction: () => Promise<void> | void;
 };
 
@@ -32,6 +34,7 @@ export function UserProfileUpdateConfirmDialog({
 	previewName,
 	previewBio,
 	previewAvatarImage,
+	previewFavoritePlayers,
 	onConfirmAction,
 }: Props) {
 	const handleOpenChange = (nextOpen: boolean) => {
@@ -83,6 +86,25 @@ export function UserProfileUpdateConfirmDialog({
 											自己紹介は未入力です
 										</p>
 									)}
+									<div className="space-y-1">
+										<p className="text-xs font-medium text-slate-500">
+											好きな選手
+										</p>
+										{previewFavoritePlayers.length === 0 ? (
+											<p className="text-sm text-slate-400">未選択です</p>
+										) : (
+											<div className="flex flex-wrap gap-1">
+												{previewFavoritePlayers.map((player) => (
+													<span
+														key={player.id}
+														className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-xs text-blue-900"
+													>
+														{player.name}
+													</span>
+												))}
+											</div>
+										)}
+									</div>
 								</div>
 							</div>
 						</section>

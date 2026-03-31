@@ -16,11 +16,18 @@ export const UserRecentPostSchema = z.object({
 	createdAt: z.string(),
 });
 
+export const FavoritePlayerSchema = z.object({
+	id: z.number().int().positive(),
+	name: z.string().min(1),
+	imageUrl: z.string().url().nullable(),
+});
+
 export const UserProfileSchema = z.object({
 	id: z.string().min(1),
 	name: z.string().min(1),
 	image: z.string().nullable().optional(),
 	bio: z.string().nullable(),
+	favoritePlayers: z.array(FavoritePlayerSchema),
 	createdAt: z.string(),
 	threadCount: z.number().int().nonnegative(),
 	postCount: z.number().int().nonnegative(),
@@ -31,6 +38,13 @@ export const UserProfileSchema = z.object({
 export const UpdateUserProfileSchema = z.object({
 	name: z.string().min(1).max(20).optional(),
 	bio: z.string().max(240).nullable().optional(),
+	favoritePlayerIds: z
+		.array(z.coerce.number().int().positive())
+		.max(3)
+		.refine((ids) => new Set(ids).size === ids.length, {
+			message: "favoritePlayerIds に重複は指定できません",
+		})
+		.optional(),
 	image: z
 		.file()
 		.max(2 * 1024 * 1024)
@@ -54,5 +68,21 @@ export const UpdateUserProfileResponseSchema = z.object({
 		name: z.string().min(1),
 		bio: z.string().nullable(),
 		image: z.string().nullable(),
+		favoritePlayers: z.array(FavoritePlayerSchema),
 	}),
+});
+
+export const UserProfileSelectablePlayerSchema = z.object({
+	id: z.number().int().positive(),
+	firstName: z.string().min(1),
+	lastName: z.string().min(1),
+	firstFurigana: z.string(),
+	lastFurigana: z.string(),
+	englishFirstName: z.string().min(1),
+	englishLastName: z.string().min(1),
+	imageUrl: z.string().url().nullable(),
+});
+
+export const UserProfileSelectablePlayersSchema = z.object({
+	players: z.array(UserProfileSelectablePlayerSchema),
 });

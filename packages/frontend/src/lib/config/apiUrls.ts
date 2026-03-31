@@ -17,6 +17,7 @@ export const API_PATH = {
 	GET_NOTIFICATIONS_COUNT: "bbs/notifications/count",
 	GET_POSTS_BY_THREADID: "bbs/posts/byThreadId/",
 	GET_USER_PROFILE_BY_ID: "bbs/users/",
+	GET_PROFILE_PLAYERS: "bbs/users/players",
 	READ_ALL_NOTIFICATIONS: "bbs/notifications/read-all",
 	UPLOAD_MY_AVATAR: "bbs/users/me/avatar",
 	UPDATE_MY_PROFILE: "bbs/users/update",

@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+	FavoritePlayerType,
+	UserProfileSelectablePlayerType,
+} from "@kotobad/shared/src/types/user";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { Camera, Check, Loader2, Pencil } from "lucide-react";
 import type { ChangeEvent, RefObject } from "react";
@@ -9,6 +13,7 @@ import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
 } from "../lib/profileEditor";
+import { FavoritePlayersSelectDialog } from "./FavoritePlayersSelectDialog";
 
 type EditorCardViewModel = {
 	isLogin: boolean;
@@ -19,6 +24,11 @@ type EditorCardViewModel = {
 	editedName: string;
 	editedBio: string;
 	avatarImage: string | null;
+	editedFavoritePlayers: FavoritePlayerType[];
+	isFavoritePlayersDialogOpen: boolean;
+	favoritePlayerOptions: UserProfileSelectablePlayerType[];
+	isLoadingFavoritePlayers: boolean;
+	favoritePlayersLoadError: string | null;
 	avatarInputRef: RefObject<HTMLInputElement | null>;
 };
 
@@ -30,6 +40,12 @@ type EditorCardActions = {
 	onAvatarFileChangeAction: (event: ChangeEvent<HTMLInputElement>) => void;
 	onEditedNameChangeAction: (value: string) => void;
 	onEditedBioChangeAction: (value: string) => void;
+	onFavoritePlayersDialogOpenChangeAction: (open: boolean) => void;
+	onToggleFavoritePlayerAction: (
+		player: UserProfileSelectablePlayerType,
+	) => void;
+	onRemoveFavoritePlayerAction: (playerId: number) => void;
+	onReloadFavoritePlayersAction: () => Promise<void>;
 };
 
 type Props = {
@@ -47,6 +63,11 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		editedName,
 		editedBio,
 		avatarImage,
+		editedFavoritePlayers,
+		isFavoritePlayersDialogOpen,
+		favoritePlayerOptions,
+		isLoadingFavoritePlayers,
+		favoritePlayersLoadError,
 		avatarInputRef,
 	} = viewModel;
 	const {
@@ -57,6 +78,10 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		onAvatarFileChangeAction,
 		onEditedNameChangeAction,
 		onEditedBioChangeAction,
+		onFavoritePlayersDialogOpenChangeAction,
+		onToggleFavoritePlayerAction,
+		onRemoveFavoritePlayerAction,
+		onReloadFavoritePlayersAction,
 	} = actions;
 
 	return (
@@ -133,35 +158,66 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 							@{profileId}
 						</span>
 					</div>
-					{isEditing ? (
-						<div className="space-y-2">
-							<textarea
-								value={editedBio}
-								onChange={(event) =>
-									onEditedBioChangeAction(event.target.value)
-								}
-								maxLength={MAX_PROFILE_BIO_LENGTH}
-								rows={4}
-								placeholder="自己紹介を入力"
-								className="w-full max-w-2xl rounded-md border border-slate-300 bg-white px-3 py-2 text-base text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 sm:text-sm"
-							/>
-							<div className="flex items-center justify-between">
-								<p className="text-xs text-slate-400">
-									{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
-								</p>
+					<div className="space-y-2">
+						{isEditing ? (
+							<>
+								<textarea
+									value={editedBio}
+									onChange={(event) =>
+										onEditedBioChangeAction(event.target.value)
+									}
+									maxLength={MAX_PROFILE_BIO_LENGTH}
+									rows={4}
+									placeholder="自己紹介を入力"
+									className="w-full max-w-2xl rounded-md border border-slate-300 bg-white px-3 py-2 text-base text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 sm:text-sm"
+								/>
+								<div className="flex items-center justify-between">
+									<p className="text-xs text-slate-400">
+										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
+									</p>
+									<button
+										type="button"
+										className="text-xs text-slate-500 hover:text-slate-700"
+										disabled={isSavingProfile}
+										onClick={onCancelEditingAction}
+									>
+										キャンセル
+									</button>
+								</div>
+							</>
+						) : (
+							<p className="mt-2 text-sm text-slate-600">{editedBio}</p>
+						)}
+					</div>
+
+					<div className="space-y-2">
+						<div className="flex items-center justify-between">
+							<p className="text-xs font-medium text-slate-500">好きな選手</p>
+							{isEditing ? (
 								<button
 									type="button"
-									className="text-xs text-slate-500 hover:text-slate-700"
-									disabled={isSavingProfile}
-									onClick={onCancelEditingAction}
+									className="text-sm text-blue-600"
+									onClick={() => onFavoritePlayersDialogOpenChangeAction(true)}
 								>
-									キャンセル
+									選択する
 								</button>
-							</div>
+							) : null}
 						</div>
-					) : (
-						<p className="mt-2 text-sm text-slate-600">{editedBio}</p>
-					)}
+						{editedFavoritePlayers.length === 0 ? (
+							<p className="text-sm text-slate-400">未選択です</p>
+						) : (
+							<div className="flex flex-wrap gap-2">
+								{editedFavoritePlayers.map((player) => (
+									<div
+										key={player.id}
+										className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-sm text-blue-900"
+									>
+										{player.name}
+									</div>
+								))}
+							</div>
+						)}
+					</div>
 				</div>
 				<div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
 					<span className="rounded-full bg-slate-100 px-2 py-1">
@@ -169,6 +225,17 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 					</span>
 				</div>
 			</div>
+			<FavoritePlayersSelectDialog
+				open={isFavoritePlayersDialogOpen}
+				onOpenChangeAction={onFavoritePlayersDialogOpenChangeAction}
+				players={favoritePlayerOptions}
+				selectedPlayers={editedFavoritePlayers}
+				isLoading={isLoadingFavoritePlayers}
+				loadError={favoritePlayersLoadError}
+				onReloadAction={onReloadFavoritePlayersAction}
+				onTogglePlayerAction={onToggleFavoritePlayerAction}
+				onRemovePlayerAction={onRemoveFavoritePlayerAction}
+			/>
 		</section>
 	);
 }

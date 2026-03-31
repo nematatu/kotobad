@@ -9,6 +9,14 @@ export const OpenAPIUpdateUserProfileResponseSchema =
 	BaseUserSchema.UpdateUserProfileResponseSchema.openapi(
 		"UpdateUserProfileResponseSchema",
 	);
+export const OpenAPIUserProfileSelectablePlayerSchema =
+	BaseUserSchema.UserProfileSelectablePlayerSchema.openapi(
+		"UserProfileSelectablePlayerSchema",
+	);
+export const OpenAPIUserProfileSelectablePlayersSchema =
+	BaseUserSchema.UserProfileSelectablePlayersSchema.openapi(
+		"UserProfileSelectablePlayersSchema",
+	);
 
 export const OpenAPIUploadAvatarResponseSchema =
 	BaseUserSchema.UploadAvatarResponseSchema.openapi(

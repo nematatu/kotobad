@@ -18,6 +18,11 @@ export function UserProfileEditor({ profile }: Props) {
 		editedName,
 		editedBio,
 		avatarImage,
+		editedFavoritePlayers,
+		isFavoritePlayersDialogOpen,
+		favoritePlayerOptions,
+		isLoadingFavoritePlayers,
+		favoritePlayersLoadError,
 		avatarInputRef,
 		startEditingAction,
 		openConfirmAction,
@@ -27,6 +32,10 @@ export function UserProfileEditor({ profile }: Props) {
 		changeAvatarFileAction,
 		changeEditedNameAction,
 		changeEditedBioAction,
+		setIsFavoritePlayersDialogOpenAction,
+		toggleFavoritePlayerAction,
+		removeFavoritePlayerAction,
+		reloadFavoritePlayersAction,
 		confirmUpdateAction,
 	} = useUserProfileEditor(profile);
 
@@ -39,6 +48,11 @@ export function UserProfileEditor({ profile }: Props) {
 		editedName,
 		editedBio,
 		avatarImage,
+		editedFavoritePlayers,
+		isFavoritePlayersDialogOpen,
+		favoritePlayerOptions,
+		isLoadingFavoritePlayers,
+		favoritePlayersLoadError,
 		avatarInputRef,
 	};
 
@@ -50,6 +64,11 @@ export function UserProfileEditor({ profile }: Props) {
 		onAvatarFileChangeAction: changeAvatarFileAction,
 		onEditedNameChangeAction: changeEditedNameAction,
 		onEditedBioChangeAction: changeEditedBioAction,
+		onFavoritePlayersDialogOpenChangeAction:
+			setIsFavoritePlayersDialogOpenAction,
+		onToggleFavoritePlayerAction: toggleFavoritePlayerAction,
+		onRemoveFavoritePlayerAction: removeFavoritePlayerAction,
+		onReloadFavoritePlayersAction: reloadFavoritePlayersAction,
 	};
 
 	return (
@@ -63,6 +82,7 @@ export function UserProfileEditor({ profile }: Props) {
 				previewName={editedName}
 				previewBio={editedBio}
 				previewAvatarImage={avatarImage}
+				previewFavoritePlayers={editedFavoritePlayers}
 				onConfirmAction={confirmUpdateAction}
 			/>
 		</>

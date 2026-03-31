@@ -113,9 +113,15 @@ const getErrorMessage = (error: unknown) => {
 	const fetchError = error as BffFetcherError;
 	if (fetchError.body) {
 		try {
-			const parsed = JSON.parse(fetchError.body) as { error?: string };
-			if (parsed.error) {
-				return parsed.error;
+			const parsed = JSON.parse(fetchError.body) as unknown;
+			if (typeof parsed === "object" && parsed !== null) {
+				const record = parsed as Record<string, unknown>;
+				if (typeof record.message === "string" && record.message.length > 0) {
+					return record.message;
+				}
+				if (typeof record.error === "string" && record.error.length > 0) {
+					return record.error;
+				}
 			}
 		} catch {
 			return error.message;
