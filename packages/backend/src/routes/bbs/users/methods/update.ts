@@ -124,19 +124,16 @@ export const updateUserProfileRouter: RouteHandler<
 		}
 
 		const formData = await c.req.formData();
-		const favoritePlayersTouched =
-			formData.get("favoritePlayersTouched") === "1";
-		const favoritePlayerIdsInput = formData
-			.getAll("favoritePlayerIds")
-			.map((value) => String(value));
+		const favoritePlayerIds =
+			formData.get("favoritePlayersTouched") === "1"
+				? formData.getAll("favoritePlayerIds").map((value) => String(value))
+				: undefined;
 		const parsedResult = UpdateUserProfileSchema.safeParse({
 			name: formData.has("name")
 				? String(formData.get("name") ?? "").trim()
 				: undefined,
 			bio: formData.has("bio") ? String(formData.get("bio") ?? "") : undefined,
-			favoritePlayerIds: favoritePlayersTouched
-				? favoritePlayerIdsInput
-				: undefined,
+			favoritePlayerIds,
 			image: (() => {
 				const f = formData.get("image");
 				return f instanceof File && f.size > 0 ? f : undefined;

@@ -10,7 +10,7 @@ import type {
 	UserProfileType,
 } from "@kotobad/shared/src/types/user";
 import type { ChangeEvent, RefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useUser } from "@/components/feature/provider/UserProvider";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
@@ -65,14 +65,6 @@ const hasSameFavoritePlayers = (
 	left.length === right.length &&
 	left.every((player, index) => right[index]?.id === player.id);
 
-const toFavoritePlayer = (
-	player: UserProfileSelectablePlayerType,
-): FavoritePlayerType => ({
-	id: player.id,
-	name: `${player.lastName} ${player.firstName}`,
-	imageUrl: player.imageUrl ?? null,
-});
-
 export const useUserProfileEditor = (
 	profile: UserProfileType,
 ): UseUserProfileEditorResult => {
@@ -107,19 +99,22 @@ export const useUserProfileEditor = (
 	>(null);
 	const hasLoadedFavoritePlayersRef = useRef(false);
 
-	const clearPreviewAvatarUrl = () => {
+	const clearPreviewAvatarUrl = useCallback(() => {
 		revokeObjectUrl(previewAvatarUrlRef.current);
 		previewAvatarUrlRef.current = null;
-	};
+	}, []);
 
-	const applyDraft = (nextProfile: EditableProfile) => {
-		clearPreviewAvatarUrl();
-		setAvatarFile(null);
-		setEditedName(nextProfile.name);
-		setEditedBio(nextProfile.bio);
-		setAvatarImage(nextProfile.image);
-		setEditedFavoritePlayers(nextProfile.favoritePlayers);
-	};
+	const applyDraft = useCallback(
+		(nextProfile: EditableProfile) => {
+			clearPreviewAvatarUrl();
+			setAvatarFile(null);
+			setEditedName(nextProfile.name);
+			setEditedBio(nextProfile.bio);
+			setAvatarImage(nextProfile.image);
+			setEditedFavoritePlayers(nextProfile.favoritePlayers);
+		},
+		[clearPreviewAvatarUrl],
+	);
 
 	const closeEditUi = () => {
 		setIsFavoritePlayersDialogOpen(false);
@@ -130,18 +125,12 @@ export const useUserProfileEditor = (
 	useEffect(() => {
 		const nextSavedProfile = toEditableProfile(profile);
 		setSavedProfile(nextSavedProfile);
-		revokeObjectUrl(previewAvatarUrlRef.current);
-		previewAvatarUrlRef.current = null;
-		setAvatarFile(null);
-		setEditedName(nextSavedProfile.name);
-		setEditedBio(nextSavedProfile.bio);
-		setAvatarImage(nextSavedProfile.image);
-		setEditedFavoritePlayers(nextSavedProfile.favoritePlayers);
+		applyDraft(nextSavedProfile);
 		setIsSavingProfile(false);
 		setIsConfirmOpen(false);
 		setIsEditing(false);
 		setIsFavoritePlayersDialogOpen(false);
-	}, [profile]);
+	}, [profile, applyDraft]);
 
 	useEffect(() => {
 		return () => {
@@ -225,7 +214,11 @@ export const useUserProfileEditor = (
 		}
 		setEditedFavoritePlayers((current) => [
 			...current,
-			toFavoritePlayer(player),
+			{
+				id: player.id,
+				name: `${player.lastName} ${player.firstName}`,
+				imageUrl: player.imageUrl ?? null,
+			},
 		]);
 	};
 
