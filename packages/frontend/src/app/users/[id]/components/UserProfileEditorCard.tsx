@@ -5,7 +5,7 @@ import type {
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
-import { Camera, Check, Loader2, Pencil } from "lucide-react";
+import { Camera, Check, Loader2, Pencil, X } from "lucide-react";
 import type { ChangeEvent, RefObject } from "react";
 import IconButton from "@/components/common/button/IconButton";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
@@ -87,22 +87,50 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 	return (
 		<section className="relative overflow-hidden bg-white">
 			<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
-			{isLogin && (
-				<div className="absolute top-2 right-2 flex-1">
+			{isLogin && isEditing ? (
+				<div className="absolute bottom-3 right-3 flex-1 flex items-center gap-2">
+					<IconButton
+						variant="outline"
+						icon={<X />}
+						rounded="full"
+						enableClickAnimation
+						className="bg-transparent border border-slate-500 [@media(hover:hover)]:hover:!bg-slate-100/80"
+						disabled={isSavingProfile}
+						onClick={onCancelEditingAction}
+					>
+						<span className="font-bold">キャンセル</span>
+					</IconButton>
+
 					<IconButton
 						variant="logo1"
-						icon={isEditing ? <Check /> : <Pencil />}
+						icon={<Check />}
 						rounded="full"
 						enableClickAnimation
 						hover="brightness"
 						className="transition-colors text-slate-100"
 						disabled={isSavingProfile}
-						onClick={isEditing ? onOpenConfirmAction : onStartEditingAction}
+						onClick={onOpenConfirmAction}
 					>
-						<span className="">{isEditing ? "完了" : "編集"}</span>
+						<span className="font-bold">完了</span>
+					</IconButton>
+				</div>
+			) : (
+				<div className="absolute top-3 right-3 flex-1 flex items-center gap-2">
+					<IconButton
+						variant="logo1"
+						icon={<Pencil />}
+						rounded="full"
+						enableClickAnimation
+						hover="brightness"
+						className="transition-colors text-slate-100"
+						disabled={isSavingProfile}
+						onClick={onStartEditingAction}
+					>
+						<span className="font-bold">編集</span>
 					</IconButton>
 				</div>
 			)}
+
 			<div className="-mt-12 px-4 pb-6 sm:-mt-14 sm:px-6">
 				<div className="group relative inline-flex">
 					<AuthorAvatar
@@ -175,14 +203,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 									<p className="text-xs text-slate-400">
 										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
 									</p>
-									<button
-										type="button"
-										className="text-xs text-slate-500 hover:text-slate-700"
-										disabled={isSavingProfile}
-										onClick={onCancelEditingAction}
-									>
-										キャンセル
-									</button>
 								</div>
 							</>
 						) : (
@@ -191,7 +211,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 					</div>
 
 					<div className="space-y-2">
-						<div className="flex items-center justify-between">
+						<div className="flex items-center">
 							<p className="text-xs font-medium text-slate-500">好きな選手</p>
 							{isEditing ? (
 								<button
