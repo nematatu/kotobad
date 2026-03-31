@@ -165,15 +165,27 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 				<div className="space-y-4">
 					<div className="mt-3 flex flex-col flex-wrap gap-x-3 gap-y-1">
 						{isEditing ? (
-							<input
-								type="text"
-								value={editedName}
-								onChange={(event) =>
-									onEditedNameChangeAction(event.target.value)
-								}
-								maxLength={MAX_PROFILE_NAME_LENGTH}
-								className="h-10 w-full max-w-md rounded-md border border-slate-300 bg-white px-3 text-xl font-bold text-slate-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 sm:text-2xl"
-							/>
+							<div className="group relative w-full max-w-md rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
+								<label
+									htmlFor="name"
+									className="pointer-events-none absolute top-2 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+								>
+									名前
+								</label>
+								<input
+									id="name"
+									type="text"
+									value={editedName}
+									onChange={(event) =>
+										onEditedNameChangeAction(event.target.value)
+									}
+									maxLength={MAX_PROFILE_NAME_LENGTH}
+									className="h-16 w-full overflow-hidden rounded-md border-0 bg-transparent px-3 pt-6 pb-5 text-xl font-bold text-slate-900 outline-none focus:ring-0 sm:text-2xl"
+								/>
+								<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+									{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
+								</span>
+							</div>
 						) : (
 							<h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
 								{editedName}
@@ -188,23 +200,27 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 					</div>
 					<div className="space-y-2">
 						{isEditing ? (
-							<>
+							<div className="group relative w-full max-w-2xl rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
+								<label
+									htmlFor="bio"
+									className="pointer-events-none absolute top-2 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+								>
+									自己紹介
+								</label>
 								<textarea
+									id="bio"
 									value={editedBio}
 									onChange={(event) =>
 										onEditedBioChangeAction(event.target.value)
 									}
 									maxLength={MAX_PROFILE_BIO_LENGTH}
 									rows={4}
-									placeholder="自己紹介を入力"
-									className="w-full max-w-2xl rounded-md border border-slate-300 bg-white px-3 py-2 text-base text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 sm:text-sm"
+									className="w-full resize-none overflow-y-auto rounded-md border-0 bg-transparent px-3 pt-7 pb-6 text-base text-slate-700 outline-none focus:ring-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:text-sm"
 								/>
-								<div className="flex items-center justify-between">
-									<p className="text-xs text-slate-400">
-										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
-									</p>
-								</div>
-							</>
+								<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+									{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
+								</span>
+							</div>
 						) : (
 							<p className="mt-2 text-sm text-slate-600">{editedBio}</p>
 						)}
