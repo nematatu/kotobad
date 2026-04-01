@@ -20,6 +20,13 @@ function isEditableTarget(target: EventTarget | null): boolean {
 	);
 }
 
+function isWithinPullRefreshBlockedArea(target: EventTarget | null): boolean {
+	if (!(target instanceof Element)) {
+		return false;
+	}
+	return target.closest("[data-pull-refresh-block='true']") !== null;
+}
+
 export default function PwaPullToRefresh() {
 	const startYRef = useRef(0);
 	const pullDistanceRef = useRef(0);
@@ -81,6 +88,10 @@ export default function PwaPullToRefresh() {
 				return;
 			}
 			if (isEditableTarget(event.target)) {
+				resetPull();
+				return;
+			}
+			if (isWithinPullRefreshBlockedArea(event.target)) {
 				resetPull();
 				return;
 			}
