@@ -168,7 +168,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 							<div className="group relative w-full max-w-md rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
 								<label
 									htmlFor="name"
-									className="pointer-events-none absolute top-2 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+									className="pointer-events-none absolute top-1 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
 								>
 									名前
 								</label>
@@ -180,7 +180,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										onEditedNameChangeAction(event.target.value)
 									}
 									maxLength={MAX_PROFILE_NAME_LENGTH}
-									className="h-16 w-full overflow-hidden rounded-md border-0 bg-transparent px-3 pt-6 pb-5 text-xl font-bold text-slate-900 outline-none focus:ring-0 sm:text-2xl"
+									className="h-14 w-full overflow-hidden rounded-md border-0 bg-transparent px-3 pt-6 pb-5 text-[20px] font-bold text-slate-900 outline-none focus:ring-0"
 								/>
 								<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
 									{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
@@ -203,7 +203,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 							<div className="group relative w-full max-w-2xl rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
 								<label
 									htmlFor="bio"
-									className="pointer-events-none absolute top-2 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+									className="pointer-events-none absolute top-1 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
 								>
 									自己紹介
 								</label>
