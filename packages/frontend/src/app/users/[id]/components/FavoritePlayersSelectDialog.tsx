@@ -4,8 +4,10 @@ import type {
 	FavoritePlayerType,
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
+import { X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -202,26 +204,41 @@ export function FavoritePlayersSelectDialog({
 						<p className="text-xs text-slate-500">
 							選択中 {draftSelectedPlayers.length}/{MAX_FAVORITE_PLAYERS}
 						</p>
-						<div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+						<div className="mt-2 flex gap-2 overflow-x-auto pt-2 pb-1">
 							{draftSelectedPlayers.length === 0 ? (
 								<p className="text-sm text-slate-400">未選択です</p>
 							) : (
 								draftSelectedPlayers.map((player) => (
 									<div
 										key={player.id}
-										className="relative min-w-24 rounded-md border border-blue-300 bg-blue-50 px-2 py-2 pr-6"
+										className="relative flex min-w-24 flex-col items-center justify-center bg-white space-y-2"
 									>
-										<button
-											type="button"
+										<Button
+											variant="outline"
+											size="icon"
+											rounded="full"
+											enableClickAnimation
 											aria-label={`${player.name} を選択解除`}
 											onClick={() => removePlayerAction(player.id)}
-											className="absolute top-1 right-1 text-xs leading-none text-blue-700"
+											className="absolute -top-2 right-2 z-10 h-6 w-6 border-2 border-slate-200 bg-red-500 p-3 shadow-none [@media(hover:hover)]:hover:bg-slate-100"
 										>
-											×
-										</button>
-										<p className="text-xs font-medium text-blue-900">
-											{player.name}
-										</p>
+											<X strokeWidth="4" className="h-3.5 w-3.5 text-white" />
+										</Button>
+										{player.imageUrl ? (
+											<Image
+												src={player.imageUrl}
+												alt={player.name}
+												width={64}
+												height={64}
+												unoptimized
+												className="h-16 w-16 rounded-md object-cover"
+											/>
+										) : (
+											<div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500">
+												No Image
+											</div>
+										)}
+										<p className="text-[15px] font-bold">{player.name}</p>
 									</div>
 								))
 							)}

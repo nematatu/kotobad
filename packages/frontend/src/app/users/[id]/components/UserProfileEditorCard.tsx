@@ -81,7 +81,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 	} = actions;
 
 	return (
-		<section className="relative overflow-hidden bg-white">
+		<section className="relative pb-12 overflow-hidden bg-white">
 			<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
 			{isLogin && isEditing ? (
 				<div className="absolute bottom-3 right-3 flex-1 flex items-center gap-2">
