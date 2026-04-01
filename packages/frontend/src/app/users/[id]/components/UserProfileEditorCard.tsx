@@ -81,7 +81,9 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 	} = actions;
 
 	return (
-		<section className="relative pb-12 overflow-hidden bg-white">
+		<section
+			className={`relative overflow-hidden bg-white ${isEditing ? "pb-12" : ""}`}
+		>
 			<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
 			{isLogin && isEditing ? (
 				<div className="absolute bottom-3 right-3 flex-1 flex items-center gap-2">
@@ -238,13 +240,22 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 						{editedFavoritePlayers.length === 0 ? (
 							<p className="text-sm text-slate-400">未選択です</p>
 						) : (
-							<div className="flex flex-wrap gap-2">
+							<div className="flex flex-wrap gap-x-2 gap-y-1.5">
 								{editedFavoritePlayers.map((player) => (
 									<div
 										key={player.id}
-										className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-sm text-blue-900"
+										className="flex w-[5.25rem] flex-col items-start gap-0.5 text-left"
 									>
-										{player.name}
+										<AuthorAvatar
+											name={player.name}
+											image={player.imageUrl}
+											className="h-16 w-16 rounded-md bg-white"
+											fallbackClassName="rounded-md text-xs"
+											imageClassName="scale-120"
+										/>
+										<span className="text-xs leading-tight text-slate-700">
+											{player.name}
+										</span>
 									</div>
 								))}
 							</div>

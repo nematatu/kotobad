@@ -93,14 +93,23 @@ export function UserProfileUpdateConfirmDialog({
 										{previewFavoritePlayers.length === 0 ? (
 											<p className="text-sm text-slate-400">未選択です</p>
 										) : (
-											<div className="flex flex-wrap gap-1">
+											<div className="flex flex-wrap gap-x-2 gap-y-1.5">
 												{previewFavoritePlayers.map((player) => (
-													<span
+													<div
 														key={player.id}
-														className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-xs text-blue-900"
+														className="flex w-[5.25rem] flex-col items-start gap-0.5 text-left"
 													>
-														{player.name}
-													</span>
+														<AuthorAvatar
+															name={player.name}
+															image={player.imageUrl}
+															className="h-16 w-16 rounded-md bg-white"
+															fallbackClassName="rounded-md text-xs"
+															imageClassName="scale-110"
+														/>
+														<span className="text-xs leading-tight text-slate-700">
+															{player.name}
+														</span>
+													</div>
 												))}
 											</div>
 										)}

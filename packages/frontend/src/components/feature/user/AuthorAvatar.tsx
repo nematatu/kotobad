@@ -6,6 +6,7 @@ type AuthorAvatarProps = {
 	image: string | null | undefined;
 	className?: string;
 	fallbackClassName?: string;
+	imageClassName?: string;
 };
 
 export default function AuthorAvatar({
@@ -13,6 +14,7 @@ export default function AuthorAvatar({
 	image,
 	className,
 	fallbackClassName,
+	imageClassName,
 }: AuthorAvatarProps) {
 	const resolvedName = name ?? null;
 	const resolvedImage = image ?? null;
@@ -21,7 +23,11 @@ export default function AuthorAvatar({
 	return (
 		<Avatar className={cn("h-10 w-10 bg-white", className)}>
 			{resolvedImage && (
-				<AvatarImage className="object-cover" src={resolvedImage} alt="" />
+				<AvatarImage
+					className={cn("object-cover", imageClassName)}
+					src={resolvedImage}
+					alt=""
+				/>
 			)}
 			<AvatarFallback
 				className={cn(
