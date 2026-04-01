@@ -47,8 +47,7 @@ type UseUserProfileEditorResult = {
 	changeEditedNameAction: (value: string) => void;
 	changeEditedBioAction: (value: string) => void;
 	setIsFavoritePlayersDialogOpenAction: (open: boolean) => void;
-	toggleFavoritePlayerAction: (player: UserProfileSelectablePlayerType) => void;
-	removeFavoritePlayerAction: (playerId: number) => void;
+	setFavoritePlayersAction: (players: FavoritePlayerType[]) => void;
 	reloadFavoritePlayersAction: () => Promise<void>;
 	confirmUpdateAction: () => Promise<void>;
 };
@@ -197,36 +196,9 @@ export const useUserProfileEditor = (
 		setAvatarImage(previewUrl);
 	};
 
-	const toggleFavoritePlayerAction = (
-		player: UserProfileSelectablePlayerType,
-	) => {
+	const setFavoritePlayersAction = (players: FavoritePlayerType[]) => {
 		if (!isEditing || isSavingProfile) return;
-		const exists = editedFavoritePlayers.some((item) => item.id === player.id);
-		if (exists) {
-			setEditedFavoritePlayers((current) =>
-				current.filter((item) => item.id !== player.id),
-			);
-			return;
-		}
-		if (editedFavoritePlayers.length >= MAX_FAVORITE_PLAYERS) {
-			toast.error("好きな選手は3人まで選択できます");
-			return;
-		}
-		setEditedFavoritePlayers((current) => [
-			...current,
-			{
-				id: player.id,
-				name: `${player.lastName} ${player.firstName}`,
-				imageUrl: player.imageUrl ?? null,
-			},
-		]);
-	};
-
-	const removeFavoritePlayerAction = (playerId: number) => {
-		if (!isEditing || isSavingProfile) return;
-		setEditedFavoritePlayers((current) =>
-			current.filter((item) => item.id !== playerId),
-		);
+		setEditedFavoritePlayers(players.slice(0, MAX_FAVORITE_PLAYERS));
 	};
 
 	const confirmUpdateAction = async () => {
@@ -336,8 +308,7 @@ export const useUserProfileEditor = (
 		changeEditedNameAction: setEditedName,
 		changeEditedBioAction: setEditedBio,
 		setIsFavoritePlayersDialogOpenAction,
-		toggleFavoritePlayerAction,
-		removeFavoritePlayerAction,
+		setFavoritePlayersAction,
 		reloadFavoritePlayersAction,
 		confirmUpdateAction,
 	};

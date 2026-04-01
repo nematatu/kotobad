@@ -41,10 +41,7 @@ type EditorCardActions = {
 	onEditedNameChangeAction: (value: string) => void;
 	onEditedBioChangeAction: (value: string) => void;
 	onFavoritePlayersDialogOpenChangeAction: (open: boolean) => void;
-	onToggleFavoritePlayerAction: (
-		player: UserProfileSelectablePlayerType,
-	) => void;
-	onRemoveFavoritePlayerAction: (playerId: number) => void;
+	onSetFavoritePlayersAction: (players: FavoritePlayerType[]) => void;
 	onReloadFavoritePlayersAction: () => Promise<void>;
 };
 
@@ -79,8 +76,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		onEditedNameChangeAction,
 		onEditedBioChangeAction,
 		onFavoritePlayersDialogOpenChangeAction,
-		onToggleFavoritePlayerAction,
-		onRemoveFavoritePlayerAction,
+		onSetFavoritePlayersAction,
 		onReloadFavoritePlayersAction,
 	} = actions;
 
@@ -269,8 +265,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 				isLoading={isLoadingFavoritePlayers}
 				loadError={favoritePlayersLoadError}
 				onReloadAction={onReloadFavoritePlayersAction}
-				onTogglePlayerAction={onToggleFavoritePlayerAction}
-				onRemovePlayerAction={onRemoveFavoritePlayerAction}
+				onApplySelectedPlayersAction={onSetFavoritePlayersAction}
 			/>
 		</section>
 	);

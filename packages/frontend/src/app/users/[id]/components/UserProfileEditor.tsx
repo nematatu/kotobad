@@ -33,8 +33,7 @@ export function UserProfileEditor({ profile }: Props) {
 		changeEditedNameAction,
 		changeEditedBioAction,
 		setIsFavoritePlayersDialogOpenAction,
-		toggleFavoritePlayerAction,
-		removeFavoritePlayerAction,
+		setFavoritePlayersAction,
 		reloadFavoritePlayersAction,
 		confirmUpdateAction,
 	} = useUserProfileEditor(profile);
@@ -66,8 +65,7 @@ export function UserProfileEditor({ profile }: Props) {
 		onEditedBioChangeAction: changeEditedBioAction,
 		onFavoritePlayersDialogOpenChangeAction:
 			setIsFavoritePlayersDialogOpenAction,
-		onToggleFavoritePlayerAction: toggleFavoritePlayerAction,
-		onRemoveFavoritePlayerAction: removeFavoritePlayerAction,
+		onSetFavoritePlayersAction: setFavoritePlayersAction,
 		onReloadFavoritePlayersAction: reloadFavoritePlayersAction,
 	};
 

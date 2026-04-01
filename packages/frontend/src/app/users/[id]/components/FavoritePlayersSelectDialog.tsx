@@ -5,7 +5,7 @@ import type {
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -22,18 +22,11 @@ type Props = {
 	isLoading: boolean;
 	loadError: string | null;
 	onReloadAction: () => Promise<void>;
-	onTogglePlayerAction: (player: UserProfileSelectablePlayerType) => void;
-	onRemovePlayerAction: (playerId: number) => void;
+	onApplySelectedPlayersAction: (players: FavoritePlayerType[]) => void;
 };
 
-const sortOptions = [
-	{ value: "name_asc", label: "名前順（あ→ん）" },
-	{ value: "name_desc", label: "名前順（ん→あ）" },
-	{ value: "newest", label: "追加順（新しいID）" },
-	{ value: "oldest", label: "追加順（古いID）" },
-] as const;
-
 const normalize = (value: string) => value.trim().toLowerCase();
+const MAX_FAVORITE_PLAYERS = 3;
 
 export function FavoritePlayersSelectDialog({
 	open,
@@ -43,14 +36,53 @@ export function FavoritePlayersSelectDialog({
 	isLoading,
 	loadError,
 	onReloadAction,
-	onTogglePlayerAction,
-	onRemovePlayerAction,
+	onApplySelectedPlayersAction,
 }: Props) {
 	const [query, setQuery] = useState("");
-	const [sort, setSort] =
-		useState<(typeof sortOptions)[number]["value"]>("name_asc");
-	const selectedIdSet = new Set(selectedPlayers.map((player) => player.id));
+	const [draftSelectedPlayers, setDraftSelectedPlayers] =
+		useState<FavoritePlayerType[]>(selectedPlayers);
+
+	useEffect(() => {
+		if (!open) return;
+		setDraftSelectedPlayers(selectedPlayers);
+	}, [open, selectedPlayers]);
+
+	const selectedIdSet = new Set(
+		draftSelectedPlayers.map((player) => player.id),
+	);
 	const normalizedQuery = normalize(query);
+
+	const togglePlayerAction = (player: UserProfileSelectablePlayerType) => {
+		const exists = draftSelectedPlayers.some((item) => item.id === player.id);
+		if (exists) {
+			setDraftSelectedPlayers((current) =>
+				current.filter((item) => item.id !== player.id),
+			);
+			return;
+		}
+		if (draftSelectedPlayers.length >= MAX_FAVORITE_PLAYERS) {
+			return;
+		}
+		setDraftSelectedPlayers((current) => [
+			...current,
+			{
+				id: player.id,
+				name: `${player.lastName} ${player.firstName}`,
+				imageUrl: player.imageUrl ?? null,
+			},
+		]);
+	};
+
+	const removePlayerAction = (playerId: number) => {
+		setDraftSelectedPlayers((current) =>
+			current.filter((item) => item.id !== playerId),
+		);
+	};
+
+	const applySelectedPlayersAction = () => {
+		onApplySelectedPlayersAction(draftSelectedPlayers);
+		onOpenChangeAction(false);
+	};
 
 	const list =
 		normalizedQuery.length === 0
@@ -70,15 +102,9 @@ export function FavoritePlayersSelectDialog({
 				);
 	const filteredPlayers = [...list];
 	filteredPlayers.sort((left, right) => {
-		if (sort === "newest") return right.id - left.id;
-		if (sort === "oldest") return left.id - right.id;
-
 		const leftName = `${left.lastFurigana} ${left.firstFurigana}`.trim();
 		const rightName = `${right.lastFurigana} ${right.firstFurigana}`.trim();
 		const compared = leftName.localeCompare(rightName, "ja");
-		if (sort === "name_desc") {
-			return compared * -1;
-		}
 		return compared;
 	});
 
@@ -99,17 +125,6 @@ export function FavoritePlayersSelectDialog({
 								placeholder="選手名で検索"
 								className="h-10 rounded-md border border-slate-300 px-3 text-sm outline-none focus:border-blue-400"
 							/>
-							<select
-								value={sort}
-								onChange={(event) => setSort(event.target.value as typeof sort)}
-								className="h-10 rounded-md border border-slate-300 px-3 text-sm outline-none focus:border-blue-400"
-							>
-								{sortOptions.map((option) => (
-									<option key={option.value} value={option.value}>
-										{option.label}
-									</option>
-								))}
-							</select>
 						</div>
 					</DialogHeader>
 
@@ -138,12 +153,13 @@ export function FavoritePlayersSelectDialog({
 								{filteredPlayers.map((player) => {
 									const isSelected = selectedIdSet.has(player.id);
 									const cannotSelectMore =
-										!isSelected && selectedPlayers.length >= 3;
+										!isSelected &&
+										draftSelectedPlayers.length >= MAX_FAVORITE_PLAYERS;
 									return (
 										<button
 											type="button"
 											key={player.id}
-											onClick={() => onTogglePlayerAction(player)}
+											onClick={() => togglePlayerAction(player)}
 											disabled={cannotSelectMore}
 											className={[
 												"flex flex-col items-center gap-2 rounded-md border p-2 text-center transition-colors",
@@ -184,13 +200,13 @@ export function FavoritePlayersSelectDialog({
 
 					<div className="border-t bg-white px-4 py-3">
 						<p className="text-xs text-slate-500">
-							選択中 {selectedPlayers.length}/3
+							選択中 {draftSelectedPlayers.length}/{MAX_FAVORITE_PLAYERS}
 						</p>
 						<div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-							{selectedPlayers.length === 0 ? (
+							{draftSelectedPlayers.length === 0 ? (
 								<p className="text-sm text-slate-400">未選択です</p>
 							) : (
-								selectedPlayers.map((player) => (
+								draftSelectedPlayers.map((player) => (
 									<div
 										key={player.id}
 										className="relative min-w-24 rounded-md border border-blue-300 bg-blue-50 px-2 py-2 pr-6"
@@ -198,7 +214,7 @@ export function FavoritePlayersSelectDialog({
 										<button
 											type="button"
 											aria-label={`${player.name} を選択解除`}
-											onClick={() => onRemovePlayerAction(player.id)}
+											onClick={() => removePlayerAction(player.id)}
 											className="absolute top-1 right-1 text-xs leading-none text-blue-700"
 										>
 											×
@@ -210,9 +226,18 @@ export function FavoritePlayersSelectDialog({
 								))
 							)}
 						</div>
-						<button type="button" className="mt-2 text-sm text-blue-600">
-							追加リクエスト →
-						</button>
+						<div className="mt-2 flex items-center justify-between gap-2">
+							<button type="button" className="text-sm text-blue-600">
+								追加リクエスト →
+							</button>
+							<button
+								type="button"
+								className="inline-flex h-9 items-center rounded-md bg-blue-600 px-4 text-sm font-medium text-white transition-colors [@media(hover:hover)]:hover:bg-blue-700"
+								onClick={applySelectedPlayersAction}
+							>
+								追加する
+							</button>
+						</div>
 					</div>
 				</div>
 			</DialogContent>
