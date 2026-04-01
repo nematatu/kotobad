@@ -7,6 +7,7 @@ export type ActionLinkItem = {
 	href: string;
 	badge?: React.ReactNode;
 	icon?: React.ComponentType<{ className?: string }>;
+	iconPosition?: "left" | "right";
 	tone?: "default" | "accent";
 	mobileMenuPlacement?: "default" | "bottom";
 	viewTransitionKey?: ViewTransitionKey;
@@ -41,6 +42,7 @@ const ActionLink = ({
 	...linkProps
 }: Props) => {
 	const Icon = item.icon;
+	const iconPosition = item.iconPosition ?? "left";
 
 	return (
 		<Link
@@ -54,8 +56,9 @@ const ActionLink = ({
 				className,
 			)}
 		>
-			{Icon ? <Icon className="h-4 w-4" /> : null}
+			{Icon && iconPosition === "left" ? <Icon className="h-4 w-4" /> : null}
 			<span>{item.label}</span>
+			{Icon && iconPosition === "right" ? <Icon className="h-4 w-4" /> : null}
 			{item.badge ?? null}
 		</Link>
 	);

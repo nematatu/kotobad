@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 type IconButtonProps = React.ComponentProps<typeof Button> & {
 	icon: React.ReactNode;
+	iconPosition?: "left" | "right";
 };
 
 function IconButton({
@@ -11,12 +12,14 @@ function IconButton({
 	className,
 	children,
 	ref,
+	iconPosition = "left",
 	...props
 }: IconButtonProps) {
 	return (
 		<Button ref={ref} className={className} {...props}>
-			{icon}
+			{iconPosition === "left" && icon}
 			{children}
+			{iconPosition === "right" && icon}
 		</Button>
 	);
 }
