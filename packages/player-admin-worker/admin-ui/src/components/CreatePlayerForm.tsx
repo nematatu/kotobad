@@ -10,6 +10,7 @@ import { inferSingleNameByReading } from "../lib/nameInference";
 import { PREFECTURES } from "../lib/prefectures";
 import type { PlayerPayload } from "../types";
 import { GenderToggleButtons } from "./GenderToggleButtons";
+import { ImageCropUploadDialog } from "./ImageCropUploadDialog";
 
 type CreatePlayerFormProps = {
 	token: string;
@@ -53,6 +54,8 @@ export const CreatePlayerForm = ({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 	const [imageUploadError, setImageUploadError] = useState("");
+	const [cropSourceFile, setCropSourceFile] = useState<File | null>(null);
+	const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 	const [manualEdited, setManualEdited] =
 		useState<Record<AutoFillKey, boolean>>(initialManualState);
 	const [lastNameKanaReading, setLastNameKanaReading] = useState("");
@@ -192,15 +195,31 @@ export const CreatePlayerForm = ({
 			setFirstNameKanaReading("");
 			updateBirthDate("", "", "");
 			setImageUploadError("");
+			setCropSourceFile(null);
+			setIsCropDialogOpen(false);
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
 
-	const handleImageChange = async (file: File | null) => {
+	const openCropDialog = (file: File | null) => {
 		if (!file) {
 			return;
 		}
+		setImageUploadError("");
+		setCropSourceFile(file);
+		setIsCropDialogOpen(true);
+	};
+
+	const closeCropDialog = () => {
+		if (isUploadingImage) {
+			return;
+		}
+		setIsCropDialogOpen(false);
+		setCropSourceFile(null);
+	};
+
+	const uploadCroppedImage = async (file: File) => {
 		if (token.trim().length === 0) {
 			setImageUploadError("先に管理トークンを入力してください");
 			return;
@@ -214,6 +233,8 @@ export const CreatePlayerForm = ({
 				...prev,
 				imageUrl,
 			}));
+			setIsCropDialogOpen(false);
+			setCropSourceFile(null);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			setImageUploadError(message);
@@ -351,15 +372,16 @@ export const CreatePlayerForm = ({
 					<input
 						type="file"
 						accept="image/jpeg,image/png,image/webp,image/avif"
-						onChange={(event) =>
-							void handleImageChange(event.target.files?.[0] ?? null)
-						}
+						onChange={(event) => {
+							openCropDialog(event.target.files?.[0] ?? null);
+							event.currentTarget.value = "";
+						}}
 					/>
 					<input
 						type="url"
 						placeholder="アップロード後に自動入力されます"
 						value={form.imageUrl ?? ""}
-						readOnly
+						onChange={(event) => updateField("imageUrl", event.target.value)}
 					/>
 					{isUploadingImage ? (
 						<p className="small">画像アップロード中...</p>
@@ -429,6 +451,15 @@ export const CreatePlayerForm = ({
 					</button>
 				</div>
 			</form>
+			<ImageCropUploadDialog
+				open={isCropDialogOpen}
+				file={cropSourceFile}
+				title="選手画像を切り抜き"
+				isUploading={isUploadingImage}
+				uploadErrorMessage={imageUploadError}
+				onCloseAction={closeCropDialog}
+				onSubmitAction={uploadCroppedImage}
+			/>
 		</section>
 	);
 };

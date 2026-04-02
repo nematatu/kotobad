@@ -10,7 +10,9 @@ export type CfImagePreset =
 	| "threadList"
 	| "zoom"
 	| "avatar"
-	| "tagIcon";
+	| "tagIcon"
+	| "playerCard"
+	| "playerThumb";
 
 export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	post: {
@@ -37,6 +39,16 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 		width: 48,
 		quality: 68,
 		fit: "contain",
+	},
+	playerCard: {
+		width: 420,
+		quality: 72,
+		fit: "cover",
+	},
+	playerThumb: {
+		width: 192,
+		quality: 72,
+		fit: "cover",
 	},
 };
 

@@ -4,7 +4,7 @@ import type {
 	FavoritePlayerType,
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
-import { ArrowUpRight, Check, X, ZoomIn } from "lucide-react";
+import { ArrowUpRight, Check, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import ActionLink from "@/components/common/button/ActionLink";
@@ -17,6 +17,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
+import { FavoritePlayerImageCard } from "./FavoritePlayerImageCard";
 
 type Props = {
 	open: boolean;
@@ -31,6 +33,10 @@ type Props = {
 
 const normalize = (value: string) => value.trim().toLowerCase();
 const MAX_FAVORITE_PLAYERS = 3;
+const toPlayerCardImageUrl = (sourceUrl: string) =>
+	toPresetCfImageUrl(sourceUrl, "playerCard") ?? sourceUrl;
+const toPlayerPreviewImageUrl = (sourceUrl: string) =>
+	toPresetCfImageUrl(sourceUrl, "zoom") ?? sourceUrl;
 
 export function FavoritePlayersSelectDialog({
 	open,
@@ -166,6 +172,9 @@ export function FavoritePlayersSelectDialog({
 								<div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2 lg:grid-cols-5">
 									{filteredPlayers.map((player) => {
 										const imageUrl = player.imageUrl;
+										const cardImageUrl = imageUrl
+											? toPlayerCardImageUrl(imageUrl)
+											: null;
 										const isSelected = selectedIdSet.has(player.id);
 										const cannotSelectMore =
 											!isSelected &&
@@ -174,7 +183,7 @@ export function FavoritePlayersSelectDialog({
 											<div
 												key={player.id}
 												className={cn(
-													"relative aspect-[3/4] overflow-hidden rounded-md border bg-slate-100 text-left transition-all hover:scale-110 hover:z-1",
+													"relative aspect-[1/1] overflow-hidden rounded-md border bg-slate-100 text-left transition-all hover:scale-110 hover:z-1",
 													isSelected
 														? "border-blue-500 ring-2 ring-blue-500/40"
 														: "border-slate-200",
@@ -188,12 +197,12 @@ export function FavoritePlayersSelectDialog({
 													disabled={cannotSelectMore}
 													className="absolute inset-0 z-10 cursor-pointer"
 												/>
-												{imageUrl ? (
+												{cardImageUrl ? (
 													<Image
-														src={imageUrl}
+														src={cardImageUrl}
 														alt={`${player.lastName} ${player.firstName}`}
 														width={240}
-														height={320}
+														height={240}
 														unoptimized
 														className="absolute inset-0 h-full w-full object-cover"
 													/>
@@ -204,19 +213,20 @@ export function FavoritePlayersSelectDialog({
 												)}
 												<div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 via-black/60 to-transparent" />
 												{imageUrl ? (
-													<button
-														type="button"
+													<Button
+														variant="ghost"
+														size="icon"
 														aria-label="画像を拡大表示"
 														onClick={() =>
 															setPreviewImage({
-																src: imageUrl,
+																src: toPlayerPreviewImageUrl(imageUrl),
 																alt: `${player.lastName} ${player.firstName}`,
 															})
 														}
-														className="absolute right-1.5 bottom-1.5 z-30 inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/40 bg-black/55 text-white transition-colors [@media(hover:hover)]:hover:bg-black/70"
+														className="absolute right-1.5 bottom-1.5 z-30 inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/40 bg-black/55 text-white hover:none"
 													>
-														<ZoomIn className="h-3.5 w-3.5" />
-													</button>
+														<ZoomIn className="h-3.5 w-3.5 hover:scale-110" />
+													</Button>
 												) : null}
 												<div className="pointer-events-none absolute right-1.5 top-1.5 z-20">
 													{isSelected ? (
@@ -249,39 +259,11 @@ export function FavoritePlayersSelectDialog({
 									<p className="text-sm text-slate-400">未選択です</p>
 								) : (
 									draftSelectedPlayers.map((player) => (
-										<div
+										<FavoritePlayerImageCard
 											key={player.id}
-											className="relative flex min-w-24 flex-col items-center justify-center bg-white space-y-2"
-										>
-											<Button
-												variant="outline"
-												size="icon"
-												rounded="full"
-												enableClickAnimation
-												aria-label={`${player.name} を選択解除`}
-												onClick={() => removePlayerAction(player.id)}
-												className="absolute -top-2 right-2 z-10 h-6 w-6 border-2 border-slate-200 bg-red-500 p-0 text-white shadow-none [@media(hover:hover)]:hover:bg-red-400"
-											>
-												<X strokeWidth="4" className="h-3.5 w-3.5 text-white" />
-											</Button>
-											{player.imageUrl ? (
-												<Image
-													src={player.imageUrl}
-													alt={player.name}
-													width={64}
-													height={64}
-													unoptimized
-													className="h-16 w-16 rounded-md object-cover"
-												/>
-											) : (
-												<div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500">
-													No Image
-												</div>
-											)}
-											<p className="text-[15px] font-bold text-slate-700">
-												{player.name}
-											</p>
-										</div>
+											player={player}
+											onRemoveAction={removePlayerAction}
+										/>
 									))
 								)}
 							</div>

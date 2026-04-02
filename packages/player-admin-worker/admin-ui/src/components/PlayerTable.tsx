@@ -4,6 +4,7 @@ import { epochSecondsToDateInput } from "../lib/date";
 import { buildPrefectureOptions } from "../lib/prefectures";
 import type { Player, PlayerPayload, PlayerUpdatePayload } from "../types";
 import { GenderToggleButtons } from "./GenderToggleButtons";
+import { ImageCropUploadDialog } from "./ImageCropUploadDialog";
 import {
 	Dialog,
 	DialogClose,
@@ -169,15 +170,31 @@ const PlayerEditorModal = ({
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
 	const [imageUploadError, setImageUploadError] = useState("");
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+	const [cropSourceFile, setCropSourceFile] = useState<File | null>(null);
+	const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 	const birthPlaceOptions = useMemo(
 		() => buildPrefectureOptions(draft.birthPlace),
 		[draft.birthPlace],
 	);
 
-	const handleImageChange = async (file: File | null) => {
+	const openCropDialog = (file: File | null) => {
 		if (!file) {
 			return;
 		}
+		setImageUploadError("");
+		setCropSourceFile(file);
+		setIsCropDialogOpen(true);
+	};
+
+	const closeCropDialog = () => {
+		if (isUploadingImage) {
+			return;
+		}
+		setIsCropDialogOpen(false);
+		setCropSourceFile(null);
+	};
+
+	const uploadCroppedImage = async (file: File) => {
 		if (token.trim().length === 0) {
 			setImageUploadError("先に管理トークンを入力してください");
 			return;
@@ -188,6 +205,8 @@ const PlayerEditorModal = ({
 		try {
 			const uploadedImageUrl = await uploadPlayerImage(token, file);
 			onDraftFieldChange(playerId, "imageUrl", uploadedImageUrl);
+			setIsCropDialogOpen(false);
+			setCropSourceFile(null);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			setImageUploadError(message);
@@ -311,11 +330,18 @@ const PlayerEditorModal = ({
 						<input
 							type="file"
 							accept="image/jpeg,image/png,image/webp,image/avif"
+							onChange={(event) => {
+								openCropDialog(event.target.files?.[0] ?? null);
+								event.currentTarget.value = "";
+							}}
+						/>
+						<input
+							type="url"
+							value={draft.imageUrl ?? ""}
 							onChange={(event) =>
-								void handleImageChange(event.target.files?.[0] ?? null)
+								onDraftFieldChange(playerId, "imageUrl", event.target.value)
 							}
 						/>
-						<input type="url" value={draft.imageUrl ?? ""} readOnly />
 						{isUploadingImage ? (
 							<span className="small">アップロード中...</span>
 						) : null}
@@ -362,6 +388,15 @@ const PlayerEditorModal = ({
 					</div>
 				</div>
 			) : null}
+			<ImageCropUploadDialog
+				open={isCropDialogOpen}
+				file={cropSourceFile}
+				title="選手画像を切り抜き"
+				isUploading={isUploadingImage}
+				uploadErrorMessage={imageUploadError}
+				onCloseAction={closeCropDialog}
+				onSubmitAction={uploadCroppedImage}
+			/>
 		</DialogContent>
 	);
 };

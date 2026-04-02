@@ -6,7 +6,6 @@ import type {
 } from "@kotobad/shared/src/types/user";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { Camera, Check, Loader2, Pencil, X } from "lucide-react";
-import Image from "next/image";
 import type { ChangeEvent, RefObject } from "react";
 import IconButton from "@/components/common/button/IconButton";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
@@ -14,6 +13,7 @@ import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
 } from "../lib/profileEditor";
+import { FavoritePlayerImageCard } from "./FavoritePlayerImageCard";
 import { FavoritePlayersSelectDialog } from "./FavoritePlayersSelectDialog";
 
 type EditorCardViewModel = {
@@ -243,28 +243,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 						) : (
 							<div className="flex flex-wrap gap-x-2 gap-y-1.5">
 								{editedFavoritePlayers.map((player) => (
-									<div
-										key={player.id}
-										className="flex w-[5.25rem] flex-col items-start gap-0.5 text-left"
-									>
-										{player.imageUrl ? (
-											<Image
-												src={player.imageUrl}
-												alt={player.name}
-												width={64}
-												height={64}
-												unoptimized
-												className="h-16 w-16 rounded-md object-cover"
-											/>
-										) : (
-											<div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500">
-												No Image
-											</div>
-										)}
-										<span className="text-xs leading-tight text-slate-700">
-											{player.name}
-										</span>
-									</div>
+									<FavoritePlayerImageCard key={player.id} player={player} />
 								))}
 							</div>
 						)}
