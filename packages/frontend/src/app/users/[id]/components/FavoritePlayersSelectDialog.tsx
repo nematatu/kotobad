@@ -16,6 +16,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 type Props = {
 	open: boolean;
@@ -172,20 +173,20 @@ export function FavoritePlayersSelectDialog({
 										return (
 											<div
 												key={player.id}
-												className={[
-													"relative aspect-[3/4] overflow-hidden rounded-md border bg-slate-100 text-left transition-all",
+												className={cn(
+													"relative aspect-[3/4] overflow-hidden rounded-md border bg-slate-100 text-left transition-all hover:scale-110 hover:z-1",
 													isSelected
 														? "border-blue-500 ring-2 ring-blue-500/40"
 														: "border-slate-200",
-													cannotSelectMore ? "opacity-50" : "",
-												].join(" ")}
+													cannotSelectMore && "opacity-50",
+												)}
 											>
 												<button
 													type="button"
 													aria-label={`${player.lastName} ${player.firstName} を選択`}
 													onClick={() => togglePlayerAction(player)}
 													disabled={cannotSelectMore}
-													className="absolute inset-0 z-10"
+													className="absolute inset-0 z-10 cursor-pointer"
 												/>
 												{imageUrl ? (
 													<Image
