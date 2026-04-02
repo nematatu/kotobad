@@ -2,6 +2,8 @@
 
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
+import { Search } from "lucide-react";
+import { useState } from "react";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
 
@@ -9,77 +11,104 @@ type Props = {
 	profile: UserProfileType;
 };
 
-const numberFormatter = new Intl.NumberFormat("ja-JP");
+type ProfileTab = "threads" | "posts";
 
 export function UserProfileActivity({ profile }: Props) {
-	return (
-		<div className="mt-5 grid gap-4">
-			<nav className="mt-5 flex items-center gap-3 text-sm">
-				<a
-					href="#recent-threads"
-					className="px-1 pb-2 font-semibold text-slate-800"
-				>
-					スレッド {numberFormatter.format(profile.threadCount)}
-				</a>
-				<a
-					href="#recent-posts"
-					className="px-1 pb-2 text-slate-500 hover:text-slate-800"
-				>
-					返信 {numberFormatter.format(profile.postCount)}
-				</a>
-			</nav>
-			<section id="recent-threads" className="bg-white p-4">
-				{profile.recentThreads.length === 0 ? (
-					<p className="mt-3 text-sm text-slate-500">
-						投稿したスレッドはありません。
-					</p>
-				) : (
-					<ul className="mt-3 space-y-2">
-						{profile.recentThreads.map((thread) => (
-							<li key={thread.id} className="rounded-lg bg-slate-50 px-3 py-2">
-								<Link
-									href={`/threads/${thread.id}`}
-									showIndicator={false}
-									className="line-clamp-1 text-sm font-semibold text-slate-900 hover:text-blue-700"
-								>
-									{thread.title}
-								</Link>
-								<div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
-									<span>{getRelativeDate(thread.createdAt)}</span>
-								</div>
-							</li>
-						))}
-					</ul>
-				)}
-			</section>
+	const [activeTab, setActiveTab] = useState<ProfileTab>("threads");
 
-			<section id="recent-posts" className="bg-white p-4">
-				{profile.recentPosts.length === 0 ? (
-					<p className="mt-3 text-sm text-slate-500">
-						投稿した返信がありません
-					</p>
-				) : (
-					<ul className="mt-3 space-y-2">
-						{profile.recentPosts.map((post) => (
-							<li key={post.id} className="rounded-lg bg-slate-50 px-3 py-2">
-								<Link
-									href={`/threads/${post.threadId}?postId=${post.id}`}
-									showIndicator={false}
-									className="line-clamp-1 text-xs text-slate-500 hover:text-slate-700"
-								>
-									{post.threadTitle} / #{post.localId}
-								</Link>
-								<p className="mt-1 line-clamp-2 text-sm text-slate-800">
-									<AutoLinkText text={post.post} />
-								</p>
-								<div className="mt-1 text-xs text-slate-500">
-									{getRelativeDate(post.createdAt)}
-								</div>
-							</li>
-						))}
-					</ul>
-				)}
-			</section>
+	return (
+		<div className="-mt-2 mx-auto w-full max-w-[1070px] bg-white pb-6 [font-family:Roboto,Arial,sans-serif] sm:pb-8">
+			<nav className="flex h-12 items-end gap-8 border-b border-[#e5e5e5]">
+				<button
+					type="button"
+					onClick={() => setActiveTab("threads")}
+					className={`relative h-12 px-0 text-[14px] font-medium ${
+						activeTab === "threads"
+							? "text-[#0f0f0f]"
+							: "text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f]"
+					}`}
+				>
+					ホーム
+					{activeTab === "threads" ? (
+						<span className="absolute right-0 bottom-0 left-0 h-[3px] bg-[#0f0f0f]" />
+					) : null}
+				</button>
+				<button
+					type="button"
+					onClick={() => setActiveTab("posts")}
+					className={`relative h-12 px-0 text-[14px] font-medium ${
+						activeTab === "posts"
+							? "text-[#0f0f0f]"
+							: "text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f]"
+					}`}
+				>
+					ライブ
+					{activeTab === "posts" ? (
+						<span className="absolute right-0 bottom-0 left-0 h-[3px] bg-[#0f0f0f]" />
+					) : null}
+				</button>
+				<button
+					type="button"
+					aria-label="検索"
+					className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-[#606060] transition-colors [@media(hover:hover)]:hover:bg-slate-100 [@media(hover:hover)]:hover:text-[#0f0f0f]"
+				>
+					<Search className="h-6 w-6" />
+				</button>
+			</nav>
+			{activeTab === "threads" ? (
+				<section id="recent-threads">
+					{profile.recentThreads.length === 0 ? (
+						<p className="mt-6 text-sm text-[#606060]">
+							このチャンネルにはコンテンツがありません
+						</p>
+					) : (
+						<ul className="mt-3">
+							{profile.recentThreads.map((thread) => (
+								<li key={thread.id} className="border-b border-[#e5e5e5] py-3">
+									<Link
+										href={`/threads/${thread.id}`}
+										showIndicator={false}
+										className="line-clamp-1 text-[15px] font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:text-blue-700"
+									>
+										{thread.title}
+									</Link>
+									<div className="mt-1 text-xs text-[#606060]">
+										{getRelativeDate(thread.createdAt)}
+									</div>
+								</li>
+							))}
+						</ul>
+					)}
+				</section>
+			) : (
+				<section id="recent-posts">
+					{profile.recentPosts.length === 0 ? (
+						<p className="mt-6 text-sm text-[#606060]">
+							このチャンネルにはライブ履歴がありません
+						</p>
+					) : (
+						<ul className="mt-3">
+							{profile.recentPosts.map((post) => (
+								<li key={post.id} className="border-b border-[#e5e5e5] py-3">
+									<Link
+										href={`/threads/${post.threadId}?postId=${post.id}`}
+										showIndicator={false}
+										className="line-clamp-1 text-xs text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f]"
+									>
+										{post.threadTitle} / #{post.localId}
+									</Link>
+									<p className="mt-1 line-clamp-2 text-sm text-[#0f0f0f]">
+										<AutoLinkText text={post.post} />
+									</p>
+									<div className="mt-1 text-xs text-[#606060]">
+										{getRelativeDate(post.createdAt)}
+									</div>
+								</li>
+							))}
+						</ul>
+					)}
+				</section>
+			)}
 		</div>
 	);
 }

@@ -21,7 +21,7 @@ export default async function UserProfilePage({ params }: Props) {
 	try {
 		const profile = await getUserProfileById(userId);
 		return (
-			<div className="mx-auto w-full max-w-5xl px-3 py-4 sm:px-5 sm:py-6">
+			<div className="min-h-screen w-full bg-white py-4 sm:py-6">
 				<UserProfileEditor profile={profile} />
 				<UserProfileActivity profile={profile} />
 			</div>

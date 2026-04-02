@@ -5,10 +5,11 @@ import type {
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
-import { Camera, Check, Loader2, Pencil, X } from "lucide-react";
+import { Camera, Check, Loader2, X } from "lucide-react";
 import type { ChangeEvent, RefObject } from "react";
 import IconButton from "@/components/common/button/IconButton";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
+import { Button } from "@/components/ui/button";
 import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
@@ -22,6 +23,9 @@ type EditorCardViewModel = {
 	isSavingProfile: boolean;
 	profileId: string;
 	createdAt: string;
+	threadCount: number;
+	postCount: number;
+	favoritePlayerCount: number;
 	editedName: string;
 	editedBio: string;
 	avatarImage: string | null;
@@ -58,6 +62,9 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		isSavingProfile,
 		profileId,
 		createdAt,
+		threadCount,
+		postCount,
+		favoritePlayerCount,
 		editedName,
 		editedBio,
 		avatarImage,
@@ -82,123 +89,98 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 	} = actions;
 
 	return (
-		<section
-			className={`relative overflow-hidden bg-white ${isEditing ? "pb-12" : ""}`}
-		>
-			<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
-			{isLogin && isEditing ? (
-				<div className="absolute bottom-3 right-3 flex-1 flex items-center gap-2">
-					<IconButton
-						variant="outline"
-						icon={<X />}
-						rounded="full"
-						enableClickAnimation
-						className="bg-transparent border border-slate-500 [@media(hover:hover)]:hover:!bg-slate-100/80"
-						disabled={isSavingProfile}
-						onClick={onCancelEditingAction}
-					>
-						<span className="font-bold">キャンセル</span>
-					</IconButton>
-
-					<IconButton
-						variant="logo1"
-						icon={<Check />}
-						rounded="full"
-						enableClickAnimation
-						hover="brightness"
-						className="transition-colors text-slate-100"
-						disabled={isSavingProfile}
-						onClick={onOpenConfirmAction}
-					>
-						<span className="font-bold">完了</span>
-					</IconButton>
-				</div>
-			) : (
-				<div className="absolute top-3 right-3 flex-1 flex items-center gap-2">
-					<IconButton
-						variant="logo1"
-						icon={<Pencil />}
-						rounded="full"
-						enableClickAnimation
-						hover="brightness"
-						className="transition-colors text-slate-100"
-						disabled={isSavingProfile}
-						onClick={onStartEditingAction}
-					>
-						<span className="font-bold">編集</span>
-					</IconButton>
-				</div>
-			)}
-
-			<div className="-mt-12 px-4 pb-6 sm:-mt-14 sm:px-6">
-				<div className="group relative inline-flex">
-					<AuthorAvatar
-						name={editedName}
-						image={avatarImage}
-						className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28"
-						fallbackClassName="text-lg"
-					/>
-					{isLogin && isEditing && (
-						<button
-							type="button"
-							className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full border-4 border-white bg-black/30 text-white transition-colors hover:bg-black/25"
-							onClick={onOpenAvatarFileDialogAction}
-							disabled={isSavingProfile}
-							aria-label="アイコン画像を変更"
-						>
-							{isSavingProfile ? (
-								<Loader2 className="h-5 w-5 animate-spin" />
-							) : (
-								<Camera className="h-5 w-5" />
-							)}
-						</button>
-					)}
-					<input
-						ref={avatarInputRef}
-						type="file"
-						accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
-						className="hidden"
-						onChange={onAvatarFileChangeAction}
-					/>
-				</div>
-				<div className="space-y-4">
-					<div className="mt-3 flex flex-col flex-wrap gap-x-3 gap-y-1">
-						{isEditing ? (
-							<div className="group relative w-full max-w-md rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
-								<label
-									htmlFor="name"
-									className="pointer-events-none absolute top-1 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+		<section className="relative overflow-hidden bg-white">
+			{isEditing ? (
+				<>
+					<div className="h-24 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)] sm:h-32" />
+					{isLogin ? (
+						<div className="absolute right-3 bottom-3 flex items-center gap-2">
+							<IconButton
+								variant="outline"
+								icon={<X />}
+								rounded="full"
+								enableClickAnimation
+								className="border border-slate-500 bg-transparent [@media(hover:hover)]:hover:!bg-slate-100/80"
+								disabled={isSavingProfile}
+								onClick={onCancelEditingAction}
+							>
+								<span className="font-bold">キャンセル</span>
+							</IconButton>
+							<IconButton
+								variant="logo1"
+								icon={<Check />}
+								rounded="full"
+								enableClickAnimation
+								hover="brightness"
+								className="text-slate-100 transition-colors"
+								disabled={isSavingProfile}
+								onClick={onOpenConfirmAction}
+							>
+								<span className="font-bold">完了</span>
+							</IconButton>
+						</div>
+					) : null}
+					<div className="-mt-12 px-4 pb-6 sm:-mt-14 sm:px-6">
+						<div className="group relative inline-flex">
+							<AuthorAvatar
+								name={editedName}
+								image={avatarImage}
+								className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28"
+								fallbackClassName="text-lg"
+							/>
+							{isLogin ? (
+								<button
+									type="button"
+									className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full border-4 border-white bg-black/30 text-white transition-colors hover:bg-black/25"
+									onClick={onOpenAvatarFileDialogAction}
+									disabled={isSavingProfile}
+									aria-label="アイコン画像を変更"
 								>
-									名前
-								</label>
-								<input
-									id="name"
-									type="text"
-									value={editedName}
-									onChange={(event) =>
-										onEditedNameChangeAction(event.target.value)
-									}
-									maxLength={MAX_PROFILE_NAME_LENGTH}
-									className="h-14 w-full overflow-hidden rounded-md border-0 bg-transparent px-3 pt-6 pb-5 text-[20px] font-bold text-slate-900 outline-none focus:ring-0"
-								/>
-								<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
-									{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
+									{isSavingProfile ? (
+										<Loader2 className="h-5 w-5 animate-spin" />
+									) : (
+										<Camera className="h-5 w-5" />
+									)}
+								</button>
+							) : null}
+							<input
+								ref={avatarInputRef}
+								type="file"
+								accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+								className="hidden"
+								onChange={onAvatarFileChangeAction}
+							/>
+						</div>
+						<div className="mt-3 space-y-4">
+							<div className="flex flex-col gap-y-1">
+								<div className="group relative w-full max-w-md rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
+									<label
+										htmlFor="name"
+										className="pointer-events-none absolute top-1 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+									>
+										名前
+									</label>
+									<input
+										id="name"
+										type="text"
+										value={editedName}
+										onChange={(event) =>
+											onEditedNameChangeAction(event.target.value)
+										}
+										maxLength={MAX_PROFILE_NAME_LENGTH}
+										className="h-14 w-full rounded-md border-0 bg-transparent px-3 pt-6 pb-5 text-[20px] font-bold text-slate-900 outline-none focus:ring-0"
+									/>
+									<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+										{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
+									</span>
+								</div>
+								<span
+									className="text-xs text-slate-400 sm:text-sm"
+									title={profileId}
+								>
+									@{profileId}
 								</span>
 							</div>
-						) : (
-							<h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
-								{editedName}
-							</h1>
-						)}
-						<span
-							className="text-xs text-slate-400 sm:text-sm"
-							title={profileId}
-						>
-							@{profileId}
-						</span>
-					</div>
-					<div className="space-y-2">
-						{isEditing ? (
 							<div className="group relative w-full max-w-2xl rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
 								<label
 									htmlFor="bio"
@@ -220,41 +202,86 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 									{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
 								</span>
 							</div>
-						) : (
-							<p className="mt-2 text-sm text-slate-600">{editedBio}</p>
-						)}
-					</div>
-
-					<div className="space-y-2">
-						<div className="flex items-center">
-							<p className="text-xs font-medium text-slate-500">好きな選手</p>
-							{isEditing ? (
-								<button
-									type="button"
-									className="text-sm text-blue-600"
-									onClick={() => onFavoritePlayersDialogOpenChangeAction(true)}
-								>
-									選択する
-								</button>
-							) : null}
-						</div>
-						{editedFavoritePlayers.length === 0 ? (
-							<p className="text-sm text-slate-400">未選択です</p>
-						) : (
-							<div className="flex flex-wrap gap-x-2 gap-y-1.5">
-								{editedFavoritePlayers.map((player) => (
-									<FavoritePlayerImageCard key={player.id} player={player} />
-								))}
+							<div className="space-y-2">
+								<div className="flex items-center">
+									<p className="text-xs font-medium text-slate-500">
+										好きな選手
+									</p>
+									<button
+										type="button"
+										className="text-sm text-blue-600"
+										onClick={() =>
+											onFavoritePlayersDialogOpenChangeAction(true)
+										}
+									>
+										選択する
+									</button>
+								</div>
+								{editedFavoritePlayers.length === 0 ? (
+									<p className="text-sm text-slate-400">未選択です</p>
+								) : (
+									<div className="flex flex-wrap gap-x-2 gap-y-1.5">
+										{editedFavoritePlayers.map((player) => (
+											<FavoritePlayerImageCard
+												key={player.id}
+												player={player}
+											/>
+										))}
+									</div>
+								)}
 							</div>
-						)}
+							<div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+								<span className="rounded-full bg-slate-100 px-2 py-1">
+									登録日: {formatDate(createdAt, { withTime: false })}
+								</span>
+							</div>
+						</div>
+					</div>
+				</>
+			) : (
+				<div className="mx-auto w-full max-w-[1070px] pt-4 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
+					<div className="h-[118px] w-full overflow-hidden rounded-xl bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)] sm:h-[172px]" />
+					<div className="relative mt-4 px-1 sm:px-0">
+						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-4">
+							<AuthorAvatar
+								name={editedName}
+								image={avatarImage}
+								className="h-24 w-24 bg-white sm:h-40 sm:w-40"
+								fallbackClassName="text-xl sm:text-3xl"
+							/>
+							<div className="min-w-0 flex-1 pt-1 sm:pt-2">
+								<h1 className="truncate text-[2rem] leading-[1.25] font-bold text-[#0f0f0f] sm:text-[36px] sm:leading-[50px]">
+									{editedName}
+								</h1>
+								<p className="mt-1 line-clamp-1 text-sm text-[#606060] sm:text-[14px] sm:leading-[20px]">
+									@{profileId} ・ スレッド {threadCount} 件 ・ 返信 {postCount}{" "}
+									件
+								</p>
+								<p className="mt-1 line-clamp-1 whitespace-pre-line break-words text-sm text-[#0f0f0f] sm:text-[14px] sm:leading-[20px]">
+									{editedBio}
+								</p>
+								<p className="mt-1 line-clamp-1 text-xs text-[#606060] sm:text-[14px] sm:leading-[20px]">
+									このチャンネルの詳細 ・ 好きな選手 {favoritePlayerCount} 人 ・
+									登録日 {formatDate(createdAt, { withTime: false })}
+								</p>
+								<div className="mt-2 sm:mt-1.5">
+									<Button
+										type="button"
+										variant="default"
+										rounded="full"
+										enableClickAnimation
+										className="h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727]"
+										disabled={isSavingProfile}
+										onClick={isLogin ? onStartEditingAction : undefined}
+									>
+										{isLogin ? "プロフィールを編集" : "フォロー"}
+									</Button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-					<span className="rounded-full bg-slate-100 px-2 py-1">
-						登録日: {formatDate(createdAt, { withTime: false })}
-					</span>
-				</div>
-			</div>
+			)}
 			<FavoritePlayersSelectDialog
 				open={isFavoritePlayersDialogOpen}
 				onOpenChangeAction={onFavoritePlayersDialogOpenChangeAction}
