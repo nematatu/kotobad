@@ -21,7 +21,7 @@ export function FavoritePlayerImageCard({
 	return (
 		<div
 			className={cn(
-				"relative flex w-[5.25rem] flex-col items-start gap-0.5 text-left",
+				"relative flex w-[5.25rem] flex-col items-center gap-2 text-left",
 				className,
 			)}
 		>
@@ -48,14 +48,14 @@ export function FavoritePlayerImageCard({
 					width={64}
 					height={64}
 					unoptimized
-					className="h-16 w-16 rounded-md object-cover"
+					className="h-20 w-20 rounded-md object-cover"
 				/>
 			) : (
 				<div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500">
 					No Image
 				</div>
 			)}
-			<span className="text-xs leading-tight text-slate-700">
+			<span className="text-xs leading-tight text-slate-700 font-semibold">
 				{player.name}
 			</span>
 		</div>
