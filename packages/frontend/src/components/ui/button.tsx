@@ -23,6 +23,8 @@ const buttonVariants = cva(
 				google:
 					"bg-white text-slate-700 border border-slate-300 [@media(hover:hover)]:hover:bg-surface-100 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:[@media(hover:hover)]:hover:bg-slate-800",
 				tag: "bg-blue-200/20 [@media(hover:hover)]:hover:bg-blue-300/40 ring-1 ring-blue-300/60 text-blue-500 text-xs transition-colors duration-150",
+				"zenn-like":
+					"font-semibold text-white bg-[#3ea6ff] [@media(hover:hover)]:hover:bg-[#1d9bf0]",
 
 				...buttonColor,
 			},

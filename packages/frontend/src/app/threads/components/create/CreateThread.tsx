@@ -206,7 +206,7 @@ export const CreateThreadForm = ({
 										<IconButton
 											hover="brightness"
 											icon={<PencilLine />}
-											variant="logo1"
+											variant="zenn-like"
 											enableClickAnimation
 											rounded="full"
 											type="submit"

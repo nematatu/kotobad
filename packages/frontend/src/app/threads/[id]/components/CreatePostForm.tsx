@@ -241,7 +241,8 @@ export const CreatePostForm = ({
 						/>
 						<div className="shrink-0">
 							<Button
-								className="h-9 w-9 cursor-pointer rounded-full bg-blue-500 p-0 text-white hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
+								variant="zenn-like"
+								className="h-9 w-9 cursor-pointer rounded-full p-0 text-white focus:outline-none focus:ring-1 focus:ring-blue-400 focus:ring-offset-2"
 								type="submit"
 								disabled={isSubmitDisabled}
 								aria-label={isSubmitting ? "送信中" : "書き込む"}

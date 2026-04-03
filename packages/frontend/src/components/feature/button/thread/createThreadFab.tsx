@@ -13,7 +13,7 @@ export default function CreateThreadFabButton(
 		<IconButton
 			aria-label="投稿する"
 			icon={<PencilLine />}
-			variant="logo1"
+			variant="zenn-like"
 			size="icon"
 			hover="brightness"
 			enableClickAnimation

@@ -143,9 +143,10 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 										好きな選手
 									</p>
 									<Button
+										variant="zenn-like"
 										enableClickAnimation
 										size="sm"
-										className="text-xs !px-2 font-semibold bg-[#3ea6ff] [@media(hover:hover)]:hover:bg-[#1d9bf0]"
+										className="text-xs !px-2"
 										onClick={() => setIsFavoritePlayersDialogOpenAction(true)}
 									>
 										選択する
@@ -179,7 +180,8 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 						</Button>
 						<Button
 							type="button"
-							className="h-10 rounded-md bg-[#3ea6ff] px-5 text-sm font-bold text-white [@media(hover:hover)]:hover:bg-[#2a9bf6]"
+							variant="zenn-like"
+							className="h-10 rounded-md px-5 text-sm font-bold text-white"
 							onClick={() => void handleSaveAndBack()}
 							disabled={isSavingProfile}
 						>

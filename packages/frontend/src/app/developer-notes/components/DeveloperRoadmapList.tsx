@@ -436,7 +436,7 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 											type="button"
 											onClick={() => handleSaveTitle(item)}
 											disabled={isPending}
-											variant="logo1"
+											variant="zenn-like"
 											hover="brightness"
 											rounded="full"
 											enableClickAnimation

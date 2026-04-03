@@ -5,12 +5,11 @@ import type {
 	CreateDeveloperRoadmapItemType,
 	DeveloperRoadmapStatusType,
 } from "@kotobad/shared/src/types/developerRoadmap";
-import { CheckCheck, Clock3, ListTodo, PencilLine } from "lucide-react";
+import { CheckCheck, Clock3, ListTodo } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -302,7 +301,7 @@ export function CreateDeveloperNoteForm() {
 							type="submit"
 							disabled={isSubmitDisabled}
 							hover="brightness"
-							variant="logo1"
+							variant="zenn-like"
 							size="lg"
 							rounded="full"
 							enableClickAnimation

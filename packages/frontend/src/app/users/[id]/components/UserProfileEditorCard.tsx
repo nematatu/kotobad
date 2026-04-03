@@ -146,7 +146,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											<span className="font-medium">キャンセル</span>
 										</IconButton>
 										<IconButton
-											variant="logo1"
+											variant="zenn-like"
 											icon={<Check />}
 											rounded="full"
 											enableClickAnimation
