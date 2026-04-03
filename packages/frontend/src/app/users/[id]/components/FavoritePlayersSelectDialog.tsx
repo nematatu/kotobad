@@ -293,7 +293,7 @@ export function FavoritePlayersSelectDialog({
 										variant="zenn-like"
 										icon={<Check />}
 										iconPosition="right"
-										className="inline-flex h-9 items-center rounded-md px-4 text-sm font-bold text-slate-200"
+										className="inline-flex h-9 items-center rounded-md px-4 text-sm font-bold"
 										enableClickAnimation
 										disabled={draftSelectedPlayers.length === 0}
 										onClick={applySelectedPlayersAction}
