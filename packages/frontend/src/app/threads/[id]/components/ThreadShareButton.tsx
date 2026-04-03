@@ -49,7 +49,6 @@ export const ThreadShareButton = ({
 				type="button"
 				variant="ghost"
 				rounded="full"
-				enableClickAnimation
 				aria-label="リンクをコピー"
 				onClick={copyLinkHandler}
 				className="size-8 rounded-full border border-slate-200 bg-white/90 p-0 [@media(hover:hover)]:hover:brightness-95 dark:border-slate-700 dark:bg-slate-900/80 dark:[@media(hover:hover)]:hover:brightness-110 sm:size-9"
@@ -60,7 +59,6 @@ export const ThreadShareButton = ({
 				asChild
 				variant="ghost"
 				rounded="full"
-				enableClickAnimation
 				className="size-8  border bg-black p-0 [@media(hover:hover)]:hover:bg-black/80 dark:border-black dark:bg-black sm:size-9"
 			>
 				<a
@@ -76,7 +74,6 @@ export const ThreadShareButton = ({
 				asChild
 				variant="ghost"
 				rounded="full"
-				enableClickAnimation
 				className="size-8  p-0 [@media(hover:hover)]:hover:bg-[#0e9f45] sm:size-9"
 			>
 				<a

@@ -25,7 +25,6 @@ export function UserPopover({ onProfileNavigate }: Props) {
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
-					enableClickAnimation
 					variant="ghost"
 					size="icon"
 					aria-label="ユーザーメニューを開く"

@@ -39,7 +39,6 @@ export function BackToThreadList() {
 
 	return createPortal(
 		<Button
-			enableClickAnimation
 			onClick={onBackClick}
 			aria-label="スレッド一覧へ戻る"
 			className="route-transition-floating-action pointer-events-auto block sm:hidden fixed bottom-30 right-4 bottom-20 z-[70] inline-flex h-14 w-14 transform-gpu flex-col items-center justify-center rounded-full bg-gray-300/90 text-gray-900 transition-transform duration-200 ease-out motion-reduce:transition-none dark:bg-gray-500 dark:text-white"

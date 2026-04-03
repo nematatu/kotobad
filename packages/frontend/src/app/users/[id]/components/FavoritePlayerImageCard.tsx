@@ -46,7 +46,6 @@ export function FavoritePlayerImageCard({
 						variant="outline"
 						size="icon"
 						rounded="full"
-						enableClickAnimation
 						aria-label={`${player.name} を選択解除`}
 						onClick={() => onRemoveAction(player.id)}
 						className="absolute -top-2 right-0 z-10 h-6 w-6 border-2 border-slate-200 bg-red-500 p-0 text-white shadow-none [@media(hover:hover)]:hover:bg-red-400"

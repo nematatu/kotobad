@@ -55,18 +55,6 @@ const toFileFromFormData = (formData: FormData, key: string): File | null => {
 	return entry;
 };
 
-const toFavoritePlayerIdsFromFormData = (
-	formData: FormData,
-): number[] | undefined => {
-	if (formData.get("favoritePlayersTouched") !== "1") {
-		return undefined;
-	}
-
-	return formData
-		.getAll("favoritePlayerIds")
-		.map((value) => Number.parseInt(String(value), 10));
-};
-
 export const updateUserProfileRoute = createRoute({
 	method: "patch",
 	path: "/update",
@@ -134,7 +122,10 @@ export const updateUserProfileRouter: RouteHandler<
 		const publicBaseUrl = c.env.R2_PUBLIC_BASE_URL;
 
 		const formData = await c.req.formData();
-		const favoritePlayerIds = toFavoritePlayerIdsFromFormData(formData);
+		const favoritePlayerIds =
+			formData.get("favoritePlayersTouched") === "1"
+				? formData.getAll("favoritePlayerIds").map((value) => String(value))
+				: undefined;
 		const avatarFile = toFileFromFormData(formData, "image");
 		const headerImageFile = toFileFromFormData(formData, "headerImage");
 		const parsedResult = UpdateUserProfileSchema.safeParse({

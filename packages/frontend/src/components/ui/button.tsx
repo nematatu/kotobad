@@ -63,7 +63,7 @@ function Button({
 	size,
 	hover = "none",
 	asChild = false,
-	enableClickAnimation = false,
+	enableClickAnimation = true,
 	rounded,
 	...props
 }: React.ComponentProps<"button"> &

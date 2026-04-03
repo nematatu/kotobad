@@ -149,7 +149,6 @@ export const ChatLikeUI = ({
 											>
 												<PopoverTrigger asChild>
 													<IconButton
-														enableClickAnimation
 														type="button"
 														size="icon"
 														variant="ghost"

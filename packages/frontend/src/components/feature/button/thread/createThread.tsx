@@ -14,7 +14,6 @@ export default function CreateThreadButton(
 			size="lg"
 			rounded="full"
 			{...props}
-			enableClickAnimation
 		>
 			<span className="text-md">投稿する</span>
 		</IconButton>

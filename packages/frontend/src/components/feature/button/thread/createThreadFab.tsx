@@ -16,7 +16,6 @@ export default function CreateThreadFabButton(
 			variant="zenn-like"
 			size="icon"
 			hover="brightness"
-			enableClickAnimation
 			className={cn(
 				"route-transition-floating-action fixed bottom-5 right-5 z-[60] h-12 w-12 rounded-full shadow-lg md:hidden",
 				className,

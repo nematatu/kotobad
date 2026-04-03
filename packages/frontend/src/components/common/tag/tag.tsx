@@ -23,13 +23,7 @@ export default function Tag({
 	);
 
 	return (
-		<IconButton
-			enableClickAnimation
-			variant="outline"
-			icon={iconNode}
-			size="icon"
-			{...buttonProps}
-		>
+		<IconButton variant="outline" icon={iconNode} size="icon" {...buttonProps}>
 			{isViewLabel && <span className="font-bold">{name}</span>}
 		</IconButton>
 	);

@@ -282,7 +282,6 @@ export function FavoritePlayersSelectDialog({
 								/>
 								<div className="flex items-center gap-2">
 									<Button
-										enableClickAnimation
 										variant="outline"
 										className="h-9 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc]"
 										onClick={() => onOpenChangeAction(false)}
@@ -294,7 +293,6 @@ export function FavoritePlayersSelectDialog({
 										icon={<Check />}
 										iconPosition="right"
 										className="inline-flex h-9 items-center rounded-md px-4 text-sm font-bold"
-										enableClickAnimation
 										disabled={draftSelectedPlayers.length === 0}
 										onClick={applySelectedPlayersAction}
 									>

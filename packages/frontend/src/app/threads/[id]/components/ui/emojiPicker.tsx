@@ -233,7 +233,6 @@ export function Emoji({
 				</button>
 			) : (
 				<IconButton
-					enableClickAnimation
 					type="button"
 					size="icon"
 					variant="outline"

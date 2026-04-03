@@ -207,7 +207,6 @@ export const CreateThreadForm = ({
 											hover="brightness"
 											icon={<PencilLine />}
 											variant="zenn-like"
-											enableClickAnimation
 											rounded="full"
 											type="submit"
 											disabled={isSubmitDisabled || form.formState.isSubmitting}

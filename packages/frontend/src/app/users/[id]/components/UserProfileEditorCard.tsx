@@ -157,7 +157,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											variant="outline"
 											icon={<X />}
 											rounded="full"
-											enableClickAnimation
 											className="h-9 rounded-full border border-slate-300 bg-white text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100"
 											disabled={isSavingProfile}
 											onClick={onCancelEditingAction}
@@ -168,7 +167,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											variant="zenn-like"
 											icon={<Check />}
 											rounded="full"
-											enableClickAnimation
 											hover="brightness"
 											className="h-9 rounded-full bg-[#0f0f0f] px-4 text-white [@media(hover:hover)]:hover:bg-[#272727]"
 											disabled={isSavingProfile}
@@ -225,7 +223,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 							<Button
 								variant={isLogin ? "outline" : "default"}
 								rounded="full"
-								enableClickAnimation
 								asChild={isLogin}
 								className={
 									isLogin
@@ -255,7 +252,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 									<Button
 										variant={isLogin ? "outline" : "default"}
 										rounded="full"
-										enableClickAnimation
 										asChild={isLogin}
 										className={
 											isLogin

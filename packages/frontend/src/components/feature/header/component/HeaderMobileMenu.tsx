@@ -70,7 +70,6 @@ const HeaderMobileMenu = ({ links, isLoading }: Props) => {
 			<Sheet open={open} onOpenChange={setOpen}>
 				<SheetTrigger asChild>
 					<Button
-						enableClickAnimation
 						variant="ghost"
 						size="icon"
 						aria-label="メニューを開く"

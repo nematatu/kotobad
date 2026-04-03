@@ -163,7 +163,6 @@ export function LikeButton({
 		<Button
 			variant="outline"
 			rounded="full"
-			enableClickAnimation
 			onClick={onLikeClick}
 			aria-pressed={likedByMe}
 			aria-label={likedByMe ? "いいねを解除" : "いいねする"}

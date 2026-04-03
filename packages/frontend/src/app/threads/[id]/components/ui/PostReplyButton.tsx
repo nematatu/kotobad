@@ -18,7 +18,6 @@ export function PostReplyButton({ handleClick }: PostReplyProps) {
 				<TooltipTrigger asChild>
 					<IconButton
 						type="button"
-						enableClickAnimation
 						variant="ghost"
 						size="icon"
 						icon={<Reply />}

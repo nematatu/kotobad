@@ -34,7 +34,6 @@ export function BackToThreadListHeaderButton({ className }: Props) {
 	return (
 		<Button
 			variant="ghost"
-			enableClickAnimation
 			type="button"
 			onClick={onBackClick}
 			aria-label="スレッド一覧へ戻る"

@@ -304,7 +304,6 @@ export function CreateDeveloperNoteForm() {
 							variant="zenn-like"
 							size="lg"
 							rounded="full"
-							enableClickAnimation
 						>
 							<span className="text-md">投稿する</span>
 							<div className="hidden sm:block">

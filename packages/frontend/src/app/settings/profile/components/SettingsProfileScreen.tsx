@@ -97,13 +97,11 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 								<Button
 									type="button"
 									variant="outline"
-									enableClickAnimation
-									size="sm"
-									className="h-8 border-[#cfd8e3] bg-white/95 px-3 text-xs font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-white"
+									className="font-semibold text-[#4b647e] transition-colors [@media(hover:hover)]:hover:text-[#1d9bf0]"
 									onClick={openHeaderImageFileDialogAction}
 									disabled={isSavingProfile}
 								>
-									ヘッダー画像を変更
+									ヘッダー画像を変更する
 								</Button>
 							</div>
 							<input
@@ -125,7 +123,6 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 									/>
 									<Button
 										variant="outline"
-										enableClickAnimation
 										size="lg"
 										className="font-semibold text-[#4b647e] transition-colors [@media(hover:hover)]:hover:text-[#1d9bf0]"
 										onClick={openAvatarFileDialogAction}
@@ -200,7 +197,6 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 										</p>
 										<Button
 											variant="zenn-like"
-											enableClickAnimation
 											size="sm"
 											className="text-xs !px-2"
 											onClick={() => setIsFavoritePlayersDialogOpenAction(true)}

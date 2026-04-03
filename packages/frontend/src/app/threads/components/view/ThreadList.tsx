@@ -220,7 +220,6 @@ export const ThreadList = ({
 												asChild
 												variant="zenn-like"
 												rounded="lg"
-												enableClickAnimation
 												className="sm:hidden ml-auto shrink-0 pointer-events-auto z-10 h-[45px] w-[69px] gap-1 px-2 text-[13px] text-slate-100 sm:h-9 sm:w-[78px] sm:gap-1.5 sm:px-2.5 sm:text-[14px]"
 											>
 												<Link href={href} aria-label={`みる: ${thread.title}`}>

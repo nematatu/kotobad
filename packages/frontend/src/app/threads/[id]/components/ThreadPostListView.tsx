@@ -510,7 +510,6 @@ export const ThreadPostListView = ({
 												) : null}
 												<div className="mt-1 flex flex-wrap items-center text-xs">
 													<Button
-														enableClickAnimation
 														variant="ghost"
 														size="sm"
 														type="button"
@@ -530,7 +529,6 @@ export const ThreadPostListView = ({
 													) : null}
 													{post.replyCount > 0 && depth > 0 && (
 														<Button
-															enableClickAnimation
 															variant="ghost"
 															size="sm"
 															type="button"

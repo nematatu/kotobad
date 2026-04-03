@@ -35,7 +35,6 @@ export function TagPickerTooltip({
 					<TooltipTrigger asChild>
 						<PopoverTrigger asChild>
 							<IconButton
-								enableClickAnimation
 								type="button"
 								size="icon"
 								variant="ghost"
@@ -62,7 +61,6 @@ export function TagPickerTooltip({
 							{selectedTagIds.length} 件選択中
 						</span>
 						<IconButton
-							enableClickAnimation
 							icon={<X className="h-5 w-5 text-slate-600" />}
 							onClick={() => setIsTagPopoverOpen(false)}
 							className="h-8 w-8 bg-transparent border-0 hover:bg-slate-100"

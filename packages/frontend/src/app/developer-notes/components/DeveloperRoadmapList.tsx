@@ -439,7 +439,6 @@ export function DeveloperRoadmapList({ items: initialItems, canEdit }: Props) {
 											variant="zenn-like"
 											hover="brightness"
 											rounded="full"
-											enableClickAnimation
 											className="h-auto px-3 py-1.5 text-[12px] font-bold"
 										>
 											保存
