@@ -117,7 +117,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 												changeEditedNameAction(event.target.value)
 											}
 											maxLength={MAX_PROFILE_NAME_LENGTH}
-											className="h-12 w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 text-[15px] text-[#2f3439] outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white"
+											className="h-12 w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 text-base text-[#2f3439] outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white sm:text-[15px]"
 										/>
 										<span className="pointer-events-none absolute right-3 bottom-2 text-[11px] text-[#97a3b0]">
 											{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
@@ -141,7 +141,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 											}
 											maxLength={MAX_PROFILE_BIO_LENGTH}
 											rows={3}
-											className="w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 py-2 text-[15px] text-[#2f3439] resize-none outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white"
+											className="w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 py-2 text-base text-[#2f3439] resize-none outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white sm:text-[15px]"
 										/>
 										<span className="pointer-events-none absolute right-3 bottom-3 text-[11px] text-[#97a3b0]">
 											{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}

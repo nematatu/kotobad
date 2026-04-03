@@ -137,7 +137,7 @@ export function FavoritePlayersSelectDialog({
 									onChange={(event) => setQuery(event.target.value)}
 									type="search"
 									placeholder="選手名で検索"
-									className="h-10 rounded-md border border-slate-300 px-3 text-sm outline-none focus:border-blue-400"
+									className="h-10 rounded-md border border-slate-300 px-3 text-base outline-none focus:border-blue-400 sm:text-sm"
 								/>
 							</div>
 						</DialogHeader>

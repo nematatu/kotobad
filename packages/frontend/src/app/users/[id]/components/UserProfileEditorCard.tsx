@@ -173,7 +173,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											onEditedBioChangeAction(event.target.value)
 										}
 										maxLength={MAX_PROFILE_BIO_LENGTH}
-										className="h-9 w-full border-0 bg-transparent px-0 py-0 text-sm leading-[1.2] text-[#0f0f0f] outline-none focus:ring-0 sm:h-10 sm:text-[17px] sm:leading-[52px]"
+										className="h-9 w-full border-0 bg-transparent px-0 py-0 text-base leading-[1.2] text-[#0f0f0f] outline-none focus:ring-0 sm:h-10 sm:text-[17px] sm:leading-[52px]"
 									/>
 									<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
 										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}

@@ -16,19 +16,23 @@ import { highlightText } from "@/components/feature/header/component/headerSearc
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
 import { useViewTransitionRouter } from "@/hooks/useViewTransitionRouter";
+import { cn } from "@/lib/utils";
 import { ThreadPostImage } from "../shared/ThreadPostImage";
 
 type ThreadListType = {
 	threads: ThreadType[];
 	highlightQuery?: string;
+	variant?: "default" | "profileTimeline";
 };
 
 export const ThreadList = ({
 	threads,
 	highlightQuery = "",
+	variant = "default",
 }: ThreadListType) => {
 	const threadList: ThreadType[] = threads;
 	const router = useViewTransitionRouter();
+	const isProfileTimeline = variant === "profileTimeline";
 	const firstImageThreadIndex = threadList.findIndex(
 		(thread) => (thread.imageUrls ?? []).length > 0,
 	);
@@ -46,7 +50,12 @@ export const ThreadList = ({
 					"w-[9rem] sm:w-[10.5rem] aspect-[4/3] rounded-lg";
 				const previewImageClassName = "h-full w-full";
 				const renderThreadTitle = () => (
-					<h3 className="block font-bold line-clamp-2 whitespace-pre-line break-words sm:text-lg">
+					<h3
+						className={cn(
+							"block font-bold line-clamp-2 whitespace-pre-line break-words sm:text-lg",
+							isProfileTimeline && "text-[15px] sm:text-[16px] text-[#0f0f0f]",
+						)}
+					>
 						{hasYouTubeInTitle ? (
 							<AutoLinkText text={thread.title} hideYouTubeUrls />
 						) : (
@@ -84,7 +93,12 @@ export const ThreadList = ({
 				return (
 					<div
 						key={thread.id}
-						className="thread-list-card group relative z-0 flex items-start gap-4 border-b border-gray-200 bg-white px-4 pb-3 pt-4 text-gray-900 transition hover:border-gray-300 hover:bg-gray-50 sm:cursor-pointer"
+						className={cn(
+							"thread-list-card group relative z-0 flex items-start gap-4 border-b px-4 pb-3 pt-4 transition sm:cursor-pointer",
+							isProfileTimeline
+								? "border-[#e5e5e5] bg-white text-[#0f0f0f] [@media(hover:hover)]:hover:bg-[#fafafa]"
+								: "border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-gray-50",
+						)}
 						role="link"
 						tabIndex={0}
 						aria-label={`スレッドへ移動: ${thread.title}`}
@@ -112,16 +126,29 @@ export const ThreadList = ({
 						}}
 					>
 						<div className="min-w-0 flex-1 space-y-3">
-							<div className="flex items-center gap-2 text-gray-500 hover:text-gray-600">
+							<div
+								className={cn(
+									"flex items-center gap-2",
+									isProfileTimeline
+										? "text-[#606060]"
+										: "text-gray-500 hover:text-gray-600",
+								)}
+							>
 								<Link
 									href={authorHref}
 									aria-label={`ユーザー: ${thread.author.name}`}
-									className="shrink-0 inline-flex min-h-7 items-center gap-1 rounded px-1 text-xs leading-none pointer-events-auto"
+									className={cn(
+										"shrink-0 inline-flex min-h-7 items-center gap-1 rounded px-1 text-xs leading-none pointer-events-auto",
+										isProfileTimeline && "text-[#0f0f0f]",
+									)}
 								>
 									<AuthorAvatar
 										name={thread.author.name}
 										image={thread.author.image}
-										className="w-5 h-5 bg-white"
+										className={cn(
+											"w-5 h-5 bg-white",
+											isProfileTimeline && "bg-white",
+										)}
 										fallbackClassName="text-xs"
 									/>
 									<span>{thread.author.name}</span>
@@ -152,47 +179,57 @@ export const ThreadList = ({
 								{renderThreadImages()}
 							</div>
 							<div className="flex flex-col space-y-2">
-								<div className="relative z-10 flex flex-wrap gap-3 self-start">
-									{thread.threadTags?.map((tag) => (
-										<Link
-											href="/"
-											key={tag.id}
-											className="thread-list-tag-link inline-flex items-center gap-1 text-xs font-semibold text-blue-600 [@media(hover:hover)]:hover:underline"
-										>
-											#{tag.name}
-										</Link>
-									))}
-								</div>
-								<div className="relative z-10 flex flex-wrap items-center gap-2 pointer-events-none">
-									<div className={THREAD_LIST_META_CHIP_CLASS}>
-										<ChatIcon
-											className="h-4 w-4 text-[#ABBAC2]"
-											style={{ strokeWidth: 1.9 }}
-										/>
-										{thread.postCount > 0 && (
-											<span className="text-[10px] leading-none">
-												{thread.postCount}
-											</span>
-										)}
+								{!isProfileTimeline ? (
+									<div className="relative z-10 flex flex-wrap gap-3 self-start">
+										{thread.threadTags?.map((tag) => (
+											<Link
+												href="/"
+												key={tag.id}
+												className="thread-list-tag-link inline-flex items-center gap-1 text-xs font-semibold text-blue-600 [@media(hover:hover)]:hover:underline"
+											>
+												#{tag.name}
+											</Link>
+										))}
 									</div>
-									<LikeButton
-										threadId={thread.id}
-										initialLikeCount={thread.likeCount}
-										initialLikedByMe={thread.likedByMe}
-										size="compact"
-									/>
-									<Button
-										asChild
-										variant="zenn-like"
-										rounded="lg"
-										enableClickAnimation
-										className="sm:hidden ml-auto shrink-0 pointer-events-auto z-10 h-[45px] w-[69px] gap-1 px-2 text-[13px] text-slate-100 sm:h-9 sm:w-[78px] sm:gap-1.5 sm:px-2.5 sm:text-[14px]"
-									>
-										<Link href={href} aria-label={`みる: ${thread.title}`}>
-											みる
-											<ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-										</Link>
-									</Button>
+								) : null}
+								<div className="relative z-10 flex flex-wrap items-center gap-2 pointer-events-none">
+									{isProfileTimeline ? (
+										<span className="text-xs text-[#606060]">
+											返信 {thread.postCount}
+										</span>
+									) : (
+										<>
+											<div className={THREAD_LIST_META_CHIP_CLASS}>
+												<ChatIcon
+													className="h-4 w-4 text-[#ABBAC2]"
+													style={{ strokeWidth: 1.9 }}
+												/>
+												{thread.postCount > 0 && (
+													<span className="text-[10px] leading-none">
+														{thread.postCount}
+													</span>
+												)}
+											</div>
+											<LikeButton
+												threadId={thread.id}
+												initialLikeCount={thread.likeCount}
+												initialLikedByMe={thread.likedByMe}
+												size="compact"
+											/>
+											<Button
+												asChild
+												variant="zenn-like"
+												rounded="lg"
+												enableClickAnimation
+												className="sm:hidden ml-auto shrink-0 pointer-events-auto z-10 h-[45px] w-[69px] gap-1 px-2 text-[13px] text-slate-100 sm:h-9 sm:w-[78px] sm:gap-1.5 sm:px-2.5 sm:text-[14px]"
+											>
+												<Link href={href} aria-label={`みる: ${thread.title}`}>
+													みる
+													<ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+												</Link>
+											</Button>
+										</>
+									)}
 								</div>
 							</div>
 						</div>
