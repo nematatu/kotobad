@@ -36,7 +36,7 @@ const MAX_FAVORITE_PLAYERS = 3;
 const toPlayerCardImageUrl = (sourceUrl: string) =>
 	toPresetCfImageUrl(sourceUrl, "playerCard") ?? sourceUrl;
 const toPlayerPreviewImageUrl = (sourceUrl: string) =>
-	toPresetCfImageUrl(sourceUrl, "zoom") ?? sourceUrl;
+	toPresetCfImageUrl(sourceUrl, "playerZoom") ?? sourceUrl;
 
 export function FavoritePlayersSelectDialog({
 	open,
@@ -310,20 +310,20 @@ export function FavoritePlayersSelectDialog({
 				}}
 			>
 				<DialogContent
-					className="w-[calc(100vw-0.375rem)] max-w-2xl rounded-md border-slate-900 bg-black p-0"
-					closeButtonClassName="hidden sm:inline-flex right-3 top-3 z-40 h-8 w-8 bg-black/70 text-white opacity-100 shadow-sm"
+					className="w-[calc(100vw-0.375rem)] max-w-[min(92vw,720px)] rounded-md border-[#d6dde6] bg-white p-0"
+					closeButtonClassName="hidden sm:inline-flex right-3 top-3 z-40 h-8 w-8 bg-white/95 text-[#304050] opacity-100 shadow-none"
 				>
 					<DialogHeader className="sr-only">
 						<DialogTitle>選手画像プレビュー</DialogTitle>
 					</DialogHeader>
-					<div className="relative flex h-[min(90vh,980px)] items-center justify-center">
+					<div className="relative aspect-square w-full">
 						{previewImage ? (
 							<Image
 								src={previewImage.src}
 								alt={previewImage.alt}
 								fill
 								unoptimized
-								className="object-contain"
+								className="object-cover"
 							/>
 						) : null}
 					</div>

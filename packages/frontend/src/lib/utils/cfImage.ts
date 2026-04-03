@@ -12,7 +12,8 @@ export type CfImagePreset =
 	| "avatar"
 	| "tagIcon"
 	| "playerCard"
-	| "playerThumb";
+	| "playerThumb"
+	| "playerZoom";
 
 export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	post: {
@@ -47,7 +48,14 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	},
 	playerThumb: {
 		width: 192,
+		height: 192,
 		quality: 72,
+		fit: "cover",
+	},
+	playerZoom: {
+		width: 1200,
+		height: 1200,
+		quality: 82,
 		fit: "cover",
 	},
 };

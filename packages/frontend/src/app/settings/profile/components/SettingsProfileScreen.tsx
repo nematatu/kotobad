@@ -170,6 +170,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 												<FavoritePlayerImageCard
 													key={player.id}
 													player={player}
+													enablePreview
 												/>
 											))}
 										</div>

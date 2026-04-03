@@ -49,7 +49,11 @@ export function UserProfileActivity({
 				{favoritePlayers.length > 0 ? (
 					<div className="mt-3 flex flex-wrap gap-x-7 gap-y-1.5">
 						{favoritePlayers.map((player) => (
-							<FavoritePlayerImageCard key={player.id} player={player} />
+							<FavoritePlayerImageCard
+								key={player.id}
+								player={player}
+								enablePreview
+							/>
 						))}
 					</div>
 				) : null}
