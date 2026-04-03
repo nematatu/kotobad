@@ -10,6 +10,7 @@ export type CfImagePreset =
 	| "threadList"
 	| "zoom"
 	| "avatar"
+	| "profileHeader"
 	| "tagIcon"
 	| "playerCard"
 	| "playerThumb"
@@ -34,6 +35,12 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	avatar: {
 		width: 96,
 		quality: 68,
+		fit: "cover",
+	},
+	profileHeader: {
+		width: 1440,
+		height: 480,
+		quality: 72,
 		fit: "cover",
 	},
 	tagIcon: {

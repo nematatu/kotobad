@@ -19,6 +19,7 @@ export function UserProfileEditor({ profile }: Props) {
 		editedName,
 		editedBio,
 		avatarImage,
+		headerImage,
 		editedFavoritePlayers,
 		isFavoritePlayersDialogOpen,
 		favoritePlayerOptions,
@@ -45,6 +46,7 @@ export function UserProfileEditor({ profile }: Props) {
 		editedName,
 		editedBio,
 		avatarImage,
+		headerImage,
 		editedFavoritePlayers,
 		isFavoritePlayersDialogOpen,
 		favoritePlayerOptions,
@@ -85,6 +87,7 @@ export function UserProfileEditor({ profile }: Props) {
 				previewName={editedName}
 				previewBio={editedBio}
 				previewAvatarImage={avatarImage}
+				previewHeaderImage={headerImage}
 				previewFavoritePlayers={editedFavoritePlayers}
 				onConfirmAction={confirmUpdateAction}
 			/>

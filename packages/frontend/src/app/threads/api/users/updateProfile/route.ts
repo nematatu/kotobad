@@ -29,8 +29,14 @@ const handleUpdateProfile = async (req: Request) => {
 		}
 
 		console.error("Failed to update profile via BFF", error);
+		const message =
+			error instanceof Error && error.message.length > 0
+				? error.message
+				: undefined;
 		return NextResponse.json(
-			{ error: "Failed to update profile" },
+			message
+				? { error: "Failed to update profile", message }
+				: { error: "Failed to update profile" },
 			{ status: 500 },
 		);
 	}

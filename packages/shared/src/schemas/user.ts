@@ -26,6 +26,7 @@ export const UserProfileSchema = z.object({
 	id: z.string().min(1),
 	name: z.string().min(1),
 	image: z.string().nullable().optional(),
+	headerImage: z.string().url().nullable().optional(),
 	bio: z.string().nullable(),
 	favoritePlayers: z.array(FavoritePlayerSchema),
 	createdAt: z.string(),
@@ -56,6 +57,17 @@ export const UpdateUserProfileSchema = z.object({
 			"image/svg+xml",
 		])
 		.optional(),
+	headerImage: z
+		.file()
+		.max(6 * 1024 * 1024)
+		.mime([
+			"image/png",
+			"image/jpeg",
+			"image/webp",
+			"image/avif",
+			"image/svg+xml",
+		])
+		.optional(),
 });
 
 export const UploadAvatarResponseSchema = z.object({
@@ -68,6 +80,7 @@ export const UpdateUserProfileResponseSchema = z.object({
 		name: z.string().min(1),
 		bio: z.string().nullable(),
 		image: z.string().nullable(),
+		headerImage: z.string().url().nullable(),
 		favoritePlayers: z.array(FavoritePlayerSchema),
 	}),
 });

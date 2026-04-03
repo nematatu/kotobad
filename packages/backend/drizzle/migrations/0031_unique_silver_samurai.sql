@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `header_image` text;

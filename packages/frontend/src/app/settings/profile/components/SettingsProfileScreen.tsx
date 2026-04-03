@@ -3,9 +3,11 @@
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
 import { Josefin_Sans } from "next/font/google";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
+import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
 import { FavoritePlayerImageCard } from "../../../users/[id]/components/FavoritePlayerImageCard";
 import { FavoritePlayersSelectDialog } from "../../../users/[id]/components/FavoritePlayersSelectDialog";
 import { useUserProfileEditor } from "../../../users/[id]/hooks/useUserProfileEditor";
@@ -26,15 +28,19 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 		editedName,
 		editedBio,
 		avatarImage,
+		headerImage,
 		editedFavoritePlayers,
 		isSavingProfile,
 		avatarInputRef,
+		headerImageInputRef,
 		isFavoritePlayersDialogOpen,
 		favoritePlayerOptions,
 		isLoadingFavoritePlayers,
 		favoritePlayersLoadError,
 		openAvatarFileDialogAction,
 		changeAvatarFileAction,
+		openHeaderImageFileDialogAction,
+		changeHeaderImageFileAction,
 		changeEditedNameAction,
 		changeEditedBioAction,
 		setIsFavoritePlayersDialogOpenAction,
@@ -70,6 +76,44 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 
 				<div className="px-6 py-8 sm:px-10">
 					<div className="mx-auto max-w-[960px]">
+						<div className="relative mb-6 overflow-hidden rounded-lg border border-[#d6dde6] bg-[#eef3fb]">
+							<div className="relative h-[140px] w-full sm:h-[180px]">
+								{headerImage ? (
+									<Image
+										src={
+											toPresetCfImageUrl(headerImage, "profileHeader") ??
+											headerImage
+										}
+										alt="プロフィールヘッダー画像"
+										fill
+										unoptimized
+										className="object-cover"
+									/>
+								) : (
+									<div className="h-full w-full bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)]" />
+								)}
+							</div>
+							<div className="absolute top-3 right-3">
+								<Button
+									type="button"
+									variant="outline"
+									enableClickAnimation
+									size="sm"
+									className="h-8 border-[#cfd8e3] bg-white/95 px-3 text-xs font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-white"
+									onClick={openHeaderImageFileDialogAction}
+									disabled={isSavingProfile}
+								>
+									ヘッダー画像を変更
+								</Button>
+							</div>
+							<input
+								ref={headerImageInputRef}
+								type="file"
+								accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+								className="hidden"
+								onChange={changeHeaderImageFileAction}
+							/>
+						</div>
 						<div className="grid gap-6 sm:grid-cols-[minmax(0,0.4fr)_1px_minmax(0,1.1fr)] sm:gap-0">
 							<div className="p-4 sm:px-8 sm:py-5">
 								<div className="flex flex-col items-center gap-6">

@@ -5,11 +5,13 @@ import type {
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
 import { Camera, Check, Loader2, X } from "lucide-react";
+import Image from "next/image";
 import type { ChangeEvent, RefObject } from "react";
 import IconButton from "@/components/common/button/IconButton";
 import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
+import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
 import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
@@ -23,6 +25,7 @@ type EditorCardViewModel = {
 	editedName: string;
 	editedBio: string;
 	avatarImage: string | null;
+	headerImage: string | null;
 	editedFavoritePlayers: FavoritePlayerType[];
 	isFavoritePlayersDialogOpen: boolean;
 	favoritePlayerOptions: UserProfileSelectablePlayerType[];
@@ -56,6 +59,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		editedName,
 		editedBio,
 		avatarImage,
+		headerImage,
 		editedFavoritePlayers,
 		isFavoritePlayersDialogOpen,
 		favoritePlayerOptions,
@@ -79,7 +83,22 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		<section className="relative overflow-hidden bg-white">
 			{isEditing ? (
 				<div className="mx-auto w-full max-w-[1070px] pt-6 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
-					<div className="h-[118px] w-full overflow-hidden rounded-xl bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)] sm:h-[172px]" />
+					<div className="relative h-[118px] w-full overflow-hidden rounded-xl sm:h-[172px]">
+						{headerImage ? (
+							<Image
+								src={
+									toPresetCfImageUrl(headerImage, "profileHeader") ??
+									headerImage
+								}
+								alt="プロフィールヘッダー画像"
+								fill
+								unoptimized
+								className="object-cover"
+							/>
+						) : (
+							<div className="h-full w-full bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)]" />
+						)}
+					</div>
 					<div className="relative mt-10 px-1 sm:px-0">
 						<div className="flex flex-col gap-7 sm:flex-row sm:items-start sm:gap-9">
 							<div className="group relative inline-flex">
@@ -185,7 +204,22 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 				</div>
 			) : (
 				<div className="mx-auto w-full max-w-[1070px] pt-6 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
-					<div className="h-[118px] w-full overflow-hidden rounded-xl bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)] sm:h-[172px]" />
+					<div className="relative h-[118px] w-full overflow-hidden rounded-xl sm:h-[172px]">
+						{headerImage ? (
+							<Image
+								src={
+									toPresetCfImageUrl(headerImage, "profileHeader") ??
+									headerImage
+								}
+								alt="プロフィールヘッダー画像"
+								fill
+								unoptimized
+								className="object-cover"
+							/>
+						) : (
+							<div className="h-full w-full bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)]" />
+						)}
+					</div>
 					<div className="relative mt-10 px-1 sm:px-0">
 						<div className="absolute top-0 right-1 z-10 sm:hidden">
 							<Button

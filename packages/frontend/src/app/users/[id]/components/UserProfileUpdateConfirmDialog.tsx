@@ -2,6 +2,7 @@
 
 import type { FavoritePlayerType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import type { MouseEvent } from "react";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import {
@@ -13,6 +14,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
 
 type Props = {
 	open: boolean;
@@ -22,6 +24,7 @@ type Props = {
 	previewName: string;
 	previewBio: string;
 	previewAvatarImage: string | null;
+	previewHeaderImage: string | null;
 	previewFavoritePlayers: FavoritePlayerType[];
 	onConfirmAction: () => Promise<boolean> | boolean;
 };
@@ -34,6 +37,7 @@ export function UserProfileUpdateConfirmDialog({
 	previewName,
 	previewBio,
 	previewAvatarImage,
+	previewHeaderImage,
 	previewFavoritePlayers,
 	onConfirmAction,
 }: Props) {
@@ -60,7 +64,22 @@ export function UserProfileUpdateConfirmDialog({
 					</AlertDialogHeader>
 					<div className="w-full text-left">
 						<section className="relative overflow-hidden rounded-xl border border-slate-200 bg-white">
-							<div className="h-16 bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)]" />
+							<div className="relative h-16">
+								{previewHeaderImage ? (
+									<Image
+										src={
+											toPresetCfImageUrl(previewHeaderImage, "profileHeader") ??
+											previewHeaderImage
+										}
+										alt="プロフィールヘッダー画像"
+										fill
+										unoptimized
+										className="object-cover"
+									/>
+								) : (
+									<div className="h-full w-full bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)]" />
+								)}
+							</div>
 							<div className="-mt-8 px-3 pb-3">
 								<div className="group relative inline-flex">
 									<AuthorAvatar
