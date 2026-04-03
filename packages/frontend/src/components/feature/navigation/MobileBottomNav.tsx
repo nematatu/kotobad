@@ -4,7 +4,7 @@ import type { TagType } from "@kotobad/shared/src/types/tag";
 import { motion } from "motion/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MobileBottomCreateThreadMorph } from "./MobileBottomCreateThreadMorph";
+import { MobileBottomCreateThreadOverlay } from "./MobileBottomCreateThreadOverlay";
 import { MobileBottomTabs } from "./MobileBottomTabs";
 
 type Props = {
@@ -19,9 +19,9 @@ const MobileBottomNav = ({ tags }: Props) => {
 	const isThreadDetailPage = threadDetailMatch !== null;
 	const shouldHideNavByScroll = !isCreateSurfaceOpen && isHiddenByScroll;
 	const centerCreateAction = isThreadDetailPage ? undefined : (
-		<MobileBottomCreateThreadMorph
+		<MobileBottomCreateThreadOverlay
 			tags={tags}
-			onOpenStateChange={setIsCreateSurfaceOpen}
+			onOpenStateChangeAction={setIsCreateSurfaceOpen}
 		/>
 	);
 
