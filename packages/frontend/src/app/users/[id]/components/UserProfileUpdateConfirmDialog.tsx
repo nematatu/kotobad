@@ -23,7 +23,7 @@ type Props = {
 	previewBio: string;
 	previewAvatarImage: string | null;
 	previewFavoritePlayers: FavoritePlayerType[];
-	onConfirmAction: () => Promise<void> | void;
+	onConfirmAction: () => Promise<boolean> | boolean;
 };
 
 export function UserProfileUpdateConfirmDialog({

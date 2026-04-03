@@ -49,7 +49,8 @@ type UseUserProfileEditorResult = {
 	setIsFavoritePlayersDialogOpenAction: (open: boolean) => void;
 	setFavoritePlayersAction: (players: FavoritePlayerType[]) => void;
 	reloadFavoritePlayersAction: () => Promise<void>;
-	confirmUpdateAction: () => Promise<void>;
+	confirmUpdateAction: () => Promise<boolean>;
+	hasChanges: boolean;
 };
 
 const revokeObjectUrl = (objectUrl: string | null) => {
@@ -66,10 +67,12 @@ const hasSameFavoritePlayers = (
 
 export const useUserProfileEditor = (
 	profile: UserProfileType,
+	options?: { alwaysEditing?: boolean },
 ): UseUserProfileEditorResult => {
 	const { user, setUser } = useUser();
 	const isLogin = user?.id === profile.id;
-	const [isEditing, setIsEditing] = useState(false);
+	const alwaysEditing = options?.alwaysEditing === true;
+	const [isEditing, setIsEditing] = useState(alwaysEditing);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 	const [savedProfile, setSavedProfile] = useState<EditableProfile>(
 		toEditableProfile(profile),
@@ -98,6 +101,22 @@ export const useUserProfileEditor = (
 	>(null);
 	const hasLoadedFavoritePlayersRef = useRef(false);
 
+	const canEdit = alwaysEditing || isEditing;
+
+	const trimmedName = editedName.trim();
+	const hasNameChanged = trimmedName !== savedProfile.name;
+	const hasBioChanged = editedBio !== savedProfile.bio;
+	const hasImageChanged = avatarFile !== null;
+	const hasFavoritePlayersChanged = !hasSameFavoritePlayers(
+		editedFavoritePlayers,
+		savedProfile.favoritePlayers,
+	);
+	const hasChanges =
+		hasNameChanged ||
+		hasBioChanged ||
+		hasImageChanged ||
+		hasFavoritePlayersChanged;
+
 	const clearPreviewAvatarUrl = useCallback(() => {
 		revokeObjectUrl(previewAvatarUrlRef.current);
 		previewAvatarUrlRef.current = null;
@@ -118,7 +137,9 @@ export const useUserProfileEditor = (
 	const closeEditUi = () => {
 		setIsFavoritePlayersDialogOpen(false);
 		setIsConfirmOpen(false);
-		setIsEditing(false);
+		if (!alwaysEditing) {
+			setIsEditing(false);
+		}
 	};
 
 	useEffect(() => {
@@ -127,9 +148,11 @@ export const useUserProfileEditor = (
 		applyDraft(nextSavedProfile);
 		setIsSavingProfile(false);
 		setIsConfirmOpen(false);
-		setIsEditing(false);
+		if (!alwaysEditing) {
+			setIsEditing(false);
+		}
 		setIsFavoritePlayersDialogOpen(false);
-	}, [profile, applyDraft]);
+	}, [profile, applyDraft, alwaysEditing]);
 
 	useEffect(() => {
 		return () => {
@@ -158,7 +181,7 @@ export const useUserProfileEditor = (
 	};
 
 	const setIsFavoritePlayersDialogOpenAction = (open: boolean) => {
-		if (!isEditing || isSavingProfile) return;
+		if (!canEdit || isSavingProfile) return;
 		setIsFavoritePlayersDialogOpen(open);
 		if (
 			open &&
@@ -170,7 +193,7 @@ export const useUserProfileEditor = (
 	};
 
 	const openAvatarFileDialogAction = () => {
-		if (!isEditing || isSavingProfile) return;
+		if (!canEdit || isSavingProfile) return;
 		avatarInputRef.current?.click();
 	};
 
@@ -197,35 +220,21 @@ export const useUserProfileEditor = (
 	};
 
 	const setFavoritePlayersAction = (players: FavoritePlayerType[]) => {
-		if (!isEditing || isSavingProfile) return;
+		if (!canEdit || isSavingProfile) return;
 		setEditedFavoritePlayers(players.slice(0, MAX_FAVORITE_PLAYERS));
 	};
 
 	const confirmUpdateAction = async () => {
-		if (isSavingProfile) return;
-
-		const trimmedName = editedName.trim();
-		const hasNameChanged = trimmedName !== savedProfile.name;
-		const hasBioChanged = editedBio !== savedProfile.bio;
-		const hasImageChanged = avatarFile !== null;
-		const hasFavoritePlayersChanged = !hasSameFavoritePlayers(
-			editedFavoritePlayers,
-			savedProfile.favoritePlayers,
-		);
-		const hasChanges =
-			hasNameChanged ||
-			hasBioChanged ||
-			hasImageChanged ||
-			hasFavoritePlayersChanged;
+		if (isSavingProfile) return false;
 
 		if (!hasChanges) {
 			closeEditUi();
-			return;
+			return true;
 		}
 
 		if (trimmedName.length === 0) {
 			toast.error("名前を入力してください");
-			return;
+			return false;
 		}
 
 		setIsSavingProfile(true);
@@ -271,10 +280,12 @@ export const useUserProfileEditor = (
 					? "プロフィールを更新しました"
 					: "更新対象はありませんでした",
 			);
+			return true;
 		} catch (error: unknown) {
 			toast.error(
 				getBffErrorMessage(error) ?? "プロフィール更新に失敗しました",
 			);
+			return false;
 		} finally {
 			setIsSavingProfile(false);
 		}
@@ -287,7 +298,7 @@ export const useUserProfileEditor = (
 
 	return {
 		isLogin,
-		isEditing,
+		isEditing: canEdit,
 		isConfirmOpen,
 		isSavingProfile,
 		editedName,
@@ -299,7 +310,10 @@ export const useUserProfileEditor = (
 		isLoadingFavoritePlayers,
 		favoritePlayersLoadError,
 		avatarInputRef,
-		startEditingAction: () => setIsEditing(true),
+		startEditingAction: () => {
+			if (alwaysEditing) return;
+			setIsEditing(true);
+		},
 		openConfirmAction: () => setIsConfirmOpen(true),
 		setIsConfirmOpenAction: setIsConfirmOpen,
 		cancelEditingAction,
@@ -311,5 +325,6 @@ export const useUserProfileEditor = (
 		setFavoritePlayersAction,
 		reloadFavoritePlayersAction,
 		confirmUpdateAction,
+		hasChanges,
 	};
 };

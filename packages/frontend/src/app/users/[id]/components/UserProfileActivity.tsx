@@ -1,34 +1,54 @@
 "use client";
 
-import type { UserProfileType } from "@kotobad/shared/src/types/user";
+import type {
+	FavoritePlayerType,
+	UserProfileType,
+} from "@kotobad/shared/src/types/user";
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { AutoLinkText } from "@/components/common/AutoLinkText";
 import { Link } from "@/components/common/Link";
-import { useUserProfileEditor } from "../hooks/useUserProfileEditor";
 import { FavoritePlayerImageCard } from "./FavoritePlayerImageCard";
 
 type Props = {
 	profile: UserProfileType;
+	favoritePlayers: FavoritePlayerType[];
+	isEditing: boolean;
+	onOpenFavoritePlayersSelectAction: () => void;
 };
 
 type ProfileTab = "threads" | "posts";
 
-export function UserProfileActivity({ profile }: Props) {
-	const { editedFavoritePlayers } = useUserProfileEditor(profile);
+export function UserProfileActivity({
+	profile,
+	favoritePlayers,
+	isEditing,
+	onOpenFavoritePlayersSelectAction,
+}: Props) {
 	const [activeTab, setActiveTab] = useState<ProfileTab>("threads");
 
 	return (
 		<div className="mx-auto w-full max-w-[1070px] bg-white pb-6 [font-family:Roboto,Arial,sans-serif] sm:pb-8">
 			<div className="space-y-6">
 				<div className="h-[1px] w-full bg-[#e5e5e5] my-8" />
-				<p className="line-clamp-1 text-[#0f0f0f] font-bold sm:text-lg sm:leading-[20px]">
-					推し選手
-				</p>
-				{editedFavoritePlayers.length > 0 ? (
+				<div className="flex items-center justify-between gap-2">
+					<p className="line-clamp-1 text-[#0f0f0f] font-bold sm:text-lg sm:leading-[20px]">
+						推し選手
+					</p>
+					{isEditing ? (
+						<button
+							type="button"
+							className="text-xs text-blue-600 sm:text-[13px]"
+							onClick={onOpenFavoritePlayersSelectAction}
+						>
+							選択する
+						</button>
+					) : null}
+				</div>
+				{favoritePlayers.length > 0 ? (
 					<div className="mt-3 flex flex-wrap gap-x-7 gap-y-1.5">
-						{editedFavoritePlayers.map((player) => (
+						{favoritePlayers.map((player) => (
 							<FavoritePlayerImageCard key={player.id} player={player} />
 						))}
 					</div>

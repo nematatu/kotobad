@@ -4,28 +4,22 @@ import type {
 	FavoritePlayerType,
 	UserProfileSelectablePlayerType,
 } from "@kotobad/shared/src/types/user";
-import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { Camera, Check, Loader2, X } from "lucide-react";
 import type { ChangeEvent, RefObject } from "react";
 import IconButton from "@/components/common/button/IconButton";
+import { Link } from "@/components/common/Link";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
 import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
 } from "../lib/profileEditor";
-import { FavoritePlayerImageCard } from "./FavoritePlayerImageCard";
 import { FavoritePlayersSelectDialog } from "./FavoritePlayersSelectDialog";
 
 type EditorCardViewModel = {
 	isLogin: boolean;
 	isEditing: boolean;
 	isSavingProfile: boolean;
-	profileId: string;
-	createdAt: string;
-	threadCount: number;
-	postCount: number;
-	favoritePlayerCount: number;
 	editedName: string;
 	editedBio: string;
 	avatarImage: string | null;
@@ -38,7 +32,6 @@ type EditorCardViewModel = {
 };
 
 type EditorCardActions = {
-	onStartEditingAction: () => void;
 	onOpenConfirmAction: () => void;
 	onCancelEditingAction: () => void;
 	onOpenAvatarFileDialogAction: () => void;
@@ -60,11 +53,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		isLogin,
 		isEditing,
 		isSavingProfile,
-		profileId,
-		createdAt,
-		threadCount,
-		postCount,
-		favoritePlayerCount,
 		editedName,
 		editedBio,
 		avatarImage,
@@ -76,7 +64,6 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 		avatarInputRef,
 	} = viewModel;
 	const {
-		onStartEditingAction,
 		onOpenConfirmAction,
 		onCancelEditingAction,
 		onOpenAvatarFileDialogAction,
@@ -93,13 +80,13 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 			{isEditing ? (
 				<div className="mx-auto w-full max-w-[1070px] pt-4 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
 					<div className="h-[118px] w-full overflow-hidden rounded-xl bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)] sm:h-[172px]" />
-					<div className="relative mt-4 px-1 sm:px-0">
-						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-4">
+					<div className="relative mt-8 px-1 sm:px-0">
+						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-9">
 							<div className="group relative inline-flex">
 								<AuthorAvatar
 									name={editedName}
 									image={avatarImage}
-									className="h-24 w-24 bg-white sm:h-40 sm:w-40"
+									className="h-20 w-20 bg-white sm:h-30 sm:w-30"
 									fallbackClassName="text-xl sm:text-3xl"
 								/>
 								<button
@@ -123,12 +110,12 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 									onChange={onAvatarFileChangeAction}
 								/>
 							</div>
-							<div className="min-w-0 flex-1 pt-1 sm:pt-2">
-								<div className="flex items-start gap-3">
-									<div className="group relative min-w-0 flex-1 rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
+							<div className="min-w-0 flex-1 space-y-1.5 sm:pt-1">
+								<div className="flex w-full items-start gap-3">
+									<div className="group relative min-w-0 w-full max-w-[34rem] rounded-md border border-[#d9d9d9] bg-white px-3 pt-4 pb-1.5 transition-colors focus-within:border-[#1d9bf0]">
 										<label
 											htmlFor="name"
-											className="pointer-events-none absolute top-1 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+											className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0]"
 										>
 											名前
 										</label>
@@ -140,13 +127,13 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 												onEditedNameChangeAction(event.target.value)
 											}
 											maxLength={MAX_PROFILE_NAME_LENGTH}
-											className="h-14 w-full rounded-md border-0 bg-transparent px-3 pt-6 pb-5 text-[20px] font-bold text-[#0f0f0f] outline-none focus:ring-0 sm:h-[58px] sm:text-[36px] sm:leading-[50px]"
+											className="h-9 w-full border-0 bg-transparent px-0 py-0 text-[1.9rem] leading-[1.2] font-bold text-[#0f0f0f] outline-none focus:ring-0 sm:h-14 sm:text-2xl sm:leading-[52px]"
 										/>
-										<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+										<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
 											{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
-										</span>
+										</p>
 									</div>
-									<div className="mt-0.5 flex items-center gap-2">
+									<div className="mt-0.5 ml-auto flex shrink-0 items-center gap-2">
 										<IconButton
 											variant="outline"
 											icon={<X />}
@@ -172,59 +159,25 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										</IconButton>
 									</div>
 								</div>
-								<p className="mt-1 line-clamp-1 text-sm text-[#606060] sm:text-[14px] sm:leading-[20px]">
-									@{profileId} ・ スレッド {threadCount} 件 ・ 返信 {postCount}{" "}
-									件
-								</p>
-								<div className="group relative mt-2 w-full max-w-2xl rounded-md border border-slate-300 bg-white transition-colors focus-within:!border-blue-600">
+								<div className="group relative mt-0.5 w-full max-w-2xl rounded-md border border-[#d9d9d9] bg-white px-3 pt-5 pb-4 transition-colors focus-within:border-[#1d9bf0]">
 									<label
 										htmlFor="bio"
-										className="pointer-events-none absolute top-1 left-3 text-[11px] font-medium text-slate-500 transition-colors group-focus-within:text-blue-600"
+										className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0]"
 									>
 										自己紹介
 									</label>
-									<textarea
+									<input
 										id="bio"
 										value={editedBio}
 										onChange={(event) =>
 											onEditedBioChangeAction(event.target.value)
 										}
 										maxLength={MAX_PROFILE_BIO_LENGTH}
-										rows={2}
-										className="w-full resize-none overflow-y-auto rounded-md border-0 bg-transparent px-3 pt-7 pb-6 text-sm text-[#0f0f0f] outline-none focus:ring-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:text-[14px] sm:leading-[20px]"
+										className="h-9 w-full border-0 bg-transparent px-0 py-0 text-sm leading-[1.2] text-[#0f0f0f] outline-none focus:ring-0 sm:h-10 sm:text-[17px] sm:leading-[52px]"
 									/>
-									<span className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+									<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
 										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
-									</span>
-								</div>
-								<div className="mt-2 space-y-2">
-									<div className="flex items-center gap-2">
-										<p className="text-xs text-[#606060] sm:text-[14px] sm:leading-[20px]">
-											好きな選手 {favoritePlayerCount} 人 ・ 登録日{" "}
-											{formatDate(createdAt, { withTime: false })}
-										</p>
-										<button
-											type="button"
-											className="text-xs text-blue-600 sm:text-[13px]"
-											onClick={() =>
-												onFavoritePlayersDialogOpenChangeAction(true)
-											}
-										>
-											選択する
-										</button>
-									</div>
-									{editedFavoritePlayers.length > 0 ? (
-										<div className="flex flex-wrap gap-x-2 gap-y-1.5">
-											{editedFavoritePlayers.map((player) => (
-												<FavoritePlayerImageCard
-													key={player.id}
-													player={player}
-												/>
-											))}
-										</div>
-									) : (
-										<p className="text-sm text-slate-400">未選択です</p>
-									)}
+									</p>
 								</div>
 							</div>
 						</div>
@@ -247,19 +200,24 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										{editedName}
 									</h1>
 									<Button
-										type="button"
 										variant={isLogin ? "outline" : "default"}
 										rounded="full"
 										enableClickAnimation
+										asChild={isLogin}
 										className={
 											isLogin
 												? "mt-0.5 h-9 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100"
 												: "mt-0.5 h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727]"
 										}
 										disabled={isSavingProfile}
-										onClick={isLogin ? onStartEditingAction : undefined}
 									>
-										{isLogin ? "プロフィールを編集" : "フォロー"}
+										{isLogin ? (
+											<Link href="/settings/profile" showIndicator={false}>
+												プロフィールを編集
+											</Link>
+										) : (
+											"フォロー"
+										)}
 									</Button>
 								</div>
 								<p className="line-clamp-1 whitespace-pre-line break-words text-sm text-[#0f0f0f] sm:text-[14px] sm:leading-[20px]">

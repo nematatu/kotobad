@@ -2,6 +2,7 @@
 
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { useUserProfileEditor } from "../hooks/useUserProfileEditor";
+import { UserProfileActivity } from "./UserProfileActivity";
 import { UserProfileEditorCard } from "./UserProfileEditorCard";
 import { UserProfileUpdateConfirmDialog } from "./UserProfileUpdateConfirmDialog";
 
@@ -24,7 +25,6 @@ export function UserProfileEditor({ profile }: Props) {
 		isLoadingFavoritePlayers,
 		favoritePlayersLoadError,
 		avatarInputRef,
-		startEditingAction,
 		openConfirmAction,
 		setIsConfirmOpenAction,
 		cancelEditingAction,
@@ -42,11 +42,6 @@ export function UserProfileEditor({ profile }: Props) {
 		isLogin,
 		isEditing,
 		isSavingProfile,
-		profileId: profile.id,
-		createdAt: profile.createdAt,
-		threadCount: profile.threadCount,
-		postCount: profile.postCount,
-		favoritePlayerCount: editedFavoritePlayers.length,
 		editedName,
 		editedBio,
 		avatarImage,
@@ -59,7 +54,6 @@ export function UserProfileEditor({ profile }: Props) {
 	};
 
 	const actions = {
-		onStartEditingAction: startEditingAction,
 		onOpenConfirmAction: openConfirmAction,
 		onCancelEditingAction: cancelEditingAction,
 		onOpenAvatarFileDialogAction: openAvatarFileDialogAction,
@@ -75,6 +69,14 @@ export function UserProfileEditor({ profile }: Props) {
 	return (
 		<>
 			<UserProfileEditorCard viewModel={viewModel} actions={actions} />
+			<UserProfileActivity
+				profile={profile}
+				favoritePlayers={editedFavoritePlayers}
+				isEditing={isEditing}
+				onOpenFavoritePlayersSelectAction={() =>
+					setIsFavoritePlayersDialogOpenAction(true)
+				}
+			/>
 			<UserProfileUpdateConfirmDialog
 				open={isConfirmOpen}
 				onOpenChangeAction={setIsConfirmOpenAction}
