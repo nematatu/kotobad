@@ -2,6 +2,7 @@
 
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
+import { Josefin_Sans } from "next/font/google";
 import { useRouter } from "next/navigation";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,12 @@ import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
 } from "../../../users/[id]/lib/profileEditor";
+
+const settingsHeadingFont = Josefin_Sans({
+	subsets: ["latin"],
+	weight: ["700"],
+	display: "swap",
+});
 
 function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 	const router = useRouter();
@@ -51,124 +58,130 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 	};
 
 	return (
-		<div className="min-h-screen w-full bg-white !p-0">
+		<>
 			<section className="mx-auto w-full max-w-[1120px] overflow-hidden">
 				<div className="border-b px-6 py-5 sm:px-10">
-					<h1 className="mt-1 text-[34px] leading-none font-bold text-[#2f3439] sm:text-[40px]">
-						プロフィール設定
+					<h1
+						className={`${settingsHeadingFont.className} mt-1 text-[34px] leading-none font-bold tracking-[0.06em] text-[#2f3439] sm:text-[40px]`}
+					>
+						Settings
 					</h1>
 				</div>
 
 				<div className="px-6 py-8 sm:px-10">
-					<div className="mx-auto grid max-w-[860px] gap-6 sm:grid-cols-[220px_1fr] sm:gap-8">
-						<div className="p-4">
-							<div className="flex flex-col items-center gap-6">
-								<AuthorAvatar
-									name={editedName}
-									image={avatarImage}
-									className="h-22 w-22"
-									fallbackClassName="text-xl"
-								/>
-								<Button
-									variant="outline"
-									enableClickAnimation
-									size="lg"
-									className="font-semibold text-[#4b647e] transition-colors [@media(hover:hover)]:hover:text-[#1d9bf0]"
-									onClick={openAvatarFileDialogAction}
-									disabled={isSavingProfile}
-								>
-									画像を変更する
-								</Button>
-							</div>
-							<input
-								ref={avatarInputRef}
-								type="file"
-								accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
-								className="hidden"
-								onChange={changeAvatarFileAction}
-							/>
-						</div>
-
-						<div className="space-y-8 rounded-lg border border-[#e3eaf2] bg-white p-4 sm:p-5">
-							<div>
-								<label
-									htmlFor="settings-profile-name"
-									className="mb-3 block text-[13px] font-semibold text-[#38414a]"
-								>
-									表示名
-								</label>
-								<div className="relative">
-									<input
-										id="settings-profile-name"
-										value={editedName}
-										onChange={(event) =>
-											changeEditedNameAction(event.target.value)
-										}
-										maxLength={MAX_PROFILE_NAME_LENGTH}
-										className="h-12 w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 text-[15px] text-[#2f3439] outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white"
+					<div className="mx-auto max-w-[960px]">
+						<div className="grid gap-6 sm:grid-cols-[minmax(0,0.4fr)_1px_minmax(0,1.1fr)] sm:gap-0">
+							<div className="p-4 sm:px-8 sm:py-5">
+								<div className="flex flex-col items-center gap-6">
+									<AuthorAvatar
+										name={editedName}
+										image={avatarImage}
+										className="h-22 w-22"
+										fallbackClassName="text-xl"
 									/>
-									<span className="pointer-events-none absolute right-3 bottom-2 text-[11px] text-[#97a3b0]">
-										{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
-									</span>
-								</div>
-							</div>
-
-							<div>
-								<label
-									htmlFor="settings-profile-bio"
-									className="mb-3 block text-[13px] font-semibold text-[#38414a]"
-								>
-									自己紹介
-								</label>
-								<div className="relative">
-									<textarea
-										id="settings-profile-bio"
-										value={editedBio}
-										onChange={(event) =>
-											changeEditedBioAction(event.target.value)
-										}
-										maxLength={MAX_PROFILE_BIO_LENGTH}
-										rows={3}
-										className="w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 py-2 text-[15px] text-[#2f3439] resize-none outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white"
-									/>
-									<span className="pointer-events-none absolute right-3 bottom-3 text-[11px] text-[#97a3b0]">
-										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
-									</span>
-								</div>
-							</div>
-
-							<div>
-								<div className="mb-3 flex items-center gap-2">
-									<p className="text-[13px] font-semibold text-[#38414a]">
-										好きな選手
-									</p>
 									<Button
-										variant="zenn-like"
+										variant="outline"
 										enableClickAnimation
-										size="sm"
-										className="text-xs !px-2"
-										onClick={() => setIsFavoritePlayersDialogOpenAction(true)}
+										size="lg"
+										className="font-semibold text-[#4b647e] transition-colors [@media(hover:hover)]:hover:text-[#1d9bf0]"
+										onClick={openAvatarFileDialogAction}
+										disabled={isSavingProfile}
 									>
-										選択する
+										画像を変更する
 									</Button>
 								</div>
-								{editedFavoritePlayers.length > 0 ? (
-									<div className="flex flex-wrap gap-3">
-										{editedFavoritePlayers.map((player) => (
-											<FavoritePlayerImageCard
-												key={player.id}
-												player={player}
-											/>
-										))}
+								<input
+									ref={avatarInputRef}
+									type="file"
+									accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+									className="hidden"
+									onChange={changeAvatarFileAction}
+								/>
+							</div>
+
+							<div className="hidden w-px bg-[#e3eaf2] sm:block" />
+
+							<div className="space-y-8 p-4 sm:px-8 sm:py-5">
+								<div>
+									<label
+										htmlFor="settings-profile-name"
+										className="mb-3 block text-[13px] font-semibold text-[#38414a]"
+									>
+										表示名
+									</label>
+									<div className="relative">
+										<input
+											id="settings-profile-name"
+											value={editedName}
+											onChange={(event) =>
+												changeEditedNameAction(event.target.value)
+											}
+											maxLength={MAX_PROFILE_NAME_LENGTH}
+											className="h-12 w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 text-[15px] text-[#2f3439] outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white"
+										/>
+										<span className="pointer-events-none absolute right-3 bottom-2 text-[11px] text-[#97a3b0]">
+											{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
+										</span>
 									</div>
-								) : (
-									<p className="text-sm text-[#8a98a8]">選択されていません</p>
-								)}
+								</div>
+
+								<div>
+									<label
+										htmlFor="settings-profile-bio"
+										className="mb-3 block text-[13px] font-semibold text-[#38414a]"
+									>
+										自己紹介
+									</label>
+									<div className="relative">
+										<textarea
+											id="settings-profile-bio"
+											value={editedBio}
+											onChange={(event) =>
+												changeEditedBioAction(event.target.value)
+											}
+											maxLength={MAX_PROFILE_BIO_LENGTH}
+											rows={3}
+											className="w-full rounded-lg border border-[#d6dde6] bg-[#f7f9fc] px-3 py-2 text-[15px] text-[#2f3439] resize-none outline-none transition-colors focus:border-[#1d9bf0] focus:bg-white"
+										/>
+										<span className="pointer-events-none absolute right-3 bottom-3 text-[11px] text-[#97a3b0]">
+											{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
+										</span>
+									</div>
+								</div>
+
+								<div>
+									<div className="mb-3 flex items-center gap-2">
+										<p className="text-[13px] font-semibold text-[#38414a]">
+											好きな選手
+										</p>
+										<Button
+											variant="zenn-like"
+											enableClickAnimation
+											size="sm"
+											className="text-xs !px-2"
+											onClick={() => setIsFavoritePlayersDialogOpenAction(true)}
+										>
+											選択する
+										</Button>
+									</div>
+									{editedFavoritePlayers.length > 0 ? (
+										<div className="flex flex-wrap gap-3">
+											{editedFavoritePlayers.map((player) => (
+												<FavoritePlayerImageCard
+													key={player.id}
+													player={player}
+												/>
+											))}
+										</div>
+									) : (
+										<p className="text-sm text-[#8a98a8]">選択されていません</p>
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
 
-					<div className="mx-auto mt-17 flex w-full max-w-[860px] items-center justify-center gap-2">
+					<div className="mx-auto mt-10 flex w-full max-w-[960px] items-center justify-center gap-5">
 						<Button
 							type="button"
 							variant="outline"
@@ -208,7 +221,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 				onReloadAction={reloadFavoritePlayersAction}
 				onApplySelectedPlayersAction={setFavoritePlayersAction}
 			/>
-		</div>
+		</>
 	);
 }
 
