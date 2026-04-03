@@ -219,12 +219,12 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 									)}
 									<div className="mt-5 flex justify-center">
 										<Button
-											variant="zenn-like"
-											size="sm"
-											className="text-xs !px-3"
+											variant="outline"
+											size="lg"
+											className="font-semibold text-[#4b647e] transition-colors [@media(hover:hover)]:hover:text-[#1d9bf0]"
 											onClick={() => setIsFavoritePlayersDialogOpenAction(true)}
 										>
-											選択する
+											推し選手を選択する
 										</Button>
 									</div>
 								</div>
