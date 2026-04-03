@@ -125,10 +125,7 @@ export function FavoritePlayersSelectDialog({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={onOpenChangeAction}>
-				<DialogContent
-					className="w-[calc(100vw-0.375rem)] max-w-4xl rounded-md p-0"
-					closeButtonClassName="hidden sm:inline-flex right-3 top-3 z-40 h-8 w-8 bg-white/95 text-slate-700 opacity-100 shadow-sm"
-				>
+				<DialogContent className="w-[calc(100vw-0.375rem)] max-w-4xl rounded-md p-0">
 					<div className="flex h-[min(94vh,820px)] flex-col">
 						<DialogHeader className="border-b px-4 py-3">
 							<DialogTitle className="text-base">
@@ -278,28 +275,29 @@ export function FavoritePlayersSelectDialog({
 									}}
 									className="text-sm text-blue-600 underline underline-offset-4"
 								/>
-								<IconButton
-									variant="zenn-like"
-									icon={<Check />}
-									iconPosition="right"
-									className="inline-flex h-9 items-center rounded-md px-4 text-sm font-bold text-slate-200"
-									enableClickAnimation
-									onClick={applySelectedPlayersAction}
-								>
-									追加する
-								</IconButton>
+								<div className="flex items-center gap-2">
+									<Button
+										enableClickAnimation
+										variant="outline"
+										className="h-9 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc]"
+										onClick={() => onOpenChangeAction(false)}
+									>
+										キャンセル
+									</Button>
+									<IconButton
+										variant="zenn-like"
+										icon={<Check />}
+										iconPosition="right"
+										className="inline-flex h-9 items-center rounded-md px-4 text-sm font-bold text-slate-200"
+										enableClickAnimation
+										disabled={draftSelectedPlayers.length === 0}
+										onClick={applySelectedPlayersAction}
+									>
+										追加する
+									</IconButton>
+								</div>
 							</div>
 						</div>
-					</div>
-					<div className="absolute right-3 bottom-3 z-30 sm:hidden">
-						<Button
-							type="button"
-							size="sm"
-							className="h-9 rounded-full bg-slate-900/90 px-4 text-xs text-white [@media(hover:hover)]:hover:bg-slate-900"
-							onClick={() => onOpenChangeAction(false)}
-						>
-							閉じる
-						</Button>
 					</div>
 				</DialogContent>
 			</Dialog>
@@ -329,14 +327,14 @@ export function FavoritePlayersSelectDialog({
 							/>
 						) : null}
 					</div>
-					<div className="absolute right-3 bottom-3 z-30 sm:hidden">
+					<div className="block sm:hidden absolute right-3 bottom-3 z-40">
 						<Button
 							type="button"
-							size="sm"
-							className="h-9 rounded-full bg-white/95 px-4 text-xs text-slate-900 [@media(hover:hover)]:hover:bg-white"
+							variant="outline"
+							className="h-10 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc]"
 							onClick={() => setPreviewImage(null)}
 						>
-							閉じる
+							キャンセル
 						</Button>
 					</div>
 				</DialogContent>
