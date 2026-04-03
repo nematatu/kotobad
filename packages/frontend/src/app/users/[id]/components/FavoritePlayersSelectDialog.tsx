@@ -134,7 +134,7 @@ export function FavoritePlayersSelectDialog({
 					<div className="flex h-[min(94vh,820px)] flex-col">
 						<DialogHeader className="border-b px-4 py-3">
 							<DialogTitle className="text-base">
-								好きな選手を登録しよう
+								推し選手を登録しよう
 							</DialogTitle>
 							<div className="grid gap-2 sm:grid-cols-[1fr_14rem]">
 								<input

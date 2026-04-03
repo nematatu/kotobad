@@ -97,7 +97,7 @@ export function UserProfileUpdateConfirmDialog({
 									)}
 									<div className="space-y-1">
 										<p className="text-xs font-medium text-slate-500">
-											好きな選手
+											推し選手
 										</p>
 										{previewFavoritePlayers.length === 0 ? (
 											<p className="text-sm text-slate-400">未選択です</p>

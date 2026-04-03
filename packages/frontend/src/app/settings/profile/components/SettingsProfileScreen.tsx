@@ -80,15 +80,28 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 
 				<div className="px-6 py-8 sm:px-10">
 					<div className="mx-auto max-w-[960px]">
-						<div className="relative mb-6">
-							<ProfileHeaderImage
-								headerImage={headerImage}
-								alt="プロフィールヘッダー画像"
-								sizes="(max-width: 640px) calc(100vw - 3rem), 960px"
-								className="rounded-lg border border-[#d6dde6]"
-								fallbackClassName="rounded-lg border border-[#d6dde6]"
-							/>
-							<div className="absolute top-3 right-3">
+						<div className="mb-6">
+							<div className="relative">
+								<ProfileHeaderImage
+									headerImage={headerImage}
+									alt="プロフィールヘッダー画像"
+									sizes="(max-width: 640px) calc(100vw - 3rem), 960px"
+									className="rounded-lg border border-[#d6dde6]"
+									fallbackClassName="rounded-lg border border-[#d6dde6]"
+								/>
+								<div className="hidden sm:absolute sm:top-3 sm:right-3 sm:block">
+									<Button
+										type="button"
+										variant="outline"
+										className="font-semibold text-[#4b647e] transition-colors [@media(hover:hover)]:hover:text-[#1d9bf0]"
+										onClick={openHeaderImageFileDialogAction}
+										disabled={isSavingProfile}
+									>
+										ヘッダー画像を変更する
+									</Button>
+								</div>
+							</div>
+							<div className="mt-3 flex justify-center sm:hidden">
 								<Button
 									type="button"
 									variant="outline"
@@ -186,18 +199,10 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 								</div>
 
 								<div>
-									<div className="mb-3 flex items-center gap-2">
+									<div className="mb-3">
 										<p className="text-[13px] font-semibold text-[#38414a]">
-											好きな選手
+											推し選手
 										</p>
-										<Button
-											variant="zenn-like"
-											size="sm"
-											className="text-xs !px-2"
-											onClick={() => setIsFavoritePlayersDialogOpenAction(true)}
-										>
-											選択する
-										</Button>
 									</div>
 									{editedFavoritePlayers.length > 0 ? (
 										<div className="flex flex-wrap gap-3">
@@ -212,6 +217,16 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 									) : (
 										<p className="text-sm text-[#8a98a8]">選択されていません</p>
 									)}
+									<div className="mt-5 flex justify-center">
+										<Button
+											variant="zenn-like"
+											size="sm"
+											className="text-xs !px-3"
+											onClick={() => setIsFavoritePlayersDialogOpenAction(true)}
+										>
+											選択する
+										</Button>
+									</div>
 								</div>
 							</div>
 						</div>
