@@ -125,7 +125,12 @@ export function FavoritePlayersSelectDialog({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={onOpenChangeAction}>
-				<DialogContent className="w-[calc(100vw-0.375rem)] max-w-4xl rounded-md p-0">
+				<DialogContent
+					className="w-[calc(100vw-0.375rem)] max-w-4xl rounded-md p-0"
+					onOpenAutoFocus={(event) => {
+						event.preventDefault();
+					}}
+				>
 					<div className="flex h-[min(94vh,820px)] flex-col">
 						<DialogHeader className="border-b px-4 py-3">
 							<DialogTitle className="text-base">

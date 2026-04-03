@@ -48,9 +48,9 @@ export function UserProfileActivity({
 	}));
 
 	return (
-		<div className="mx-auto w-full max-w-[1070px] bg-white pb-6 text-[#0f0f0f] [font-family:Roboto,Arial,sans-serif] sm:pb-8">
-			<div className="space-y-6">
-				<div className="my-8 h-[1px] w-full bg-[#e5e5e5]" />
+		<div className="mx-auto mt-9 w-full max-w-[1070px] bg-white pb-10 text-[#0f0f0f] [font-family:Roboto,Arial,sans-serif] sm:mt-8 sm:pb-10">
+			<div className="space-y-7">
+				<div className="h-[1px] w-full bg-[#e5e5e5]" />
 				<div className="flex items-center justify-between gap-2">
 					<p className="line-clamp-1 font-bold sm:text-lg sm:leading-[20px]">
 						推し選手
@@ -66,7 +66,7 @@ export function UserProfileActivity({
 					) : null}
 				</div>
 				{favoritePlayers.length > 0 ? (
-					<div className="mt-3 flex flex-wrap gap-x-7 gap-y-1.5">
+					<div className="flex flex-wrap gap-x-5 gap-y-4 sm:gap-x-7">
 						{favoritePlayers.map((player) => (
 							<FavoritePlayerImageCard
 								key={player.id}
@@ -79,7 +79,7 @@ export function UserProfileActivity({
 					<p className="text-sm text-[#606060]">推し選手は未選択です</p>
 				)}
 			</div>
-			<div className="mt-6 w-full">
+			<div className="mt-10 w-full sm:mt-9">
 				<nav className="flex h-12 items-end gap-6 border-b border-[#e5e5e5] px-3">
 					<button
 						type="button"
@@ -111,7 +111,7 @@ export function UserProfileActivity({
 					</button>
 				</nav>
 				{activeTab === "threads" ? (
-					<section id="recent-threads">
+					<section id="recent-threads" className="pt-5 sm:pt-4">
 						{profile.recentThreads.length === 0 ? (
 							<p className="mt-6 px-3 text-sm text-[#606060]">
 								スレッドはまだありません
@@ -124,7 +124,7 @@ export function UserProfileActivity({
 					</section>
 				) : null}
 				{activeTab === "posts" ? (
-					<section id="recent-posts">
+					<section id="recent-posts" className="pt-5 sm:pt-4">
 						{profile.recentPosts.length === 0 ? (
 							<p className="mt-6 px-3 text-sm text-[#606060]">
 								返信はまだありません
@@ -132,7 +132,7 @@ export function UserProfileActivity({
 						) : (
 							<ul className="divide-y divide-[#e5e5e5]">
 								{profile.recentPosts.map((post) => (
-									<li key={post.id} className="px-3 py-4">
+									<li key={post.id} className="px-3 py-5 sm:py-4">
 										<div className="flex items-start gap-3">
 											<AuthorAvatar
 												name={profile.name}

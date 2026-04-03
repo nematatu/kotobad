@@ -78,10 +78,10 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 	return (
 		<section className="relative overflow-hidden bg-white">
 			{isEditing ? (
-				<div className="mx-auto w-full max-w-[1070px] pt-4 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
+				<div className="mx-auto w-full max-w-[1070px] pt-6 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
 					<div className="h-[118px] w-full overflow-hidden rounded-xl bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)] sm:h-[172px]" />
-					<div className="relative mt-8 px-1 sm:px-0">
-						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-9">
+					<div className="relative mt-10 px-1 sm:px-0">
+						<div className="flex flex-col gap-7 sm:flex-row sm:items-start sm:gap-9">
 							<div className="group relative inline-flex">
 								<AuthorAvatar
 									name={editedName}
@@ -110,7 +110,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 									onChange={onAvatarFileChangeAction}
 								/>
 							</div>
-							<div className="min-w-0 flex-1 space-y-1.5 sm:pt-1">
+							<div className="min-w-0 flex-1 space-y-5 sm:pt-1">
 								<div className="flex w-full items-start gap-3">
 									<div className="group relative min-w-0 w-full max-w-[34rem] rounded-md border border-[#d9d9d9] bg-white px-3 pt-4 pb-1.5 transition-colors focus-within:border-[#1d9bf0]">
 										<label
@@ -127,7 +127,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 												onEditedNameChangeAction(event.target.value)
 											}
 											maxLength={MAX_PROFILE_NAME_LENGTH}
-											className="h-9 w-full border-0 bg-transparent px-0 py-0 text-[1.9rem] leading-[1.2] font-bold text-[#0f0f0f] outline-none focus:ring-0 sm:h-14 sm:text-2xl sm:leading-[52px]"
+											className="h-9 w-full border-0 bg-transparent px-0 py-0 text-[1.55rem] leading-[1.2] font-bold text-[#0f0f0f] outline-none focus:ring-0 sm:h-14 sm:text-2xl sm:leading-[52px]"
 										/>
 										<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
 											{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
@@ -159,7 +159,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										</IconButton>
 									</div>
 								</div>
-								<div className="group relative mt-0.5 w-full max-w-2xl rounded-md border border-[#d9d9d9] bg-white px-3 pt-5 pb-4 transition-colors focus-within:border-[#1d9bf0]">
+								<div className="group relative mt-1.5 w-full max-w-2xl rounded-md border border-[#d9d9d9] bg-white px-3 pt-5 pb-4 transition-colors focus-within:border-[#1d9bf0]">
 									<label
 										htmlFor="bio"
 										className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0]"
@@ -184,21 +184,40 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 					</div>
 				</div>
 			) : (
-				<div className="mx-auto w-full max-w-[1070px] pt-4 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
+				<div className="mx-auto w-full max-w-[1070px] pt-6 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
 					<div className="h-[118px] w-full overflow-hidden rounded-xl bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)] sm:h-[172px]" />
-					<div className="relative mt-8 px-1 sm:px-0">
-						<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-9">
+					<div className="relative mt-10 px-1 sm:px-0">
+						<div className="absolute top-0 right-1 z-10 sm:hidden">
+							<Button
+								variant={isLogin ? "outline" : "default"}
+								rounded="full"
+								enableClickAnimation
+								asChild={isLogin}
+								className={
+									isLogin
+										? "mt-0.5 h-9 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100"
+										: "mt-0.5 h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727]"
+								}
+								disabled={isSavingProfile}
+							>
+								{isLogin ? (
+									<Link href="/settings/profile" showIndicator={false}>
+										プロフィールを編集
+									</Link>
+								) : (
+									"フォロー"
+								)}
+							</Button>
+						</div>
+						<div className="flex flex-col gap-7 sm:flex-row sm:items-start sm:gap-9">
 							<AuthorAvatar
 								name={editedName}
 								image={avatarImage}
 								className="h-20 w-20 bg-white sm:h-30 sm:w-30"
 								fallbackClassName="text-xl sm:text-3xl"
 							/>
-							<div className="min-w-0 flex-1 pt-1 space-y-1 sm:pt-2">
-								<div className="flex items-start">
-									<h1 className="min-w-0 flex-1 truncate text-[2rem] leading-[1.25] font-bold text-[#0f0f0f] sm:text-2xl sm:leading-[58px]">
-										{editedName}
-									</h1>
+							<div className="relative min-w-0 flex-1 pt-1 space-y-5 sm:pt-2">
+								<div className="absolute top-0 right-0 z-10 hidden sm:block">
 									<Button
 										variant={isLogin ? "outline" : "default"}
 										rounded="full"
@@ -220,7 +239,12 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										)}
 									</Button>
 								</div>
-								<p className="line-clamp-1 whitespace-pre-line break-words text-sm text-[#0f0f0f] sm:text-[14px] sm:leading-[20px]">
+								<div className="sm:pr-[10rem]">
+									<h1 className="min-w-0 truncate text-[1.35rem] leading-[1.3] font-bold text-[#0f0f0f] sm:text-2xl sm:leading-[58px]">
+										{editedName}
+									</h1>
+								</div>
+								<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-[#0f0f0f] sm:text-[14px] sm:leading-[20px]">
 									{editedBio}
 								</p>
 							</div>
