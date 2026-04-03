@@ -27,6 +27,43 @@ const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
 	"image/avif": "avif",
 	"image/svg+xml": "svg",
 };
+const R2_PUT_MAX_ATTEMPTS = 3;
+const R2_PUT_RETRY_DELAY_MS = 150;
+
+const sleep = (ms: number) =>
+	new Promise<void>((resolve) => {
+		setTimeout(resolve, ms);
+	});
+
+const putObjectWithRetry = async ({
+	bucket,
+	objectKey,
+	fileBuffer,
+	contentType,
+}: {
+	bucket: AppEnvironment["Bindings"]["KOTOBAD_BUCKET"];
+	objectKey: string;
+	fileBuffer: ArrayBuffer;
+	contentType: string;
+}) => {
+	let lastError: unknown = null;
+	for (let attempt = 1; attempt <= R2_PUT_MAX_ATTEMPTS; attempt++) {
+		try {
+			await bucket.put(objectKey, fileBuffer, {
+				httpMetadata: {
+					contentType,
+					cacheControl: "public, max-age=31536000, immutable",
+				},
+			});
+			return;
+		} catch (error: unknown) {
+			lastError = error;
+			if (attempt >= R2_PUT_MAX_ATTEMPTS) break;
+			await sleep(R2_PUT_RETRY_DELAY_MS * attempt);
+		}
+	}
+	throw new Error(`R2 put failed: ${getErrorMessage(lastError)}`);
+};
 
 const toPublicR2Url = (baseUrl: string, objectKey: string): string => {
 	const normalized = baseUrl.trim().replace(/\/+$/, "");
@@ -214,11 +251,11 @@ export const updateUserProfileRouter: RouteHandler<
 			}
 			const fileBuffer = await file.arrayBuffer();
 			const objectKey = `${objectPrefix}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-			await c.env.KOTOBAD_BUCKET.put(objectKey, fileBuffer, {
-				httpMetadata: {
-					contentType: file.type,
-					cacheControl: "public, max-age=31536000, immutable",
-				},
+			await putObjectWithRetry({
+				bucket: c.env.KOTOBAD_BUCKET,
+				objectKey,
+				fileBuffer,
+				contentType: file.type,
 			});
 			return toPublicR2Url(publicBaseUrl ?? "", objectKey);
 		};

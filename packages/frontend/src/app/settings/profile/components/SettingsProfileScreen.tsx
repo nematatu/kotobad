@@ -3,13 +3,13 @@
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
 import { Josefin_Sans } from "next/font/google";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
-import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
 import { FavoritePlayerImageCard } from "../../../users/[id]/components/FavoritePlayerImageCard";
 import { FavoritePlayersSelectDialog } from "../../../users/[id]/components/FavoritePlayersSelectDialog";
+import { HeaderImageCropDialog } from "../../../users/[id]/components/HeaderImageCropDialog";
+import { ProfileHeaderImage } from "../../../users/[id]/components/ProfileHeaderImage";
 import { useUserProfileEditor } from "../../../users/[id]/hooks/useUserProfileEditor";
 import {
 	MAX_PROFILE_BIO_LENGTH,
@@ -37,10 +37,14 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 		favoritePlayerOptions,
 		isLoadingFavoritePlayers,
 		favoritePlayersLoadError,
+		isHeaderImageCropDialogOpen,
+		headerImageCropSourceFile,
 		openAvatarFileDialogAction,
 		changeAvatarFileAction,
 		openHeaderImageFileDialogAction,
 		changeHeaderImageFileAction,
+		closeHeaderImageCropDialogAction,
+		applyHeaderImageCropAction,
 		changeEditedNameAction,
 		changeEditedBioAction,
 		setIsFavoritePlayersDialogOpenAction,
@@ -76,23 +80,14 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 
 				<div className="px-6 py-8 sm:px-10">
 					<div className="mx-auto max-w-[960px]">
-						<div className="relative mb-6 overflow-hidden rounded-lg border border-[#d6dde6] bg-[#eef3fb]">
-							<div className="relative h-[140px] w-full sm:h-[180px]">
-								{headerImage ? (
-									<Image
-										src={
-											toPresetCfImageUrl(headerImage, "profileHeader") ??
-											headerImage
-										}
-										alt="プロフィールヘッダー画像"
-										fill
-										unoptimized
-										className="object-cover"
-									/>
-								) : (
-									<div className="h-full w-full bg-[linear-gradient(135deg,#76b8ff_0%,#86a8ff_25%,#7edac4_100%)]" />
-								)}
-							</div>
+						<div className="relative mb-6">
+							<ProfileHeaderImage
+								headerImage={headerImage}
+								alt="プロフィールヘッダー画像"
+								sizes="(max-width: 640px) calc(100vw - 3rem), 960px"
+								className="rounded-lg border border-[#d6dde6]"
+								fallbackClassName="rounded-lg border border-[#d6dde6]"
+							/>
 							<div className="absolute top-3 right-3">
 								<Button
 									type="button"
@@ -261,6 +256,12 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 				loadError={favoritePlayersLoadError}
 				onReloadAction={reloadFavoritePlayersAction}
 				onApplySelectedPlayersAction={setFavoritePlayersAction}
+			/>
+			<HeaderImageCropDialog
+				open={isHeaderImageCropDialogOpen}
+				file={headerImageCropSourceFile}
+				onCloseAction={closeHeaderImageCropDialogAction}
+				onApplyAction={applyHeaderImageCropAction}
 			/>
 		</>
 	);

@@ -39,7 +39,7 @@ export const CF_IMAGE_PRESET_OPTIONS: Record<CfImagePreset, CfImageOptions> = {
 	},
 	profileHeader: {
 		width: 1440,
-		height: 480,
+		height: 360,
 		quality: 72,
 		fit: "cover",
 	},

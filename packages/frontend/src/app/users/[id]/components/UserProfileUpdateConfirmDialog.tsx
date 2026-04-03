@@ -2,7 +2,6 @@
 
 import type { FavoritePlayerType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
 import type { MouseEvent } from "react";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import {
@@ -14,7 +13,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toPresetCfImageUrl } from "@/lib/utils/cfImage";
+import { ProfileHeaderImage } from "./ProfileHeaderImage";
 
 type Props = {
 	open: boolean;
@@ -63,23 +62,14 @@ export function UserProfileUpdateConfirmDialog({
 						</AlertDialogTitle>
 					</AlertDialogHeader>
 					<div className="w-full text-left">
-						<section className="relative overflow-hidden rounded-xl border border-slate-200 bg-white">
-							<div className="relative h-16">
-								{previewHeaderImage ? (
-									<Image
-										src={
-											toPresetCfImageUrl(previewHeaderImage, "profileHeader") ??
-											previewHeaderImage
-										}
-										alt="プロフィールヘッダー画像"
-										fill
-										unoptimized
-										className="object-cover"
-									/>
-								) : (
-									<div className="h-full w-full bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)]" />
-								)}
-							</div>
+						<section className="relative rounded-xl border border-slate-200 bg-white">
+							<ProfileHeaderImage
+								headerImage={previewHeaderImage}
+								alt="プロフィールヘッダー画像"
+								sizes="(max-width: 640px) 80vw, 360px"
+								className="rounded-t-xl"
+								fallbackClassName="rounded-t-xl bg-[linear-gradient(135deg,#93c5fd_0%,#dbeafe_42%,#cffafe_100%)]"
+							/>
 							<div className="-mt-8 px-3 pb-3">
 								<div className="group relative inline-flex">
 									<AuthorAvatar

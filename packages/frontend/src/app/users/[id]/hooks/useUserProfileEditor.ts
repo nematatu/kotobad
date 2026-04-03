@@ -39,6 +39,8 @@ type UseUserProfileEditorResult = {
 	favoritePlayerOptions: UserProfileSelectablePlayerType[];
 	isLoadingFavoritePlayers: boolean;
 	favoritePlayersLoadError: string | null;
+	isHeaderImageCropDialogOpen: boolean;
+	headerImageCropSourceFile: File | null;
 	avatarInputRef: RefObject<HTMLInputElement | null>;
 	headerImageInputRef: RefObject<HTMLInputElement | null>;
 	startEditingAction: () => void;
@@ -49,6 +51,8 @@ type UseUserProfileEditorResult = {
 	changeAvatarFileAction: (event: ChangeEvent<HTMLInputElement>) => void;
 	openHeaderImageFileDialogAction: () => void;
 	changeHeaderImageFileAction: (event: ChangeEvent<HTMLInputElement>) => void;
+	closeHeaderImageCropDialogAction: () => void;
+	applyHeaderImageCropAction: (file: File) => void;
 	changeEditedNameAction: (value: string) => void;
 	changeEditedBioAction: (value: string) => void;
 	setIsFavoritePlayersDialogOpenAction: (open: boolean) => void;
@@ -95,6 +99,10 @@ export const useUserProfileEditor = (
 	>(savedProfile.favoritePlayers);
 	const [avatarFile, setAvatarFile] = useState<File | null>(null);
 	const [headerImageFile, setHeaderImageFile] = useState<File | null>(null);
+	const [isHeaderImageCropDialogOpen, setIsHeaderImageCropDialogOpen] =
+		useState(false);
+	const [headerImageCropSourceFile, setHeaderImageCropSourceFile] =
+		useState<File | null>(null);
 	const [isSavingProfile, setIsSavingProfile] = useState(false);
 	const previewAvatarUrlRef = useRef<string | null>(null);
 	const previewHeaderImageUrlRef = useRef<string | null>(null);
@@ -156,6 +164,8 @@ export const useUserProfileEditor = (
 	);
 
 	const closeEditUi = () => {
+		setIsHeaderImageCropDialogOpen(false);
+		setHeaderImageCropSourceFile(null);
 		setIsFavoritePlayersDialogOpen(false);
 		setIsConfirmOpen(false);
 		if (!alwaysEditing) {
@@ -263,11 +273,24 @@ export const useUserProfileEditor = (
 			toast.error("6MB以下の画像を選択してください");
 			return;
 		}
+		setHeaderImageCropSourceFile(file);
+		setIsHeaderImageCropDialogOpen(true);
+	};
+
+	const closeHeaderImageCropDialogAction = () => {
+		if (isSavingProfile) return;
+		setIsHeaderImageCropDialogOpen(false);
+		setHeaderImageCropSourceFile(null);
+	};
+
+	const applyHeaderImageCropAction = (file: File) => {
 		const previewUrl = URL.createObjectURL(file);
 		clearPreviewHeaderImageUrl();
 		previewHeaderImageUrlRef.current = previewUrl;
 		setHeaderImageFile(file);
 		setHeaderImage(previewUrl);
+		setHeaderImageCropSourceFile(null);
+		setIsHeaderImageCropDialogOpen(false);
 	};
 
 	const setFavoritePlayersAction = (players: FavoritePlayerType[]) => {
@@ -364,6 +387,8 @@ export const useUserProfileEditor = (
 		favoritePlayerOptions,
 		isLoadingFavoritePlayers,
 		favoritePlayersLoadError,
+		isHeaderImageCropDialogOpen,
+		headerImageCropSourceFile,
 		avatarInputRef,
 		headerImageInputRef,
 		startEditingAction: () => {
@@ -377,6 +402,8 @@ export const useUserProfileEditor = (
 		changeAvatarFileAction,
 		openHeaderImageFileDialogAction,
 		changeHeaderImageFileAction,
+		closeHeaderImageCropDialogAction,
+		applyHeaderImageCropAction,
 		changeEditedNameAction: setEditedName,
 		changeEditedBioAction: setEditedBio,
 		setIsFavoritePlayersDialogOpenAction,
