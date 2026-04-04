@@ -35,12 +35,12 @@ export function YouTubeEmbedPlayer({
 				className,
 			)}
 		>
-			<div className="aspect-video w-full">
+			<div className="relative aspect-video w-full bg-black leading-none">
 				{isActivated ? (
 					<iframe
 						src={iframeUrl.toString()}
 						title="YouTube video player"
-						className="h-full w-full"
+						className="block h-full w-full border-0 align-top"
 						loading="lazy"
 						referrerPolicy="strict-origin-when-cross-origin"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -51,7 +51,7 @@ export function YouTubeEmbedPlayer({
 						type="button"
 						aria-label="YouTube を再生"
 						onClick={() => setIsActivated(true)}
-						className="relative h-full w-full cursor-pointer"
+						className="relative block h-full w-full cursor-pointer"
 					>
 						{/* biome-ignore lint/performance/noImgElement: The thumbnail is loaded from YouTube CDN and used as a lightweight preview image. */}
 						<img
@@ -61,7 +61,7 @@ export function YouTubeEmbedPlayer({
 							decoding="async"
 							width={480}
 							height={360}
-							className="h-full w-full object-cover"
+							className="block h-full w-full object-cover"
 						/>
 						<span
 							aria-hidden="true"
