@@ -1,4 +1,6 @@
 import type {
+	Career,
+	CareerPayload,
 	FetchPlayersResult,
 	Player,
 	PlayerPayload,
@@ -142,4 +144,35 @@ export const uploadPlayerImage = async (
 		throw new Error("imageUrl がレスポンスに含まれていません");
 	}
 	return json.imageUrl;
+};
+
+export const fetchPlayerCareers = async (
+	token: string,
+	playerId: number,
+): Promise<Career[]> => {
+	const response = await fetch(`/players/${playerId}/careers`, {
+		headers: createHeaders(token, false),
+	});
+	if (!response.ok) {
+		throw new Error(await parseApiError(response));
+	}
+	const json = (await response.json()) as { careers?: Career[] };
+	return Array.isArray(json.careers) ? json.careers : [];
+};
+
+export const replacePlayerCareers = async (
+	token: string,
+	playerId: number,
+	careers: CareerPayload[],
+): Promise<Career[]> => {
+	const response = await fetch(`/players/${playerId}/careers`, {
+		method: "PUT",
+		headers: createHeaders(token, true),
+		body: JSON.stringify({ careers }),
+	});
+	if (!response.ok) {
+		throw new Error(await parseApiError(response));
+	}
+	const json = (await response.json()) as { careers?: Career[] };
+	return Array.isArray(json.careers) ? json.careers : [];
 };

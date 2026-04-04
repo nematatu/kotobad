@@ -12,7 +12,7 @@ app.use(
 	"*",
 	cors({
 		origin: (origin, c) => resolveCorsOrigin(origin, c.env),
-		allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
+		allowMethods: ["GET", "POST", "PATCH", "PUT", "OPTIONS"],
 		allowHeaders: [
 			"Content-Type",
 			"Authorization",

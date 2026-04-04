@@ -6,7 +6,11 @@ import {
 	sanitizeBirthMonth,
 	sanitizeBirthYear,
 } from "../lib/birthDate";
-import { inferSingleNameByReading } from "../lib/nameInference";
+import {
+	inferSingleNameByReading,
+	normalizeFuriganaInput,
+	normalizeRomajiInput,
+} from "../lib/nameInference";
 import { PREFECTURES } from "../lib/prefectures";
 import type { PlayerPayload } from "../types";
 import { GenderToggleButtons } from "./GenderToggleButtons";
@@ -244,11 +248,17 @@ export const CreatePlayerForm = ({
 	};
 
 	const handleAutoFillFieldChange = (key: AutoFillKey, value: string) => {
+		const normalizedValue =
+			key === "lastFurigana" || key === "firstFurigana"
+				? normalizeFuriganaInput(value)
+				: key === "englishLastName" || key === "englishFirstName"
+					? normalizeRomajiInput(value)
+					: value;
 		setManualEdited((prev) => ({
 			...prev,
 			[key]: true,
 		}));
-		updateField(key, value);
+		updateField(key, normalizedValue);
 	};
 
 	const handleBirthYearChange = (value: string) => {

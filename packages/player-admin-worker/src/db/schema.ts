@@ -14,4 +14,13 @@ export const players = sqliteTable("players", {
 	birthDate: integer("birth_date"),
 });
 
-export const schema = { players };
+export const careers = sqliteTable("careers", {
+	id: integer("id").primaryKey({ autoIncrement: true }),
+	playerId: integer("player_id").notNull(),
+	name: text("name").notNull(),
+	category: text("category"),
+	startYear: integer("start_year"),
+	endYear: integer("end_year"),
+});
+
+export const schema = { players, careers };

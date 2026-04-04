@@ -1,7 +1,8 @@
 import { count, desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { z } from "zod";
 import { createDb } from "../db/client";
-import { players } from "../db/schema";
+import { careers, players } from "../db/schema";
 import type { AppEnv } from "../types";
 import { parsePositiveInt } from "../utils/request";
 import {
@@ -49,6 +50,40 @@ const pickDefined = <T extends Record<string, unknown>>(input: T): Partial<T> =>
 	Object.fromEntries(
 		Object.entries(input).filter(([, value]) => value !== undefined),
 	) as Partial<T>;
+
+const careerCategoryValues = [
+	"SJリーグ",
+	"大学",
+	"高校",
+	"中学",
+	"クラブ",
+	"ジュニア",
+] as const;
+
+const careerItemSchema = z
+	.object({
+		name: z.string().trim().min(1).max(120),
+		category: z.enum(careerCategoryValues),
+		startYear: z.number().int().min(1900).max(2100).nullable().optional(),
+		endYear: z.number().int().min(1900).max(2100).nullable().optional(),
+	})
+	.strict()
+	.refine(
+		(value) =>
+			value.startYear == null ||
+			value.endYear == null ||
+			value.startYear <= value.endYear,
+		{
+			message: "startYear は endYear 以下で指定してください",
+			path: ["startYear"],
+		},
+	);
+
+const replaceCareersSchema = z
+	.object({
+		careers: z.array(careerItemSchema).max(60),
+	})
+	.strict();
 
 playersRouter.get("/", async (c) => {
 	const db = createDb(c.env.DB);
@@ -160,6 +195,75 @@ playersRouter.get("/:id", async (c) => {
 	}
 
 	return c.json({ player: row });
+});
+
+playersRouter.get("/:id/careers", async (c) => {
+	const db = createDb(c.env.DB);
+	const id = parsePositiveInt(c.req.param("id"));
+	if (!id) {
+		return c.json({ error: "id は正の整数で指定してください" }, 400);
+	}
+
+	const rows = await db
+		.select()
+		.from(careers)
+		.where(eq(careers.playerId, id))
+		.orderBy(desc(careers.startYear), desc(careers.endYear), desc(careers.id));
+
+	return c.json({ careers: rows });
+});
+
+playersRouter.put("/:id/careers", async (c) => {
+	const db = createDb(c.env.DB);
+	const id = parsePositiveInt(c.req.param("id"));
+	if (!id) {
+		return c.json({ error: "id は正の整数で指定してください" }, 400);
+	}
+
+	const player = await db.query.players.findFirst({
+		where: eq(players.id, id),
+	});
+	if (!player) {
+		return c.json({ error: "not_found" }, 404);
+	}
+
+	const body = await c.req.json().catch(() => null);
+	if (!body) {
+		return c.json({ error: "invalid_json" }, 400);
+	}
+
+	const parsed = replaceCareersSchema.safeParse(body);
+	if (!parsed.success) {
+		return c.json(
+			{
+				error: "validation_error",
+				issues: parsed.error.issues,
+			},
+			400,
+		);
+	}
+
+	await db.delete(careers).where(eq(careers.playerId, id));
+
+	if (parsed.data.careers.length > 0) {
+		await db.insert(careers).values(
+			parsed.data.careers.map((item) => ({
+				playerId: id,
+				name: item.name,
+				category: item.category,
+				startYear: item.startYear ?? null,
+				endYear: item.endYear ?? null,
+			})),
+		);
+	}
+
+	const rows = await db
+		.select()
+		.from(careers)
+		.where(eq(careers.playerId, id))
+		.orderBy(desc(careers.startYear), desc(careers.endYear), desc(careers.id));
+
+	return c.json({ careers: rows }, 200);
 });
 
 playersRouter.post("/", async (c) => {

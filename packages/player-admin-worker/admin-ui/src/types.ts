@@ -27,6 +27,22 @@ export type PlayerPayload = {
 
 export type PlayerUpdatePayload = Partial<PlayerPayload>;
 
+export type Career = {
+	id: number;
+	playerId: number;
+	name: string;
+	category: string;
+	startYear: number | null;
+	endYear: number | null;
+};
+
+export type CareerPayload = {
+	name: string;
+	category: string;
+	startYear: number | null;
+	endYear: number | null;
+};
+
 export type PlayerPagination = {
 	limit: number;
 	offset: number;

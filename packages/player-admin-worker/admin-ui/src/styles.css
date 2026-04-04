@@ -313,11 +313,6 @@ button.ghost {
 	min-width: 0;
 }
 
-.player-preview-meta {
-	color: #64748b;
-	font-size: 11px;
-}
-
 .player-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -346,11 +341,13 @@ button.ghost {
 	color: #0f172a;
 }
 
-.player-editor-open-button {
-	width: auto;
-	height: 34px;
-	padding: 0 12px;
-	flex-shrink: 0;
+.player-editor-summary-button {
+	cursor: pointer;
+	transition: background-color 0.16s ease;
+}
+
+.player-editor-summary-button:hover {
+	background: #f1f5f9;
 }
 
 .player-editor-fields {
@@ -375,6 +372,50 @@ button.ghost {
 
 .field-full {
 	grid-column: 1 / -1;
+}
+
+.career-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.career-add-button {
+	width: auto;
+	padding: 0 12px;
+	height: 30px;
+}
+
+.career-list {
+	display: grid;
+	gap: 8px;
+}
+
+.career-row {
+	display: grid;
+	grid-template-columns: minmax(130px, 1fr) minmax(200px, 1.6fr) 100px 100px 72px;
+	gap: 6px;
+	align-items: center;
+	padding: 8px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	background: #f8fafc;
+}
+
+.career-delete-button {
+	height: 34px;
+}
+
+.career-actions {
+	display: grid;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.career-actions button {
+	width: auto;
+	padding: 0 14px;
 }
 
 .image-edit-grid {
@@ -515,6 +556,37 @@ button.ghost {
 	border-bottom: 1px solid #e2e8f0;
 }
 
+.player-editor-modal-header-main {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
+}
+
+.player-editor-modal-face {
+	width: 56px;
+	height: 56px;
+	flex-shrink: 0;
+}
+
+.player-editor-modal-face img,
+.player-editor-modal-face-empty {
+	width: 100%;
+	height: 100%;
+	border-radius: 8px;
+	object-fit: cover;
+	border: 1px solid #dbe3ed;
+}
+
+.player-editor-modal-face-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	color: #94a3b8;
+	background: #f8fafc;
+}
+
 .player-editor-modal-header h3 {
 	margin: 0;
 	font-size: 15px;
@@ -525,6 +597,15 @@ button.ghost {
 	height: 32px;
 	padding: 0 10px;
 	flex-shrink: 0;
+}
+
+.player-editor-modal-footer {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+	padding: 10px;
+	border-top: 1px solid #e2e8f0;
+	background: #fff;
 }
 
 @media (max-width: 960px) {
@@ -552,6 +633,10 @@ button.ghost {
 	.player-editor-fields {
 		grid-template-columns: 1fr;
 		padding: 8px;
+	}
+
+	.career-row {
+		grid-template-columns: 1fr;
 	}
 
 	.field-full {

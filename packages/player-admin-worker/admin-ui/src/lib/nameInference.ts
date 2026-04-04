@@ -31,6 +31,21 @@ const toKatakana = (value: string): string =>
 		})
 		.join("");
 
+const toHalfWidthAscii = (value: string): string =>
+	value
+		.replace(/[\uFF01-\uFF5E]/g, (char) =>
+			String.fromCharCode(char.charCodeAt(0) - 0xfee0),
+		)
+		.replace(/\u3000/g, " ");
+
+export const normalizeFuriganaInput = (value: string): string =>
+	toKatakana(value).replace(/\u3000/g, " ");
+
+export const normalizeRomajiInput = (value: string): string =>
+	toHalfWidthAscii(value)
+		.toLowerCase()
+		.replace(/[^a-z0-9 .'-]/g, "");
+
 const normalizeKana = (value: string): string | null => {
 	const trimmed = normalize(value);
 	if (trimmed.length === 0 || !KANA_ONLY_PATTERN.test(trimmed)) {

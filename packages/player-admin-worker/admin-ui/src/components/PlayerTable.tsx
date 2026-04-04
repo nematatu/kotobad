@@ -1,17 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
-import { uploadPlayerImage } from "../lib/api";
+import {
+	fetchPlayerCareers,
+	replacePlayerCareers,
+	uploadPlayerImage,
+} from "../lib/api";
 import { epochSecondsToDateInput } from "../lib/date";
+import {
+	normalizeFuriganaInput,
+	normalizeRomajiInput,
+} from "../lib/nameInference";
 import { buildPrefectureOptions } from "../lib/prefectures";
-import type { Player, PlayerPayload, PlayerUpdatePayload } from "../types";
+import type {
+	Career,
+	CareerPayload,
+	Player,
+	PlayerPayload,
+	PlayerUpdatePayload,
+} from "../types";
 import { GenderToggleButtons } from "./GenderToggleButtons";
 import { ImageCropUploadDialog } from "./ImageCropUploadDialog";
-import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogTitle,
-	DialogTrigger,
-} from "./ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "./ui/dialog";
 
 type PlayerTableProps = {
 	token: string;
@@ -33,6 +41,56 @@ const fieldKeys = [
 
 type EditableField = (typeof fieldKeys)[number];
 type GenderFilter = "all" | "male" | "female";
+type CareerEditableField = "name" | "category" | "startYear" | "endYear";
+type CareerDraft = {
+	localId: string;
+	name: string;
+	category: string;
+	startYear: string;
+	endYear: string;
+};
+const careerCategoryOptions = [
+	"SJリーグ",
+	"大学",
+	"高校",
+	"中学",
+	"クラブ",
+	"ジュニア",
+] as const;
+const careerYearMin = 1900;
+const careerYearMax = new Date().getFullYear();
+const sjLeagueTeamOptions = [
+	"ACT SAIKYO",
+	"BIPROGY",
+	"Cheerful鳥取",
+	"NTT 東日本",
+	"NTT東日本",
+	"コンサドーレ",
+	"ジェイテクトStingers",
+	"トナミ運輸",
+	"ヨネックス",
+	"レゾナック",
+	"七十七銀行",
+	"三菱自動車京都",
+	"丸杉スティーラーズ",
+	"再春館製薬所",
+	"北都銀行",
+	"大同特殊鋼",
+	"山陰合同銀行",
+	"岐阜Bluvic",
+	"広島ガス",
+	"日立情報通信エンジニアリング",
+	"東海興業",
+	"豊田通商",
+	"金沢学院クラブ",
+] as const;
+const careerYearOptions = Array.from(
+	{ length: careerYearMax - careerYearMin + 1 },
+	(_, index) => String(careerYearMin + index),
+);
+type CareerCategory = (typeof careerCategoryOptions)[number];
+const isCareerCategory = (value: string): value is CareerCategory =>
+	careerCategoryOptions.includes(value as CareerCategory);
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
@@ -60,6 +118,16 @@ const isSameDraft = (left: PlayerPayload, right: PlayerPayload) =>
 	left.imageUrl === right.imageUrl &&
 	left.birthPlace === right.birthPlace &&
 	left.birthDate === right.birthDate;
+
+const normalizeEditableValue = (key: EditableField, value: string): string => {
+	if (key === "lastFurigana" || key === "firstFurigana") {
+		return normalizeFuriganaInput(value);
+	}
+	if (key === "englishLastName" || key === "englishFirstName") {
+		return normalizeRomajiInput(value);
+	}
+	return value;
+};
 
 const buildUpdatePayload = (
 	baseline: PlayerPayload,
@@ -104,24 +172,86 @@ const buildSearchTarget = (draft: PlayerPayload) =>
 		.join(" ")
 		.toLowerCase();
 
+const toCareerDraft = (career: Career): CareerDraft => ({
+	localId:
+		typeof crypto !== "undefined" ? crypto.randomUUID() : String(career.id),
+	name: career.name,
+	category: isCareerCategory(career.category) ? career.category : "",
+	startYear: career.startYear ? String(career.startYear) : "",
+	endYear: career.endYear ? String(career.endYear) : "",
+});
+
+const toCareerPayload = (
+	draft: CareerDraft,
+): { ok: true; value: CareerPayload } | { ok: false; message: string } => {
+	const name = draft.name.trim();
+	if (name.length === 0) {
+		return { ok: false, message: "経歴名は必須です" };
+	}
+	if (!isCareerCategory(draft.category)) {
+		return { ok: false, message: "カテゴリを選択してください" };
+	}
+
+	const parseYear = (value: string) => {
+		const trimmed = value.trim();
+		if (trimmed.length === 0) return null;
+		const year = Number.parseInt(trimmed, 10);
+		if (
+			!Number.isSafeInteger(year) ||
+			year < careerYearMin ||
+			year > careerYearMax
+		) {
+			return Number.NaN;
+		}
+		return year;
+	};
+
+	const startYear = parseYear(draft.startYear);
+	if (Number.isNaN(startYear)) {
+		return {
+			ok: false,
+			message: `開始年は ${careerYearMin}-${careerYearMax} で指定してください`,
+		};
+	}
+	const endYear = parseYear(draft.endYear);
+	if (Number.isNaN(endYear)) {
+		return {
+			ok: false,
+			message: `終了年は ${careerYearMin}-${careerYearMax} で指定してください`,
+		};
+	}
+	if (startYear != null && endYear != null && startYear > endYear) {
+		return { ok: false, message: "開始年は終了年以下で指定してください" };
+	}
+
+	return {
+		ok: true,
+		value: {
+			name,
+			category: draft.category,
+			startYear,
+			endYear,
+		},
+	};
+};
+
 const PlayerEditorCard = ({
-	token,
-	playerId,
 	draft,
-	onDraftFieldChange,
-	onDraftBirthDateChange,
+	onOpenAction,
 }: {
-	token: string;
-	playerId: number;
 	draft: PlayerPayload;
-	onDraftFieldChange: (id: number, key: EditableField, value: string) => void;
-	onDraftBirthDateChange: (id: number, value: string) => void;
+	onOpenAction: () => void;
 }) => {
 	const fullName = `${draft.lastName}${draft.firstName}`.trim();
 
 	return (
 		<article className="player-editor-card">
-			<div className="player-editor-summary">
+			<button
+				type="button"
+				className="player-editor-summary player-editor-summary-button"
+				onClick={onOpenAction}
+				aria-label={`${fullName || "未入力の選手"} を編集`}
+			>
 				<div className="player-preview">
 					{draft.imageUrl ? (
 						<img
@@ -135,35 +265,33 @@ const PlayerEditorCard = ({
 						<p>{fullName.length > 0 ? fullName : "（未入力）"}</p>
 					</div>
 				</div>
-				<Dialog>
-					<DialogTrigger asChild>
-						<button type="button" className="ghost player-editor-open-button">
-							編集
-						</button>
-					</DialogTrigger>
-					<PlayerEditorModal
-						token={token}
-						playerId={playerId}
-						draft={draft}
-						onDraftFieldChange={onDraftFieldChange}
-						onDraftBirthDateChange={onDraftBirthDateChange}
-					/>
-				</Dialog>
-			</div>
+			</button>
 		</article>
 	);
 };
 
 const PlayerEditorModal = ({
+	open,
 	token,
 	playerId,
 	draft,
+	canMovePrev,
+	canMoveNext,
+	onMovePrevAction,
+	onMoveNextAction,
+	onCloseAction,
 	onDraftFieldChange,
 	onDraftBirthDateChange,
 }: {
+	open: boolean;
 	token: string;
 	playerId: number;
 	draft: PlayerPayload;
+	canMovePrev: boolean;
+	canMoveNext: boolean;
+	onMovePrevAction: () => void;
+	onMoveNextAction: () => void;
+	onCloseAction: () => void;
 	onDraftFieldChange: (id: number, key: EditableField, value: string) => void;
 	onDraftBirthDateChange: (id: number, value: string) => void;
 }) => {
@@ -172,10 +300,47 @@ const PlayerEditorModal = ({
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const [cropSourceFile, setCropSourceFile] = useState<File | null>(null);
 	const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
+	const [careers, setCareers] = useState<CareerDraft[]>([]);
+	const [isLoadingCareers, setIsLoadingCareers] = useState(false);
+	const [isSavingCareers, setIsSavingCareers] = useState(false);
+	const [careerMessage, setCareerMessage] = useState("");
 	const birthPlaceOptions = useMemo(
 		() => buildPrefectureOptions(draft.birthPlace),
 		[draft.birthPlace],
 	);
+
+	useEffect(() => {
+		if (!open) {
+			return;
+		}
+
+		let cancelled = false;
+		const loadCareers = async () => {
+			setIsLoadingCareers(true);
+			setCareerMessage("");
+			try {
+				const rows = await fetchPlayerCareers(token, playerId);
+				if (!cancelled) {
+					setCareers(rows.map(toCareerDraft));
+				}
+			} catch (error) {
+				if (!cancelled) {
+					const message =
+						error instanceof Error ? error.message : String(error);
+					setCareerMessage(`経歴の読み込み失敗: ${message}`);
+				}
+			} finally {
+				if (!cancelled) {
+					setIsLoadingCareers(false);
+				}
+			}
+		};
+
+		void loadCareers();
+		return () => {
+			cancelled = true;
+		};
+	}, [open, playerId, token]);
 
 	const openCropDialog = (file: File | null) => {
 		if (!file) {
@@ -215,14 +380,88 @@ const PlayerEditorModal = ({
 		}
 	};
 
+	const handleCareerFieldChange = (
+		localId: string,
+		key: CareerEditableField,
+		value: string,
+	) => {
+		setCareers((prev) =>
+			prev.map((career) =>
+				career.localId === localId ? { ...career, [key]: value } : career,
+			),
+		);
+	};
+
+	const handleAddCareer = () => {
+		setCareers((prev) => [
+			...prev,
+			{
+				localId: crypto.randomUUID(),
+				name: "",
+				category: "",
+				startYear: "",
+				endYear: "",
+			},
+		]);
+	};
+
+	const handleRemoveCareer = (localId: string) => {
+		setCareers((prev) => prev.filter((career) => career.localId !== localId));
+	};
+
+	const handleSaveCareers = async () => {
+		if (token.trim().length === 0) {
+			setCareerMessage("先に管理トークンを入力してください");
+			return;
+		}
+		if (isSavingCareers) {
+			return;
+		}
+
+		const payloads: CareerPayload[] = [];
+		for (const career of careers) {
+			const parsed = toCareerPayload(career);
+			if (!parsed.ok) {
+				setCareerMessage(parsed.message);
+				return;
+			}
+			payloads.push(parsed.value);
+		}
+
+		setCareerMessage("");
+		setIsSavingCareers(true);
+		try {
+			const saved = await replacePlayerCareers(token, playerId, payloads);
+			setCareers(saved.map(toCareerDraft));
+			setCareerMessage(`経歴を保存しました（${saved.length}件）`);
+		} catch (error) {
+			const message = error instanceof Error ? error.message : String(error);
+			setCareerMessage(`経歴の保存失敗: ${message}`);
+		} finally {
+			setIsSavingCareers(false);
+		}
+	};
+
 	return (
 		<DialogContent className="player-editor-modal-content">
 			<div className="player-editor-modal-header">
-				<DialogTitle>
-					{`${draft.lastName}${draft.firstName}`.trim() || "選手編集"}
-				</DialogTitle>
+				<div className="player-editor-modal-header-main">
+					<div className="player-editor-modal-face">
+						{draft.imageUrl ? (
+							<img
+								src={draft.imageUrl}
+								alt={`${draft.lastName}${draft.firstName}`}
+							/>
+						) : (
+							<div className="player-editor-modal-face-empty">No Image</div>
+						)}
+					</div>
+					<DialogTitle>
+						{`${draft.lastName}${draft.firstName}`.trim() || "選手編集"}
+					</DialogTitle>
+				</div>
 				<DialogClose asChild>
-					<button type="button" className="ghost">
+					<button type="button" className="ghost" onClick={onCloseAction}>
 						閉じる
 					</button>
 				</DialogClose>
@@ -325,6 +564,136 @@ const PlayerEditorModal = ({
 					/>
 				</label>
 				<div className="field field-full">
+					<div className="career-header">
+						<span>経歴 (Career)</span>
+						<button
+							type="button"
+							className="ghost career-add-button"
+							onClick={handleAddCareer}
+						>
+							行を追加
+						</button>
+					</div>
+					<div className="career-list">
+						{isLoadingCareers ? (
+							<p className="small">経歴を読み込み中...</p>
+						) : careers.length === 0 ? (
+							<p className="small">経歴は未登録です。</p>
+						) : (
+							careers.map((career, index) => (
+								<div key={career.localId} className="career-row">
+									<select
+										value={career.category}
+										onChange={(event) =>
+											handleCareerFieldChange(
+												career.localId,
+												"category",
+												event.target.value,
+											)
+										}
+									>
+										<option value="">カテゴリを選択</option>
+										{careerCategoryOptions.map((category) => (
+											<option key={category} value={category}>
+												{category}
+											</option>
+										))}
+									</select>
+									{career.category === "SJリーグ" ? (
+										<select
+											value={career.name}
+											onChange={(event) =>
+												handleCareerFieldChange(
+													career.localId,
+													"name",
+													event.target.value,
+												)
+											}
+										>
+											<option value="">SJリーグチームを選択</option>
+											{sjLeagueTeamOptions.map((teamName) => (
+												<option key={teamName} value={teamName}>
+													{teamName}
+												</option>
+											))}
+										</select>
+									) : (
+										<input
+											placeholder="経歴名（必須）"
+											value={career.name}
+											disabled={career.category.length === 0}
+											onChange={(event) =>
+												handleCareerFieldChange(
+													career.localId,
+													"name",
+													event.target.value,
+												)
+											}
+										/>
+									)}
+									<select
+										value={career.startYear}
+										disabled={career.category.length === 0}
+										onChange={(event) =>
+											handleCareerFieldChange(
+												career.localId,
+												"startYear",
+												event.target.value,
+											)
+										}
+									>
+										<option value="">開始年</option>
+										{careerYearOptions.map((year) => (
+											<option key={year} value={year}>
+												{year}
+											</option>
+										))}
+									</select>
+									<select
+										value={career.endYear}
+										disabled={career.category.length === 0}
+										onChange={(event) =>
+											handleCareerFieldChange(
+												career.localId,
+												"endYear",
+												event.target.value,
+											)
+										}
+									>
+										<option value="">終了年</option>
+										{careerYearOptions.map((year) => (
+											<option key={year} value={year}>
+												{year}
+											</option>
+										))}
+									</select>
+									<button
+										type="button"
+										className="ghost career-delete-button"
+										onClick={() => handleRemoveCareer(career.localId)}
+										aria-label={`経歴 ${index + 1} を削除`}
+									>
+										削除
+									</button>
+								</div>
+							))
+						)}
+					</div>
+					<div className="career-actions">
+						<button
+							type="button"
+							className="secondary"
+							onClick={() => void handleSaveCareers()}
+							disabled={isLoadingCareers || isSavingCareers}
+						>
+							{isSavingCareers ? "経歴を保存中..." : "経歴を保存"}
+						</button>
+						{careerMessage.length > 0 ? (
+							<p className="small">{careerMessage}</p>
+						) : null}
+					</div>
+				</div>
+				<div className="field field-full">
 					<span>画像URL</span>
 					<div className="image-edit-grid">
 						<input
@@ -359,6 +728,24 @@ const PlayerEditorModal = ({
 						) : null}
 					</div>
 				</div>
+			</div>
+			<div className="player-editor-modal-footer">
+				<button
+					type="button"
+					className="secondary"
+					disabled={!canMovePrev}
+					onClick={onMovePrevAction}
+				>
+					戻る
+				</button>
+				<button
+					type="button"
+					className="secondary"
+					disabled={!canMoveNext}
+					onClick={onMoveNextAction}
+				>
+					次へ
+				</button>
 			</div>
 			{isPreviewOpen && draft.imageUrl ? (
 				<div
@@ -404,6 +791,7 @@ const PlayerEditorModal = ({
 export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 	const [nameQuery, setNameQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState<GenderFilter>("all");
+	const [activePlayerId, setActivePlayerId] = useState<number | null>(null);
 	const [draftsById, setDraftsById] = useState<Record<number, PlayerPayload>>(
 		{},
 	);
@@ -433,6 +821,7 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 		key: EditableField,
 		value: string,
 	) => {
+		const normalizedValue = normalizeEditableValue(key, value);
 		setDraftsById((prev) => {
 			const current = prev[id] ?? baselineById[id];
 			if (!current) {
@@ -444,10 +833,10 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 					...current,
 					[key]:
 						key === "gender" || key === "imageUrl"
-							? value.trim().length > 0
-								? value
+							? normalizedValue.trim().length > 0
+								? normalizedValue
 								: null
-							: value,
+							: normalizedValue,
 				},
 			};
 		});
@@ -502,6 +891,40 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 			return buildSearchTarget(draft).includes(normalizedQuery);
 		});
 	}, [genderFilter, nameQuery, players, draftsById, baselineById]);
+
+	const activePlayerIndex = useMemo(
+		() =>
+			activePlayerId == null
+				? -1
+				: filteredPlayers.findIndex((player) => player.id === activePlayerId),
+		[activePlayerId, filteredPlayers],
+	);
+
+	const activePlayer =
+		activePlayerId == null
+			? null
+			: (filteredPlayers.find((player) => player.id === activePlayerId) ??
+				players.find((player) => player.id === activePlayerId) ??
+				null);
+
+	const openPlayerEditorAction = (playerId: number) => {
+		setActivePlayerId(playerId);
+	};
+
+	const closePlayerEditorAction = () => {
+		setActivePlayerId(null);
+	};
+
+	const moveToAdjacentPlayerAction = (delta: -1 | 1) => {
+		if (activePlayerIndex < 0) {
+			return;
+		}
+		const nextPlayer = filteredPlayers[activePlayerIndex + delta];
+		if (!nextPlayer) {
+			return;
+		}
+		setActivePlayerId(nextPlayer.id);
+	};
 
 	const handleSaveAll = async () => {
 		if (dirtyIds.length === 0 || isSavingAll) {
@@ -587,14 +1010,38 @@ export const PlayerTable = ({ token, players, onSave }: PlayerTableProps) => {
 				{filteredPlayers.map((player) => (
 					<PlayerEditorCard
 						key={player.id}
-						token={token}
-						playerId={player.id}
 						draft={getDraftById(player.id) ?? toPlayerDraft(player)}
-						onDraftFieldChange={handleDraftFieldChange}
-						onDraftBirthDateChange={handleDraftBirthDateChange}
+						onOpenAction={() => openPlayerEditorAction(player.id)}
 					/>
 				))}
 			</div>
+			<Dialog
+				open={activePlayerId != null}
+				onOpenChange={(open) => {
+					if (!open) {
+						closePlayerEditorAction();
+					}
+				}}
+			>
+				{activePlayer ? (
+					<PlayerEditorModal
+						open
+						token={token}
+						playerId={activePlayer.id}
+						draft={getDraftById(activePlayer.id) ?? toPlayerDraft(activePlayer)}
+						canMovePrev={activePlayerIndex > 0}
+						canMoveNext={
+							activePlayerIndex >= 0 &&
+							activePlayerIndex < filteredPlayers.length - 1
+						}
+						onMovePrevAction={() => moveToAdjacentPlayerAction(-1)}
+						onMoveNextAction={() => moveToAdjacentPlayerAction(1)}
+						onCloseAction={closePlayerEditorAction}
+						onDraftFieldChange={handleDraftFieldChange}
+						onDraftBirthDateChange={handleDraftBirthDateChange}
+					/>
+				) : null}
+			</Dialog>
 			{filteredPlayers.length === 0 ? (
 				<p className="small">該当する選手がいません。</p>
 			) : null}
