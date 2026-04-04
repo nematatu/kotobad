@@ -52,6 +52,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 		reloadFavoritePlayersAction,
 		confirmUpdateAction,
 		cancelEditingAction,
+		hasChanges,
 	} = useUserProfileEditor(profile, { alwaysEditing: true });
 
 	const profileHref = `/users/${encodeURIComponent(profile.id)}`;
@@ -61,10 +62,8 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 		router.push(profileHref);
 	};
 
-	const handleSaveAndBack = async () => {
-		const ok = await confirmUpdateAction();
-		if (!ok) return;
-		router.push(profileHref);
+	const handleSaveAction = async () => {
+		await confirmUpdateAction();
 	};
 
 	return (
@@ -78,7 +77,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 					</h1>
 				</div>
 
-				<div className="px-6 py-8 sm:px-10">
+				<div className="px-6 py-8 pb-28 sm:px-10 sm:pb-24">
 					<div className="mx-auto max-w-[960px]">
 						<div className="mb-6">
 							<div className="relative">
@@ -233,36 +232,37 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 							</div>
 						</div>
 					</div>
-
-					<div className="mx-auto mt-10 flex w-full max-w-[960px] items-center justify-center gap-5">
-						<Button
-							type="button"
-							variant="outline"
-							className="h-10 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc] dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
-							onClick={handleCancel}
-							disabled={isSavingProfile}
-						>
-							キャンセル
-						</Button>
-						<Button
-							type="button"
-							variant="zenn-like"
-							className="h-10 rounded-md px-5 text-sm font-bold text-white"
-							onClick={() => void handleSaveAndBack()}
-							disabled={isSavingProfile}
-						>
-							{isSavingProfile ? (
-								<span className="inline-flex items-center gap-1.5">
-									<Loader2 className="h-4 w-4 animate-spin" />
-									更新中
-								</span>
-							) : (
-								"更新して戻る"
-							)}
-						</Button>
-					</div>
 				</div>
 			</section>
+			<div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e3eaf2] bg-white dark:border-slate-800 dark:bg-slate-950">
+				<div className="mx-auto flex w-full max-w-[1120px] items-center justify-center gap-3 px-6 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:px-10">
+					<Button
+						type="button"
+						variant="outline"
+						className="h-10 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc] dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
+						onClick={handleCancel}
+						disabled={isSavingProfile}
+					>
+						キャンセル
+					</Button>
+					<Button
+						type="button"
+						variant="zenn-like"
+						className="h-10 rounded-md px-5 text-sm font-bold text-white"
+						onClick={() => void handleSaveAction()}
+						disabled={isSavingProfile || !hasChanges}
+					>
+						{isSavingProfile ? (
+							<span className="inline-flex items-center gap-1.5">
+								<Loader2 className="h-4 w-4 animate-spin" />
+								更新中
+							</span>
+						) : (
+							"更新する"
+						)}
+					</Button>
+				</div>
+			</div>
 
 			<FavoritePlayersSelectDialog
 				open={isFavoritePlayersDialogOpen}

@@ -35,7 +35,7 @@ export default async function SettingsProfilePage() {
 	const profile = await getUserProfileById(userId);
 
 	return (
-		<div className="min-h-screen w-full bg-white py-4 dark:bg-slate-950 sm:py-6">
+		<div className="min-h-screen w-full bg-white py-4 dark:bg-slate-950 sm:py-6 [@media(max-width:495px)]:pb-40 [@media(max-width:495px)]:-mb-28">
 			<SettingsProfileScreen profile={profile} />
 		</div>
 	);

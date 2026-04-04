@@ -13,6 +13,7 @@ type Props = {
 
 const MobileBottomNav = ({ tags }: Props) => {
 	const pathname = usePathname();
+	const isSettingsPage = pathname.startsWith("/settings");
 	const [isCreateSurfaceOpen, setIsCreateSurfaceOpen] = useState(false);
 	const [isHiddenByScroll, setIsHiddenByScroll] = useState(false);
 	const threadDetailMatch = pathname.match(/^\/threads\/(\d+)$/);
@@ -26,7 +27,7 @@ const MobileBottomNav = ({ tags }: Props) => {
 	);
 
 	useEffect(() => {
-		if (isThreadDetailPage || isCreateSurfaceOpen) {
+		if (isSettingsPage || isThreadDetailPage || isCreateSurfaceOpen) {
 			setIsHiddenByScroll(false);
 			return;
 		}
@@ -64,7 +65,11 @@ const MobileBottomNav = ({ tags }: Props) => {
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
 		};
-	}, [isCreateSurfaceOpen, isThreadDetailPage]);
+	}, [isCreateSurfaceOpen, isSettingsPage, isThreadDetailPage]);
+
+	if (isSettingsPage) {
+		return null;
+	}
 
 	return (
 		<motion.nav

@@ -136,6 +136,9 @@ export function FavoritePlayersSelectDialog({
 							<DialogTitle className="text-base">
 								推し選手を登録しよう
 							</DialogTitle>
+							<p className="text-xs text-slate-500 dark:text-slate-400">
+								3人まで選択できます
+							</p>
 							<div className="grid gap-2 sm:grid-cols-[1fr_14rem]">
 								<input
 									value={query}
