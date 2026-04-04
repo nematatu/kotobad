@@ -205,7 +205,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 										</p>
 									</div>
 									{editedFavoritePlayers.length > 0 ? (
-										<div className="flex flex-wrap gap-3">
+										<div className="flex flex-wrap justify-center gap-3">
 											{editedFavoritePlayers.map((player) => (
 												<FavoritePlayerImageCard
 													key={player.id}
