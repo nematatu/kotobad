@@ -2,10 +2,10 @@
 
 import type { UserProfileType } from "@kotobad/shared/src/types/user";
 import { Loader2 } from "lucide-react";
-import { Josefin_Sans } from "next/font/google";
 import { useRouter } from "next/navigation";
 import AuthorAvatar from "@/components/feature/user/AuthorAvatar";
 import { Button } from "@/components/ui/button";
+import { headingJosefinSans } from "@/lib/config/fonts";
 import { FavoritePlayerImageCard } from "../../../users/[id]/components/FavoritePlayerImageCard";
 import { FavoritePlayersSelectDialog } from "../../../users/[id]/components/FavoritePlayersSelectDialog";
 import { HeaderImageCropDialog } from "../../../users/[id]/components/HeaderImageCropDialog";
@@ -15,12 +15,6 @@ import {
 	MAX_PROFILE_BIO_LENGTH,
 	MAX_PROFILE_NAME_LENGTH,
 } from "../../../users/[id]/lib/profileEditor";
-
-const settingsHeadingFont = Josefin_Sans({
-	subsets: ["latin"],
-	weight: ["700"],
-	display: "swap",
-});
 
 function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 	const router = useRouter();
@@ -74,7 +68,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 			<section className="mx-auto w-full max-w-[1120px] overflow-hidden">
 				<div className="border-b border-[#e3eaf2] px-6 py-5 dark:border-slate-800 sm:px-10">
 					<h1
-						className={`${settingsHeadingFont.className} mt-1 text-[34px] leading-none font-bold tracking-[0.06em] text-[#2f3439] dark:text-slate-100 sm:text-[40px]`}
+						className={`${headingJosefinSans.className} mt-1 text-[34px] leading-none font-bold tracking-[0.06em] text-[#2f3439] dark:text-slate-100 sm:text-[40px]`}
 					>
 						Settings
 					</h1>

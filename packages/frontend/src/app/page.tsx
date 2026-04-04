@@ -1,5 +1,6 @@
 import { ThreadList } from "@/app/threads/components/view/ThreadList";
 import { getTrendingThreads } from "@/app/threads/lib/getTrendingThreads";
+import { headingJosefinSans } from "@/lib/config/fonts";
 
 export default async function Page() {
 	const { threads } = await getTrendingThreads({ limit: 8 });
@@ -7,7 +8,11 @@ export default async function Page() {
 	return (
 		<div className="flex flex-col gap-y-4 max-w-5xl mx-auto p-4">
 			<section className="space-y-2">
-				<h2 className="text-2xl font-bold text-slate-700">トレンド</h2>
+				<h2
+					className={`${headingJosefinSans.className} my-3 text-[30px] leading-none font-bold tracking-[0.06em] text-slate-700 dark:text-slate-100`}
+				>
+					Trending
+				</h2>
 				{threads.length > 0 ? (
 					<div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
 						<ThreadList threads={threads} />

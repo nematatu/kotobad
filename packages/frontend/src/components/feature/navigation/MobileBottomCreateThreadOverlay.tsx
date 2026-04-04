@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { CreateThreadForm } from "@/app/threads/components/create/CreateThread";
+import { headingJosefinSans } from "@/lib/config/fonts";
 
 type Props = {
 	tags: TagType[];
@@ -100,17 +101,11 @@ export function MobileBottomCreateThreadOverlay({
 								className={`flex ${FULLSCREEN_HEIGHT_CLS} w-full flex-col overflow-hidden border-0 bg-white dark:bg-slate-950`}
 							>
 								<header className="relative flex items-center justify-center border-b border-slate-200/80 px-3 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] dark:border-slate-700">
-									<button
-										type="button"
-										aria-label="スレッド作成を閉じる"
-										onClick={closeSurface}
-										className="absolute left-3 inline-flex items-center text-left text-slate-500 transition-colors dark:text-slate-300"
-									>
-										<p>キャンセル</p>
-									</button>
 									<div className="min-w-0 text-center">
-										<p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-											スレッドを作成
+										<p
+											className={`${headingJosefinSans.className} truncate text-[22px] leading-none font-bold tracking-[0.06em] text-slate-900 dark:text-slate-100`}
+										>
+											Create Thread
 										</p>
 									</div>
 								</header>
@@ -122,6 +117,7 @@ export function MobileBottomCreateThreadOverlay({
 										autoFocusTitle
 										initialTags={tags}
 										onCreated={handleCreated}
+										closeSurface={closeSurface}
 									/>
 								</div>
 							</div>

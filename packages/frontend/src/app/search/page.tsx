@@ -6,6 +6,7 @@ import { parseSort } from "@/app/threads/lib/sort";
 import RouterBackButton from "@/components/common/RouterBackButton";
 import { HEADER_SEARCH_CONFIG } from "@/components/feature/header/const/serach-config";
 import ThreadSearchForm from "@/components/feature/search/ThreadSearchForm";
+import { headingJosefinSans } from "@/lib/config/fonts";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +34,7 @@ export default async function SearchPage({ searchParams }: Props) {
 		: { threads: [] };
 
 	return (
-		<div className="mx-auto w-full max-w-5xl px-3 py-5 md:px-5">
+		<div className="mx-auto w-full max-w-5xl px-4 py-5 md:px-5">
 			<div className="flex flex-col space-y-5">
 				<div className="space-y-2">
 					<RouterBackButton
@@ -42,8 +43,10 @@ export default async function SearchPage({ searchParams }: Props) {
 						className="self-start"
 					/>
 					<div className="space-y-1">
-						<h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">
-							検索
+						<h1
+							className={`${headingJosefinSans.className} my-2 text-[30px] leading-none font-bold tracking-[0.06em] text-slate-900 dark:text-slate-50`}
+						>
+							Search
 						</h1>
 					</div>
 				</div>

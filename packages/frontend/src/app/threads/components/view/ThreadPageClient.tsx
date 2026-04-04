@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Sort } from "@/app/threads/lib/sort";
 import { emitAuthRequiredEvent } from "@/lib/auth/authRequiredEvent";
+import { headingJosefinSans } from "@/lib/config/fonts";
 import NoThread from "./NoThread";
 import { ThreadDisplayCount } from "./ThreadDisplayCount";
 import { ThreadList } from "./ThreadList";
@@ -168,9 +169,11 @@ export default function ThreadPageClient({
 
 	return (
 		<div className="w-full sm:max-w-5xl mx-auto flex flex-col space-y-2">
-			<div className="w-full px-3 pt-5">
-				<div className="text-xl font-bold">
-					{isFiltering ? `「${state.activeQuery}」の検索結果` : "スレッド一覧"}
+			<div className="w-full px-4 pt-5">
+				<div
+					className={`${headingJosefinSans.className} my-2 text-[30px] leading-none font-bold tracking-[0.06em] text-slate-900 dark:text-slate-50`}
+				>
+					{isFiltering ? `Search Results: "${state.activeQuery}"` : "Threads"}
 				</div>
 			</div>
 			<div className="w-full px-3 md:px-0">

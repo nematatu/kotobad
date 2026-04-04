@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import IconButton from "@/components/common/button/IconButton";
 import UserAvatar from "@/components/feature/user/UserAvatar";
+import { Button } from "@/components/ui/button";
 import {
 	Form,
 	FormControl,
@@ -37,12 +38,14 @@ type CreateThreadFormProps = {
 	onCreated: () => void;
 	initialTags?: TagType[];
 	autoFocusTitle?: boolean;
+	closeSurface: () => void;
 };
 
 export const CreateThreadForm = ({
 	onCreated,
 	initialTags,
 	autoFocusTitle = false,
+	closeSurface,
 }: CreateThreadFormProps) => {
 	const router = useRouter();
 	const [error, setError] = useState<string | null>(null);
@@ -202,7 +205,15 @@ export const CreateThreadForm = ({
 										/>
 									</div>
 
-									<div className="flex space-x-3 items-end">
+									<div className="flex space-x-3">
+										<Button
+											variant="outline"
+											aria-label="スレッド作成を閉じる"
+											onClick={closeSurface}
+											className="inline-flex justify-center items-center text-slate-500 dark:text-slate-300"
+										>
+											<p>キャンセル</p>
+										</Button>
 										<IconButton
 											hover="brightness"
 											icon={<PencilLine />}

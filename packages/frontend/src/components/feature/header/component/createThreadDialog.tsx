@@ -9,6 +9,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { headingJosefinSans } from "@/lib/config/fonts";
 import { cn } from "@/lib/utils";
 import CreateThreadButton from "../../button/thread/createThread";
 
@@ -39,9 +40,9 @@ export default function CreateThreadDialog({
 								<div>
 									<h2
 										id="create-thread-title"
-										className="text-base font-semibold text-slate-900"
+										className={`${headingJosefinSans.className} text-[28px] leading-none font-bold tracking-[0.06em] text-slate-900 dark:text-slate-100`}
 									>
-										新規スレッドを作成
+										Create Thread
 									</h2>
 									<p className="text-xs text-slate-500">
 										今の気持ちや話題をシェアしましょう
