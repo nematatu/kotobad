@@ -63,7 +63,10 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 	};
 
 	const handleSaveAction = async () => {
-		await confirmUpdateAction();
+		const ok = await confirmUpdateAction();
+		if (ok) {
+			router.push(profileHref);
+		}
 	};
 
 	return (
@@ -258,7 +261,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 								更新中
 							</span>
 						) : (
-							"更新する"
+							"更新して戻る"
 						)}
 					</Button>
 				</div>
