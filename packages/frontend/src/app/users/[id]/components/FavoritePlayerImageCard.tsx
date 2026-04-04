@@ -48,7 +48,7 @@ export function FavoritePlayerImageCard({
 						rounded="full"
 						aria-label={`${player.name} を選択解除`}
 						onClick={() => onRemoveAction(player.id)}
-						className="absolute -top-2 right-0 z-10 h-6 w-6 border-2 border-slate-200 bg-red-500 p-0 text-white shadow-none [@media(hover:hover)]:hover:bg-red-400"
+						className="absolute -top-2 right-0 z-10 h-6 w-6 border-2 border-slate-200 bg-red-500 p-0 text-white shadow-none [@media(hover:hover)]:hover:bg-red-400 dark:border-slate-700 dark:[@media(hover:hover)]:hover:bg-red-500"
 					>
 						<X strokeWidth="4" className="h-3.5 w-3.5 text-white" />
 					</Button>
@@ -81,19 +81,19 @@ export function FavoritePlayerImageCard({
 						/>
 					)
 				) : (
-					<div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500">
+					<div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
 						No Image
 					</div>
 				)}
-				<span className="text-xs leading-tight text-slate-700 font-semibold">
+				<span className="text-xs leading-tight font-semibold text-slate-700 dark:text-slate-200">
 					{player.name}
 				</span>
 			</div>
 			{enablePreview && previewImageUrl ? (
 				<Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
 					<DialogContent
-						className="w-[calc(100vw-0.375rem)] max-w-[min(92vw,720px)] rounded-md border-[#d6dde6] bg-white p-0"
-						closeButtonClassName="right-3 top-3 z-40 h-8 w-8 bg-white/95 text-[#304050] opacity-100 shadow-none"
+						className="w-[calc(100vw-0.375rem)] max-w-[min(92vw,720px)] rounded-md border-[#d6dde6] bg-white p-0 dark:border-slate-700 dark:bg-slate-950"
+						closeButtonClassName="right-3 top-3 z-40 h-8 w-8 bg-white/95 text-[#304050] opacity-100 shadow-none dark:bg-slate-900/95 dark:text-slate-200"
 					>
 						<DialogHeader className="sr-only">
 							<DialogTitle>{player.name} の画像プレビュー</DialogTitle>

@@ -48,9 +48,9 @@ export function UserProfileActivity({
 	}));
 
 	return (
-		<div className="mx-auto mt-9 w-full max-w-[1070px] bg-white pb-10 text-[#0f0f0f] [font-family:Roboto,Arial,sans-serif] sm:mt-8 sm:pb-10">
+		<div className="mx-auto mt-9 w-full max-w-[1070px] bg-white pb-10 text-[#0f0f0f] dark:bg-slate-950 dark:text-slate-100 [font-family:Roboto,Arial,sans-serif] sm:mt-8 sm:pb-10">
 			<div className="space-y-7">
-				<div className="h-[1px] w-full bg-[#e5e5e5]" />
+				<div className="h-[1px] w-full bg-[#e5e5e5] dark:bg-slate-800" />
 				<div className="flex items-center justify-between gap-2">
 					<p className="line-clamp-1 font-bold sm:text-lg sm:leading-[20px]">
 						推し選手
@@ -76,23 +76,25 @@ export function UserProfileActivity({
 						))}
 					</div>
 				) : (
-					<p className="text-sm text-[#606060]">推し選手は未選択です</p>
+					<p className="text-sm text-[#606060] dark:text-slate-400">
+						推し選手は未選択です
+					</p>
 				)}
 			</div>
 			<div className="mt-10 w-full sm:mt-9">
-				<nav className="flex h-12 items-end gap-6 border-b border-[#e5e5e5] px-3">
+				<nav className="flex h-12 items-end gap-6 border-b border-[#e5e5e5] px-3 dark:border-slate-800">
 					<button
 						type="button"
 						onClick={() => setActiveTab("threads")}
 						className={`relative h-12 px-0 text-[14px] font-medium cursor-pointer ${
 							activeTab === "threads"
-								? "text-[#0f0f0f]"
-								: "text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f]"
+								? "text-[#0f0f0f] dark:text-slate-100"
+								: "text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f] dark:text-slate-400 dark:[@media(hover:hover)]:hover:text-slate-100"
 						}`}
 					>
 						スレッド
 						{activeTab === "threads" ? (
-							<span className="absolute right-0 bottom-0 left-0 h-[2px] bg-[#0f0f0f]" />
+							<span className="absolute right-0 bottom-0 left-0 h-[2px] bg-[#0f0f0f] dark:bg-slate-100" />
 						) : null}
 					</button>
 					<button
@@ -100,20 +102,20 @@ export function UserProfileActivity({
 						onClick={() => setActiveTab("posts")}
 						className={`relative h-12 px-0 text-[14px] font-medium cursor-pointer ${
 							activeTab === "posts"
-								? "text-[#0f0f0f]"
-								: "text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f]"
+								? "text-[#0f0f0f] dark:text-slate-100"
+								: "text-[#606060] [@media(hover:hover)]:hover:text-[#0f0f0f] dark:text-slate-400 dark:[@media(hover:hover)]:hover:text-slate-100"
 						}`}
 					>
 						返信
 						{activeTab === "posts" ? (
-							<span className="absolute right-0 bottom-0 left-0 h-[2px] bg-[#0f0f0f]" />
+							<span className="absolute right-0 bottom-0 left-0 h-[2px] bg-[#0f0f0f] dark:bg-slate-100" />
 						) : null}
 					</button>
 				</nav>
 				{activeTab === "threads" ? (
 					<section id="recent-threads" className="pt-5 sm:pt-4">
 						{profile.recentThreads.length === 0 ? (
-							<p className="mt-6 px-3 text-sm text-[#606060]">
+							<p className="mt-6 px-3 text-sm text-[#606060] dark:text-slate-400">
 								スレッドはまだありません
 							</p>
 						) : (
@@ -126,11 +128,11 @@ export function UserProfileActivity({
 				{activeTab === "posts" ? (
 					<section id="recent-posts" className="pt-5 sm:pt-4">
 						{profile.recentPosts.length === 0 ? (
-							<p className="mt-6 px-3 text-sm text-[#606060]">
+							<p className="mt-6 px-3 text-sm text-[#606060] dark:text-slate-400">
 								返信はまだありません
 							</p>
 						) : (
-							<ul className="divide-y divide-[#e5e5e5]">
+							<ul className="divide-y divide-[#e5e5e5] dark:divide-slate-800">
 								{profile.recentPosts.map((post) => (
 									<li key={post.id} className="px-3 py-5 sm:py-4">
 										<div className="flex items-start gap-3">
@@ -141,28 +143,28 @@ export function UserProfileActivity({
 											/>
 											<div className="min-w-0 flex-1">
 												<div className="flex flex-wrap items-center gap-x-2 text-sm">
-													<span className="font-semibold text-[#0f0f0f]">
+													<span className="font-semibold text-[#0f0f0f] dark:text-slate-100">
 														{profile.name}
 													</span>
-													<span className="text-[#606060]">
+													<span className="text-[#606060] dark:text-slate-400">
 														{getRelativeDate(post.createdAt)}
 													</span>
 												</div>
-												<p className="mt-1 whitespace-pre-line break-words text-[15px] leading-6 text-[#0f0f0f]">
+												<p className="mt-1 whitespace-pre-line break-words text-[15px] leading-6 text-[#0f0f0f] dark:text-slate-100">
 													<AutoLinkText text={post.post} />
 												</p>
 												<Link
 													href={`/threads/${post.threadId}?postId=${post.id}`}
 													showIndicator={false}
-													className="mt-3 block rounded-2xl border border-[#e5e5e5] p-3 [@media(hover:hover)]:hover:bg-[#f8fafc]"
+													className="mt-3 block rounded-2xl border border-[#e5e5e5] p-3 [@media(hover:hover)]:hover:bg-[#f8fafc] dark:border-slate-700 dark:[@media(hover:hover)]:hover:bg-slate-900"
 												>
-													<p className="text-xs text-[#606060]">
+													<p className="text-xs text-[#606060] dark:text-slate-400">
 														返信先スレッド
 													</p>
-													<p className="mt-1 line-clamp-2 text-sm text-[#0f0f0f]">
+													<p className="mt-1 line-clamp-2 text-sm text-[#0f0f0f] dark:text-slate-100">
 														{post.threadTitle}
 													</p>
-													<p className="mt-1 text-xs text-[#606060]">
+													<p className="mt-1 text-xs text-[#606060] dark:text-slate-400">
 														#{post.localId}
 													</p>
 												</Link>

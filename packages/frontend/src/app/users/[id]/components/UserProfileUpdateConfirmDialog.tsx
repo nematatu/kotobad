@@ -54,15 +54,15 @@ export function UserProfileUpdateConfirmDialog({
 
 	return (
 		<AlertDialog open={open} onOpenChange={handleOpenChange}>
-			<AlertDialogContent className="gap-0 overflow-hidden p-0 sm:max-w-md">
+			<AlertDialogContent className="gap-0 overflow-hidden p-0 sm:max-w-md dark:border-slate-700 dark:bg-slate-950">
 				<div className="mb-2 flex flex-col items-center justify-center gap-2 p-8">
 					<AlertDialogHeader>
-						<AlertDialogTitle className="text-center text-base font-semibold">
+						<AlertDialogTitle className="text-center text-base font-semibold dark:text-slate-100">
 							プロフィールを更新しますか？
 						</AlertDialogTitle>
 					</AlertDialogHeader>
 					<div className="w-full text-left">
-						<section className="relative rounded-xl border border-slate-200 bg-white">
+						<section className="relative rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
 							<ProfileHeaderImage
 								headerImage={previewHeaderImage}
 								alt="プロフィールヘッダー画像"
@@ -75,32 +75,36 @@ export function UserProfileUpdateConfirmDialog({
 									<AuthorAvatar
 										name={normalizedPreviewName}
 										image={previewAvatarImage}
-										className="h-16 w-16 border-4 border-white bg-white"
+										className="h-16 w-16 border-4 border-white bg-white dark:border-slate-900 dark:bg-slate-900"
 										fallbackClassName="text-xs"
 									/>
 								</div>
 								<div className="mt-2 space-y-2">
 									<div className="flex min-w-0 flex-col gap-y-1">
-										<p className="truncate text-base font-bold text-slate-900">
+										<p className="truncate text-base font-bold text-slate-900 dark:text-slate-100">
 											{normalizedPreviewName || "（名前未入力）"}
 										</p>
-										<p className="text-xs text-slate-400">@{profileId}</p>
+										<p className="text-xs text-slate-400 dark:text-slate-500">
+											@{profileId}
+										</p>
 									</div>
 									{normalizedPreviewBio ? (
-										<p className="max-h-24 overflow-y-auto whitespace-pre-line break-words text-sm text-slate-600">
+										<p className="max-h-24 overflow-y-auto whitespace-pre-line break-words text-sm text-slate-600 dark:text-slate-300">
 											{previewBio}
 										</p>
 									) : (
-										<p className="text-sm text-slate-400">
+										<p className="text-sm text-slate-400 dark:text-slate-500">
 											自己紹介は未入力です
 										</p>
 									)}
 									<div className="space-y-1">
-										<p className="text-xs font-medium text-slate-500">
+										<p className="text-xs font-medium text-slate-500 dark:text-slate-400">
 											推し選手
 										</p>
 										{previewFavoritePlayers.length === 0 ? (
-											<p className="text-sm text-slate-400">未選択です</p>
+											<p className="text-sm text-slate-400 dark:text-slate-500">
+												未選択です
+											</p>
 										) : (
 											<div className="flex flex-wrap gap-x-2 gap-y-1.5">
 												{previewFavoritePlayers.map((player) => (
@@ -111,11 +115,11 @@ export function UserProfileUpdateConfirmDialog({
 														<AuthorAvatar
 															name={player.name}
 															image={player.imageUrl}
-															className="h-16 w-16 rounded-md bg-white"
+															className="h-16 w-16 rounded-md bg-white dark:bg-slate-800"
 															fallbackClassName="rounded-md text-xs"
 															imageClassName="scale-110"
 														/>
-														<span className="text-xs leading-tight text-slate-700">
+														<span className="text-xs leading-tight text-slate-700 dark:text-slate-200">
 															{player.name}
 														</span>
 													</div>
@@ -128,9 +132,9 @@ export function UserProfileUpdateConfirmDialog({
 						</section>
 					</div>
 				</div>
-				<AlertDialogFooter className="grid flex-none grid-cols-2 gap-0 border-t pt-0 sm:space-x-0">
+				<AlertDialogFooter className="grid flex-none grid-cols-2 gap-0 border-t pt-0 dark:border-slate-700 sm:space-x-0">
 					<AlertDialogCancel
-						className="border-border mt-0 h-12 flex-1 rounded-none border-0 border-r p-0"
+						className="border-border mt-0 h-12 flex-1 rounded-none border-0 border-r p-0 dark:border-r-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:[@media(hover:hover)]:hover:bg-slate-800"
 						disabled={isSavingProfile}
 					>
 						戻る

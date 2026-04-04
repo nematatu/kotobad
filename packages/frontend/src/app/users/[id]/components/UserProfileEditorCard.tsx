@@ -79,7 +79,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 	} = actions;
 
 	return (
-		<section className="relative overflow-hidden bg-white">
+		<section className="relative overflow-hidden bg-white dark:bg-slate-950">
 			{isEditing ? (
 				<div className="mx-auto w-full max-w-[1070px] pt-6 pb-0 [font-family:Roboto,Arial,sans-serif] sm:pt-6">
 					<ProfileHeaderImage
@@ -121,10 +121,10 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 							</div>
 							<div className="min-w-0 flex-1 space-y-5 sm:pt-1">
 								<div className="flex w-full items-start gap-3">
-									<div className="group relative min-w-0 w-full max-w-[34rem] rounded-md border border-[#d9d9d9] bg-white px-3 pt-4 pb-1.5 transition-colors focus-within:border-[#1d9bf0]">
+									<div className="group relative min-w-0 w-full max-w-[34rem] rounded-md border border-[#d9d9d9] bg-white px-3 pt-4 pb-1.5 transition-colors focus-within:border-[#1d9bf0] dark:border-slate-700 dark:bg-slate-900 dark:focus-within:border-sky-500">
 										<label
 											htmlFor="name"
-											className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0]"
+											className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0] dark:text-slate-400 dark:group-focus-within:text-sky-400"
 										>
 											名前
 										</label>
@@ -136,9 +136,9 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 												onEditedNameChangeAction(event.target.value)
 											}
 											maxLength={MAX_PROFILE_NAME_LENGTH}
-											className="h-9 w-full border-0 bg-transparent px-0 py-0 text-[1.55rem] leading-[1.2] font-bold text-[#0f0f0f] outline-none focus:ring-0 sm:h-14 sm:text-2xl sm:leading-[52px]"
+											className="h-9 w-full border-0 bg-transparent px-0 py-0 text-[1.55rem] leading-[1.2] font-bold text-[#0f0f0f] outline-none focus:ring-0 dark:text-slate-100 sm:h-14 sm:text-2xl sm:leading-[52px]"
 										/>
-										<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+										<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400 dark:text-slate-500">
 											{editedName.length}/{MAX_PROFILE_NAME_LENGTH}
 										</p>
 									</div>
@@ -147,7 +147,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											variant="outline"
 											icon={<X />}
 											rounded="full"
-											className="h-9 rounded-full border border-slate-300 bg-white text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100"
+											className="h-9 rounded-full border border-slate-300 bg-white text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100 dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
 											disabled={isSavingProfile}
 											onClick={onCancelEditingAction}
 										>
@@ -158,7 +158,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											icon={<Check />}
 											rounded="full"
 											hover="brightness"
-											className="h-9 rounded-full bg-[#0f0f0f] px-4 text-white [@media(hover:hover)]:hover:bg-[#272727]"
+											className="h-9 rounded-full bg-[#0f0f0f] px-4 text-white [@media(hover:hover)]:hover:bg-[#272727] dark:bg-slate-100 dark:text-slate-900 dark:[@media(hover:hover)]:hover:bg-slate-200"
 											disabled={isSavingProfile}
 											onClick={onOpenConfirmAction}
 										>
@@ -166,10 +166,10 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										</IconButton>
 									</div>
 								</div>
-								<div className="group relative mt-1.5 w-full max-w-2xl rounded-md border border-[#d9d9d9] bg-white px-3 pt-5 pb-4 transition-colors focus-within:border-[#1d9bf0]">
+								<div className="group relative mt-1.5 w-full max-w-2xl rounded-md border border-[#d9d9d9] bg-white px-3 pt-5 pb-4 transition-colors focus-within:border-[#1d9bf0] dark:border-slate-700 dark:bg-slate-900 dark:focus-within:border-sky-500">
 									<label
 										htmlFor="bio"
-										className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0]"
+										className="pointer-events-none absolute top-2.5 left-3 text-[11px] text-[#606060] transition-colors group-focus-within:text-[#1d9bf0] dark:text-slate-400 dark:group-focus-within:text-sky-400"
 									>
 										自己紹介
 									</label>
@@ -180,9 +180,9 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 											onEditedBioChangeAction(event.target.value)
 										}
 										maxLength={MAX_PROFILE_BIO_LENGTH}
-										className="h-9 w-full border-0 bg-transparent px-0 py-0 text-base leading-[1.2] text-[#0f0f0f] outline-none focus:ring-0 sm:h-10 sm:text-[17px] sm:leading-[52px]"
+										className="h-9 w-full border-0 bg-transparent px-0 py-0 text-base leading-[1.2] text-[#0f0f0f] outline-none focus:ring-0 dark:text-slate-100 sm:h-10 sm:text-[17px] sm:leading-[52px]"
 									/>
-									<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400">
+									<p className="pointer-events-none absolute right-3 bottom-1 text-[11px] text-slate-400 dark:text-slate-500">
 										{editedBio.length}/{MAX_PROFILE_BIO_LENGTH}
 									</p>
 								</div>
@@ -207,8 +207,8 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 								asChild={isLogin}
 								className={
 									isLogin
-										? "mt-0.5 h-9 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100"
-										: "mt-0.5 h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727]"
+										? "mt-0.5 h-9 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100 dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
+										: "mt-0.5 h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727] dark:bg-slate-100 dark:text-slate-900 dark:[@media(hover:hover)]:hover:bg-slate-200"
 								}
 								disabled={isSavingProfile}
 							>
@@ -236,8 +236,8 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 										asChild={isLogin}
 										className={
 											isLogin
-												? "mt-0.5 h-9 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100"
-												: "mt-0.5 h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727]"
+												? "mt-0.5 h-9 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-[#0f0f0f] [@media(hover:hover)]:hover:bg-slate-100 dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
+												: "mt-0.5 h-9 rounded-full bg-[#0f0f0f] px-4 text-sm font-medium text-white [@media(hover:hover)]:hover:bg-[#272727] dark:bg-slate-100 dark:text-slate-900 dark:[@media(hover:hover)]:hover:bg-slate-200"
 										}
 										disabled={isSavingProfile}
 									>
@@ -251,11 +251,11 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 									</Button>
 								</div>
 								<div className="sm:pr-[10rem]">
-									<h1 className="min-w-0 truncate text-[1.35rem] leading-[1.3] font-bold text-[#0f0f0f] sm:text-2xl sm:leading-[58px]">
+									<h1 className="min-w-0 truncate text-[1.35rem] leading-[1.3] font-bold text-[#0f0f0f] dark:text-slate-100 sm:text-2xl sm:leading-[58px]">
 										{editedName}
 									</h1>
 								</div>
-								<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-[#0f0f0f] sm:text-[14px] sm:leading-[20px]">
+								<p className="line-clamp-2 whitespace-pre-line break-words text-sm text-[#0f0f0f] dark:text-slate-200 sm:text-[14px] sm:leading-[20px]">
 									{editedBio}
 								</p>
 							</div>

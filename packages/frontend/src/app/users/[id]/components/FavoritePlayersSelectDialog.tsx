@@ -126,13 +126,13 @@ export function FavoritePlayersSelectDialog({
 		<>
 			<Dialog open={open} onOpenChange={onOpenChangeAction}>
 				<DialogContent
-					className="w-[calc(100vw-0.375rem)] max-w-4xl rounded-md p-0"
+					className="w-[calc(100vw-0.375rem)] max-w-4xl rounded-md bg-white p-0 dark:bg-slate-950"
 					onOpenAutoFocus={(event) => {
 						event.preventDefault();
 					}}
 				>
 					<div className="flex h-[min(94vh,820px)] flex-col">
-						<DialogHeader className="border-b px-4 py-3">
+						<DialogHeader className="border-b px-4 py-3 dark:border-slate-800">
 							<DialogTitle className="text-base">
 								推し選手を登録しよう
 							</DialogTitle>
@@ -142,7 +142,7 @@ export function FavoritePlayersSelectDialog({
 									onChange={(event) => setQuery(event.target.value)}
 									type="search"
 									placeholder="選手名で検索"
-									className="h-10 rounded-md border border-slate-300 px-3 text-base outline-none focus:border-blue-400 sm:text-sm"
+									className="h-10 rounded-md border border-slate-300 px-3 text-base outline-none focus:border-blue-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 sm:text-sm"
 								/>
 							</div>
 						</DialogHeader>
@@ -152,22 +152,24 @@ export function FavoritePlayersSelectDialog({
 							data-pull-refresh-block="true"
 						>
 							{isLoading ? (
-								<p className="py-10 text-center text-sm text-slate-500">
+								<p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
 									選手一覧を読み込み中...
 								</p>
 							) : loadError ? (
 								<div className="py-10 text-center">
-									<p className="text-sm text-rose-600">{loadError}</p>
+									<p className="text-sm text-rose-600 dark:text-rose-400">
+										{loadError}
+									</p>
 									<button
 										type="button"
-										className="mt-2 text-sm text-blue-600"
+										className="mt-2 text-sm text-blue-600 dark:text-blue-400"
 										onClick={() => void onReloadAction()}
 									>
 										再読み込み
 									</button>
 								</div>
 							) : filteredPlayers.length === 0 ? (
-								<p className="py-10 text-center text-sm text-slate-500">
+								<p className="py-10 text-center text-sm text-slate-500 dark:text-slate-400">
 									該当する選手が見つかりません
 								</p>
 							) : (
@@ -188,7 +190,7 @@ export function FavoritePlayersSelectDialog({
 													"relative aspect-[1/1] overflow-hidden rounded-md border bg-slate-100 text-left transition-all hover:scale-110 hover:z-1",
 													isSelected
 														? "border-blue-500 ring-2 ring-blue-500/40"
-														: "border-slate-200",
+														: "border-slate-200 dark:border-slate-700 dark:bg-slate-900",
 													cannotSelectMore && "opacity-50",
 												)}
 											>
@@ -209,7 +211,7 @@ export function FavoritePlayersSelectDialog({
 														className="absolute inset-0 h-full w-full object-cover"
 													/>
 												) : (
-													<div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-[10px] text-slate-500 sm:text-xs">
+													<div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400 sm:text-xs">
 														No Image
 													</div>
 												)}
@@ -252,13 +254,15 @@ export function FavoritePlayersSelectDialog({
 							)}
 						</div>
 
-						<div className="border-t bg-white px-4 py-3">
-							<p className="text-xs text-slate-500">
+						<div className="border-t bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-950">
+							<p className="text-xs text-slate-500 dark:text-slate-400">
 								選択中 {draftSelectedPlayers.length}/{MAX_FAVORITE_PLAYERS}
 							</p>
 							<div className="mt-2 flex gap-2 overflow-x-auto pt-2 pb-1">
 								{draftSelectedPlayers.length === 0 ? (
-									<p className="text-sm text-slate-400">未選択です</p>
+									<p className="text-sm text-slate-400 dark:text-slate-500">
+										未選択です
+									</p>
 								) : (
 									draftSelectedPlayers.map((player) => (
 										<FavoritePlayerImageCard
@@ -278,12 +282,12 @@ export function FavoritePlayersSelectDialog({
 										icon: ArrowUpRight,
 										iconPosition: "right",
 									}}
-									className="text-sm text-blue-600 underline underline-offset-4"
+									className="text-sm text-blue-600 underline underline-offset-4 dark:text-blue-400"
 								/>
 								<div className="flex items-center gap-2">
 									<Button
 										variant="outline"
-										className="h-9 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc]"
+										className="h-9 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc] dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
 										onClick={() => onOpenChangeAction(false)}
 									>
 										キャンセル
@@ -313,8 +317,8 @@ export function FavoritePlayersSelectDialog({
 				}}
 			>
 				<DialogContent
-					className="w-[calc(100vw-0.375rem)] max-w-[min(92vw,720px)] rounded-md border-[#d6dde6] bg-white p-0"
-					closeButtonClassName="hidden sm:inline-flex right-3 top-3 z-40 h-8 w-8 bg-white/95 text-[#304050] opacity-100 shadow-none"
+					className="w-[calc(100vw-0.375rem)] max-w-[min(92vw,720px)] rounded-md border-[#d6dde6] bg-white p-0 dark:border-slate-700 dark:bg-slate-950"
+					closeButtonClassName="hidden sm:inline-flex right-3 top-3 z-40 h-8 w-8 bg-white/95 text-[#304050] opacity-100 shadow-none dark:bg-slate-900/95 dark:text-slate-200"
 				>
 					<DialogHeader className="sr-only">
 						<DialogTitle>選手画像プレビュー</DialogTitle>
@@ -334,7 +338,7 @@ export function FavoritePlayersSelectDialog({
 						<Button
 							type="button"
 							variant="outline"
-							className="h-10 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc]"
+							className="h-10 rounded-md border-[#cfd8e3] bg-white px-4 text-sm font-semibold text-[#304050] [@media(hover:hover)]:hover:bg-[#f7f9fc] dark:border-slate-500 dark:bg-slate-800 dark:text-slate-50 dark:[@media(hover:hover)]:hover:bg-slate-700"
 							onClick={() => setPreviewImage(null)}
 						>
 							キャンセル

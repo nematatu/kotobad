@@ -20,7 +20,7 @@ export default async function UserProfilePage({ params }: Props) {
 	try {
 		const profile = await getUserProfileById(userId);
 		return (
-			<div className="min-h-screen w-full bg-white px-4 py-7 sm:px-6 sm:py-6">
+			<div className="min-h-screen w-full bg-white px-4 py-7 dark:bg-slate-950 sm:px-6 sm:py-6">
 				<UserProfileEditor profile={profile} />
 			</div>
 		);
