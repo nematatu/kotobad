@@ -1,4 +1,9 @@
-import type { Player, PlayerPayload, PlayerUpdatePayload } from "../types";
+import type {
+	FetchPlayersResult,
+	Player,
+	PlayerPayload,
+	PlayerUpdatePayload,
+} from "../types";
 import { optimizeImageForUpload } from "./imageOptimize";
 
 const createHeaders = (token: string, withJsonContentType = false) => {
@@ -46,15 +51,43 @@ const parseApiError = async (response: Response): Promise<string> => {
 export const fetchPlayers = async (
 	token: string,
 	limit: number,
-): Promise<Player[]> => {
-	const response = await fetch(`/players?limit=${limit}&offset=0`, {
+	offset: number,
+): Promise<FetchPlayersResult> => {
+	const response = await fetch(`/players?limit=${limit}&offset=${offset}`, {
 		headers: createHeaders(token, false),
 	});
 	if (!response.ok) {
 		throw new Error(await parseApiError(response));
 	}
-	const json = (await response.json()) as { players?: Player[] };
-	return Array.isArray(json.players) ? json.players : [];
+	const json = (await response.json()) as {
+		players?: Player[];
+		pagination?: {
+			limit?: number;
+			offset?: number;
+			count?: number;
+			total?: number;
+		};
+	};
+	const players = Array.isArray(json.players) ? json.players : [];
+	return {
+		players,
+		pagination: {
+			limit:
+				typeof json.pagination?.limit === "number"
+					? json.pagination.limit
+					: limit,
+			offset:
+				typeof json.pagination?.offset === "number"
+					? json.pagination.offset
+					: offset,
+			count:
+				typeof json.pagination?.count === "number"
+					? json.pagination.count
+					: players.length,
+			total:
+				typeof json.pagination?.total === "number" ? json.pagination.total : 0,
+		},
+	};
 };
 
 export const createPlayer = async (

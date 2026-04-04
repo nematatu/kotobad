@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { createDb } from "../db/client";
 import { players } from "../db/schema";
@@ -77,6 +77,7 @@ playersRouter.get("/", async (c) => {
 		.orderBy(desc(players.id))
 		.limit(limit)
 		.offset(offset);
+	const [{ total }] = await db.select({ total: count() }).from(players);
 
 	return c.json({
 		players: rows,
@@ -84,6 +85,7 @@ playersRouter.get("/", async (c) => {
 			limit,
 			offset,
 			count: rows.length,
+			total,
 		},
 	});
 });

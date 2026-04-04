@@ -26,3 +26,15 @@ export type PlayerPayload = {
 };
 
 export type PlayerUpdatePayload = Partial<PlayerPayload>;
+
+export type PlayerPagination = {
+	limit: number;
+	offset: number;
+	count: number;
+	total: number;
+};
+
+export type FetchPlayersResult = {
+	players: Player[];
+	pagination: PlayerPagination;
+};

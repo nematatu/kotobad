@@ -94,6 +94,36 @@ button.ghost {
 	align-items: flex-end;
 }
 
+.pagination-controls {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #e2e8f0;
+}
+
+.pagination-panel {
+	margin-top: 16px;
+}
+
+.pagination-row {
+	display: grid;
+	grid-template-columns: 120px minmax(120px, 180px) 120px;
+	gap: 8px;
+	align-items: end;
+}
+
+.page-input-wrap {
+	display: grid;
+	gap: 4px;
+	font-size: 12px;
+	color: #475569;
+}
+
+@media (max-width: 640px) {
+	.pagination-row {
+		grid-template-columns: 1fr;
+	}
+}
+
 .status {
 	font-size: 13px;
 	margin: 8px 0 16px;
