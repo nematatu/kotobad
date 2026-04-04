@@ -208,6 +208,7 @@ export const CreateThreadForm = ({
 									<div className="flex space-x-3">
 										<Button
 											variant="outline"
+											rounded="full"
 											aria-label="スレッド作成を閉じる"
 											onClick={closeSurface}
 											className="inline-flex justify-center items-center text-slate-500 dark:text-slate-300"

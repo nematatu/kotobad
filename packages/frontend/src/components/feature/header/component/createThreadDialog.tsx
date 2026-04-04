@@ -27,6 +27,9 @@ export default function CreateThreadDialog({
 }: Props) {
 	const router = useRouter();
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
+	const closeSurface = () => {
+		setIsCreateOpen(false);
+	};
 	return (
 		<div className={cn("flex items-center", className)}>
 			<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -54,9 +57,10 @@ export default function CreateThreadDialog({
 					<CreateThreadForm
 						onCreated={() => {
 							router.refresh();
-							setIsCreateOpen(false);
+							closeSurface();
 						}}
 						initialTags={tags}
+						closeSurface={closeSurface}
 					/>
 				</DialogContent>
 			</Dialog>
