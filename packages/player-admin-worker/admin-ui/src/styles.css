@@ -64,6 +64,14 @@ textarea {
 	font-size: 16px;
 }
 
+@supports (-webkit-touch-callout: none) {
+	select {
+		-webkit-appearance: menulist;
+		appearance: menulist;
+		background-image: none;
+	}
+}
+
 button {
 	font-size: 14px;
 }

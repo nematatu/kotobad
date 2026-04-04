@@ -399,8 +399,8 @@ const PlayerEditorModal = ({
 				localId: crypto.randomUUID(),
 				name: "",
 				category: "",
-				startYear: "",
-				endYear: "",
+				startYear: String(careerYearMax),
+				endYear: String(careerYearMax),
 			},
 		]);
 	};
