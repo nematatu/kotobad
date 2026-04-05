@@ -81,30 +81,12 @@ const handler = async (req: NextRequest, context: BetterAuthContext) => {
 	return nextResponse;
 };
 
-export async function GET(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
-
-export async function POST(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
-
-export async function PUT(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
-
-export async function PATCH(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
-
-export async function DELETE(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
-
-export async function OPTIONS(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
-
-export async function HEAD(req: NextRequest, context: BetterAuthContext) {
-	return handler(req, context);
-}
+export {
+	handler as GET,
+	handler as POST,
+	handler as PUT,
+	handler as PATCH,
+	handler as DELETE,
+	handler as OPTIONS,
+	handler as HEAD,
+};
