@@ -1,3 +1,5 @@
+import { ensureTrailingSlash } from "@kotobad/shared/src/utils/url/ensureTrailingSlash";
+
 const env = process.env.NODE_ENV;
 
 const apiUrlMap: Record<
@@ -9,17 +11,7 @@ const apiUrlMap: Record<
 	test: process.env.NEXT_PUBLIC_API_URL,
 };
 
-const ensureTrailingSlash = (value: string): string =>
-	value.endsWith("/") ? value : `${value}/`;
-
 const resolveBaseUrl = () => {
-	if (typeof window !== "undefined" && env !== "production") {
-		const origin = ensureTrailingSlash(
-			`http://${window.location.hostname}:8787`,
-		);
-		return origin;
-	}
-
 	const raw = apiUrlMap[env];
 
 	if (!raw) {
@@ -28,8 +20,7 @@ const resolveBaseUrl = () => {
 		);
 	}
 
-	const fallback = ensureTrailingSlash(raw);
-	return fallback;
+	return ensureTrailingSlash(raw);
 };
 
 const BASE_URL = resolveBaseUrl();
