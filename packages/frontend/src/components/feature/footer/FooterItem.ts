@@ -6,7 +6,7 @@ export type FooterItem = {
 	icon?: "twitter" | "github";
 };
 
-export type FooterSection = {
+type FooterSection = {
 	title: string;
 	items: FooterItem[];
 };

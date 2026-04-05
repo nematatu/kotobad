@@ -2,7 +2,7 @@ import { inArray, sql } from "drizzle-orm";
 import { threadLikes } from "../../../../../drizzle/schema";
 import type { AppEnvironment } from "../../../../types";
 
-export type ThreadLikeSummary = {
+type ThreadLikeSummary = {
 	likeCount: number;
 	likedByMe: boolean;
 };

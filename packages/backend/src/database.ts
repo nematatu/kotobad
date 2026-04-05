@@ -12,5 +12,3 @@ export const createDb = (env: Bindings) => {
 	dbCache.set(env.DB, db);
 	return db;
 };
-
-export type Database = ReturnType<typeof createDb>;

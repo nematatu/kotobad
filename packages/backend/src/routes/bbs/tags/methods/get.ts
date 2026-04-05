@@ -48,5 +48,3 @@ export const getAllTagRouter: RouteHandler<
 		);
 	}
 };
-
-export type GetAllTagRouteType = typeof getAllTagRoute;

@@ -60,16 +60,3 @@ export async function getPostReactions({ db, posts, viewerUserId }: props) {
 
 	return reactionMap;
 }
-
-export async function getPostReactionsByPost({
-	db,
-	post,
-	viewerUserId,
-}: {
-	db: AppEnvironment["Variables"]["db"];
-	post: PostQueryItem;
-	viewerUserId: string | null;
-}) {
-	const map = await getPostReactions({ db, posts: [post], viewerUserId });
-	return map;
-}

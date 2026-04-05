@@ -12,7 +12,7 @@ export type BffFetcherError = Error & {
 
 type BffFetcherOptions = FetchArgs[1] & { skipCookie?: boolean };
 
-export async function BffFetcherRaw(
+async function BffFetcherRaw(
 	url: FetchArgs[0],
 	options: BffFetcherOptions = {},
 	skipErrorThrow = false,

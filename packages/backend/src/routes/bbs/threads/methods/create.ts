@@ -164,5 +164,3 @@ export const createThreadRouter: RouteHandler<
 		);
 	}
 };
-
-export type CreateThreadRouterType = typeof createThreadRouter;

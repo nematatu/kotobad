@@ -247,6 +247,3 @@ export const setPostReactionsRouter: RouteHandler<
 		);
 	}
 };
-
-export type SetPostReactionsRouterType = typeof setPostReactionsRoute;
-export type GetReactionOptionsRouterType = typeof getReactionOptionsRoute;

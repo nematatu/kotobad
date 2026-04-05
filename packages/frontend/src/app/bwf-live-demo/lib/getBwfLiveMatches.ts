@@ -121,7 +121,7 @@ export type BwfLiveMatch = {
 	}>;
 };
 
-export type BwfLiveMatchesResult =
+type BwfLiveMatchesResult =
 	| {
 			ok: true;
 			tournamentId: string;
@@ -137,7 +137,7 @@ export type BwfLiveMatchesResult =
 			message: string;
 	  };
 
-export type BwfCurrentLiveTournament = {
+type BwfCurrentLiveTournament = {
 	id: string;
 	code: string;
 	name: string;
@@ -148,7 +148,7 @@ export type BwfCurrentLiveTournament = {
 	categoryName: string | null;
 };
 
-export type BwfLiveTournamentSection =
+type BwfLiveTournamentSection =
 	| {
 			ok: true;
 			tournament: BwfCurrentLiveTournament;
@@ -162,7 +162,7 @@ export type BwfLiveTournamentSection =
 			message: string;
 	  };
 
-export type BwfCurrentLiveTournamentSectionsResult =
+type BwfCurrentLiveTournamentSectionsResult =
 	| {
 			ok: true;
 			fetchedAt: string;
@@ -174,10 +174,10 @@ export type BwfCurrentLiveTournamentSectionsResult =
 			message: string;
 	  };
 
-export const normalizeBwfTournamentId = (value?: string) =>
+const normalizeBwfTournamentId = (value?: string) =>
 	value && /^\d+$/.test(value) ? value : DEFAULT_TOURNAMENT_ID;
 
-export const buildBwfLiveMatchesUrl = (tournamentId?: string) => {
+const buildBwfLiveMatchesUrl = (tournamentId?: string) => {
 	const resolvedTournamentId = normalizeBwfTournamentId(tournamentId);
 	const targetUrl = new URL(
 		"vue-live-matches",
@@ -270,7 +270,7 @@ const toTournamentSummary = (
 	categoryName: tournament.category_model?.name ?? null,
 });
 
-export async function getBwfLiveMatches(
+async function getBwfLiveMatches(
 	tournamentId?: string,
 ): Promise<BwfLiveMatchesResult> {
 	const resolvedTournamentId = normalizeBwfTournamentId(tournamentId);

@@ -141,5 +141,3 @@ export const setThreadLikesRouter: RouteHandler<
 		);
 	}
 };
-
-export type SetThreadLikesRouterType = typeof setThreadLikesRoute;

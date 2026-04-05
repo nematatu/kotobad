@@ -5,7 +5,7 @@ import type { UploadImageTargetType } from "@kotobad/shared/src/types/media";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
 import { getBffApiUrl } from "@/lib/api/url/bffApiUrls";
 
-export const MAX_THREAD_POST_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_THREAD_POST_IMAGE_BYTES = 8 * 1024 * 1024;
 
 const ACCEPTED_IMAGE_TYPES = new Set([
 	"image/jpeg",

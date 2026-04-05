@@ -1,6 +1,6 @@
 import type { DeveloperNoteType } from "@kotobad/shared/src/types/developerNote";
 
-export type DeveloperNoteQueryResult = {
+type DeveloperNoteQueryResult = {
 	id: number;
 	content: string;
 	createdAt: Date;

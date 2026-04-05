@@ -1,6 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { AppEnvironment } from "../../../types";
-import { uploadMyAvatarRoute, uploadMyAvatarRouter } from "./methods/avatar";
 import {
 	getUserProfileByIdRoute,
 	getUserProfileByIdRouter,
@@ -17,7 +16,6 @@ import {
 const userRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(getProfileSelectablePlayersRoute, getProfileSelectablePlayersRouter)
 	.openapi(getUserProfileByIdRoute, getUserProfileByIdRouter)
-	.openapi(updateUserProfileRoute, updateUserProfileRouter)
-	.openapi(uploadMyAvatarRoute, uploadMyAvatarRouter);
+	.openapi(updateUserProfileRoute, updateUserProfileRouter);
 
 export default userRouter;

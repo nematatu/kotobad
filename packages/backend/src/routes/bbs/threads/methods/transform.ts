@@ -1,7 +1,7 @@
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
 
-export type ThreadQueryResult = {
+type ThreadQueryResult = {
 	id: number;
 	title: string;
 	createdAt: Date;

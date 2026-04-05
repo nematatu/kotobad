@@ -20,7 +20,7 @@ export function appendSetCookies(res: NextResponse, cookiesToAdd: string[]) {
 	});
 }
 
-export function mergeCookies(
+function mergeCookies(
 	cookieStore: ReadonlyRequestCookies,
 	newCookies: string[],
 ) {
@@ -32,7 +32,7 @@ export function mergeCookies(
 		.join("; ");
 }
 
-export async function fetchSession(
+async function fetchSession(
 	newCookies: string[],
 	cookieStore: ReadonlyRequestCookies,
 ): Promise<BetterAuthSessionResponse | null> {

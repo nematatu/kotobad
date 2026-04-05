@@ -8,7 +8,7 @@ import {
 	useState,
 } from "react";
 
-export interface ItemRect {
+interface ItemRect {
 	top: number;
 	height: number;
 	left: number;
@@ -178,13 +178,3 @@ export function useProximityHover<T extends HTMLElement>(
  * Hook for child items to register themselves with the proximity hover system.
  * Call in useEffect with the item's ref and index.
  */
-export function useRegisterProximityItem(
-	registerItem: (index: number, element: HTMLElement | null) => void,
-	index: number,
-	ref: RefObject<HTMLElement | null>,
-) {
-	useEffect(() => {
-		registerItem(index, ref.current);
-		return () => registerItem(index, null);
-	}, [index, registerItem, ref]);
-}

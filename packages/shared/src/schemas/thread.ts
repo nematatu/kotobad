@@ -1,5 +1,4 @@
 import { z } from "@hono/zod-openapi";
-import { PostListSchema } from "./post";
 import { TagListSchema } from "./tag";
 
 export const ThreadSchema = z.object({
@@ -39,14 +38,7 @@ export const CreateThreadSchema = z.object({
 	tagIds: z.array(z.number().int().positive()).default([]),
 });
 
-export const EditThreadSchema = ThreadSchema.partial();
-
 export const ThreadListSchema = z.object({
 	threads: z.array(ThreadSchema),
 	totalCount: z.number(),
-});
-
-export const ThreadWithPostsSchema = z.object({
-	thread: ThreadSchema,
-	posts: PostListSchema,
 });

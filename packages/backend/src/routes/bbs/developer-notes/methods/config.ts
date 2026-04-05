@@ -6,9 +6,8 @@ const splitAuthorIds = (value?: string) =>
 		.map((authorId) => authorId.trim())
 		.filter(Boolean) ?? [];
 
-export const getDeveloperNoteAllowedAuthorIds = (
-	env: AppEnvironment["Bindings"],
-) => new Set(splitAuthorIds(env.DEVELOPER_NOTE_AUTHOR_IDS));
+const getDeveloperNoteAllowedAuthorIds = (env: AppEnvironment["Bindings"]) =>
+	new Set(splitAuthorIds(env.DEVELOPER_NOTE_AUTHOR_IDS));
 
 export const canCreateDeveloperNote = (
 	env: AppEnvironment["Bindings"],

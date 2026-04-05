@@ -1,7 +1,7 @@
 import type { PostType } from "@kotobad/shared/src/types/post";
 import type { PostReactionType } from "@kotobad/shared/src/types/reaction";
 
-export type PostQueryResult = {
+type PostQueryResult = {
 	id: number;
 	localId: number;
 	post: string;

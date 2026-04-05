@@ -10,11 +10,6 @@ export const OpenAPINotificationUnreadCountSchema =
 		"NotificationUnreadCountSchema",
 	);
 
-export const OpenAPINotificationItemSchema =
-	BaseNotificationSchema.NotificationItemSchema.openapi(
-		"NotificationItemSchema",
-	);
-
 export const OpenAPINotificationReadAllResponseSchema =
 	BaseNotificationSchema.NotificationReadAllResponseSchema.openapi(
 		"NotificationReadAllResponseSchema",

@@ -1,16 +1,4 @@
-import type { Player } from "../types";
-
-type Gender = "male" | "female" | null;
-
-export type InferredNameFields = {
-	lastFurigana?: string;
-	firstFurigana?: string;
-	englishLastName?: string;
-	englishFirstName?: string;
-	gender?: Gender;
-};
-
-export type InferredSingleNameFields = {
+type InferredSingleNameFields = {
 	furigana: string;
 	english?: string;
 };
@@ -279,51 +267,4 @@ export const inferSingleNameByReading = (
 		furigana: kana,
 		english: toLowerCaseEnglish(romaji) ?? undefined,
 	};
-};
-
-const inferByKana = (
-	lastName: string,
-	firstName: string,
-): InferredNameFields => {
-	const inferredLast = inferSingleNameByReading(lastName);
-	const inferredFirst = inferSingleNameByReading(firstName);
-	if (!inferredLast || !inferredFirst) {
-		return {};
-	}
-
-	return {
-		lastFurigana: inferredLast.furigana,
-		firstFurigana: inferredFirst.furigana,
-		englishLastName: inferredLast.english,
-		englishFirstName: inferredFirst.english,
-	};
-};
-
-export const inferNameFields = (
-	lastName: string,
-	firstName: string,
-	players: Player[],
-): InferredNameFields => {
-	const normalizedLastName = normalize(lastName);
-	const normalizedFirstName = normalize(firstName);
-	if (normalizedLastName.length === 0 || normalizedFirstName.length === 0) {
-		return {};
-	}
-
-	const matched = players.find(
-		(player) =>
-			normalize(player.lastName) === normalizedLastName &&
-			normalize(player.firstName) === normalizedFirstName,
-	);
-	if (matched) {
-		return {
-			lastFurigana: matched.lastFurigana,
-			firstFurigana: matched.firstFurigana,
-			englishLastName: matched.englishLastName,
-			englishFirstName: matched.englishFirstName,
-			gender: matched.gender,
-		};
-	}
-
-	return inferByKana(normalizedLastName, normalizedFirstName);
 };

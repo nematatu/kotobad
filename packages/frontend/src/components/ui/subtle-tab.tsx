@@ -371,4 +371,3 @@ const SubtleTabPanel = forwardRef<HTMLDivElement, SubtleTabPanelProps>(
 SubtleTabPanel.displayName = "SubtleTabPanel";
 
 export { SubtleTab, SubtleTabItem, SubtleTabPanel };
-export default SubtleTab;

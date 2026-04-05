@@ -1,13 +1,13 @@
 import { z } from "@hono/zod-openapi";
 
-export const UserRecentThreadSchema = z.object({
+const UserRecentThreadSchema = z.object({
 	id: z.number().int().positive(),
 	title: z.string().min(1),
 	postCount: z.number().int().nonnegative(),
 	createdAt: z.string(),
 });
 
-export const UserRecentPostSchema = z.object({
+const UserRecentPostSchema = z.object({
 	id: z.number().int().positive(),
 	threadId: z.number().int().positive(),
 	threadTitle: z.string().min(1),
@@ -68,10 +68,6 @@ export const UpdateUserProfileSchema = z.object({
 			"image/svg+xml",
 		])
 		.optional(),
-});
-
-export const UploadAvatarResponseSchema = z.object({
-	imageUrl: z.string().url(),
 });
 
 export const UpdateUserProfileResponseSchema = z.object({

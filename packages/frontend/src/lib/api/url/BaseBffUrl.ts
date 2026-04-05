@@ -12,7 +12,7 @@ export const apiUrlMap: Record<
 	test: process.env.NEXT_PUBLIC_FRONTEND_URL,
 };
 
-export const resolveBaseUrl = async (): Promise<string> => {
+const resolveBaseUrl = async (): Promise<string> => {
 	if (typeof window !== "undefined") {
 		return getClientOrigin();
 	}

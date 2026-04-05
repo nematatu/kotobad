@@ -509,5 +509,3 @@ export const searchThreadRouter: RouteHandler<
 		);
 	}
 };
-
-export type SearchThreadRouteType = typeof searchThreadRouter;

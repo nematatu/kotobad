@@ -1,6 +1,6 @@
 export type Offset = { x: number; y: number };
 export type Size = { width: number; height: number };
-export type GuideRect = {
+type GuideRect = {
 	width: number;
 	height: number;
 	left: number;

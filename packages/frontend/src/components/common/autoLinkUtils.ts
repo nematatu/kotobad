@@ -2,14 +2,14 @@ const URL_PATTERN = /https?:\/\/[^\s<>"'`]+/g;
 const TRAILING_PUNCTUATION_PATTERN =
 	/[.,!?;:)\]｝）】〉》」』、。，．！？；：]$/;
 
-export type TextUrlMatch = {
+type TextUrlMatch = {
 	index: number;
 	matchedText: string;
 	url: string;
 	trailing: string;
 };
 
-export function splitUrlAndTrailing(text: string): {
+function splitUrlAndTrailing(text: string): {
 	url: string;
 	trailing: string;
 } {

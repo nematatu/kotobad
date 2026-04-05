@@ -1,6 +1,6 @@
 import { BaseDeveloperNoteSchema } from "@kotobad/shared/src/schemas";
 
-export const OpenAPIDeveloperNoteLabelSchema =
+const OpenAPIDeveloperNoteLabelSchema =
 	BaseDeveloperNoteSchema.DeveloperNoteLabelSchema.openapi(
 		"DeveloperNoteLabelSchema",
 	);

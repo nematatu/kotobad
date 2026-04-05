@@ -32,11 +32,6 @@ export const buildShareUrlFromPath = (pathname: string) => {
 	return new URL(pathname, origin).toString();
 };
 
-export const buildCurrentPathShareUrl = () => {
-	if (typeof window === "undefined") return "";
-	return buildShareUrlFromPath(window.location.pathname);
-};
-
 export const buildXShareIntentUrl = ({ url, text }: ShareIntentInput) => {
 	const intentUrl = new URL("https://twitter.com/intent/tweet");
 	intentUrl.searchParams.set("url", url + "\n");
@@ -55,15 +50,6 @@ export const buildLineShareIntentUrl = ({ url, text }: ShareIntentInput) => {
 		intentUrl.searchParams.set("text", text);
 	}
 	return intentUrl.toString();
-};
-
-export const openShareWindow = (shareUrl: string) => {
-	if (typeof window === "undefined") return;
-	const popup = window.open(shareUrl, "_blank", "noopener,noreferrer");
-	if (popup) {
-		return;
-	}
-	window.location.href = shareUrl;
 };
 
 export const copyTextToClipboard = async (value: string) => {

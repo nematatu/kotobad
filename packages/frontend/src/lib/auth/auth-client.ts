@@ -11,8 +11,8 @@ const buildBaseUrl = () => {
 	return `${frontendUrl.replace(/\/$/, "")}/auth/api`;
 };
 
-export const authClient = createAuthClient({
+const authClient = createAuthClient({
 	baseURL: buildBaseUrl(),
 });
 
-export const { signIn, signOut, signUp, useSession } = authClient;
+export const { signIn, signOut, useSession } = authClient;

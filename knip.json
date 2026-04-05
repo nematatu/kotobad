@@ -1,0 +1,13 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"ignore": [
+		".scaffdog/config.js",
+		"packages/frontend/open-next.config.ts",
+		"packages/frontend/public/sw.js",
+		"packages/frontend/public/theme-init.js",
+		"packages/frontend/src/app/threads/*/components/chat/**",
+		"packages/frontend/src/app/threads/*/components/lib/postListViewHelpers.ts",
+		"packages/frontend/src/components/ui/card.tsx"
+	],
+	"ignoreDependencies": ["cloudflare"]
+}

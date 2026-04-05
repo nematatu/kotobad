@@ -2,8 +2,6 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import type { AppEnvironment } from "../../../types";
 
 import { createThreadRoute, createThreadRouter } from "./methods/create";
-import { deleteThreadRoute, deleteThreadRouter } from "./methods/delete";
-import { editThreadRoute, editThreadRouter } from "./methods/edit";
 import {
 	getAllThreadRoute,
 	getAllThreadRouter,
@@ -22,8 +20,6 @@ const threadRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(searchThreadRoute, searchThreadRouter)
 	.openapi(getThreadByIdRoute, getThreadByIdRouter)
 	.openapi(createThreadRoute, createThreadRouter)
-	.openapi(deleteThreadRoute, deleteThreadRouter)
-	.openapi(editThreadRoute, editThreadRouter)
 	.openapi(setThreadLikesRoute, setThreadLikesRouter);
 
 export default threadRouter;

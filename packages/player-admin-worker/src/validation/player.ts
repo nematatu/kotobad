@@ -6,7 +6,7 @@ const imageUrlField = z
 	.union([z.string().trim().url().max(2000), z.null()])
 	.optional();
 
-export const birthDateField = z
+const birthDateField = z
 	.union([
 		z
 			.string()

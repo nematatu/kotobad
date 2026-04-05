@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from "../api/url/BaseUrl";
 
-export const API_PATH = {
+const API_PATH = {
 	ME: "better-auth/get-session",
 	GET_ALL_THREADS: "bbs/threads",
 	GET_TRENDING_THREADS: "bbs/threads/trending",
@@ -19,7 +19,6 @@ export const API_PATH = {
 	GET_USER_PROFILE_BY_ID: "bbs/users/",
 	GET_PROFILE_PLAYERS: "bbs/users/players",
 	READ_ALL_NOTIFICATIONS: "bbs/notifications/read-all",
-	UPLOAD_MY_AVATAR: "bbs/users/me/avatar",
 	UPDATE_MY_PROFILE: "bbs/users/update",
 	GET_ALL_TAGS: "bbs/labels",
 	GET_REACTION_OPTIONS: "bbs/posts/reactions/available",
@@ -27,7 +26,7 @@ export const API_PATH = {
 	SET_THREAD_LIKES: "bbs/threads/likes/set",
 } as const;
 
-export type ApiPathKey = keyof typeof API_PATH;
+type ApiPathKey = keyof typeof API_PATH;
 
 export const getApiUrl = async (key: ApiPathKey): Promise<URL> => {
 	const baseUrl = getApiBaseUrl();

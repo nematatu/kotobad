@@ -1,6 +1,6 @@
 import type { DeveloperRoadmapItemType } from "@kotobad/shared/src/types/developerRoadmap";
 
-export type DeveloperRoadmapQueryResult = {
+type DeveloperRoadmapQueryResult = {
 	id: number;
 	title: string;
 	isArchived: boolean;

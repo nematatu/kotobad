@@ -1,10 +1,10 @@
-export type ProductUpdateCategory = "new" | "improvement" | "fix";
+type ProductUpdateCategory = "new" | "improvement" | "fix";
 
-export type ProductUpdateDetailPage = {
+type ProductUpdateDetailPage = {
 	slug: string;
 };
 
-export type ProductUpdate = {
+type ProductUpdate = {
 	date: string;
 	title: string;
 	category: ProductUpdateCategory;

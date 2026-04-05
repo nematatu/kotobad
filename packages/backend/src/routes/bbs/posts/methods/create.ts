@@ -305,5 +305,3 @@ export const createPostRouter: RouteHandler<
 		);
 	}
 };
-
-export type CreatePostRouterType = typeof createPostRouter;

@@ -11,17 +11,11 @@ import {
 import {
 	updateDeveloperRoadmapItemRoute,
 	updateDeveloperRoadmapItemRouter,
-	updateDeveloperRoadmapStatusRoute,
-	updateDeveloperRoadmapStatusRouter,
 } from "./methods/update";
 
 const developerRoadmapRouter = new OpenAPIHono<AppEnvironment>()
 	.openapi(getAllDeveloperRoadmapRoute, getAllDeveloperRoadmapRouter)
 	.openapi(createDeveloperRoadmapRoute, createDeveloperRoadmapRouter)
-	.openapi(updateDeveloperRoadmapItemRoute, updateDeveloperRoadmapItemRouter)
-	.openapi(
-		updateDeveloperRoadmapStatusRoute,
-		updateDeveloperRoadmapStatusRouter,
-	);
+	.openapi(updateDeveloperRoadmapItemRoute, updateDeveloperRoadmapItemRouter);
 
 export default developerRoadmapRouter;

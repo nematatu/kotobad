@@ -27,8 +27,6 @@ export const CreatePostSchema = PostSchema.pick({
 	threadId: z.number().int().positive(),
 });
 
-export const EditPostSchema = CreatePostSchema.partial();
-
 export const PostListSchema = z.array(PostSchema);
 
 export const SetPostReactionsScheme = z.object({

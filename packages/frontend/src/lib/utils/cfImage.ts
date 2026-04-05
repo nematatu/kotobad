@@ -1,11 +1,11 @@
-export type CfImageOptions = {
+type CfImageOptions = {
 	width?: number;
 	height?: number;
 	quality?: number;
 	fit?: "cover" | "contain" | "scale-down" | "pad";
 };
 
-export type CfImagePreset =
+type CfImagePreset =
 	| "post"
 	| "threadList"
 	| "zoom"

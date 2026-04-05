@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-export const DeveloperNoteAuthorSchema = z.object({
+const DeveloperNoteAuthorSchema = z.object({
 	name: z.string(),
 	image: z.string().nullable().optional(),
 });

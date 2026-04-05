@@ -10,7 +10,7 @@ import {
 	type ViewTransitionTarget,
 } from "@/config/viewTransition";
 
-export type ViewTransitionNavigateOptions = {
+type ViewTransitionNavigateOptions = {
 	restoreScrollOnCommit?: boolean;
 	scroll?: boolean;
 	viewTransitionKey?: ViewTransitionKey;

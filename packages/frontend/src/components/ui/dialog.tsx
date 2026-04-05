@@ -62,7 +62,7 @@ const dialogVariants = cva(
 	},
 );
 
-export interface DialogContentProps
+interface DialogContentProps
 	extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
 		VariantProps<typeof dialogVariants> {
 	hideCloseButton?: boolean;
@@ -166,15 +166,4 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-export {
-	Dialog,
-	DialogPortal,
-	DialogOverlay,
-	DialogTrigger,
-	DialogClose,
-	DialogContent,
-	DialogHeader,
-	DialogFooter,
-	DialogTitle,
-	DialogDescription,
-};
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger };

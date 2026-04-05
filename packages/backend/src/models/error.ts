@@ -6,6 +6,3 @@ export const ErrorResponse =
 export const SimpleErrorResponse = BaseErrorSchema.SimpleErrorResponse.openapi(
 	"SimpleErrorResponse",
 );
-
-export const ValidationErrorResponse =
-	BaseErrorSchema.ValidationErrorResponse.openapi("ValidationErrorResponse");

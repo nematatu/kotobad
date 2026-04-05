@@ -1,9 +1,6 @@
 import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import type { Context } from "hono";
-import type { z } from "zod";
 import type * as schema from "../drizzle/schema";
-import type { OpenAPIPostSchema } from "./models/posts";
 
 export type Bindings = {
 	DB: D1Database;
@@ -37,17 +34,7 @@ export type Variables = {
 	betterAuthUser: BetterAuthUserTokenPayload;
 };
 
-type ValidatedData = z.infer<typeof OpenAPIPostSchema>;
-
-type ValidationOutput = {
-	out: {
-		json: ValidatedData;
-	};
-};
-
 export type AppEnvironment = {
 	Bindings: Bindings;
 	Variables: Variables;
 };
-
-export type AppContext = Context<AppEnvironment, string, ValidationOutput>;

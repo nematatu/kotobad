@@ -11,7 +11,7 @@ export const NotificationUnreadCountSchema = z.object({
 	count: z.number().int().nonnegative(),
 });
 
-export const NotificationItemSchema = z.object({
+const NotificationItemSchema = z.object({
 	id: z.number().int().positive(),
 	type: NotificationTypeSchema,
 	message: z.string(),

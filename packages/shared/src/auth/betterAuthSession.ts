@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const dateLike = z.union([z.string(), z.number(), z.date()]);
 
-export const BetterAuthSessionSchema = z
+const BetterAuthSessionSchema = z
 	.object({
 		id: z.string(),
 		token: z.string(),

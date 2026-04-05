@@ -7,12 +7,10 @@ const joinClassNames = (...values: Array<string | undefined>) =>
 		.join(" ");
 
 export const Dialog = DialogPrimitive.Root;
-export const DialogTrigger = DialogPrimitive.Trigger;
-export const DialogPortal = DialogPrimitive.Portal;
 export const DialogClose = DialogPrimitive.Close;
 export const DialogTitle = DialogPrimitive.Title;
 
-export const DialogOverlay = React.forwardRef<
+const DialogOverlay = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitive.Overlay>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
@@ -29,14 +27,14 @@ export const DialogContent = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitive.Content>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
-	<DialogPortal>
+	<DialogPrimitive.Portal>
 		<DialogOverlay />
 		<div className="player-editor-dialog-content">
 			<DialogPrimitive.Content ref={ref} className={className} {...props}>
 				{children}
 			</DialogPrimitive.Content>
 		</div>
-	</DialogPortal>
+	</DialogPrimitive.Portal>
 ));
 
 DialogContent.displayName = DialogPrimitive.Content.displayName;
