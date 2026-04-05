@@ -6,7 +6,7 @@ import type { AppEnvironment } from "../types";
 import bbsRouter from "./bbs";
 import { betterAuthHandler, betterAuthPath } from "./better-auth-handler";
 
-const rawOrigins = process.env.ALLOWED_ORIGIN || "";
+const rawOrigins = process.env.ALLOWED_ORIGINS || "";
 
 const allowedOrigin = rawOrigins
 	.split(",")
