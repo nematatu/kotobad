@@ -1,6 +1,6 @@
 "use client";
 
-import { Github } from "lucide-react";
+import { IconBrandGithub } from "@tabler/icons-react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
 import { Link } from "@/components/common/Link";
@@ -11,7 +11,10 @@ import { FOOTER_SECTIONS } from "./FooterItem";
 const FooterItemLink = ({ item }: { item: FooterItem }) => {
 	const icon =
 		item.icon === "github" ? (
-			<Github className="h-3.5 w-3.5 text-slate-500" strokeWidth={1.9} />
+			<IconBrandGithub
+				className="h-3.5 w-3.5 text-slate-500"
+				strokeWidth={1.9}
+			/>
 		) : item.icon === "twitter" ? (
 			<span className="inline-flex h-3.5 w-3.5 items-center justify-center text-[11px] font-semibold text-slate-500">
 				X
