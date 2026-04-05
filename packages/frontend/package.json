@@ -16,7 +16,6 @@
 		"build:check-and-save-assets": "bun run cf:build && bun ../../scripts/check-save-next-static-assets.ts"
 	},
 	"dependencies": {
-		"@daveyplate/better-auth-ui": "^3.4.0",
 		"@headless-tree/core": "^1.6.3",
 		"@headless-tree/react": "^1.6.3",
 		"@hookform/resolvers": "^5.2.2",

@@ -12,8 +12,8 @@ export async function POST(req: Request) {
 		const raw = await createPost(value);
 		const post = PostSchema.parse(raw);
 
-		revalidateTag("threads");
-		revalidateTag(`thread:${value.threadId}`);
+		revalidateTag("threads", "max");
+		revalidateTag(`thread:${value.threadId}`, "max");
 		return NextResponse.json(post);
 	} catch (error: unknown) {
 		const fetchError = error as BffFetcherError;
