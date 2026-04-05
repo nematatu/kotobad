@@ -2,7 +2,6 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
-import { authMiddleware } from "../middleware/auth";
 import type { AppEnvironment } from "../types";
 import bbsRouter from "./bbs";
 import tagRouter from "./bbs/tags";
@@ -64,7 +63,6 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 	)
 	.all(betterAuthPath, betterAuthHandler)
 	.all(`${betterAuthPath}/*`, betterAuthHandler)
-	.use("/auth/me", authMiddleware)
 	.route("/bbs", bbsRouter)
 	.route("/tags", tagRouter);
 

@@ -7,7 +7,6 @@ import type { OpenAPIPostSchema } from "./models/posts";
 
 export type Bindings = {
 	DB: D1Database;
-	JWT_SECRET: string;
 	BETTER_AUTH_SECRET: string;
 	BETTER_AUTH_URL?: string;
 	APP_ENV?: "development" | "production";
