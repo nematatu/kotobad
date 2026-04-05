@@ -18,12 +18,6 @@ export const headerNavLinks: ActionLinkItem[] = [
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,
 	},
 	{
-		label: "更新情報",
-		href: "/updates",
-		mobileMenuPlacement: "bottom",
-		viewTransitionKey: viewTransitionKeys.threadListNavigation,
-	},
-	{
 		label: "開発日記📚",
 		href: "/developer-notes",
 		mobileMenuPlacement: "bottom",

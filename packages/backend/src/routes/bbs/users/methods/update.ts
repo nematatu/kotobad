@@ -46,10 +46,11 @@ const putObjectWithRetry = async ({
 	fileBuffer: ArrayBuffer;
 	contentType: string;
 }) => {
+	const fileBytes = new Uint8Array(fileBuffer);
 	let lastError: unknown = null;
 	for (let attempt = 1; attempt <= R2_PUT_MAX_ATTEMPTS; attempt++) {
 		try {
-			await bucket.put(objectKey, fileBuffer, {
+			await bucket.put(objectKey, fileBytes.slice(), {
 				httpMetadata: {
 					contentType,
 					cacheControl: "public, max-age=31536000, immutable",
