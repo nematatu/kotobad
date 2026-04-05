@@ -68,35 +68,20 @@ type CreateAuthOptions = {
 	restRequest?: Request;
 };
 
-const authCache = new Map<string, ReturnType<typeof betterAuth>>();
-
-export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
-	const baseURL = resolveBaseUrl(env, restRequest);
-	const secret = env.BETTER_AUTH_SECRET;
-	const isProd: boolean = env.APP_ENV === "production";
-
-	if (!secret) {
-		throw new Error("BETTER_AUTH_SECRET is not configured.");
-	}
-
-	const trustedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
-	const effectiveOrigins = maybeAddPreviewOrigin(
-		env,
-		restRequest,
-		trustedOrigins,
-	);
-	const cacheKey = [
-		secret,
-		baseURL ?? "",
-		effectiveOrigins.slice().sort().join(","),
-	].join("::");
-
-	const cached = authCache.get(cacheKey);
-	if (cached) {
-		return cached;
-	}
-
-	const authInstance = betterAuth({
+const createAuthInstance = ({
+	env,
+	secret,
+	baseURL,
+	isProd,
+	effectiveOrigins,
+}: {
+	env: Bindings;
+	secret: string;
+	baseURL: string | undefined;
+	isProd: boolean;
+	effectiveOrigins: string[];
+}) =>
+	betterAuth({
 		secret,
 		baseURL,
 		basePath: BETTER_AUTH_BASE_PATH,
@@ -146,6 +131,42 @@ export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
 				},
 			},
 		},
+	});
+
+const authCache = new Map<string, ReturnType<typeof createAuthInstance>>();
+
+export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
+	const baseURL = resolveBaseUrl(env, restRequest);
+	const secret = env.BETTER_AUTH_SECRET;
+	const isProd: boolean = env.APP_ENV === "production";
+
+	if (!secret) {
+		throw new Error("BETTER_AUTH_SECRET is not configured.");
+	}
+
+	const trustedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
+	const effectiveOrigins = maybeAddPreviewOrigin(
+		env,
+		restRequest,
+		trustedOrigins,
+	);
+	const cacheKey = [
+		secret,
+		baseURL ?? "",
+		effectiveOrigins.slice().sort().join(","),
+	].join("::");
+
+	const cached = authCache.get(cacheKey);
+	if (cached) {
+		return cached;
+	}
+
+	const authInstance = createAuthInstance({
+		env,
+		secret,
+		baseURL,
+		isProd,
+		effectiveOrigins,
 	});
 	authCache.set(cacheKey, authInstance);
 	return authInstance;
