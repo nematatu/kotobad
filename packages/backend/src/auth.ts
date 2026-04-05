@@ -27,8 +27,7 @@ const maybeAddPreviewOrigin = (
 	restRequest: Request | undefined,
 	allowList: string[] = [],
 ) => {
-	const allowPreview = env.ALLOW_CF_PAGES_PREVIEW === "true";
-	if (!allowPreview || !restRequest) {
+	if (!restRequest) {
 		return allowList;
 	}
 	const origin = restRequest.headers.get("origin");

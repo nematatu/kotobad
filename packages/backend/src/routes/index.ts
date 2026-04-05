@@ -15,8 +15,6 @@ const allowedOrigin = rawOrigins
 	.map((origin) => origin.trim())
 	.filter(Boolean);
 
-// CloudFlare側飲み環境変数設定した
-const allowPreviewOrigins = process.env.ALLOW_CF_PAGES_PREVIEW === "true";
 const previewSuffix =
 	process.env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
 
@@ -29,9 +27,6 @@ const previewHostnamePattern = new RegExp(
 const isAllowedOrigin = (origin: string): boolean => {
 	if (allowedOrigin.includes(origin)) {
 		return true;
-	}
-	if (!allowPreviewOrigins) {
-		return false;
 	}
 	try {
 		const url = new URL(origin);
