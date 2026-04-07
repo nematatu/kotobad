@@ -14,7 +14,6 @@ import { getThreadLikeSummaryMap } from "./likes-summary";
 import { toThreadResponse } from "./transform";
 import {
 	getLatestThreadTrends,
-	refreshThreadTrends,
 	TREND_DEFAULT_LIMIT,
 	TREND_MAX_LIMIT,
 } from "./trending";
@@ -337,24 +336,16 @@ export const getTrendingThreadRouter: RouteHandler<
 
 		c.header("Cache-Control", "no-store");
 
-		let trendRows = await getLatestThreadTrends({
+		const trendRows = await getLatestThreadTrends({
 			db,
 			limit,
 		});
 
 		if (trendRows.length === 0) {
-			await refreshThreadTrends({ db });
-			trendRows = await getLatestThreadTrends({
-				db,
-				limit,
-			});
+			return c.json({ threads: [], totalCount: 0 }, 200);
 		}
 
 		const rankedThreadIds = trendRows.map((row) => row.threadId);
-
-		if (rankedThreadIds.length === 0) {
-			return c.json({ threads: [], totalCount: 0 }, 200);
-		}
 
 		const sourceThreads = await db.query.threads.findMany({
 			where: inArray(threads.id, rankedThreadIds),
