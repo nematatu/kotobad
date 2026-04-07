@@ -6,26 +6,28 @@ import type { AppEnvironment } from "../types";
 import bbsRouter from "./bbs";
 import { betterAuthHandler, betterAuthPath } from "./better-auth-handler";
 
-const rawOrigins = process.env.ALLOWED_ORIGINS || "";
-
-const allowedOrigin = rawOrigins
-	.split(",")
-	.map((origin) => origin.trim())
-	.filter(Boolean);
-
-const previewSuffix =
-	process.env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
+const parseOrigins = (value?: string) =>
+	(value ?? "")
+		.split(",")
+		.map((origin) => origin.trim())
+		.filter(Boolean);
 
 const escapeRegex = (value: string) =>
 	value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const previewHostnamePattern = new RegExp(
-	`^[0-9a-f]+${escapeRegex(previewSuffix)}$`,
-);
 
-const isAllowedOrigin = (origin: string): boolean => {
-	if (allowedOrigin.includes(origin)) {
+const isAllowedOrigin = (
+	origin: string,
+	env: AppEnvironment["Bindings"],
+): boolean => {
+	const allowedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
+	if (allowedOrigins.includes(origin)) {
 		return true;
 	}
+	const previewSuffix =
+		env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
+	const previewHostnamePattern = new RegExp(
+		`^[0-9a-f]+${escapeRegex(previewSuffix)}$`,
+	);
 	try {
 		const url = new URL(origin);
 		if (url.protocol !== "https:") {
@@ -49,11 +51,11 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 	.use(
 		"/*",
 		cors({
-			origin(origin) {
+			origin(origin, c) {
 				if (!origin) {
 					return "";
 				}
-				return isAllowedOrigin(origin) ? origin : "";
+				return isAllowedOrigin(origin, c.env) ? origin : "";
 			},
 			allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 			allowHeaders: ["Content-Type", "Authorization"],
