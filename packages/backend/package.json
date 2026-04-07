@@ -19,7 +19,7 @@
 		"@hono/swagger-ui": "^0.6.1",
 		"@hono/zod-openapi": "^1.2.4",
 		"@kotobad/shared": "workspace:*",
-		"better-auth": "^1.5.6",
+		"better-auth": "^1.6.0",
 		"drizzle-orm": "^0.45.2",
 		"hono": "^4.12.10",
 		"zod": "^4.3.6"
