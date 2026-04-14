@@ -2,42 +2,11 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
+import { csrfOriginMiddleware } from "../middleware/csrf-origin";
 import type { AppEnvironment } from "../types";
+import { isAllowedOrigin } from "../utils/isAllowedOrigin";
 import bbsRouter from "./bbs";
 import { betterAuthHandler, betterAuthPath } from "./better-auth-handler";
-
-const parseOrigins = (value?: string) =>
-	(value ?? "")
-		.split(",")
-		.map((origin) => origin.trim())
-		.filter(Boolean);
-
-const escapeRegex = (value: string) =>
-	value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const isAllowedOrigin = (
-	origin: string,
-	env: AppEnvironment["Bindings"],
-): boolean => {
-	const allowedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
-	if (allowedOrigins.includes(origin)) {
-		return true;
-	}
-	const previewSuffix =
-		env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
-	const previewHostnamePattern = new RegExp(
-		`^[0-9a-f]+${escapeRegex(previewSuffix)}$`,
-	);
-	try {
-		const url = new URL(origin);
-		if (url.protocol !== "https:") {
-			return false;
-		}
-		return previewHostnamePattern.test(url.hostname);
-	} catch {
-		return false;
-	}
-};
 
 const mainRouter = new OpenAPIHono<AppEnvironment>()
 	.doc("/specification", {
@@ -64,6 +33,7 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 	)
 	.all(betterAuthPath, betterAuthHandler)
 	.all(`${betterAuthPath}/*`, betterAuthHandler)
+	.use("/bbs/*", csrfOriginMiddleware)
 	.route("/bbs", bbsRouter);
 
 mainRouter.use("/doc/*", async (c, next) => {
