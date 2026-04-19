@@ -1,4 +1,6 @@
 import { emitAuthRequiredEvent } from "@/lib/auth/authRequiredEvent";
+import { ensureCsrfToken, resetCsrfToken } from "../security/ensureCsrfToken";
+import { isUnsafeMethod } from "../security/httpMethod";
 
 type FetchArgs = Parameters<typeof fetch>;
 
@@ -47,6 +49,37 @@ export async function BffFetcher<T>(
 	url: FetchArgs[0],
 	options: BffFetcherOptions = {},
 ): Promise<T> {
-	const response = await BffFetcherRaw(url, options);
-	return response.json() as Promise<T>;
+	const mergeHeaders = toHeaders(options.headers);
+
+	if (isUnsafeMethod(options.method)) {
+		const token = await ensureCsrfToken();
+		mergeHeaders.set("x-csrf-token", token);
+	}
+
+	options = {
+		...options,
+		headers: mergeHeaders,
+	};
+
+	try {
+		const response = await BffFetcherRaw(url, options);
+		return response.json() as Promise<T>;
+	} catch (error: unknown) {
+		const fetchError = error as BffFetcherError;
+
+		if (isUnsafeMethod(options.method) && fetchError.status === 403) {
+			const retryHeader = toHeaders(options.headers);
+			const freshToken = await resetCsrfToken();
+			retryHeader.set("x-csrf-token", freshToken);
+
+			options = {
+				...options,
+				headers: retryHeader,
+			};
+
+			const response = await BffFetcherRaw(url, options);
+			return response.json() as Promise<T>;
+		}
+		throw error;
+	}
 }

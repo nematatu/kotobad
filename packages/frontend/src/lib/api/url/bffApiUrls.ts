@@ -15,6 +15,7 @@ const BFF_API_PATH = {
 	GET_NOTIFICATIONS: "threads/api/notifications",
 	GET_NOTIFICATIONS_COUNT: "threads/api/notifications/count",
 	READ_ALL_NOTIFICATIONS: "threads/api/notifications/readAll",
+	CSRF_TOKEN: "threads/api/csrf-token",
 } as const;
 
 type BffApiPathKey = keyof typeof BFF_API_PATH;

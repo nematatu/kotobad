@@ -15,3 +15,4 @@
 
 - Strategy
   - [kotobad 価値向上戦略メモ（2026-03-29）](strategy/kotobad-value-strategy-2026-03-29.md)
+  - [セキュリティ対策メモ（CSRF中心, 2026-04-18）](strategy/security-csrf-roadmap-2026-04-18.md)
