@@ -15,6 +15,7 @@ export type Bindings = {
 	KOTOBAD_BUCKET: R2Bucket;
 	R2_PUBLIC_BASE_URL?: string;
 	THREAD_ROOM: DurableObjectNamespace;
+	INTERNAL_API_SECRET: string;
 };
 
 export type BetterAuthUserTokenPayload = {

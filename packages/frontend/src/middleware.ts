@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { isUnsafeMethod } from "@/lib/api/security/httpMethod";
+import { isUnsafeMethod } from "@/lib/api/security/utils/httpMethod";
 
 const PROTECTED_PREFIXES = ["/threads/api/", "/developer-notes/api/"];
 const GET_CSRF_TOKEN_ENDPOINT = "/threads/api/csrf-token";

@@ -1,6 +1,6 @@
 import { emitAuthRequiredEvent } from "@/lib/auth/authRequiredEvent";
 import { ensureCsrfToken, resetCsrfToken } from "../security/ensureCsrfToken";
-import { isUnsafeMethod } from "../security/httpMethod";
+import { isUnsafeMethod } from "../security/utils/httpMethod";
 
 type FetchArgs = Parameters<typeof fetch>;
 
