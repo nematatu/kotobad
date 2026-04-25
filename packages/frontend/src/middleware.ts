@@ -5,7 +5,9 @@ const PROTECTED_PREFIXES = ["/threads/api/", "/developer-notes/api/"];
 const GET_CSRF_TOKEN_ENDPOINT = "/threads/api/csrf-token";
 
 const cookieName =
-	process.env.NODE_ENV === "production" ? "__Host-bff_token" : "dev_csrf_token";
+	process.env.NODE_ENV === "production"
+		? "__Host-csrf_token"
+		: "dev_csrf_token";
 
 const isProtectedPath = (pathname: string) =>
 	PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));

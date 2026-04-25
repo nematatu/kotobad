@@ -12,7 +12,7 @@ export async function GET() {
 
 	const csrfTokenName =
 		process.env.NODE_ENV === "production"
-			? "__Host-bff_token"
+			? "__Host-csrf_token"
 			: "dev_csrf_token";
 
 	res.cookies.set({
