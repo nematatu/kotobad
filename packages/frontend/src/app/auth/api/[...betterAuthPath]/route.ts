@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
-import { getApiBaseUrl } from "@/lib/api/url/BaseUrl";
+import { API_BASE_URL } from "@/lib/api/url/BaseUrl";
 import { appendSetCookies, extractSetCookies } from "../shared";
 
 const ALLOWED_METHODS = [
@@ -28,10 +28,9 @@ const handler = async (req: NextRequest, context: BetterAuthContext) => {
 		return NextResponse.json({ error: "Not Found" }, { status: 404 });
 	}
 
-	const backendBase = getApiBaseUrl();
 	const targetUrl = new URL(
 		`better-auth/${pathSegments.join("/")}`,
-		backendBase,
+		API_BASE_URL,
 	);
 	if (req.nextUrl.search) {
 		targetUrl.search = req.nextUrl.search;

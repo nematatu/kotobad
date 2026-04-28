@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { getApiBaseUrl } from "@/lib/api/url/BaseUrl";
+import { API_BASE_URL } from "@/lib/api/url/BaseUrl";
 
 type ThreadEvent = {
 	type: "post.created";
@@ -10,7 +10,7 @@ type ThreadEvent = {
 };
 
 const buildWsUrl = (threadId: number) => {
-	const base = new URL(getApiBaseUrl());
+	const base = new URL(API_BASE_URL);
 	base.protocol = base.protocol === "https:" ? "wss:" : "ws:";
 	base.pathname = `/bbs/realtime/threads/${threadId}/ws`;
 	base.search = "";

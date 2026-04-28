@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "../api/url/BaseUrl";
+import { API_BASE_URL } from "../api/url/BaseUrl";
 
 const API_PATH = {
 	ME: "better-auth/get-session",
@@ -29,6 +29,5 @@ const API_PATH = {
 type ApiPathKey = keyof typeof API_PATH;
 
 export const getApiUrl = async (key: ApiPathKey): Promise<URL> => {
-	const baseUrl = getApiBaseUrl();
-	return new URL(API_PATH[key], baseUrl);
+	return new URL(API_PATH[key], API_BASE_URL);
 };
