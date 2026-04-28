@@ -11,6 +11,8 @@ type GoogleUserInfo = {
 	verified_email?: boolean;
 };
 
+const CF_PAGES_PREVIEW_SUFFIX = "-kotobad-frontend.amtt.workers.dev";
+
 const parseOrigins = (value?: string) =>
 	value
 		?.split(",")
@@ -34,8 +36,7 @@ const maybeAddPreviewOrigin = (
 	if (!origin) {
 		return allowList;
 	}
-	const suffix =
-		env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
+	const suffix = CF_PAGES_PREVIEW_SUFFIX;
 	try {
 		const url = new URL(origin);
 		if (url.protocol !== "https:") {
@@ -49,16 +50,6 @@ const maybeAddPreviewOrigin = (
 	} catch {
 		return allowList;
 	}
-};
-
-const resolveBaseUrl = (env: Bindings, request?: Request) => {
-	if (env.BETTER_AUTH_URL) {
-		return env.BETTER_AUTH_URL;
-	}
-	if (request) {
-		return new URL(request.url).origin;
-	}
-	return undefined;
 };
 
 export const BETTER_AUTH_BASE_PATH = "/better-auth";
@@ -136,10 +127,12 @@ const createAuthInstance = ({
 const authCache = new Map<string, ReturnType<typeof createAuthInstance>>();
 
 export const createAuth = ({ env, restRequest }: CreateAuthOptions) => {
-	const baseURL = resolveBaseUrl(env, restRequest);
-	const secret = env.BETTER_AUTH_SECRET;
 	const isProd: boolean = env.APP_ENV === "production";
 
+	const baseURL = env.BETTER_AUTH_URL;
+	if (!baseURL) throw new Error("BETTER_AUTH_URL is not configured.");
+
+	const secret = env.BETTER_AUTH_SECRET;
 	if (!secret) {
 		throw new Error("BETTER_AUTH_SECRET is not configured.");
 	}

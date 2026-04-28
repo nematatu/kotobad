@@ -9,6 +9,8 @@ const parseOrigins = (value?: string) =>
 const escapeRegex = (value: string) =>
 	value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const CF_PAGES_PREVIEW_SUFFIX = "-kotobad-frontend.amtt.workers.dev";
+
 export const isAllowedOrigin = (
 	origin: string,
 	env: AppEnvironment["Bindings"],
@@ -17,10 +19,8 @@ export const isAllowedOrigin = (
 	if (allowedOrigins.includes(origin)) {
 		return true;
 	}
-	const previewSuffix =
-		env.CF_PAGES_PREVIEW_SUFFIX ?? "-kotobad-frontend.amtt.workers.dev";
 	const previewHostnamePattern = new RegExp(
-		`^[0-9a-f]+${escapeRegex(previewSuffix)}$`,
+		`^[0-9a-f]+${escapeRegex(CF_PAGES_PREVIEW_SUFFIX)}$`,
 	);
 	try {
 		const url = new URL(origin);

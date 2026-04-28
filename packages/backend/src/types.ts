@@ -8,7 +8,6 @@ export type Bindings = {
 	BETTER_AUTH_URL?: string;
 	APP_ENV?: "development" | "production";
 	ALLOWED_ORIGINS?: string;
-	CF_PAGES_PREVIEW_SUFFIX?: string;
 	DEVELOPER_NOTE_AUTHOR_IDS?: string;
 	GOOGLE_CLIENT_ID: string;
 	GOOGLE_CLIENT_SECRET: string;
