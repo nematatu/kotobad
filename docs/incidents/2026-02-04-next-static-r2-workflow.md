@@ -35,7 +35,7 @@ cf:build
 - 初回はR2キーが存在しなくても、**自動でベースラインを作成してアップロード**される
 - 参照範囲は **CSS + JS（標準）**
 - `url(/_next/static/...woff2)` のような参照に含まれる末尾 `)` などは、比較前に正規化して除去する
-- fallback origin は `ASSET_FALLBACK_ORIGIN` → `NEXT_PUBLIC_FRONTEND_URL_PRODUCT` → `https://kotobad.com` の順で決定する
+- fallback origin は `ASSET_FALLBACK_ORIGIN` → `NEXT_PUBLIC_FRONTEND_URL` → `https://kotobad.com` の順で決定する
 
 ## 参照先
 - `docs/incidents/2026-02-04-next-static-cache-404.md`

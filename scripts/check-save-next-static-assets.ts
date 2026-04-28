@@ -28,7 +28,7 @@ const wranglerConfig =
 const wranglerBin = process.env.WRANGLER_BIN ?? DEFAULT_WRANGLER_BIN;
 const assetFallbackOrigin =
 	process.env.ASSET_FALLBACK_ORIGIN ??
-	process.env.NEXT_PUBLIC_FRONTEND_URL_PRODUCT ??
+	process.env.NEXT_PUBLIC_FRONTEND_URL ??
 	DEFAULT_ASSET_FALLBACK_ORIGIN;
 
 const refRegex = /\/_next\/static\/[^\s"'<>]+/g;

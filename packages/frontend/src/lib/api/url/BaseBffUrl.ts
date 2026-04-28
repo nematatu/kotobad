@@ -1,31 +1,14 @@
-import { ensureTrailingSlash } from "@kotobad/shared/src/utils/url/ensureTrailingSlash";
+import { getRequiredEnv } from "@/lib/config/requiredEnv";
 import { getClientOrigin } from "./clientOrigin";
 
-const env = process.env.NODE_ENV;
-
-export const apiUrlMap: Record<
-	"production" | "development" | "test",
-	string | undefined
-> = {
-	production: process.env.NEXT_PUBLIC_FRONTEND_URL_PRODUCT,
-	development: process.env.NEXT_PUBLIC_FRONTEND_URL,
-	test: process.env.NEXT_PUBLIC_FRONTEND_URL,
-};
+export const FRONTEND_BASE_URL = getRequiredEnv("NEXT_PUBLIC_FRONTEND_URL");
 
 const resolveBaseUrl = async (): Promise<string> => {
 	if (typeof window !== "undefined") {
 		return getClientOrigin();
 	}
 
-	const raw = apiUrlMap[env];
-	if (!raw) {
-		throw new Error(
-			"NEXT_PUBLIC_FRONTEND_URL (または NEXT_PUBLIC_FRONTEND_URL_PRODUCT) が設定されていません。",
-		);
-	}
-
-	const fallback = ensureTrailingSlash(raw);
-	return fallback;
+	return FRONTEND_BASE_URL;
 };
 
 export const getApiBaseUrl = resolveBaseUrl;

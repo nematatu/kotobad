@@ -127,7 +127,7 @@
 - `R2_KEY` **必須**（例: `ops/next-static-assets-snapshot.json`）
 - `WRANGLER_CONFIG` 任意（default: `wrangler.jsonc`）
 - `WRANGLER_BIN` 任意（default: `wrangler`）
-- `ASSET_FALLBACK_ORIGIN` 任意（未指定時は `NEXT_PUBLIC_FRONTEND_URL_PRODUCT` → `https://kotobad.com`）
+- `ASSET_FALLBACK_ORIGIN` 任意（未指定時は `NEXT_PUBLIC_FRONTEND_URL` → `https://kotobad.com`）
 
 注意:
 - エラーメッセージに `R2_BUCKET` が残っているため文言統一が必要

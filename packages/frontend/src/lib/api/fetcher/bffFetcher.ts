@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies, headers as nextHeaders } from "next/headers";
 import { ensureInternalSecret } from "../security/ensureInternalSecret";
-import { apiUrlMap } from "../url/BaseBffUrl";
+import { FRONTEND_BASE_URL } from "../url/BaseBffUrl";
 
 type FetchArgs = Parameters<typeof fetch>;
 
@@ -22,8 +22,6 @@ export async function BffFetcherRaw(
 ): Promise<Response> {
 	const { headers, cache, skipCookie, ...init } = options;
 	const method = (init.method ?? "GET").toUpperCase();
-	const frontendUrl = apiUrlMap[process.env.NODE_ENV];
-	const defaultOrigin = frontendUrl ?? "http://localhost:3000";
 
 	const mergeHeaders = toHeaders(headers);
 
@@ -58,7 +56,7 @@ export async function BffFetcherRaw(
 	}
 
 	if (!mergeHeaders.has("origin")) {
-		mergeHeaders.set("origin", defaultOrigin);
+		mergeHeaders.set("origin", FRONTEND_BASE_URL);
 	}
 
 	const secretSetedHeader = await ensureInternalSecret(

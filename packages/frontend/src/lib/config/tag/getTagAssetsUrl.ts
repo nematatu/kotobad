@@ -1,10 +1,9 @@
-export default function getTagAssetsUrl(tagValue: string): string {
-	const baseUrl = process.env.NEXT_PUBLIC_R2_ASSETS_URL!;
-	if (!baseUrl) {
-		throw new Error("NEXT_PUBLIC_R2_ASSETS_URL が設定されていません。");
-	}
+import { getRequiredEnv } from "../requiredEnv";
 
-	const trimmed = baseUrl.replace(/\/+$/, "");
+export const R2_ASSETS_URL = getRequiredEnv("NEXT_PUBLIC_R2_ASSETS_URL");
+
+export default function getTagAssetsUrl(tagValue: string): string {
+	const trimmed = R2_ASSETS_URL.replace(/\/+$/, "");
 
 	const normalized = tagValue.replace(/^\/+/, "");
 

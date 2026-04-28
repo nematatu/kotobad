@@ -1,7 +1,3 @@
-const raw = process.env.NEXT_PUBLIC_API_URL;
+import { getRequiredEnv } from "@/lib/config/requiredEnv";
 
-if (!raw) {
-	throw new Error("API_URLが設定されていません");
-}
-
-export const API_BASE_URL = raw;
+export const API_BASE_URL = getRequiredEnv("NEXT_PUBLIC_API_URL");
