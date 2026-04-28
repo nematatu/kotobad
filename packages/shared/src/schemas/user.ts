@@ -56,6 +56,7 @@ export const UpdateUserProfileSchema = z.object({
 			"image/avif",
 			"image/svg+xml",
 		])
+		.openapi({ type: "string", format: "binary" })
 		.optional(),
 	headerImage: z
 		.file()
@@ -67,6 +68,7 @@ export const UpdateUserProfileSchema = z.object({
 			"image/avif",
 			"image/svg+xml",
 		])
+		.openapi({ type: "string", format: "binary" })
 		.optional(),
 });
 
