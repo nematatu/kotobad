@@ -54,7 +54,7 @@ const buildCspHeader = (nonce: string): string => {
 		"object-src 'none'",
 		scriptSrc,
 		styleSrc,
-		"img-src 'self' data: blob: https://assets.kotobad.com https://kotobad-bucket.kotobad.com https://i.ytimg.com",
+		"img-src 'self' data: blob: https://assets.kotobad.com https://kotobad-bucket.kotobad.com https://i.ytimg.com https://www.sj-league.jp",
 		"font-src 'self' data:",
 		`connect-src ${CONNECT_SOURCES.join(" ")}`,
 		"frame-src https://www.youtube-nocookie.com",
