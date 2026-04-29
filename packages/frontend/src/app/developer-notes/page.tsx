@@ -5,8 +5,6 @@ import { DeveloperRoadmapList } from "./components/DeveloperRoadmapList";
 import { getDeveloperNotes } from "./lib/getDeveloperNotes";
 import { getDeveloperRoadmap } from "./lib/getDeveloperRoadmap";
 
-export const dynamic = "force-dynamic";
-
 export default async function DeveloperNotesPage() {
 	const [{ notes, labels, canCreate }, roadmapItems] = await Promise.all([
 		getDeveloperNotes(),

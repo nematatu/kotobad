@@ -6,8 +6,6 @@ import { getApiUrl } from "@/lib/config/apiUrls";
 import { getUserProfileById } from "../../users/[id]/lib/getUserProfileById";
 import { SettingsProfileScreen } from "./components/SettingsProfileScreen";
 
-export const dynamic = "force-dynamic";
-
 export default async function SettingsProfilePage() {
 	const sessionUrl = await getApiUrl("ME");
 	let userId: string | null = null;

@@ -5,8 +5,6 @@ import { parseSort, type Sort } from "@/app/threads/lib/sort";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(req: Request) {
 	const url = new URL(req.url);
 	const query = url.searchParams.get("q")?.trim();

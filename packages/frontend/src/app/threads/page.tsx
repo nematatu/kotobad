@@ -2,7 +2,6 @@ import { parseSort } from "@/app/threads/lib/sort";
 import ThreadPageClient from "./components/view/ThreadPageClient";
 import { getThreads } from "./lib/getThread";
 import { searchThreads } from "./lib/searchThreads";
-export const dynamic = "force-dynamic";
 
 export type Props = {
 	searchParams?: Promise<{ page?: string; q?: string; sort?: string }>;

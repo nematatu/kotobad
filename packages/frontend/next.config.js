@@ -1,9 +1,4 @@
 const {initOpenNextCloudflareForDev} = require("@opennextjs/cloudflare")
-const { NormalModuleReplacementPlugin } = require("webpack")
-
-const lucideFingerprintPatternPath = require.resolve(
-  "lucide-react/dist/esm/icons/fingerprint-pattern.js",
-)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -29,13 +24,6 @@ const nextConfig = {
     ];
   },
   webpack(config) {
-    config.plugins.push(
-      new NormalModuleReplacementPlugin(
-        /\.\/icons\/fingerprint\.js$/,
-        lucideFingerprintPatternPath,
-      ),
-    );
-
     config.module.rules.push({
       test: /\.svg$/,
       use: ["@svgr/webpack"],

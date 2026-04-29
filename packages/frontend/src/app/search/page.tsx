@@ -8,8 +8,6 @@ import { HEADER_SEARCH_CONFIG } from "@/components/feature/header/const/serach-c
 import ThreadSearchForm from "@/components/feature/search/ThreadSearchForm";
 import { headingJosefinSans } from "@/lib/config/fonts";
 
-export const dynamic = "force-dynamic";
-
 type Props = {
 	searchParams?: Promise<{ q?: string; sort?: string }>;
 };

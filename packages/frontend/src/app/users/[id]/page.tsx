@@ -3,8 +3,6 @@ import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { UserProfileEditor } from "./components/UserProfileEditor";
 import { getUserProfileById } from "./lib/getUserProfileById";
 
-export const dynamic = "force-dynamic";
-
 type Props = {
 	params: Promise<{ id: string }>;
 };

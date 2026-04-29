@@ -9,8 +9,6 @@ import { ThreadAuthorPanel } from "./components/ThreadAuthorPanel";
 import { ThreadDetailHeader } from "./components/ThreadDetailHeader";
 import { ThreadPostsStream } from "./components/ThreadPostsStream";
 import { ThreadShareButton } from "./components/ThreadShareButton";
-export const dynamic = "force-dynamic";
-
 export type Props = {
 	params: Promise<{ id: string }>;
 	searchParams: Promise<{ postId?: string; view?: string }>;
