@@ -5,12 +5,12 @@
 	"scripts": {
 		"generate:product-update-markdown": "bun ./scripts/generate-product-update-markdown.ts",
 		"dev": "bun run generate:product-update-markdown && next dev --turbopack",
-		"build": "bun run generate:product-update-markdown && next build",
+		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
 		"cf:build": "opennextjs-cloudflare build",
-		"deploy": "bun run cf:build && opennextjs-cloudflare deploy",
-		"deploy:preview": "bun run cf:build && opennextjs-cloudflare deploy --env preview",
+		"deploy": "opennextjs-cloudflare deploy",
+		"deploy:preview": "opennextjs-cloudflare deploy --env preview",
 		"preview": "bun run cf:build && bun opennextjs-cloudflare preview --port 3000",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
 		"build:check-and-save-assets": "bun run cf:build && bun ../../scripts/check-save-next-static-assets.ts"
