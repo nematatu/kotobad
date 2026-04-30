@@ -1,3 +1,4 @@
 [tools]
+bun = "latest"
 ni = "latest"
 node = "latest"

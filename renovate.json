@@ -1,6 +1,97 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:best-practices",
+    ":approveMajorUpdates"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": [
+    "* * * * 0,6"
+  ],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "prConcurrentLimit": 5,
+  "packageRules": [
+    {
+      "description": "ルートワークスペースの依存関係更新をまとめます。",
+      "matchFileNames": [
+        "package.json",
+        "bun.lock"
+      ],
+      "groupName": "root workspace dependencies",
+      "groupSlug": "root-workspace"
+    },
+    {
+      "description": "フロントエンドパッケージの依存関係更新をまとめます。",
+      "matchFileNames": [
+        "packages/frontend/**"
+      ],
+      "groupName": "frontend dependencies",
+      "groupSlug": "frontend"
+    },
+    {
+      "description": "バックエンドパッケージの依存関係更新をまとめます。",
+      "matchFileNames": [
+        "packages/backend/**"
+      ],
+      "groupName": "backend dependencies",
+      "groupSlug": "backend"
+    },
+    {
+      "description": "共有パッケージの依存関係更新をまとめます。",
+      "matchFileNames": [
+        "packages/shared/**"
+      ],
+      "groupName": "shared dependencies",
+      "groupSlug": "shared"
+    },
+    {
+      "description": "選手管理Workerパッケージの依存関係更新をまとめます。",
+      "matchFileNames": [
+        "packages/player-admin-worker/**"
+      ],
+      "groupName": "player admin worker dependencies",
+      "groupSlug": "player-admin-worker"
+    },
+    {
+      "description": "Next.js、React、React DOMをまとめて更新します。",
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom"
+      ],
+      "groupName": "Next.js and React",
+      "groupSlug": "nextjs-react"
+    },
+    {
+      "description": "Cloudflareのデプロイ・ランタイム関連ツールをまとめて更新します。",
+      "matchPackageNames": [
+        "wrangler",
+        "@cloudflare/workers-types",
+        "@opennextjs/cloudflare"
+      ],
+      "groupName": "Cloudflare tooling",
+      "groupSlug": "cloudflare-tooling"
+    },
+    {
+      "description": "バックエンドとWorkerで使うHono関連パッケージをまとめて更新します。",
+      "matchPackageNames": [
+        "hono",
+        "@hono/**"
+      ],
+      "groupName": "Hono ecosystem",
+      "groupSlug": "hono"
+    },
+    {
+      "description": "Drizzle ORMとマイグレーション関連ツールをまとめて更新します。",
+      "matchPackageNames": [
+        "drizzle-orm",
+        "drizzle-kit"
+      ],
+      "groupName": "Drizzle tooling",
+      "groupSlug": "drizzle"
+    }
   ]
 }
