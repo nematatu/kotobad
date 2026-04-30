@@ -59,7 +59,7 @@
 		"@types/node": "^25.6.0",
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
-		"lru-cache": "11.3.2",
+		"lru-cache": "11.3.5",
 		"postcss": "^8.5.12",
 		"postcss-load-config": "^6.0.1",
 		"tailwindcss": "^4.2.4",
