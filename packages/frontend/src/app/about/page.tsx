@@ -33,6 +33,7 @@ export default async function Page() {
 								<strong className="text-lg text-blue-700 underline underline-offset-2">
 									熱狂したい。
 								</strong>
+								早く公開したい
 							</p>
 						</div>
 					</section>
