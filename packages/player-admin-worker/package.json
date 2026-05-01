@@ -5,6 +5,7 @@
 		"dev": "bun run build:admin-ui && wrangler dev --ip 0.0.0.0 --port 8788 --inspector-port 9230 --persist-to ../backend/.wrangler/state",
 		"build:admin-ui": "vite build --config admin-ui/vite.config.ts --base ./",
 		"deploy": "wrangler deploy --minify --env production",
+		"deploy:preview": "wrangler versions upload --env production",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
 	},
 	"dependencies": {
