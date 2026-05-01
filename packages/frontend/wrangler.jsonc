@@ -17,51 +17,70 @@
 	"env": {
 		"preview": {
 			"name": "kotobad-frontend-preview",
-      "services": [
-          {
-              "binding": "WORKER_SELF_REFERENCE", 
-              "service": "kotobad-frontend-preview"
-          }
-      ]
+			"services": [
+				{
+					"binding": "WORKER_SELF_REFERENCE",
+					"service": "kotobad-frontend-preview"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "NEXT_INC_CACHE_R2_BUCKET",
+					"bucket_name": "kotobad-next-cache"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "NEXT_CACHE_DO_QUEUE",
+						"class_name": "DOQueueHandler"
+					}
+				]
+			},
+			"d1_databases": [
+				{
+					"binding": "NEXT_TAG_CACHE_D1",
+					"database_name": "kotobad-next-tag-cache",
+					"database_id": "85ac0eb4-3241-4303-9011-1a472e241caa"
+				}
+			]
 		},
 		"production": {
 			"name": "kotobad-frontend",
-      "services": [
-          {
-              "binding": "WORKER_SELF_REFERENCE", 
-              "service": "kotobad-frontend"
-          }
-      ]
+			"services": [
+				{
+					"binding": "WORKER_SELF_REFERENCE",
+					"service": "kotobad-frontend"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "NEXT_INC_CACHE_R2_BUCKET",
+					"bucket_name": "kotobad-next-cache"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "NEXT_CACHE_DO_QUEUE",
+						"class_name": "DOQueueHandler"
+					}
+				]
+			},
+			"d1_databases": [
+				{
+					"binding": "NEXT_TAG_CACHE_D1",
+					"database_name": "kotobad-next-tag-cache",
+					"database_id": "85ac0eb4-3241-4303-9011-1a472e241caa"
+				}
+			]
 		}
 	},
-   "r2_buckets": [
-    {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "kotobad-next-cache"
-    }
-  ],
- 
-  // DO Queue
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "NEXT_CACHE_DO_QUEUE",
-        "class_name": "DOQueueHandler"
-      }
-    ]
-  },
-  "placement": { "mode": "smart" },
-  "d1_databases": [
-    {
-      "binding": "NEXT_TAG_CACHE_D1",
-      "database_name": "kotobad-next-tag-cache",
-      "database_id": "85ac0eb4-3241-4303-9011-1a472e241caa"
-    }
-  ],
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["DOQueueHandler"]
-    }
-  ]
+	"placement": { "mode": "smart" },
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["DOQueueHandler"]
+		}
+	]
 }
