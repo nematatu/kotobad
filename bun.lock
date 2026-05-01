@@ -30,7 +30,7 @@
       "devDependencies": {
         "@cloudflare/workers-types": "^4.20260426.1",
         "@types/node": "^25.6.0",
-        "drizzle-kit": "^0.31.10",
+        "drizzle-kit": "0.31.10",
         "wrangler": "^4.86.0",
       },
     },
