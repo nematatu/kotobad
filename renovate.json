@@ -56,14 +56,6 @@
       "groupSlug": "shared"
     },
     {
-      "description": "選手管理Workerパッケージの依存関係更新をまとめます。",
-      "matchFileNames": [
-        "packages/player-admin-worker/**"
-      ],
-      "groupName": "player admin worker dependencies",
-      "groupSlug": "player-admin-worker"
-    },
-    {
       "description": "Next.js、React、React DOMをまとめて更新します。",
       "matchPackageNames": [
         "next",
