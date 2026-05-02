@@ -12,7 +12,7 @@
     "dependencies",
     "renovate"
   ],
-  "prConcurrentLimit": 5,
+  "prConcurrentLimit": 0, 
   "packageRules": [
     {
       "description": "npm 由来の依存関係更新は公開直後を避けるため 3 日待機します。",

@@ -1,5 +1,3 @@
-export * as BaseDeveloperNoteSchema from "./developerNote";
-export * as BaseDeveloperRoadmapSchema from "./developerRoadmap";
 export * as BaseErrorSchema from "./error";
 export * as BaseMediaSchema from "./media";
 export * as BaseNotificationSchema from "./notifications";

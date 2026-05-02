@@ -17,10 +17,4 @@ export const headerNavLinks: ActionLinkItem[] = [
 		href: "/about",
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,
 	},
-	{
-		label: "開発日記📚",
-		href: "/developer-notes",
-		mobileMenuPlacement: "bottom",
-		viewTransitionKey: viewTransitionKeys.threadListNavigation,
-	},
 ];

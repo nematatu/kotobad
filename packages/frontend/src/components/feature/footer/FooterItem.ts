@@ -14,10 +14,7 @@ type FooterSection = {
 export const FOOTER_SECTIONS = [
 	{
 		title: "About",
-		items: [
-			{ label: "kotobadとは", href: "/" },
-			{ label: "開発日記📚", href: "/developer-notes" },
-		],
+		items: [{ label: "kotobadとは", href: "/" }],
 	},
 	{
 		title: "Guides",

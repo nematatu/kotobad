@@ -2,8 +2,6 @@ import { getApiBaseUrl } from "./BaseBffUrl";
 
 const BFF_API_PATH = {
 	CREATE_THREAD: "threads/api/threads/createThread",
-	CREATE_DEVELOPER_NOTE: "developer-notes/api/createNote",
-	CREATE_DEVELOPER_ROADMAP: "developer-notes/api/createRoadmap",
 	CREATE_POST: "threads/api/posts/createPost",
 	UPLOAD_IMAGE: "threads/api/media/upload",
 	GET_POSTS_BY_THREADID: "threads/api/posts/getPostByThreadId/",

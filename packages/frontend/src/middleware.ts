@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { isUnsafeMethod } from "@/lib/api/security/utils/httpMethod";
 
-const PROTECTED_PREFIXES = ["/threads/api/", "/developer-notes/api/"];
+const PROTECTED_PREFIXES = ["/threads/api/"];
 
 const cookieName =
 	process.env.NODE_ENV === "production"

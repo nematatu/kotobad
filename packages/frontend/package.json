@@ -3,8 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"generate:product-update-markdown": "bun ./scripts/generate-product-update-markdown.ts",
-		"dev": "bun run generate:product-update-markdown && next dev --turbopack",
+		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",

@@ -1,8 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { betterAuthMiddleware } from "../../middleware/better-auth";
 import type { AppEnvironment } from "../../types";
-import developerNotesRouter from "./developer-notes";
-import developerRoadmapRouter from "./developer-roadmap";
 import mediaRouter from "./media";
 import notificationsRouter from "./notifications";
 import postRouter from "./posts";
@@ -17,17 +15,11 @@ const bbsRouter = new OpenAPIHono<AppEnvironment>()
 	.use("/threads/likes/set", betterAuthMiddleware)
 	.use("/posts/create", betterAuthMiddleware)
 	.use("/posts/reactions/set", betterAuthMiddleware)
-	.use("/developer-notes/create", betterAuthMiddleware)
-	.use("/developer-notes/:id/label", betterAuthMiddleware)
-	.use("/developer-roadmap/create", betterAuthMiddleware)
-	.use("/developer-roadmap/:id", betterAuthMiddleware)
 	.use("/notifications", betterAuthMiddleware)
 	.use("/notifications/*", betterAuthMiddleware)
 	.use("/users/update", betterAuthMiddleware)
 	.use("/media/upload", betterAuthMiddleware)
 	.route("/notifications", notificationsRouter)
-	.route("/developer-roadmap", developerRoadmapRouter)
-	.route("/developer-notes", developerNotesRouter)
 	.route("/media", mediaRouter)
 	.route("/posts", postRouter)
 	.route("/threads", threadRouter)

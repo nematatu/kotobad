@@ -10,7 +10,6 @@ import {
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import type { DeveloperRoadmapStatusType } from "@kotobad/shared/src/types/developerRoadmap";
 import type {TagIconKindType} from "@kotobad/shared/src/types/tag";
 import type { NotificationType } from "@kotobad/shared/src/types/notifications";
 import { user } from "./better-auth.schema";
@@ -334,76 +333,6 @@ export const threadTags = sqliteTable("thread_tag", {
 	    })
 	)
 
-export const developerNotes = sqliteTable(
-	"developer_notes",
-	{
-		id: integer("id").primaryKey({ autoIncrement: true }),
-		content: text("content").notNull(),
-		labelId: integer("label_id").references(() => developerNoteLabels.id, {
-			onDelete: "set null",
-		}),
-		authorId: text("author_id")
-			.notNull()
-			.references(() => user.id, { onDelete: "cascade" }),
-		createdAt: timestamp("created_at")
-			.default(sql`(strftime('%s', 'now'))`)
-			.notNull(),
-		updatedAt: timestamp("updated_at").$onUpdate(
-			() => sql`(strftime('%s', 'now'))`,
-		),
-	},
-	(t) => [
-		index("developer_notes_created_at_idx").on(t.createdAt),
-		index("developer_notes_author_idx").on(t.authorId),
-		index("developer_notes_label_idx").on(t.labelId),
-	],
-);
-
-export const developerNoteLabels = sqliteTable(
-	"developer_note_labels",
-	{
-		id: integer("id").primaryKey({ autoIncrement: true }),
-		code: text("code").notNull().unique(),
-		name: text("name").notNull(),
-		sortOrder: integer("sort_order").notNull().default(0),
-		createdAt: timestamp("created_at")
-			.default(sql`(strftime('%s', 'now'))`)
-			.notNull(),
-		updatedAt: timestamp("updated_at").$onUpdate(
-			() => sql`(strftime('%s', 'now'))`,
-		),
-	},
-	(t) => [
-		index("developer_note_labels_sort_order_idx").on(t.sortOrder),
-	],
-);
-
-export const developerRoadmapItems = sqliteTable(
-	"developer_roadmap_items",
-	{
-		id: integer("id").primaryKey({ autoIncrement: true }),
-		title: text("title").notNull(),
-		status: text("status").$type<DeveloperRoadmapStatusType>().notNull(),
-		isArchived: boolean("is_archived").default(false).notNull(),
-		sortOrder: integer("sort_order").notNull().default(0),
-		createdAt: timestamp("created_at")
-			.default(sql`(strftime('%s', 'now'))`)
-			.notNull(),
-		updatedAt: timestamp("updated_at").$onUpdate(
-			() => sql`(strftime('%s', 'now'))`,
-		),
-	},
-	(t) => [
-		index("developer_roadmap_items_status_idx").on(t.status),
-		index("developer_roadmap_items_archived_idx").on(t.isArchived),
-		index("developer_roadmap_items_sort_order_idx").on(t.status, t.sortOrder),
-		check(
-			"developer_roadmap_items_status_check",
-			sql`${t.status} IN ('wip', 'todo', 'done')`,
-		),
-	],
-)
-
 export const notifications = sqliteTable("notifications", {
     id: integer("id").primaryKey({autoIncrement: true}), 
     recipientUserId: text("recipient_user_id")
@@ -498,7 +427,6 @@ export const usersRelations = relations(user, ({ many }) => ({
 	posts: many(posts),
 	threads: many(threads),
 	  threadLikes: many(threadLikes),
-	developerNotes: many(developerNotes),
 	favoritePlayers: many(userFavoritePlayers),
 }));
 
@@ -513,24 +441,6 @@ export const userFavoritePlayersRelations = relations(
 			fields: [userFavoritePlayers.playerId],
 			references: [players.id],
 		}),
-	}),
-);
-
-export const developerNotesRelations = relations(developerNotes, ({ one }) => ({
-	author: one(user, {
-		fields: [developerNotes.authorId],
-		references: [user.id],
-	}),
-	label: one(developerNoteLabels, {
-		fields: [developerNotes.labelId],
-		references: [developerNoteLabels.id],
-	}),
-}));
-
-export const developerNoteLabelsRelations = relations(
-	developerNoteLabels,
-	({ many }) => ({
-		notes: many(developerNotes),
 	}),
 );
 
