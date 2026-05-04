@@ -2,6 +2,7 @@ import { UpdateUserProfileResponseSchema } from "@kotobad/shared/src/schemas/use
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { toBffErrorPayload } from "@/lib/api/fetcher/errorPayload";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function PATCH(req: Request) {
@@ -13,6 +14,9 @@ export async function PUT(req: Request) {
 }
 
 const handleUpdateProfile = async (req: Request) => {
+	const rateLimitResponse = checkFrontendRateLimit(req, "upload");
+	if (rateLimitResponse) return rateLimitResponse;
+
 	try {
 		const formData = await req.formData();
 		const raw = await updateMyProfile(formData);

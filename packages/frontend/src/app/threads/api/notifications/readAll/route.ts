@@ -1,9 +1,13 @@
 import { NotificationReadAllResponseSchema } from "@kotobad/shared/src/schemas/notifications";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
-export async function POST() {
+export async function POST(req: Request) {
+	const rateLimitResponse = checkFrontendRateLimit(req, "notifications");
+	if (rateLimitResponse) return rateLimitResponse;
+
 	try {
 		const raw = await readAllNotifications();
 		const response = NotificationReadAllResponseSchema.parse(raw);

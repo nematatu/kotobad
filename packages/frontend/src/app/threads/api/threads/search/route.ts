@@ -3,9 +3,13 @@ import type { ThreadListType } from "@kotobad/shared/src/types/thread";
 import { NextResponse } from "next/server";
 import { parseSort, type Sort } from "@/app/threads/lib/sort";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function GET(req: Request) {
+	const rateLimitResponse = checkFrontendRateLimit(req, "search");
+	if (rateLimitResponse) return rateLimitResponse;
+
 	const url = new URL(req.url);
 	const query = url.searchParams.get("q")?.trim();
 	const page = url.searchParams.get("page") ?? "1";

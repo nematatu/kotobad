@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BffFetcherRaw } from "@/lib/api/fetcher/bffFetcher";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 import { API_BASE_URL } from "@/lib/api/url/BaseUrl";
 import { appendSetCookies, extractSetCookies } from "../shared";
 
@@ -21,6 +22,9 @@ const handler = async (req: NextRequest, context: BetterAuthContext) => {
 	if (!ALLOWED_METHODS.includes(req.method)) {
 		return NextResponse.json({ error: "Method Not Allowed" }, { status: 405 });
 	}
+
+	const rateLimitResponse = checkFrontendRateLimit(req, "auth");
+	if (rateLimitResponse) return rateLimitResponse;
 
 	const params = await context.params;
 	const pathSegments = params.betterAuthPath ?? [];

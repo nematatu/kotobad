@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 
 const generateCsrfToken = (): string => {
 	const bytes = crypto.getRandomValues(new Uint8Array(32));
 	return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 };
 
-export async function GET() {
+export async function GET(req: Request) {
+	const rateLimitResponse = checkFrontendRateLimit(req, "csrf");
+	if (rateLimitResponse) return rateLimitResponse;
+
 	const token = generateCsrfToken();
 
 	const res = NextResponse.json({ csrfToken: token }, { status: 200 });

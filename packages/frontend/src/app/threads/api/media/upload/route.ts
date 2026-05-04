@@ -4,9 +4,13 @@ import {
 } from "@kotobad/shared/src/schemas/media";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function POST(req: Request) {
+	const rateLimitResponse = checkFrontendRateLimit(req, "upload");
+	if (rateLimitResponse) return rateLimitResponse;
+
 	try {
 		const formData = await req.formData();
 		const fileEntry = formData.get("file");

@@ -121,6 +121,14 @@
 - better-auth userが解決済みのrouteでは、userId単位も併用します。
 - 適用対象は auth、upload、createThread、createPost、reaction、search、notifications、realtime です。
 
+## Frontend Route Handler Rate Limit Baseline
+
+- `packages/frontend/src/lib/api/security/frontendRateLimit.ts` を追加済みです。
+- frontend Route Handler側はBFF入口の補助防御として扱います。
+- `CF-Connecting-IP` 優先のIP単位で制限します。
+- 適用対象は `/auth/api/*` と実体のある `/threads/api/*` Route Handlerです。
+- 指定されたが実体がない `/threads/api/threads/getAllThreads` と `/threads/api/threads/getThreadById/[id]` は対象外です。
+
 ## Initial Risks
 
 - `bbs/users/update` はSVGを許可しています。サニタイズ処理は確認できていません。

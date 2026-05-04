@@ -5,9 +5,13 @@ import {
 import { NextResponse } from "next/server";
 import type { z } from "zod";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
+import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function POST(req: Request) {
+	const rateLimitResponse = checkFrontendRateLimit(req, "reaction");
+	if (rateLimitResponse) return rateLimitResponse;
+
 	try {
 		const json = await req.json();
 		const value = SetThreadLikesSchema.parse(json);
