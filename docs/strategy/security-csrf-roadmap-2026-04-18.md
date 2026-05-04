@@ -28,29 +28,39 @@
   Frontendサーバー側コードから Backend URL を直接呼ぶ実装が存在する。  
   参照: `packages/frontend/src/app/threads/lib/getThread.ts` など
 
-## 未実装（検証済み）
-### 1. CSRFトークン検証
+### 5. Frontend CSRFトークン検証（2026-05-04確認）
+- BFF（Next Route Handler）側では `/threads/api/` 配下の unsafe method に対して、cookie と `X-CSRF-Token` の照合を実装済み。
+  参照: `packages/frontend/src/middleware.ts`
+- CSRFトークン発行Route Handlerを実装済み。
+  参照: `packages/frontend/src/app/threads/api/csrf-token/route.ts`
+- Backend `/bbs` では `X-CSRF-Token` と cookie の照合は未実装。
+  Backend側は `Origin/Referer` とinternal authを防御層として使う構成。
+
+### 6. BFF -> Backend の内部認証（2026-05-04確認）
+- BFFからBackend APIへHMAC署名ヘッダーを付与済み。
+  参照: `packages/frontend/src/lib/api/fetcher/bffFetcher.ts`
+- Backend `/bbs/*` でHMAC署名ヘッダーを検証済み。
+  参照: `packages/backend/src/middleware/internal-auth.ts`
+- `OPTIONS` と `/bbs/realtime/` はinternal auth検証の例外。
+  参照: `packages/backend/src/middleware/internal-auth.ts`
+
+## 未実装・未確認（2026-05-04確認）
+### 1. Backend CSRFトークン照合
 - Backend `/bbs` で `X-CSRF-Token` と cookie の照合は未実装。
-- BFF（Next Route Handler）側のCSRFトークン検証も未実装。
+- 現状はfrontend middleware、Backend Origin/Referer、internal authの多層防御。
 
-### 2. BFF -> Backend の内部認証
-- 「BFFからの正規中継であること」を秘密情報で検証する仕組み（内部ヘッダー/HMAC等）は未実装。
-
-## いま着手中（方針）
-- Backendで CSRFトークン発行ルーターを作成する。
+### 2. セキュリティ回帰テスト
+- CSRFシナリオの自動テストは未確認。
 
 ## 今後の実施項目（優先順）
 ### P1: 先に必須
-1. Backend CSRFトークン発行・検証を実装
-2. BFFのunsafe methodでトークン送信を実装（未対応だと全403になる）
-3. BFFでもCSRF検証を実装（Browser入口防御）
-4. Backendでもトークン検証を維持（最終防衛線）
+1. Backend CSRFトークン照合を追加するか、現状の防御層で十分かを判断する
+2. セキュリティ回帰テストを整備する
 
 ### P2: 早めに実施
-1. BFF -> Backend の内部認証（共有秘密ヘッダー/HMAC）
-2. `allowHeaders` に `X-CSRF-Token` を追加
-3. Cookie属性の見直し（Path/Domain/Max-Age含む）
-4. `bffFetcher` / fetcher群の責務整理（送信ヘッダー・cookie付与ルールの統一）
+1. `allowHeaders` に `X-CSRF-Token` を追加する必要があるかを確認する
+2. Cookie属性の見直し（Path/Domain/Max-Age含む）
+3. `bffFetcher` / fetcher群の責務整理（送信ヘッダー・cookie付与ルールの統一）
 
 ### P3: 継続改善
 1. XSS対策の強化（出力エスケープ、CSP、危険なHTML挿入点の監査）
