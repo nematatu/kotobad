@@ -15,6 +15,9 @@ export type Bindings = {
 	R2_PUBLIC_BASE_URL?: string;
 	THREAD_ROOM: DurableObjectNamespace;
 	INTERNAL_API_SECRET: string;
+	TURNSTILE_SECRET_KEY?: string;
+	TURNSTILE_ENFORCE_SCOPES?: string;
+	TURNSTILE_ALLOWED_HOSTNAMES?: string;
 };
 
 export type BetterAuthUserTokenPayload = {

@@ -5,6 +5,10 @@ import {
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
+import {
+	getTurnstileTokenFromFormData,
+	verifyTurnstileToken,
+} from "@/lib/api/security/turnstile";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function POST(req: Request) {
@@ -13,6 +17,13 @@ export async function POST(req: Request) {
 
 	try {
 		const formData = await req.formData();
+		const turnstileResponse = await verifyTurnstileToken({
+			req,
+			scope: "upload",
+			token: getTurnstileTokenFromFormData(formData),
+		});
+		if (turnstileResponse) return turnstileResponse;
+
 		const fileEntry = formData.get("file");
 		const target = formData.get("target");
 

@@ -132,6 +132,17 @@
 - 適用対象は `/auth/api/*` と実体のある `/threads/api/*` Route Handlerです。
 - 指定されたが実体がない `/threads/api/threads/getAllThreads` と `/threads/api/threads/getThreadById/[id]` は対象外です。
 
+## Turnstile Baseline
+
+- 2026-05-04時点では段階導入として、環境変数で明示したscopeのみTurnstileを検証します。
+- frontend BFFでは upload、createThread、createPost に `verifyTurnstileToken` を追加済みです。
+- backend better-authでは auth / authSensitive に `turnstileMiddleware` を追加済みです。
+- デフォルトでは `TURNSTILE_ENFORCE_SCOPES` が空なら検証しません。
+- 推奨初期値は `TURNSTILE_ENFORCE_SCOPES=authSensitive,upload,createThread,createPost` です。
+- tokenは `x-turnstile-token` header、または `cf-turnstile-response` / `turnstileToken` fieldで受け取ります。
+- CloudflareのSiteverify APIでサーバー側検証します。
+  参照: <https://developers.cloudflare.com/turnstile/get-started/server-side-validation/>
+
 ## Initial Risks
 
 - realtime WebSocketは未認証です。backend rate limitは追加済みですが、接続中WebSocket数の上限は未確認です。

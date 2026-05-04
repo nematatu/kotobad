@@ -7,6 +7,10 @@ import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
+import {
+	getTurnstileTokenFromJson,
+	verifyTurnstileToken,
+} from "@/lib/api/security/turnstile";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function POST(req: Request) {
@@ -15,6 +19,13 @@ export async function POST(req: Request) {
 
 	try {
 		const json = await req.json();
+		const turnstileResponse = await verifyTurnstileToken({
+			req,
+			scope: "createThread",
+			token: getTurnstileTokenFromJson(json),
+		});
+		if (turnstileResponse) return turnstileResponse;
+
 		const value = CreateThreadSchema.parse(json);
 		const raw = await createThread(value);
 		const thread = ThreadSchema.parse(raw);

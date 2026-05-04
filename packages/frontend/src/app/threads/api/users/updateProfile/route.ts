@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { toBffErrorPayload } from "@/lib/api/fetcher/errorPayload";
 import { checkFrontendRateLimit } from "@/lib/api/security/frontendRateLimit";
+import {
+	getTurnstileTokenFromFormData,
+	verifyTurnstileToken,
+} from "@/lib/api/security/turnstile";
 import { getApiUrl } from "@/lib/config/apiUrls";
 
 export async function PATCH(req: Request) {
@@ -19,6 +23,13 @@ const handleUpdateProfile = async (req: Request) => {
 
 	try {
 		const formData = await req.formData();
+		const turnstileResponse = await verifyTurnstileToken({
+			req,
+			scope: "upload",
+			token: getTurnstileTokenFromFormData(formData),
+		});
+		if (turnstileResponse) return turnstileResponse;
+
 		const raw = await updateMyProfile(formData);
 		const response = UpdateUserProfileResponseSchema.parse(raw);
 		return NextResponse.json(response, { status: 200 });
