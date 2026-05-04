@@ -111,7 +111,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 							<input
 								ref={headerImageInputRef}
 								type="file"
-								accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+								accept="image/jpeg,image/png,image/webp,image/avif"
 								className="hidden"
 								onChange={changeHeaderImageFileAction}
 							/>
@@ -138,7 +138,7 @@ function SettingsProfileForm({ profile }: { profile: UserProfileType }) {
 								<input
 									ref={avatarInputRef}
 									type="file"
-									accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+									accept="image/jpeg,image/png,image/webp,image/avif"
 									className="hidden"
 									onChange={changeAvatarFileAction}
 								/>

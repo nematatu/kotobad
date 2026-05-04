@@ -95,13 +95,16 @@
   - 認証必須です。
   - 8MB上限です。
   - MIME typeは `jpeg` / `png` / `webp` / `avif` のみです。
+  - MIME typeと拡張子の対応を検証します。
   - SVGは許可していません。
   - R2 keyはサーバー側固定prefixと `crypto.randomUUID()` で生成されます。
   - userId単位で1分20回のupload制限があります。
 - `bbs/users/update`
   - 認証必須です。
   - avatarは2MB、header imageは6MB上限です。
-  - 2026-05-04時点では `image/svg+xml` を許可しています。
+  - MIME typeは `jpeg` / `png` / `webp` / `avif` のみです。
+  - MIME typeと拡張子の対応を検証します。
+  - SVGは許可していません。
   - R2 keyはサーバー側固定prefixと `crypto.randomUUID()` で生成されます。
 
 ## IP Resolver Baseline
@@ -131,7 +134,6 @@
 
 ## Initial Risks
 
-- `bbs/users/update` はSVGを許可しています。サニタイズ処理は確認できていません。
 - realtime WebSocketは未認証です。backend rate limitは追加済みですが、接続中WebSocket数の上限は未確認です。
 - `better-auth-handler.ts` は `origin` を毎回 `console.log` しています。
 - search系はbackend rate limitを追加済みです。ただし `/bbs/threads/search` の `limit` query上限は未設定です。

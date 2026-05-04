@@ -24,6 +24,12 @@ import {
 } from "../lib/profileEditor";
 
 const MAX_FAVORITE_PLAYERS = 3;
+const PROFILE_IMAGE_ALLOWED_EXTENSIONS: Record<string, string[]> = {
+	"image/jpeg": ["jpg", "jpeg"],
+	"image/png": ["png"],
+	"image/webp": ["webp"],
+	"image/avif": ["avif"],
+};
 
 type UseUserProfileEditorResult = {
 	isLogin: boolean;
@@ -73,6 +79,40 @@ const hasSameFavoritePlayers = (
 ) =>
 	left.length === right.length &&
 	left.every((player, index) => right[index]?.id === player.id);
+
+const getLowercaseExtension = (fileName: string): string | null => {
+	const dotIndex = fileName.lastIndexOf(".");
+	if (dotIndex < 0 || dotIndex === fileName.length - 1) {
+		return null;
+	}
+	return fileName.slice(dotIndex + 1).toLowerCase();
+};
+
+const validateProfileImageFile = (
+	file: File,
+	maxBytes: number,
+	maxBytesMessage: string,
+): string | null => {
+	if (file.size <= 0) {
+		return "ファイルが空です";
+	}
+
+	if (file.size > maxBytes) {
+		return maxBytesMessage;
+	}
+
+	const allowedExtensions = PROFILE_IMAGE_ALLOWED_EXTENSIONS[file.type];
+	if (!allowedExtensions) {
+		return "jpeg/png/webp/avif の画像を選択してください";
+	}
+
+	const extension = getLowercaseExtension(file.name);
+	if (!extension || !allowedExtensions.includes(extension)) {
+		return "拡張子が画像形式と一致する jpeg/png/webp/avif の画像を選択してください";
+	}
+
+	return null;
+};
 
 export const useUserProfileEditor = (
 	profile: UserProfileType,
@@ -235,13 +275,13 @@ export const useUserProfileEditor = (
 		event.target.value = "";
 		if (!file) return;
 
-		if (file.size <= 0) {
-			toast.error("ファイルが空です");
-			return;
-		}
-
-		if (file.size > MAX_AVATAR_BYTES) {
-			toast.error("2MB以下の画像を選択してください");
+		const errorMessage = validateProfileImageFile(
+			file,
+			MAX_AVATAR_BYTES,
+			"2MB以下の画像を選択してください",
+		);
+		if (errorMessage) {
+			toast.error(errorMessage);
 			return;
 		}
 
@@ -264,13 +304,13 @@ export const useUserProfileEditor = (
 		event.target.value = "";
 		if (!file) return;
 
-		if (file.size <= 0) {
-			toast.error("ファイルが空です");
-			return;
-		}
-
-		if (file.size > MAX_HEADER_IMAGE_BYTES) {
-			toast.error("6MB以下の画像を選択してください");
+		const errorMessage = validateProfileImageFile(
+			file,
+			MAX_HEADER_IMAGE_BYTES,
+			"6MB以下の画像を選択してください",
+		);
+		if (errorMessage) {
+			toast.error(errorMessage);
 			return;
 		}
 		setHeaderImageCropSourceFile(file);

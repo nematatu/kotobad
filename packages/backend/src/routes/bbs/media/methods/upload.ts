@@ -5,6 +5,7 @@ import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage
 import { ErrorResponse, SimpleErrorResponse } from "../../../../models/error";
 import { OpenAPIUploadImageResponseSchema } from "../../../../models/media";
 import type { AppEnvironment } from "../../../../types";
+import { resolveAllowedImageFile } from "../../../../utils/upload/imageFile";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const UPLOAD_WINDOW_MS = 60 * 1000;
@@ -13,13 +14,6 @@ const uploadRateLimitStore = new Map<
 	string,
 	{ startAtMs: number; count: number }
 >();
-
-const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/webp": "webp",
-	"image/avif": "avif",
-};
 
 const toPublicImageUrl = (baseUrl: string, objectKey: string): string => {
 	const normalized = baseUrl.trim().replace(/\/+$/, "");
@@ -155,12 +149,9 @@ export const uploadImageRouter: RouteHandler<
 			);
 		}
 
-		const extension = MIME_TYPE_TO_EXTENSION[fileEntry.type];
-		if (!extension) {
-			return c.json(
-				{ error: "file type must be jpeg, png, webp, or avif" },
-				400,
-			);
+		const imageFile = resolveAllowedImageFile(fileEntry);
+		if (!imageFile.ok) {
+			return c.json({ error: imageFile.error }, 400);
 		}
 
 		const parsedTarget = UploadImageTargetSchema.safeParse(
@@ -172,7 +163,7 @@ export const uploadImageRouter: RouteHandler<
 
 		const objectPrefix =
 			parsedTarget.data === "thread" ? "thread-image" : "post-image";
-		const objectKey = `${objectPrefix}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+		const objectKey = `${objectPrefix}/${Date.now()}-${crypto.randomUUID()}.${imageFile.extension}`;
 		const fileBuffer = await fileEntry.arrayBuffer();
 
 		await c.env.KOTOBAD_BUCKET.put(objectKey, fileBuffer, {

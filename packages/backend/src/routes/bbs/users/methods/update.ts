@@ -14,19 +14,13 @@ import {
 	OpenAPIUpdateUserProfileSchema,
 } from "../../../../models/users";
 import type { AppEnvironment } from "../../../../types";
+import { resolveAllowedImageFile } from "../../../../utils/upload/imageFile";
 import {
 	findUserFavoritePlayers,
 	hasSameNumberOrder,
 	toFavoritePlayersResponse,
 } from "./favoritePlayers";
 
-const MIME_TYPE_TO_EXTENSION: Record<string, string> = {
-	"image/jpeg": "jpg",
-	"image/png": "png",
-	"image/webp": "webp",
-	"image/avif": "avif",
-	"image/svg+xml": "svg",
-};
 const R2_PUT_MAX_ATTEMPTS = 3;
 const R2_PUT_RETRY_DELAY_MS = 150;
 
@@ -245,30 +239,33 @@ export const updateUserProfileRouter: RouteHandler<
 		const uploadProfileImage = async (
 			file: File,
 			objectPrefix: "user-icon" | "user-header",
-		): Promise<string | null> => {
-			const extension = MIME_TYPE_TO_EXTENSION[file.type];
-			if (!extension) {
-				return null;
+		): Promise<
+			{ ok: true; imageUrl: string } | { ok: false; error: string }
+		> => {
+			const imageFile = resolveAllowedImageFile(file);
+			if (!imageFile.ok) {
+				return imageFile;
 			}
 			const fileBuffer = await file.arrayBuffer();
-			const objectKey = `${objectPrefix}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+			const objectKey = `${objectPrefix}/${Date.now()}-${crypto.randomUUID()}.${imageFile.extension}`;
 			await putObjectWithRetry({
 				bucket: c.env.KOTOBAD_BUCKET,
 				objectKey,
 				fileBuffer,
 				contentType: file.type,
 			});
-			return toPublicR2Url(publicBaseUrl ?? "", objectKey);
+			return {
+				ok: true,
+				imageUrl: toPublicR2Url(publicBaseUrl ?? "", objectKey),
+			};
 		};
 
 		if (avatarFile) {
-			const imageUrl = await uploadProfileImage(avatarFile, "user-icon");
-			if (!imageUrl) {
-				return c.json(
-					{ error: "file type must be jpeg, png, webp, avif or svg" },
-					400,
-				);
+			const uploadResult = await uploadProfileImage(avatarFile, "user-icon");
+			if (!uploadResult.ok) {
+				return c.json({ error: uploadResult.error }, 400);
 			}
+			const imageUrl = uploadResult.imageUrl;
 			if (imageUrl !== current.image) {
 				patch.image = imageUrl;
 				if (current.image) {
@@ -278,16 +275,14 @@ export const updateUserProfileRouter: RouteHandler<
 		}
 
 		if (headerImageFile) {
-			const headerImageUrl = await uploadProfileImage(
+			const uploadResult = await uploadProfileImage(
 				headerImageFile,
 				"user-header",
 			);
-			if (!headerImageUrl) {
-				return c.json(
-					{ error: "file type must be jpeg, png, webp, avif or svg" },
-					400,
-				);
+			if (!uploadResult.ok) {
+				return c.json({ error: uploadResult.error }, 400);
 			}
+			const headerImageUrl = uploadResult.imageUrl;
 			if (headerImageUrl !== current.headerImage) {
 				patch.headerImage = headerImageUrl;
 				if (current.headerImage) {

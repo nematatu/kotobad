@@ -315,7 +315,7 @@ export function HeaderImageCropDialog({
 						<input
 							ref={changeImageInputRef}
 							type="file"
-							accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+							accept="image/jpeg,image/png,image/webp,image/avif"
 							className="hidden"
 							onChange={handleChangeSourceImageAction}
 						/>

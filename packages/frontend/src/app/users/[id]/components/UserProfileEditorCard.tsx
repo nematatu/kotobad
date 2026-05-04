@@ -114,7 +114,7 @@ export function UserProfileEditorCard({ viewModel, actions }: Props) {
 								<input
 									ref={avatarInputRef}
 									type="file"
-									accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
+									accept="image/jpeg,image/png,image/webp,image/avif"
 									className="hidden"
 									onChange={onAvatarFileChangeAction}
 								/>

@@ -49,25 +49,13 @@ export const UpdateUserProfileSchema = z.object({
 	image: z
 		.file()
 		.max(2 * 1024 * 1024)
-		.mime([
-			"image/png",
-			"image/jpeg",
-			"image/webp",
-			"image/avif",
-			"image/svg+xml",
-		])
+		.mime(["image/png", "image/jpeg", "image/webp", "image/avif"])
 		.openapi({ type: "string", format: "binary" })
 		.optional(),
 	headerImage: z
 		.file()
 		.max(6 * 1024 * 1024)
-		.mime([
-			"image/png",
-			"image/jpeg",
-			"image/webp",
-			"image/avif",
-			"image/svg+xml",
-		])
+		.mime(["image/png", "image/jpeg", "image/webp", "image/avif"])
 		.openapi({ type: "string", format: "binary" })
 		.optional(),
 });
