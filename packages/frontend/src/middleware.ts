@@ -24,7 +24,10 @@ const buildNonce = (): string => {
 };
 
 const resolveConnectSources = (): string[] => {
-	const source = new Set<string>(["'self'"]);
+	const source = new Set<string>([
+		"'self'",
+		"https://extranet-lv.bwfbadminton.com/api/match-center/vue-current-live",
+	]);
 	const rawApiUrl = process.env.NEXT_PUBLIC_API_URL;
 	if (!rawApiUrl) {
 		return [...source];
