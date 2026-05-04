@@ -1,1 +1,1 @@
-export {};
+export { getClientIp } from "./utils/request/getClientIp";

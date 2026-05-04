@@ -104,9 +104,16 @@
   - 2026-05-04時点では `image/svg+xml` を許可しています。
   - R2 keyはサーバー側固定prefixと `crypto.randomUUID()` で生成されます。
 
+## IP Resolver Baseline
+
+- `packages/shared/src/utils/request/getClientIp.ts` を追加済みです。
+- `CF-Connecting-IP` を優先します。
+- `True-Client-IP` は `CF-Connecting-IP` がない場合に使います。
+- `X-Forwarded-For` はクライアントが偽装できる可能性があるため、最後のフォールバックとして扱います。
+- IPが取れない場合は `unknown` を返します。
+
 ## Initial Risks
 
-- `X-Forwarded-For` を信頼しない共通IP取得関数は未確認です。
 - `bbs/users/update` はSVGを許可しています。サニタイズ処理は確認できていません。
 - realtime WebSocketは未認証で、接続数制限とrate limitは未確認です。
 - `better-auth-handler.ts` は `origin` を毎回 `console.log` しています。
