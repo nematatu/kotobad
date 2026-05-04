@@ -112,12 +112,21 @@
 - `X-Forwarded-For` はクライアントが偽装できる可能性があるため、最後のフォールバックとして扱います。
 - IPが取れない場合は `unknown` を返します。
 
+## Backend Rate Limit Baseline
+
+- `packages/backend/src/middleware/rate-limit.ts` を追加済みです。
+- Cloudflare側のrate limitを主、backend側のrate limitを補助として扱います。
+- backend側はWorkers isolate内のメモリMapで制御します。グローバルな厳密性はCloudflare側設定に依存します。
+- `CF-Connecting-IP` 優先のIP単位で制限します。
+- better-auth userが解決済みのrouteでは、userId単位も併用します。
+- 適用対象は auth、upload、createThread、createPost、reaction、search、notifications、realtime です。
+
 ## Initial Risks
 
 - `bbs/users/update` はSVGを許可しています。サニタイズ処理は確認できていません。
-- realtime WebSocketは未認証で、接続数制限とrate limitは未確認です。
+- realtime WebSocketは未認証です。backend rate limitは追加済みですが、接続中WebSocket数の上限は未確認です。
 - `better-auth-handler.ts` は `origin` を毎回 `console.log` しています。
-- search系はbackend側で `limit` 上限がありますが、`/bbs/threads/search` は上限が未設定です。
+- search系はbackend rate limitを追加済みです。ただし `/bbs/threads/search` の `limit` query上限は未設定です。
 
 ## Acceptance Criteria
 

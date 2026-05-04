@@ -4,6 +4,7 @@ import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { csrfOriginMiddleware } from "../middleware/csrf-origin";
 import { internalAuthMiddleware } from "../middleware/internal-auth";
+import { backendRateLimitMiddleware } from "../middleware/rate-limit";
 import type { AppEnvironment } from "../types";
 import { isAllowedOrigin } from "../utils/isAllowedOrigin";
 import bbsRouter from "./bbs";
@@ -32,6 +33,8 @@ const mainRouter = new OpenAPIHono<AppEnvironment>()
 			credentials: true,
 		}),
 	)
+	.use(betterAuthPath, backendRateLimitMiddleware("auth"))
+	.use(`${betterAuthPath}/*`, backendRateLimitMiddleware("auth"))
 	.all(betterAuthPath, betterAuthHandler)
 	.all(`${betterAuthPath}/*`, betterAuthHandler)
 	.use("/bbs/*", csrfOriginMiddleware)
