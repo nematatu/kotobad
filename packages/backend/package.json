@@ -2,6 +2,7 @@
 	"name": "@kotobad/backend",
 	"type": "module",
 	"scripts": {
+		"typecheck": "tsc --noEmit",
 		"dev": "wrangler dev --ip 0.0.0.0 --port 8787",
 		"dev:local": "wrangler dev --ip 0.0.0.0 --port 8787",
 		"dev:remote": "wrangler dev --remote --ip 0.0.0.0 --port 8787",
@@ -22,13 +23,13 @@
 		"@kotobad/shared": "workspace:*",
 		"better-auth": "^1.6.9",
 		"drizzle-orm": "^0.45.2",
-		"hono": "^4.12.15",
+		"hono": "^4.12.27",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
 		"@types/node": "^25.6.0",
 		"@cloudflare/workers-types": "^4.20260426.1",
 		"drizzle-kit": "^0.31.10",
-		"wrangler": "^4.86.0"
+		"wrangler": "^4.104.0"
 	}
 }

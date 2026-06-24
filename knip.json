@@ -9,5 +9,5 @@
 		"packages/frontend/src/app/threads/*/components/lib/postListViewHelpers.ts",
 		"packages/frontend/src/components/ui/card.tsx"
 	],
-	"ignoreDependencies": ["cloudflare"]
+	"ignoreDependencies": ["@svgr/webpack", "cloudflare"]
 }

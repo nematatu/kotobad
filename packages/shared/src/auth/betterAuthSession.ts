@@ -15,7 +15,7 @@ const BetterAuthSessionSchema = z
 	})
 	.passthrough();
 
-export const BetterAuthUserSchema = z
+const BetterAuthUserSchema = z
 	.object({
 		id: z.string(),
 		email: z.string().email(),
@@ -32,7 +32,7 @@ export const BetterAuthSessionResponseSchema = z.object({
 	user: BetterAuthUserSchema,
 });
 
-export type BetterAuthSessionResponse = z.infer<
+type BetterAuthSessionResponse = z.infer<
 	typeof BetterAuthSessionResponseSchema
 >;
 export type BetterAuthUser = z.infer<typeof BetterAuthUserSchema>;

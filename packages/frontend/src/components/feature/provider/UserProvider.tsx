@@ -7,7 +7,7 @@ import { useSession } from "@/lib/auth/auth-client";
 // undefined: ローディング中
 // null: 未ログイン
 // BetterAuthUser: ログイン中
-export type User = BetterAuthUser | null;
+type User = BetterAuthUser | null;
 export type UserState = User | undefined;
 
 type Ctx = {

@@ -4,6 +4,9 @@
     "main": "src/index.ts",
     "type": "module",
     "types": "src/index.ts",
+    "scripts": {
+        "typecheck": "tsc --noEmit"
+    },
     "dependencies": {
         "@hono/zod-openapi": "^1.2.4",
         "zod": "^4.3.6"

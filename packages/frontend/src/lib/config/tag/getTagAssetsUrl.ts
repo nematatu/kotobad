@@ -1,6 +1,6 @@
 import { getRequiredEnv } from "../requiredEnv";
 
-export const R2_ASSETS_URL = getRequiredEnv("NEXT_PUBLIC_R2_ASSETS_URL");
+const R2_ASSETS_URL = getRequiredEnv("NEXT_PUBLIC_R2_ASSETS_URL");
 
 export default function getTagAssetsUrl(tagValue: string): string {
 	const trimmed = R2_ASSETS_URL.replace(/\/+$/, "");

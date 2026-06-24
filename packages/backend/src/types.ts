@@ -20,12 +20,12 @@ export type Bindings = {
 	TURNSTILE_ALLOWED_HOSTNAMES?: string;
 };
 
-export type BetterAuthUserTokenPayload = {
+type BetterAuthUserTokenPayload = {
 	id: string;
 	username: string;
 };
 
-export type Variables = {
+type Variables = {
 	db: DrizzleD1Database<typeof schema>;
 	betterAuthUser: BetterAuthUserTokenPayload;
 };
