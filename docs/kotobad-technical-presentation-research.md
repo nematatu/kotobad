@@ -532,11 +532,11 @@ Cache-Control: public, max-age=31536000, immutable
 
 - Frontendの`build:check-and-save-assets`では実行されます。
 - Rootの`build:frontend:cf`もwrapperを呼びます。
-- 通常の`deploy:frontend`にはcheckerを明示的に連結していません。
+- `packages/frontend`の`deploy`は`build:check-and-save-assets`を先に実行してから、同じOpenNext build成果物をproductionへdeployします。
 - Pre-commitには含まれません。
-- `.github/workflows/ci.yml`でtypecheck、Biome、test、Backend build、Frontend buildを実行する設定です。ただしstatic asset checkerはこのCIに含めていません。
+- `.github/workflows/ci.yml`では外部R2 snapshotを更新しないため、static asset checkerは実行していません。
 - Cloudflare Dashboard側のBuild commandは未確認です。
-- 全deployで必ず実行されるとは断定しません。
+- `deploy:frontend:preview`はproduction snapshotを更新しないため、checkerの対象外です。
 
 ## 7. UX / UI
 
@@ -789,7 +789,7 @@ flowchart LR
 
 #### 9. Static assetの404問題をどう解決しましたか
 
-- 回答案: 前回CSSとJSが参照した`/_next/static/*`をR2 snapshotへ保存します。次Buildで存在確認し、欠落時はProduction originから復旧します。復旧不能ならBuildを失敗させます。全deployでwrapperが実行されるかは未確認です。
+- 回答案: 前回CSSとJSが参照した`/_next/static/*`をR2 snapshotへ保存します。次Buildで存在確認し、欠落時はProduction originから復旧します。復旧不能ならBuildを失敗させます。現在の`packages/frontend`のproduction `deploy` scriptにはcheckerを連結済みですが、Dashboard側のBuild commandやpreview deployは別途未確認です。
 
 #### 10. Optimistic UIはどこで使いますか
 
@@ -807,7 +807,7 @@ flowchart LR
 
 - Frontendの統合テストとE2Eがないため、Backendの単体テストだけでは画面からAPIまでのRuntime regressionを検出できません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
-- Static asset checkerが全deployで必ず実行されるかは未確認です。
+- Dashboard側のBuild commandやpreview deployを含む全経路でstatic asset checkerが実行されるかは未確認です。
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
 - Module-level memoryのrate limitはGlobalに一貫した制限ではありません。
@@ -816,7 +816,7 @@ flowchart LR
 ## Open Questions
 
 - Cloudflare DashboardのProduction Build commandは未確認です。
-- Static asset checkerがProduction deployで必ず実行されるかは未確認です。
+- Production deployがrepositoryの`packages/frontend` script経由で必ず実行されるか、Dashboard側のBuild commandからもcheckerが呼ばれるかは未確認です。
 - ProductionのTurnstile scopeは未確認です。
 - Productionの`APP_ENV`がどの設定から注入されるかは未確認です。
 - Cloudflare Image Transformationsのaccount有効状態は未確認です。

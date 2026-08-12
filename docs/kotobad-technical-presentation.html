@@ -750,7 +750,7 @@
 					<div class="guard-step"><b>RECOVER</b>欠落assetをfallbackから復旧</div>
 					<div class="guard-step"><b>STOP / SAVE</b>未解決なら失敗、成功なら更新</div>
 				</div>
-				<p class="limit-line"><strong>保証範囲:</strong> 直前snapshotの参照が対象です。複数世代の旧参照を累積保全する仕組みではなく、全deployでの実行もリポジトリだけでは確認できません。</p>
+				<p class="limit-line"><strong>保証範囲:</strong> 直前snapshotの参照が対象です。複数世代の旧参照を累積保全する仕組みではありません。repositoryのproduction deploy scriptにはcheckerを連結済みですが、全deploy経路での実行は未確認です。</p>
 			</div>
 			<details class="evidence">
 				<summary>実装根拠とキャッシュ方針</summary>

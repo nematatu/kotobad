@@ -138,6 +138,8 @@
 - 追加:
   - `build:check-and-save-assets`: `bun run cf:build && bun ../../scripts/check-save-next-static-assets.ts`
 
+※ 上記は2026-02-04時点の作業記録です。2026-08-13現在は、`packages/frontend`のproduction `deploy` scriptがこのwrapperを先に実行します。
+
 ### 6-4. CI / Cloudflare Build command
 - `bun run build:check-and-save-assets`
 
