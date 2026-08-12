@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: Backend 10件（Zodエラーフォーマット2件、API docs認証8件）が成功しました。API docs認証は資格情報解決に加え、Honoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: Backend 13件（Zodエラーフォーマット2件、API docs認証8件、CSRF token照合3件）が成功しました。API docs認証は資格情報解決に加え、Honoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -143,7 +143,7 @@ flowchart LR
 
     U -->|"HTML / navigation"| N
     U -->|"same-origin API"| BFF
-    BFF -->|"Cookie + Origin + HMAC"| H
+    BFF -->|"Cookie + Origin + CSRF + HMAC"| H
     N -->|"Server-side fetch + HMAC"| H
     N --> AS
 
@@ -166,9 +166,9 @@ flowchart LR
 ### 2.1 HTTP request flow
 
 - Browserは`/threads/api/*`または`/auth/api/*`を呼びます。
-- Next.js BFFはCookie、Origin、method、body、queryをBackendへ転送します。
+- Next.js BFFはCookie、Origin、CSRF token、method、body、queryをBackendへ転送します。
 - 通常のBBS requestにはHMAC-SHA-256署名を追加します。
-- Hono BackendはHMAC、Origin、必要なsessionを検証します。
+- Hono BackendはHMAC、Origin、CSRF token、必要なsessionを検証します。
 - BackendはDrizzle経由でD1を操作します。
 - Frontend BFFは多くのrequestとresponseを共有Zod schemaで検証します。
 - HMAC実装は`packages/frontend/src/lib/api/security/ensureInternalSecret.ts`です。
@@ -808,6 +808,7 @@ flowchart LR
 
 - Frontendの統合テストとE2Eがないため、Backendの単体テストだけでは画面からAPIまでのRuntime regressionを検出できません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
+- Backend CSRFはOrigin/Refererに加えてdouble-submit cookie（`__Host-csrf_token`または`dev_csrf_token`）と`x-csrf-token`を照合します。CSRF cookieとheaderの受け渡しはBFF経由に依存します。
 - Static asset checkerが全deployで必ず実行されるかは未確認です。
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
@@ -845,6 +846,7 @@ flowchart LR
 - API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にします。
 - `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一します。
 - `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認します。
+- `/bbs/*`のunsafe requestでBackendがCSRF cookie/headerを照合し、BFFが`x-csrf-token`を転送する実装と回帰テストを追加済みです。
 - DB migrationは変更しません。
 - `docs/_sidebar.md`から本資料へ遷移できることを確認します。
 - Mermaid code blockがMarkdownとして閉じていることを確認します。

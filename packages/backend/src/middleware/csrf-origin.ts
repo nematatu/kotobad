@@ -18,6 +18,41 @@ const resolveSourceOrigin = (origin?: string, referer?: string): string => {
 	}
 };
 
+const CSRF_TOKEN_HEADER = "x-csrf-token";
+const CSRF_COOKIE_NAMES = ["__Host-csrf_token", "dev_csrf_token"];
+const MAX_CSRF_TOKEN_LENGTH = 2048;
+
+const resolveCookieValue = (
+	cookieHeader: string | undefined,
+	cookieNames: readonly string[],
+): string | null => {
+	if (!cookieHeader) return null;
+
+	for (const cookie of cookieHeader.split(";")) {
+		const separatorIndex = cookie.indexOf("=");
+		if (separatorIndex === -1) continue;
+
+		const name = cookie.slice(0, separatorIndex).trim();
+		if (!cookieNames.includes(name)) continue;
+
+		return cookie.slice(separatorIndex + 1).trim();
+	}
+
+	return null;
+};
+
+export const isValidCsrfToken = (
+	cookieHeader: string | undefined,
+	headerToken: string | undefined,
+): boolean => {
+	if (!headerToken || headerToken.length > MAX_CSRF_TOKEN_LENGTH) {
+		return false;
+	}
+
+	const cookieToken = resolveCookieValue(cookieHeader, CSRF_COOKIE_NAMES);
+	return cookieToken === headerToken;
+};
+
 export const csrfOriginMiddleware = createMiddleware<AppEnvironment>(
 	async (c, next) => {
 		const method = c.req.method.toUpperCase();
@@ -33,6 +68,13 @@ export const csrfOriginMiddleware = createMiddleware<AppEnvironment>(
 		if (!sourceOrigin || !isAllowedOrigin(sourceOrigin, c.env)) {
 			return c.json({ error: "Forbidden origin." }, 403);
 		}
+
+		if (
+			!isValidCsrfToken(c.req.header("cookie"), c.req.header(CSRF_TOKEN_HEADER))
+		) {
+			return c.json({ error: "Invalid CSRF token." }, 403);
+		}
+
 		return next();
 	},
 );
