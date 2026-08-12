@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { isValidCsrfToken } from "./csrf-origin";
+import { Hono } from "hono";
+import { csrfOriginMiddleware, isValidCsrfToken } from "./csrf-origin";
+
+const createCsrfTestApp = () => {
+	const app = new Hono<{
+		Bindings: { ALLOWED_ORIGINS?: string };
+	}>();
+	app.use("/bbs/*", csrfOriginMiddleware);
+	app.post("/bbs/test", (c) => c.text("ok"));
+	return app;
+};
 
 describe("isValidCsrfToken", () => {
 	test("accepts a matching production CSRF cookie and header", () => {
@@ -24,5 +34,43 @@ describe("isValidCsrfToken", () => {
 			false,
 		);
 		assert.equal(isValidCsrfToken("other=value", "token-123"), false);
+	});
+});
+
+describe("csrfOriginMiddleware", () => {
+	test("allows a valid unsafe request", async () => {
+		const app = createCsrfTestApp();
+		const response = await app.request(
+			"http://backend.test/bbs/test",
+			{
+				method: "POST",
+				headers: {
+					Origin: "https://kotobad.com",
+					Cookie: "__Host-csrf_token=token-123",
+					"X-CSRF-Token": "token-123",
+				},
+			},
+			{ ALLOWED_ORIGINS: "https://kotobad.com" },
+		);
+
+		assert.equal(response.status, 200);
+		assert.equal(await response.text(), "ok");
+	});
+
+	test("rejects a missing CSRF token before the handler runs", async () => {
+		const app = createCsrfTestApp();
+		const response = await app.request(
+			"http://backend.test/bbs/test",
+			{
+				method: "POST",
+				headers: { Origin: "https://kotobad.com" },
+			},
+			{ ALLOWED_ORIGINS: "https://kotobad.com" },
+		);
+
+		assert.equal(response.status, 403);
+		assert.deepEqual(await response.json(), {
+			error: "Invalid CSRF token.",
+		});
 	});
 });
