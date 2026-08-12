@@ -6,6 +6,8 @@ const generateCsrfToken = (): string => {
 	return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 };
 
+const CSRF_TOKEN_MAX_AGE_SECONDS = 60 * 60;
+
 export async function GET(req: Request) {
 	const rateLimitResponse = checkFrontendRateLimit(req, "csrf");
 	if (rateLimitResponse) return rateLimitResponse;
@@ -14,19 +16,17 @@ export async function GET(req: Request) {
 
 	const res = NextResponse.json({ csrfToken: token }, { status: 200 });
 
-	const csrfTokenName =
-		process.env.NODE_ENV === "production"
-			? "__Host-csrf_token"
-			: "dev_csrf_token";
+	const isProduction = process.env.NODE_ENV === "production";
+	const csrfTokenName = isProduction ? "__Host-csrf_token" : "dev_csrf_token";
 
 	res.cookies.set({
 		name: csrfTokenName,
 		value: token,
 		httpOnly: true,
 		path: "/",
-		sameSite: "lax",
-		secure: process.env.NODE_ENV === "production",
-		maxAge: 60 * 60,
+		sameSite: "strict",
+		secure: isProduction,
+		maxAge: CSRF_TOKEN_MAX_AGE_SECONDS,
 	});
 
 	res.headers.set("Cache-Control", "no-store");
