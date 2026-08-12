@@ -1,6 +1,6 @@
 # コトバド 技術プレゼン調査資料
 
-- 調査日: 2026-08-10（認証・Turnstile関連は2026-08-13再確認）
+- 調査日: 2026-08-10（認証・Turnstile・Backend build・CI関連は2026-08-13再確認）
 - 対象ブランチ: `main`
 - 対象リポジトリ: `kotobad`
 - 調査方針: 実装・設定を優先し、未確認事項は未確認と明記する
@@ -15,7 +15,7 @@
 - 新規投稿通知にはWebSocketとDurable Objectsを使います。
 - FrontendとBackendは共有Zod schemaをAPI契約として利用します。
 - PWAはstandalone起動に対応しますが、offline cacheとWeb Pushは未実装です。
-- 自動テストとGitHub Actionsは確認できませんでした。
+- BackendにBunの初期回帰テストとGitHub Actions CIを追加しました。Frontendの自動テスト、統合テスト、E2Eは未実装です。
 
 ## Background
 
@@ -64,6 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
+- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件が成功しました。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -94,8 +95,8 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- Frontendのtest runner、test script、`*.test.*`、`*.spec.*`は確認できません。
-- `.github/workflows`は存在しません。
+- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
+- `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
 
 ### 1.2 実装済みと誤認しないもの
 
@@ -533,7 +534,7 @@ Cache-Control: public, max-age=31536000, immutable
 - Rootの`build:frontend:cf`もwrapperを呼びます。
 - 通常の`deploy:frontend`にはcheckerを明示的に連結していません。
 - Pre-commitには含まれません。
-- GitHub Actions workflowはありません。
+- `.github/workflows/ci.yml`でtypecheck、Biome、test、Backend build、Frontend buildを実行する設定です。ただしstatic asset checkerはこのCIに含めていません。
 - Cloudflare Dashboard側のBuild commandは未確認です。
 - 全deployで必ず実行されるとは断定しません。
 
@@ -796,7 +797,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: 現状、自動test runnerとtest suiteは確認できません。確認できる自動検証はTypeScript typecheck、Next build、Biome、Pre-commitのlint-stagedです。
+- 回答案: BackendはBun testでZodエラーフォーマットの回帰テストを実行します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -804,9 +805,8 @@ flowchart LR
 
 ## Risks
 
-- 自動testがないため、Runtime regressionをtypecheckだけでは検出できません。
+- Frontendの統合テストとE2Eがないため、Backendの単体テストだけでは画面からAPIまでのRuntime regressionを検出できません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
-- GitHub Actionsがないため、repository内で自動CI実行を確認できません。
 - Static asset checkerが全deployで必ず実行されるかは未確認です。
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。

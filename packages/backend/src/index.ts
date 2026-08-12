@@ -8,6 +8,7 @@ import { ThreadRoom } from "./realtime/thread-room";
 import mainRouter from "./routes";
 import { refreshThreadTrends } from "./routes/bbs/threads/methods/trending";
 import type { AppEnvironment } from "./types";
+import { formatZodValidationError } from "./utils/formatZodValidationError";
 
 const app = new Hono<AppEnvironment>()
 	.use("*", db)
@@ -22,10 +23,7 @@ app.notFound((c) => c.json({ message: "Not Found", ok: false }, 404));
 
 app.onError((err, c) => {
 	if (err instanceof ZodError) {
-		const firstIssue = err.issues[0];
-		const issuePath = firstIssue?.path.join(".") || "root";
-		const issueMessage = firstIssue?.message || "Invalid input";
-		const errorMessage = `Invalid Input for ${issuePath}: ${issueMessage}`;
+		const errorMessage = formatZodValidationError(err);
 		return c.json(
 			{ error: "Validation Error", message: errorMessage, success: false },
 			400,
