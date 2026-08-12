@@ -3,6 +3,7 @@
 	"type": "module",
 	"scripts": {
 		"typecheck": "tsc --noEmit",
+		"build": "wrangler deploy --dry-run --minify --env=\"\"",
 		"dev": "wrangler dev --ip 0.0.0.0 --port 8787",
 		"dev:local": "wrangler dev --ip 0.0.0.0 --port 8787",
 		"dev:remote": "wrangler dev --remote --ip 0.0.0.0 --port 8787",

@@ -63,7 +63,7 @@
 - `bun run build:frontend`: 成功しました。
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
-- `bun run build:backend`: Backend packageに`build` scriptがないため失敗しました。
+- `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -812,7 +812,6 @@ flowchart LR
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
 - Module-level memoryのrate limitはGlobalに一貫した制限ではありません。
 - `worker-configuration.d.ts`と手書きBinding型に差があります。
-- Backendのroot `build:backend` scriptは現状成功しません。
 
 ## Open Questions
 
