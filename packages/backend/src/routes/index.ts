@@ -34,7 +34,7 @@ mainRouter.use(
 			return isAllowedOrigin(origin, c.env) ? origin : "";
 		},
 		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-		allowHeaders: ["Content-Type", "Authorization"],
+		allowHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
 		credentials: true,
 	}),
 );

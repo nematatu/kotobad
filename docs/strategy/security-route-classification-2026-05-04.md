@@ -1,4 +1,4 @@
-# kotobad セキュリティルート分類（2026-05-04）
+# kotobad セキュリティルート分類（2026-05-04、2026-08-13更新）
 
 ## Summary
 
@@ -24,7 +24,8 @@
 - BFF internal auth: `packages/frontend/src/lib/api/fetcher/bffFetcher.ts`
   - Backend API へ `x-internal-ts` と `x-internal-signature` を付与します。
 - backend CSRF Origin/Referer: `packages/backend/src/middleware/csrf-origin.ts`
-  - `/bbs/*` の unsafe method で `Origin` / `Referer` を検証します。
+  - `/bbs/*` の unsafe method で `Origin` / `Referer` とCSRF cookie/headerを検証します。
+  - CSRF headerは`packages/frontend/src/lib/api/fetcher/bffFetcher.ts`からBackendへ転送します。
 - backend internal auth: `packages/backend/src/middleware/internal-auth.ts`
   - `/bbs/*` にHMAC検証を適用します。
   - `OPTIONS` と `/bbs/realtime/` は例外です。
