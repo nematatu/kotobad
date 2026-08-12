@@ -842,7 +842,7 @@
 				<details><summary>FrontendからDBまで完全に型安全ですか？</summary><p>いいえ。主なBBS API / BFFでは共有Zod schemaで境界を検証し、DrizzleはDB queryを型推論しますが、DBからZodの自動生成やHono RPC clientは使っていません。</p></details>
 				<details><summary>Cloudflareを選んだ理由は費用ですか？</summary><p>コードから確認できるのは、Workers、D1、R2、DOへ基盤を集約し、常時起動VMや外部RDB設定を持たないことです。本人の選定理由と実料金は未確認なので断定しません。</p></details>
 				<details><summary>WebSocket切断中のeventはどうなりますか？</summary><p>指数backoffで再接続しますが、event履歴、replay、再接続直後の明示的な全件refetchはありません。現行の保証は接続中の変更通知です。</p></details>
-				<details><summary>自動テストはありますか？</summary><p>BackendではZodエラーフォーマット、API docs認証、CSRF cookie/header照合をBun testで確認します。API docs認証middlewareには実Requestを渡し、未設定503、認証なし・不正資格情報401、正しいBasic Auth 200を検証します。<code>.github/workflows/ci.yml</code>でtest、typecheck、Biome、Backend build、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。</p></details>
+				<details><summary>自動テストはありますか？</summary><p>BackendではAPI docs認証とCSRFのHono middlewareへ実Requestを渡し、FrontendではCSRF Route Handlerの<code>Set-Cookie</code>属性を検証します。rootの<code>bun run test</code>と<code>.github/workflows/ci.yml</code>でBackend・Frontendのtest、typecheck、Biome、両buildを実行します。Frontendの統合テストとE2Eは未実装です。</p></details>
 			</div>
 		</section>
 
@@ -853,7 +853,7 @@
 				<p class="lead">この資料はリポジトリの実装・設定を根拠にしています。外部環境は確認済み範囲を越えて断定しません。</p>
 			</header>
 			<div class="scope-grid">
-				<div class="scope-card confirmed"><h3>確認済み</h3><ul><li>Frontend / Backend / Sharedのtypecheck成功</li><li>Frontend build成功</li><li>Backend 13件のBun testとWrangler build成功</li><li>API docs認証の503・401・200をHonoの実Requestで確認</li><li>BackendのCSRF middleware、BFFのCSRF header転送、CSRF cookieのStrict属性を実装・確認</li><li>GitHub Actions CIにtest、typecheck、Biome、両buildを設定</li><li>packageだけでなくimport・route・設定で実利用を確認</li><li>Better Auth / Google OAuth、DB schema、WebSocket、PWA、cache実装を確認</li></ul></div>
+				<div class="scope-card confirmed"><h3>確認済み</h3><ul><li>Frontend / Backend / Sharedのtypecheck成功</li><li>Frontend build成功</li><li>Backend 15件、Frontend 1件のBun testとWrangler build成功</li><li>API docs認証の503・401・200をHonoの実Requestで確認</li><li>BackendのCSRF middleware、BFFのCSRF header転送、CSRF cookieのStrict属性をruntime testで確認</li><li>GitHub Actions CIにBackend・Frontendのtest、typecheck、Biome、両buildを設定</li><li>packageだけでなくimport・route・設定で実利用を確認</li><li>Better Auth / Google OAuth、DB schema、WebSocket、PWA、cache実装を確認</li></ul></div>
 				<div class="scope-card limited"><h3>未実装・未確認</h3><ul><li>Turnstileはserver-side validatorのみで、client widget / token生成は未実装。現行clientのままFrontendの<code>upload</code> / <code>createThread</code> / <code>createPost</code>、Backendの<code>auth</code> / <code>authSensitive</code>を有効化すると、token未送信requestが403になります</li><li>Frontendの統合テストとE2Eは未実装</li><li>WebSocket replay / heartbeatは未実装</li><li>Production Dashboard設定、remote migration、cache hit率は未確認</li><li>Cloudflareの実料金と本人の選定理由は未確認</li></ul></div>
 			</div>
 		</section>

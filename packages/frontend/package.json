@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"typecheck": "tsc --noEmit",
+		"test": "bun test",
 		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",

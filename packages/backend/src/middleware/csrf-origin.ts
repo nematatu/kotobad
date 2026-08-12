@@ -4,6 +4,10 @@ import { createMiddleware } from "hono/factory";
 import type { AppEnvironment } from "../types";
 import { isAllowedOrigin } from "../utils/isAllowedOrigin";
 
+type CsrfEnvironment = {
+	Bindings: Pick<AppEnvironment["Bindings"], "ALLOWED_ORIGINS">;
+};
+
 const resolveSourceOrigin = (origin?: string, referer?: string): string => {
 	if (origin) {
 		return origin;
@@ -53,7 +57,7 @@ export const isValidCsrfToken = (
 	return cookieToken === headerToken;
 };
 
-export const csrfOriginMiddleware = createMiddleware<AppEnvironment>(
+export const csrfOriginMiddleware = createMiddleware<CsrfEnvironment>(
 	async (c, next) => {
 		const method = c.req.method.toUpperCase();
 		if (method === "GET" || method === "HEAD" || method === "OPTIONS") {

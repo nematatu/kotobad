@@ -52,7 +52,8 @@
 
 ## 未実装・未確認（2026-08-13確認）
 ### 1. セキュリティ回帰テスト
-- CSRF middlewareのcookie/header照合テストは追加済みです。
+- CSRF middlewareのcookie/header照合とHTTP挙動のruntime testは追加済みです。
+- CSRF token Route Handlerの`Set-Cookie`属性runtime testも追加済みです。
 - BrowserからNext BFF、Backendまでを通すE2Eシナリオは未確認です。
 
 ## 今後の実施項目（優先順）

@@ -13,7 +13,7 @@ const CF_PAGES_PREVIEW_SUFFIX = "-kotobad-frontend.amtt.workers.dev";
 
 export const isAllowedOrigin = (
 	origin: string,
-	env: AppEnvironment["Bindings"],
+	env: Pick<AppEnvironment["Bindings"], "ALLOWED_ORIGINS">,
 ): boolean => {
 	const allowedOrigins = parseOrigins(env.ALLOWED_ORIGINS);
 	if (allowedOrigins.includes(origin)) {
