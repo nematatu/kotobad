@@ -188,7 +188,8 @@ flowchart LR
 - Better Authは`/better-auth/*`へ登録されます。
 - OpenAPI JSONは`/specification`です。
 - Swagger UIは`/doc`です。
-- `/doc`は現行source literalのBasic Authで保護されます。
+- `/doc`、`/doc/*`、`/specification`は`API_DOCS_USERNAME`と`API_DOCS_PASSWORD`を使うBasic Auth middlewareで保護します（`packages/backend/src/middleware/api-docs-auth.ts`）。
+- どちらかの環境変数が未設定の場合は503を返し、ドキュメントを公開しません。リポジトリ内にProductionのsecret値や設定済み状態は存在しないため、実際の本番設定は未確認です。
 
 ### 2.3 認証が必要なAPI
 
@@ -812,6 +813,7 @@ flowchart LR
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
 - Module-level memoryのrate limitはGlobalに一貫した制限ではありません。
 - `worker-configuration.d.ts`と手書きBinding型に差があります。
+- API docsのBasic Auth用secretがProduction環境へ設定済みかは、リポジトリからは確認できません。未設定の場合、`/doc`と`/specification`は503になります。
 
 ## Open Questions
 
@@ -840,8 +842,10 @@ flowchart LR
 
 ## Rollout / Test Plan
 
-- 本変更は文書追加だけです。
-- Application codeとmigrationは変更しません。
+- API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にします。
+- `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一します。
+- `resolveApiDocsCredentials`の設定済み・未設定ケースをBun testで確認します。
+- DB migrationは変更しません。
 - `docs/_sidebar.md`から本資料へ遷移できることを確認します。
 - Mermaid code blockがMarkdownとして閉じていることを確認します。
 - Repository内の重要pathが現存することを確認します。
