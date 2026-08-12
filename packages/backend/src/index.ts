@@ -22,8 +22,10 @@ app.notFound((c) => c.json({ message: "Not Found", ok: false }, 404));
 
 app.onError((err, c) => {
 	if (err instanceof ZodError) {
-		const firstError = err.issues[0];
-		const errorMessage = `Invalid Input for ${firstError.path.join(".")}: ${firstError.message[0]}}`;
+		const firstIssue = err.issues[0];
+		const issuePath = firstIssue?.path.join(".") || "root";
+		const issueMessage = firstIssue?.message || "Invalid input";
+		const errorMessage = `Invalid Input for ${issuePath}: ${issueMessage}`;
 		return c.json(
 			{ error: "Validation Error", message: errorMessage, success: false },
 			400,
