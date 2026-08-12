@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="コトバドの構成と設計判断を、実装根拠に基づいて図解した技術プレゼン資料です。">
+	<title>コトバド — 技術プレゼン</title>
+	<style>
+		:root {
+			--ink: #172236;
+			--muted: #5d6a7f;
+			--paper: #f5f7f9;
+			--card: #ffffff;
+			--soft: #edf2f5;
+			--line: #d5dee6;
+			--brand: #08786e;
+			--brand-dark: #075d56;
+			--brand-soft: #dcf5f0;
+			--blue: #3157c9;
+			--blue-soft: #e9eeff;
+			--orange: #a85c09;
+			--orange-soft: #fff0d8;
+			--red: #a93d42;
+			--red-soft: #ffebec;
+			--purple: #7049ad;
+			--purple-soft: #f0e9fb;
+			--shadow: 0 16px 42px rgb(26 45 70 / 9%);
+		}
+
+		* { box-sizing: border-box; }
+		html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+		body {
+			margin: 0;
+			background: var(--paper);
+			color: var(--ink);
+			font-family: Inter, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+			font-size: 16px;
+			line-height: 1.7;
+			-webkit-font-smoothing: antialiased;
+		}
+
+		a { color: var(--brand-dark); text-underline-offset: 0.2em; }
+		button, a { -webkit-tap-highlight-color: transparent; }
+		:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+		.skip {
+			position: fixed;
+			z-index: 100;
+			top: 0.75rem;
+			left: 0.75rem;
+			transform: translateY(-180%);
+			padding: 0.6rem 0.9rem;
+			border-radius: 8px;
+			background: var(--ink);
+			color: #fff;
+			font-weight: 700;
+		}
+		.skip:focus { transform: none; }
+
+		.topbar {
+			position: sticky;
+			top: 0;
+			z-index: 30;
+			border-bottom: 1px solid rgb(213 222 230 / 85%);
+			background: rgb(245 247 249 / 92%);
+			backdrop-filter: blur(14px);
+		}
+		.topbar-inner {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			max-width: 1180px;
+			min-height: 3.8rem;
+			margin: auto;
+			padding: 0 1.25rem;
+		}
+		.brand { color: var(--ink); font-weight: 850; text-decoration: none; letter-spacing: -0.02em; }
+		.nav { display: flex; align-items: center; gap: 1.1rem; }
+		.nav a { color: var(--muted); font-size: 0.83rem; font-weight: 700; text-decoration: none; }
+		.nav a:hover { color: var(--brand-dark); }
+		.top-action {
+			padding: 0.42rem 0.75rem;
+			border: 1px solid var(--line);
+			border-radius: 8px;
+			background: var(--card);
+			color: var(--ink) !important;
+		}
+
+		.hero {
+			position: relative;
+			overflow: hidden;
+			background: linear-gradient(135deg, #10243b 0%, #093d45 55%, #08786e 100%);
+			color: #fff;
+		}
+		.hero::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background-image:
+				linear-gradient(rgb(255 255 255 / 5%) 1px, transparent 1px),
+				linear-gradient(90deg, rgb(255 255 255 / 5%) 1px, transparent 1px);
+			background-size: 42px 42px;
+			mask-image: linear-gradient(90deg, #000 30%, transparent 88%);
+		}
+		.hero-inner {
+			position: relative;
+			display: grid;
+			grid-template-columns: minmax(0, 1.1fr) minmax(350px, 0.9fr);
+			align-items: center;
+			gap: clamp(2rem, 5vw, 5rem);
+			max-width: 1180px;
+			min-height: 590px;
+			margin: auto;
+			padding: clamp(3rem, 7vw, 6.2rem) 1.25rem;
+		}
+		.eyebrow {
+			margin: 0 0 0.8rem;
+			color: #9ae5d9;
+			font-size: 0.78rem;
+			font-weight: 850;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+		}
+		.hero h1 {
+			margin: 0;
+			font-size: clamp(2.7rem, 6vw, 5.8rem);
+			line-height: 0.98;
+			letter-spacing: -0.06em;
+		}
+		.hero-copy {
+			max-width: 650px;
+			margin: 1.35rem 0 0;
+			color: #d9ebef;
+			font-size: clamp(1.05rem, 2vw, 1.3rem);
+			line-height: 1.65;
+		}
+		.hero-copy strong { color: #fff; }
+		.stack-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+		.stack-chip {
+			padding: 0.34rem 0.7rem;
+			border: 1px solid rgb(255 255 255 / 25%);
+			border-radius: 999px;
+			background: rgb(255 255 255 / 8%);
+			color: #eefafa;
+			font-size: 0.8rem;
+			font-weight: 700;
+		}
+
+		.hero-summary {
+			padding: 1.25rem;
+			border: 1px solid rgb(255 255 255 / 20%);
+			border-radius: 22px;
+			background: rgb(8 26 38 / 48%);
+			box-shadow: 0 24px 65px rgb(0 0 0 / 24%);
+			backdrop-filter: blur(12px);
+		}
+		.hero-summary-label { margin: 0 0 0.9rem; color: #9ae5d9; font-size: 0.76rem; font-weight: 850; letter-spacing: 0.1em; }
+		.hero-point {
+			display: grid;
+			grid-template-columns: 2rem 1fr;
+			gap: 0.75rem;
+			align-items: start;
+			padding: 0.9rem 0;
+			border-top: 1px solid rgb(255 255 255 / 13%);
+		}
+		.hero-point:first-of-type { border-top: 0; }
+		.hero-no {
+			display: grid;
+			place-items: center;
+			width: 2rem;
+			height: 2rem;
+			border-radius: 8px;
+			background: #cffff7;
+			color: #075d56;
+			font-size: 0.72rem;
+			font-weight: 900;
+		}
+		.hero-point strong { display: block; margin-bottom: 0.1rem; font-size: 0.98rem; }
+		.hero-point span { display: block; color: #c9dbe2; font-size: 0.83rem; line-height: 1.5; }
+
+		main { max-width: 1180px; margin: auto; padding: 0 1.25rem 5rem; }
+		.section { padding: clamp(4rem, 8vw, 7rem) 0; border-bottom: 1px solid var(--line); }
+		.section:last-child { border-bottom: 0; }
+		.section-head { max-width: 800px; margin-bottom: 2rem; }
+		.section-index { margin: 0 0 0.4rem; color: var(--brand-dark); font-size: 0.74rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
+		.section h2 { margin: 0; font-size: clamp(1.9rem, 4vw, 3.3rem); line-height: 1.2; letter-spacing: -0.045em; }
+		.lead { margin: 0.8rem 0 0; color: var(--muted); font-size: clamp(1rem, 2vw, 1.18rem); }
+		.emphasis { color: var(--brand-dark); }
+
+		.metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: -2.3rem; position: relative; z-index: 3; }
+		.metric {
+			padding: 1.15rem;
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			background: var(--card);
+			box-shadow: var(--shadow);
+		}
+		.metric strong { display: block; color: var(--brand-dark); font-size: 1.65rem; line-height: 1.2; }
+		.metric span { color: var(--muted); font-size: 0.82rem; }
+
+		.architecture {
+			padding: clamp(1.1rem, 3vw, 2rem);
+			border: 1px solid var(--line);
+			border-radius: 22px;
+			background: var(--card);
+			box-shadow: var(--shadow);
+		}
+		.arch-svg { display: block; width: 100%; height: auto; }
+		.arch-svg .node { stroke-width: 2; }
+		.arch-svg .node-main { fill: #ecfaf7; stroke: #55b7aa; }
+		.arch-svg .node-data { fill: #eef2ff; stroke: #8499e8; }
+		.arch-svg .node-user { fill: #fff3df; stroke: #d19a4a; }
+		.arch-svg .node-auth { fill: #f4edfd; stroke: #a486d2; }
+		.arch-svg .edge { fill: none; stroke: #607086; stroke-width: 2.2; marker-end: url(#arrow); }
+		.arch-svg .edge-related { fill: none; stroke: #8a72ae; stroke-width: 2; stroke-dasharray: 3 4; }
+		.arch-svg .edge-realtime { stroke: #08786e; stroke-dasharray: 7 5; marker-start: url(#arrow-realtime); marker-end: url(#arrow-realtime); }
+		.arch-svg .node-title { fill: #172236; font-size: 18px; font-weight: 800; text-anchor: middle; }
+		.arch-svg .node-sub { fill: #5d6a7f; font-size: 12px; text-anchor: middle; }
+		.arch-svg .edge-label { fill: #5d6a7f; font-size: 11px; font-weight: 700; text-anchor: middle; }
+		.mobile-architecture { display: none; gap: 0.65rem; }
+		.mobile-node { padding: 0.85rem; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); text-align: center; }
+		.mobile-arrow { color: var(--brand); font-size: 1rem; font-weight: 900; text-align: center; }
+		.mobile-data { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+		.mobile-branch { padding: 0.65rem; border-left: 3px solid var(--blue); background: var(--blue-soft); color: #263c78; font-size: 0.8rem; text-align: center; }
+		.mobile-live-route { padding: 0.85rem; border: 2px dashed var(--brand); border-radius: 12px; background: var(--brand-soft); color: var(--brand-dark); text-align: center; }
+		.mobile-live-route strong, .mobile-live-route span { display: block; }
+		.mobile-live-route span { margin-top: 0.2rem; font-size: 0.8rem; }
+
+		.legend-row { display: flex; flex-wrap: wrap; gap: 0.55rem 1rem; margin-top: 1rem; color: var(--muted); font-size: 0.8rem; }
+		.legend { display: inline-flex; align-items: center; gap: 0.4rem; }
+		.legend::before { content: ""; width: 1.5rem; border-top: 2px solid #607086; }
+		.legend.realtime::before { border-top-color: var(--brand); border-top-style: dashed; }
+
+		.decision-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+		.decision {
+			position: relative;
+			overflow: hidden;
+			padding: 1.35rem;
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			background: var(--card);
+		}
+		.decision::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--brand); }
+		.decision:nth-child(2)::before { background: var(--blue); }
+		.decision:nth-child(3)::before { background: var(--orange); }
+		.decision:nth-child(4)::before { background: var(--purple); }
+		.decision-label { color: var(--muted); font-size: 0.72rem; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
+		.decision h3 { margin: 0.35rem 0 0.45rem; font-size: 1.15rem; line-height: 1.4; }
+		.decision p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+		.contract-flow {
+			display: grid;
+			grid-template-columns: 1fr 3rem 1.15fr 3rem 1fr;
+			align-items: stretch;
+			gap: 0.5rem;
+		}
+		.flow-box {
+			display: flex;
+			min-height: 150px;
+			flex-direction: column;
+			justify-content: center;
+			padding: 1.2rem;
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			background: var(--card);
+			text-align: center;
+		}
+		.flow-box.central { border: 2px solid var(--brand); background: var(--brand-soft); }
+		.flow-box strong { display: block; font-size: 1.02rem; }
+		.flow-box span { display: block; margin-top: 0.35rem; color: var(--muted); font-size: 0.82rem; }
+		.flow-arrow { display: grid; place-items: center; color: var(--brand); font-size: 1.8rem; font-weight: 900; }
+		.boundary {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.8rem;
+			margin-top: 1rem;
+		}
+		.boundary-card { padding: 1rem; border-radius: 14px; font-size: 0.88rem; }
+		.boundary-card.good { border: 1px solid #65b9ae; background: var(--brand-soft); }
+		.boundary-card.limit { border: 1px solid #d5a05a; background: var(--orange-soft); }
+		.boundary-card strong { display: block; margin-bottom: 0.25rem; }
+
+		.realtime-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.7fr); gap: 1rem; }
+		.sequence { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.55rem; }
+		.actor-note { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 4fr; gap: 0.55rem; margin-bottom: 0.1rem; }
+		.actor-note span { padding: 0.35rem 0.55rem; border-radius: 7px; background: var(--blue-soft); color: #263c78; font-size: 0.7rem; font-weight: 850; text-align: center; }
+		.actor-note span:last-child { background: var(--brand-soft); color: var(--brand-dark); }
+		.step {
+			position: relative;
+			min-height: 180px;
+			padding: 1rem 0.85rem;
+			border: 1px solid var(--line);
+			border-radius: 15px;
+			background: var(--card);
+		}
+		.step:not(:last-child)::after {
+			content: "→";
+			position: absolute;
+			z-index: 2;
+			top: 50%;
+			right: -0.72rem;
+			transform: translateY(-50%);
+			color: var(--brand);
+			font-size: 1.2rem;
+			font-weight: 900;
+		}
+		.step-no { display: block; color: var(--brand-dark); font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em; }
+		.step strong { display: block; margin: 0.45rem 0 0.35rem; font-size: 0.95rem; line-height: 1.35; }
+		.step p { margin: 0; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+		.source-of-truth {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 1.25rem;
+			border-radius: 18px;
+			background: linear-gradient(145deg, #0d2a3b, #086e66);
+			color: #fff;
+		}
+		.source-of-truth .label { color: #9ae5d9; font-size: 0.72rem; font-weight: 850; letter-spacing: 0.1em; }
+		.source-of-truth strong { margin: 0.45rem 0; font-size: 1.35rem; }
+		.source-of-truth p { margin: 0; color: #d6e8ec; font-size: 0.86rem; }
+		.mini-notes { display: grid; gap: 0.55rem; margin-top: 1rem; }
+		.mini-note { padding: 0.7rem 0.8rem; border: 1px solid rgb(255 255 255 / 20%); border-radius: 10px; font-size: 0.8rem; }
+		.cache-layers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1rem; }
+		.cache-layer { padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+		.cache-layer b { display: block; color: var(--brand-dark); font-size: 0.72rem; letter-spacing: 0.08em; }
+		.cache-layer strong { display: block; margin-top: 0.2rem; font-size: 1rem; }
+		.cache-layer span { display: block; color: var(--muted); font-size: 0.78rem; }
+
+		.incident {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+		.incident-card { position: relative; padding: 1.25rem; border-radius: 18px; border: 1px solid var(--line); background: var(--card); }
+		.incident-card:not(:last-child)::after { content: "→"; position: absolute; right: -0.8rem; top: 2.3rem; z-index: 2; color: var(--red); font-size: 1.3rem; font-weight: 900; }
+		.incident-card .icon { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 10px; background: var(--red-soft); color: var(--red); font-weight: 900; }
+		.incident-card strong { display: block; margin: 0.8rem 0 0.35rem; }
+		.incident-card p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+		.guard {
+			padding: 1.5rem;
+			border: 2px solid var(--brand);
+			border-radius: 20px;
+			background: var(--brand-soft);
+		}
+		.guard-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+		.guard-head h3 { margin: 0; font-size: 1.2rem; }
+		.verified-tag { flex: none; padding: 0.25rem 0.58rem; border: 1px solid var(--brand); border-radius: 999px; color: var(--brand-dark); font-size: 0.7rem; font-weight: 850; }
+		.guard-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+		.guard-step { padding: 0.8rem; border-radius: 12px; background: var(--card); font-size: 0.82rem; font-weight: 700; text-align: center; }
+		.guard-step b { display: block; margin-bottom: 0.15rem; color: var(--brand-dark); font-size: 0.7rem; }
+		.limit-line { margin: 0.9rem 0 0; color: var(--muted); font-size: 0.82rem; }
+
+		.cloud-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; }
+		.cloud-card { min-height: 190px; padding: 1.2rem; border: 1px solid var(--line); border-radius: 17px; background: var(--card); }
+		.cloud-code { display: inline-flex; padding: 0.22rem 0.48rem; border-radius: 7px; background: var(--blue-soft); color: var(--blue); font: 750 0.76rem/1.3 "SFMono-Regular", Consolas, monospace; }
+		.cloud-card h3 { margin: 0.75rem 0 0.35rem; font-size: 1.08rem; }
+		.cloud-card p { margin: 0; color: var(--muted); font-size: 0.84rem; }
+		.cloud-fact { margin-top: 1rem; padding: 1rem 1.15rem; border-left: 4px solid var(--blue); background: var(--blue-soft); color: #263c78; }
+		.cloud-fact strong { color: #1e3473; }
+
+		.ux-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 2rem; align-items: center; }
+		.phone {
+			position: relative;
+			width: 285px;
+			margin: auto;
+			padding: 13px;
+			border: 3px solid #263449;
+			border-radius: 36px;
+			background: #172236;
+			box-shadow: 0 24px 55px rgb(25 40 65 / 20%);
+		}
+		.phone-screen { overflow: hidden; min-height: 490px; border-radius: 25px; background: #f8fafb; color: #172236; }
+		.phone-top { padding: 0.8rem 1rem; border-bottom: 1px solid #dfe5ea; font-size: 0.8rem; font-weight: 850; }
+		.pull { margin: 0.7rem 0.8rem; padding: 0.55rem; border-radius: 9px; background: #dcf5f0; color: #075d56; font-size: 0.7rem; text-align: center; }
+		.phone-post { margin: 0.65rem 0.8rem; padding: 0.8rem; border: 1px solid #dce3e9; border-radius: 12px; background: #fff; }
+		.skeleton { height: 0.55rem; margin-top: 0.45rem; border-radius: 99px; background: #e5eaee; }
+		.skeleton.short { width: 62%; }
+		.like { display: inline-flex; gap: 0.35rem; margin-top: 0.7rem; padding: 0.25rem 0.55rem; border-radius: 999px; background: #ffebec; color: #a93d42; font-size: 0.7rem; font-weight: 800; }
+		.phone-nav { position: absolute; inset: auto 13px 13px; display: grid; grid-template-columns: repeat(3, 1fr); padding: 0.7rem; border-radius: 0 0 24px 24px; background: #fff; box-shadow: 0 -8px 20px rgb(20 35 50 / 8%); color: #6a7687; font-size: 0.66rem; text-align: center; }
+		.phone-nav strong { color: #08786e; }
+		.feedback-list { display: grid; gap: 0.8rem; }
+		.feedback { display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem; align-items: start; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 15px; background: var(--card); }
+		.feedback-key { color: var(--brand-dark); font-size: 0.74rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+		.feedback strong { display: block; margin-bottom: 0.2rem; }
+		.feedback p { margin: 0; color: var(--muted); font-size: 0.84rem; }
+
+		.interview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+		.interview-card { padding: 1.25rem; border: 1px solid var(--line); border-radius: 17px; background: var(--card); }
+		.interview-card h3 { margin: 0; font-size: 1.05rem; }
+		.slide-line { margin: 0.55rem 0; color: var(--brand-dark); font-size: 0.88rem; font-weight: 750; }
+		.speaking { margin: 0; color: var(--muted); font-size: 0.82rem; }
+
+		.qa { margin-top: 1.5rem; }
+		.qa > h3 { margin-bottom: 0.7rem; }
+		details { border-top: 1px solid var(--line); }
+		details:last-child { border-bottom: 1px solid var(--line); }
+		summary { padding: 0.9rem 0.2rem; cursor: pointer; color: var(--ink); font-weight: 750; }
+		details p, details ul { margin: 0 0 1rem; color: var(--muted); font-size: 0.86rem; }
+		details code { padding: 0.12em 0.32em; border-radius: 5px; background: var(--soft); color: var(--brand-dark); overflow-wrap: anywhere; }
+
+		.scope-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+		.scope-card { padding: 1.25rem; border-radius: 18px; }
+		.scope-card.confirmed { border: 1px solid #63b5aa; background: var(--brand-soft); }
+		.scope-card.limited { border: 1px solid #d09a56; background: var(--orange-soft); }
+		.scope-card h3 { margin: 0 0 0.6rem; font-size: 1.02rem; }
+		.scope-card ul { margin: 0; padding-left: 1.2rem; }
+		.scope-card li { margin: 0.35rem 0; font-size: 0.86rem; }
+
+		.evidence {
+			margin-top: 1.1rem;
+			border: 0;
+			border-radius: 12px;
+			background: var(--soft);
+		}
+		.evidence:last-child { border-bottom: 0; }
+		.evidence summary { padding: 0.75rem 0.9rem; color: var(--muted); font-size: 0.78rem; }
+		.evidence ul { padding: 0 1rem 0.8rem 2rem; }
+		.evidence a { overflow-wrap: anywhere; }
+
+		.footer { padding: 2.5rem 1rem 3.5rem; color: var(--muted); font-size: 0.8rem; text-align: center; }
+		.footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem 1rem; margin-bottom: 0.45rem; }
+		.footer a { font-weight: 700; }
+
+		@media (max-width: 960px) {
+			.hero-inner { grid-template-columns: 1fr; min-height: auto; }
+			.hero-summary { max-width: 680px; }
+			.metric-row { grid-template-columns: repeat(2, 1fr); margin-top: 1rem; }
+			.cloud-grid { grid-template-columns: repeat(2, 1fr); }
+			.realtime-layout { grid-template-columns: 1fr; }
+			.source-of-truth { min-height: 220px; }
+		}
+
+		@media (max-width: 900px) {
+			.arch-svg { display: none; }
+			.mobile-architecture { display: grid; }
+		}
+
+		@media (max-width: 760px) {
+			.nav a:not(.top-action) { display: none; }
+			.hero-inner { padding-top: 3.5rem; padding-bottom: 3.8rem; }
+			.decision-grid, .interview-grid, .scope-grid { grid-template-columns: 1fr; }
+			.contract-flow { grid-template-columns: 1fr; }
+			.flow-arrow { transform: rotate(90deg); min-height: 2.3rem; }
+			.sequence { grid-template-columns: 1fr; }
+			.actor-note { grid-template-columns: 1fr; }
+			.step { min-height: auto; }
+			.step:not(:last-child)::after { content: "↓"; top: auto; right: 50%; bottom: -1rem; transform: translateX(50%); }
+			.incident { grid-template-columns: 1fr; }
+			.incident-card:not(:last-child)::after { content: "↓"; top: auto; right: 50%; bottom: -1rem; transform: translateX(50%); }
+			.guard-flow { grid-template-columns: repeat(2, 1fr); }
+			.cache-layers { grid-template-columns: 1fr; }
+			.ux-layout { grid-template-columns: 1fr; }
+			.phone { order: 2; }
+		}
+
+		@media (max-width: 520px) {
+			body { font-size: 15px; }
+			.topbar-inner { padding-inline: 1rem; }
+			.hero-inner, main { padding-inline: 1rem; }
+			.hero h1 { font-size: 3rem; }
+			.metric-row, .cloud-grid, .guard-flow, .boundary, .mobile-data { grid-template-columns: 1fr; }
+			.metric { padding: 0.9rem 1rem; }
+			.feedback { grid-template-columns: 1fr; gap: 0.35rem; }
+			.phone { width: min(285px, 90vw); }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+		}
+
+		@media print {
+			@page { size: A4; margin: 13mm; }
+			body { background: #fff; font-size: 10pt; }
+			.topbar { display: none; }
+			.hero { background: #fff; color: var(--ink); border-bottom: 2px solid var(--ink); }
+			.hero::before { display: none; }
+			.hero-inner { display: block; min-height: auto; padding: 0 0 8mm; }
+			.hero-copy, .hero-summary span { color: var(--muted); }
+			.hero-summary { margin-top: 8mm; border-color: var(--line); background: #fff; box-shadow: none; }
+			.hero-summary-label { color: var(--ink); }
+			.hero-point { border-top-color: var(--line); }
+			.stack-chip { border-color: var(--line); color: var(--ink); }
+			main { max-width: none; padding: 0; }
+			.metric-row { margin-top: 7mm; }
+			.section { padding: 11mm 0; }
+			.architecture, .decision, .flow-box, .step, .cloud-card, .feedback, .interview-card, .source-of-truth, .incident-card, .guard, .phone, .scope-card { box-shadow: none; break-inside: avoid; }
+			.arch-svg { display: none; }
+			.mobile-architecture { display: grid; }
+			.source-of-truth { border: 1px solid var(--line); background: #fff; color: var(--ink); }
+			.source-of-truth .label, .source-of-truth p { color: var(--muted); }
+			.mini-note { border-color: var(--line); }
+			#interview { break-before: page; }
+			details { break-inside: avoid; }
+			details:not(.evidence) > * { display: block; }
+			.evidence { display: none; }
+			.footer { padding-bottom: 0; }
+		}
+	</style>
+</head>
+<body>
+	<a class="skip" href="#overview">本文へ移動</a>
+	<header class="topbar">
+		<div class="topbar-inner">
+			<a class="brand" href="#top">KOTOBAD / TECH</a>
+			<nav class="nav" aria-label="ページ内ナビゲーション">
+				<a href="#architecture">構成</a>
+				<a href="#type-safety">型安全</a>
+				<a href="#realtime">Realtime</a>
+				<a href="#cache">障害対策</a>
+				<a href="#ux">UX</a>
+				<a class="top-action" href="./kotobad-technical-presentation-research.md">詳細調査</a>
+			</nav>
+		</div>
+	</header>
+
+	<section class="hero" id="top">
+		<div class="hero-inner">
+			<div>
+				<p class="eyebrow">Engineering presentation</p>
+				<h1>コトバド</h1>
+				<p class="hero-copy"><strong>バドミントン特化のスレッド型掲示板。</strong><br>Cloudflare上でFrontend・API・DB・画像・リアルタイム通信を構成し、型安全性、整合性、障害対応、モバイルUXを設計しました。</p>
+				<div class="stack-chips" aria-label="主要技術">
+					<span class="stack-chip">Next.js 16 / React 19</span>
+					<span class="stack-chip">Hono / OpenAPI</span>
+					<span class="stack-chip">TypeScript</span>
+					<span class="stack-chip">Zod</span>
+					<span class="stack-chip">D1 / Drizzle ORM</span>
+					<span class="stack-chip">Better Auth</span>
+					<span class="stack-chip">R2</span>
+					<span class="stack-chip">Durable Objects / WebSocket</span>
+					<span class="stack-chip">OpenNext / Workers</span>
+					<span class="stack-chip">SWR</span>
+					<span class="stack-chip">Tailwind CSS</span>
+					<span class="stack-chip">PWA / Service Worker</span>
+				</div>
+			</div>
+			<div class="hero-summary" aria-label="技術的な要点">
+				<p class="hero-summary-label">3つの設計ポイント</p>
+				<div class="hero-point">
+					<span class="hero-no">01</span>
+					<div><strong>共有SchemaでAPI境界を検証</strong><span>主なBBS API / BFFでは、ZodでHTTPの入出力も検査します。</span></div>
+				</div>
+				<div class="hero-point">
+					<span class="hero-no">02</span>
+					<div><strong>通知と正本を分離</strong><span>WebSocketは変更通知だけ。表示データはD1から再取得します。</span></div>
+				</div>
+				<div class="hero-point">
+					<span class="hero-no">03</span>
+					<div><strong>障害をBuild guardへ変換</strong><span>R2の直前snapshotと照合し、欠落assetを専用build時に検出・復旧します。</span></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<main id="overview">
+		<div class="metric-row" aria-label="プロジェクト概要">
+			<div class="metric"><strong>2</strong><span>Frontend / Backend Workers</span></div>
+			<div class="metric"><strong>18</strong><span>OpenAPI登録済みBBS API</span></div>
+			<div class="metric"><strong>1</strong><span>Realtime event: post.created</span></div>
+			<div class="metric"><strong>12h</strong><span>トレンド再計算のCron間隔</span></div>
+		</div>
+
+		<section class="section" id="architecture">
+			<header class="section-head">
+				<p class="section-index">01 / Architecture</p>
+				<h2>BrowserとBackendの間に<br><span class="emphasis">Next.js BFF</span>を置く</h2>
+				<p class="lead">画面と同一originのRoute HandlerをBFFとし、通常のBBS APIへCookie（存在時）とOriginを転送してHMAC署名を付けます。Hono側でOriginとHMACを検証します。</p>
+			</header>
+
+			<figure class="architecture">
+				<svg class="arch-svg" viewBox="0 0 1080 480" role="img" aria-labelledby="architecture-title architecture-desc">
+					<title id="architecture-title">コトバドのシステム構成</title>
+					<desc id="architecture-desc">BrowserまたはPWAがNext.js Frontend Workerへ接続し、BFFを通してHono Backend Workerへアクセスします。BackendはD1、R2、Google OAuth、ThreadRoom Durable Objectを利用します。WebSocketはNext.js BFFを通らず、BrowserからHonoのWebSocket routeを経由してThreadRoomへ接続します。</desc>
+					<defs>
+						<marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#607086" /></marker>
+						<marker id="arrow-realtime" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 Z" fill="#08786e" /></marker>
+					</defs>
+					<path class="edge" d="M190 170 H260" />
+					<path class="edge" d="M500 170 H570" />
+					<path class="edge" d="M810 135 H875 V70 H900" />
+					<path class="edge" d="M810 160 H900" />
+					<path class="edge-related" d="M810 200 H875 V285 H900" />
+					<path class="edge-realtime edge" d="M105 115 V45 H535 V115 H570" />
+					<path class="edge-realtime edge" d="M690 245 V335 H855 V405 H900" />
+					<path class="edge" d="M380 245 V360" />
+					<text class="edge-label" x="225" y="155">HTML / API</text>
+					<text class="edge-label" x="535" y="273">BFF: Cookie・Origin転送 / HMAC署名</text>
+					<text class="edge-label" x="330" y="34">WebSocket</text>
+					<text class="edge-label" x="775" y="325">thread:{id}</text>
+					<text class="edge-label" x="410" y="310">OpenNext cache</text>
+
+					<rect class="node node-user" x="20" y="115" width="170" height="115" rx="18" />
+					<text class="node-title" x="105" y="160">User</text>
+					<text class="node-sub" x="105" y="184">Browser / Installed PWA</text>
+
+					<rect class="node node-main" x="260" y="95" width="240" height="150" rx="18" />
+					<text class="node-title" x="380" y="143">Next.js Worker</text>
+					<text class="node-sub" x="380" y="170">App Router / SSR / BFF</text>
+					<text class="node-sub" x="380" y="192">OpenNext / Workers Assets</text>
+
+					<rect class="node node-main" x="570" y="95" width="240" height="150" rx="18" />
+					<text class="node-title" x="690" y="143">Hono Worker</text>
+					<text class="node-sub" x="690" y="170">OpenAPI / Better Auth</text>
+					<text class="node-sub" x="690" y="192">Drizzle / Cron</text>
+
+					<rect class="node node-data" x="900" y="25" width="160" height="85" rx="16" />
+					<text class="node-title" x="980" y="61">D1</text>
+					<text class="node-sub" x="980" y="82">掲示板 + session</text>
+					<rect class="node node-data" x="900" y="130" width="160" height="85" rx="16" />
+					<text class="node-title" x="980" y="166">R2</text>
+					<text class="node-sub" x="980" y="187">画像Storage</text>
+					<rect class="node node-auth" x="900" y="240" width="160" height="85" rx="16" />
+					<text class="node-title" x="980" y="276">Google</text>
+					<text class="node-sub" x="980" y="297">OAuth</text>
+					<rect class="node node-main" x="900" y="365" width="160" height="85" rx="16" />
+					<text class="node-title" x="980" y="401">ThreadRoom</text>
+					<text class="node-sub" x="980" y="422">Durable Object</text>
+
+					<rect class="node node-data" x="260" y="360" width="240" height="90" rx="16" />
+					<text class="node-title" x="380" y="397">OpenNext Cache</text>
+					<text class="node-sub" x="380" y="420">R2 + D1 + DO Queue</text>
+				</svg>
+
+				<div class="mobile-architecture" aria-label="コトバドのシステム構成">
+					<div class="mobile-node"><strong>User</strong><br>Browser / PWA</div>
+					<div class="mobile-arrow">↓ HTML / same-origin API</div>
+					<div class="mobile-node"><strong>Next.js Worker</strong><br>App Router / SSR / BFF</div>
+					<div class="mobile-branch">↳ OpenNext Cache: R2 + D1 + DO Queue</div>
+					<div class="mobile-arrow">↓ BFF: Cookie・Origin転送 / HMAC署名</div>
+					<div class="mobile-node"><strong>Hono Worker</strong><br>OpenAPI / Better Auth / Drizzle</div>
+					<div class="mobile-data">
+						<div class="mobile-node"><strong>D1</strong><br>掲示板 + session</div>
+						<div class="mobile-node"><strong>R2</strong><br>画像</div>
+						<div class="mobile-node"><strong>Google</strong><br>OAuth</div>
+					</div>
+					<div class="mobile-live-route"><strong>Realtime side path</strong><span>User ↔ Hono WebSocket route ↔ ThreadRoom DO</span></div>
+				</div>
+				<div class="legend-row"><span class="legend">通常のHTTP経路</span><span class="legend realtime">WebSocket接続 / 新規投稿通知</span></div>
+			</figure>
+
+			<details class="evidence">
+				<summary>実装根拠</summary>
+				<ul>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/app/auth/api/%5B...betterAuthPath%5D/route.ts">Frontend認証BFF</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/src/routes/index.ts">Hono route構成</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/open-next.config.ts">OpenNext cache設定</a></li>
+				</ul>
+			</details>
+		</section>
+
+		<section class="section" id="decisions">
+			<header class="section-head">
+				<p class="section-index">02 / Design decisions</p>
+				<h2>技術の数ではなく、<br><span class="emphasis">責務の分け方</span>がポイント</h2>
+				<p class="lead">面接で軸にする4つの設計判断です。以降で実装と制約を図解します。</p>
+			</header>
+			<div class="decision-grid">
+				<article class="decision"><span class="decision-label">Type safety</span><h3>共有Zod schemaをAPI契約にする</h3><p>主なBBS API / BFFで同じ検証規則を使い、HTTP境界の不正データを実行時にも検出します。</p></article>
+				<article class="decision"><span class="decision-label">Consistency</span><h3>WebSocketを通知だけに使う</h3><p>リアルタイム性は確保しつつ、投稿データをWebSocket側へ二重管理しません。</p></article>
+				<article class="decision"><span class="decision-label">Operations</span><h3>障害知見をBuild処理へ組み込む</h3><p>immutable cacheを維持しながら、R2の直前snapshotに記録された参照assetの欠落を専用buildで検査します。</p></article>
+				<article class="decision"><span class="decision-label">User experience</span><h3>操作・待機・失敗へ反応を返す</h3><p>Bottom Navigation、pending、skeleton、optimistic updateを役割別に実装します。</p></article>
+			</div>
+		</section>
+
+		<section class="section" id="type-safety">
+			<header class="section-head">
+				<p class="section-index">03 / Type safety</p>
+				<h2>型定義を共有するだけでなく、<br><span class="emphasis">通信時にも検証</span>する</h2>
+				<p class="lead">Zod schemaを中心に、Honoのvalidation、OpenAPI、TypeScript型、Frontend BFFのparseを接続しています。</p>
+			</header>
+			<div class="contract-flow" aria-label="共有Zod schemaを中心としたAPI契約">
+				<div class="flow-box"><strong>Backend / Hono</strong><span><code>createRoute()</code><br><code>c.req.valid()</code><br>Response schema</span></div>
+				<div class="flow-arrow" aria-hidden="true">↔</div>
+				<div class="flow-box central"><strong>Shared Zod Schema</strong><span>Validation<br>OpenAPI<br><code>z.infer</code></span></div>
+				<div class="flow-arrow" aria-hidden="true">↔</div>
+				<div class="flow-box"><strong>Frontend / BFF</strong><span>Request parse<br>Response parse<br>Client向け型</span></div>
+			</div>
+			<div class="boundary">
+				<div class="boundary-card good"><strong>型安全性を高めている箇所</strong>主なRequest / Responseを共有schemaで検証し、handlerは<code>RouteHandler&lt;typeof route&gt;</code>でroute定義と結び付けます。</div>
+				<div class="boundary-card limit"><strong>説明を限定する箇所</strong>DB schemaからZodを自動生成せず、Hono RPC clientも未使用です。汎用<code>BffFetcher&lt;T&gt;</code>自体とWebSocket eventは、共有Zodによる一律検証ではありません。</div>
+			</div>
+			<details class="evidence">
+				<summary>実装根拠</summary>
+				<ul>
+					<li><a href="https://github.com/nematatu/kotobad/tree/main/packages/shared/src/schemas">共有Zod schema</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/src/routes/bbs/posts/methods/create.ts">Hono route / handlerの型付け</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/app/threads/api/posts/createPost/route.ts">Frontend BFFのparse</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/src/database.ts">Drizzleへのschema連携</a></li>
+				</ul>
+			</details>
+		</section>
+
+		<section class="section" id="realtime">
+			<header class="section-head">
+				<p class="section-index">04 / Realtime</p>
+				<h2>WebSocketは変更通知、<br><span class="emphasis">HTTPは正本取得</span></h2>
+				<p class="lead">即時性と整合性を両立するため、Socket payloadをそのまま投稿として表示しません。</p>
+			</header>
+			<div class="realtime-layout">
+				<div class="sequence" aria-label="新規投稿のリアルタイム反映フロー">
+					<div class="actor-note"><span>閲覧者が事前接続</span><span>別Userの投稿を契機に通知 → 再取得</span></div>
+					<div class="step"><span class="step-no">VIEWER</span><strong>Roomへ接続</strong><p><code>thread:{id}</code>単位でDurable ObjectへWebSocket接続。</p></div>
+					<div class="step"><span class="step-no">POSTER</span><strong>D1へ保存</strong><p>投稿APIが先にPostをD1へINSERTします。</p></div>
+					<div class="step"><span class="step-no">BACKGROUND</span><strong>変更を通知</strong><p>201応答を返し、<code>waitUntil()</code>で<code>post.created</code>をfan-out。</p></div>
+					<div class="step"><span class="step-no">VIEWER</span><strong>150msまとめる</strong><p>短時間の通知をdebounceし、再取得回数を抑えます。</p></div>
+					<div class="step"><span class="step-no">VIEWER</span><strong>HTTPで再取得</strong><p>SWRの<code>mutate()</code>から通常APIを呼びます。</p></div>
+				</div>
+				<aside class="source-of-truth">
+					<span class="label">SOURCE OF TRUTH</span>
+					<strong>D1</strong>
+					<p>Durable Objectは接続中socketをまとめますが、Post本文やevent履歴は保存しません。</p>
+					<div class="mini-notes"><div class="mini-note">再接続: 1 → 2 → 4 → 8 → 最大10秒</div><div class="mini-note">現行制約: Replay / Heartbeatなし</div></div>
+				</aside>
+			</div>
+			<details class="evidence">
+				<summary>実装根拠</summary>
+				<ul>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/src/realtime/thread-room.ts">ThreadRoom Durable Object</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/src/realtime/thread-event.ts">thread単位のrouting</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/app/threads/%5Bid%5D/hook/useThreadPostRealtime.ts">切断・再接続</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/app/threads/%5Bid%5D/components/ThreadPostsStream.tsx">通知後のSWR再取得</a></li>
+				</ul>
+			</details>
+		</section>
+
+		<section class="section" id="cache">
+			<header class="section-head">
+				<p class="section-index">05 / Incident → Guardrail</p>
+				<h2>実障害を、専用buildで<br><span class="emphasis">検出できる仕組み</span>へ</h2>
+				<p class="lead">長期cacheを捨てず、R2の直前snapshotに記録された参照assetの欠落を専用build wrapperで検査します。</p>
+			</header>
+			<div class="cache-layers" aria-label="キャッシュを用途別に分けた方針">
+				<div class="cache-layer"><b>LIVE DATA</b><strong>no-store</strong><span>Thread / Search / Profile</span></div>
+				<div class="cache-layer"><b>MASTER DATA</b><strong>300秒</strong><span>Tag一覧をrevalidate</span></div>
+				<div class="cache-layer"><b>STATIC / IMAGE</b><strong>1年 immutable</strong><span>Next static asset / R2画像</span></div>
+			</div>
+			<div class="incident" aria-label="静的asset 404障害の流れ">
+				<article class="incident-card"><span class="icon">1</span><strong>古いCSSが端末に残る</strong><p>iOS端末が1年immutableの旧CSSを保持していました。</p></article>
+				<article class="incident-card"><span class="icon">2</span><strong>参照先woff2が新buildで消える</strong><p>旧CSSから存在しないfont assetへの404が繰り返されました。</p></article>
+				<article class="incident-card"><span class="icon">3</span><strong>WorkerがCPU超過・hung</strong><p>404の連続がWorkers側の負荷へ波及したことがincidentに記録されています。</p></article>
+			</div>
+			<div class="guard">
+				<div class="guard-head"><h3>Build-time static asset guard</h3><span class="verified-tag">専用script実装済み</span></div>
+				<div class="guard-flow">
+					<div class="guard-step"><b>SCAN</b>CSS / JS内の参照を収集</div>
+					<div class="guard-step"><b>COMPARE</b>R2の直前snapshotと照合</div>
+					<div class="guard-step"><b>RECOVER</b>欠落assetをfallbackから復旧</div>
+					<div class="guard-step"><b>STOP / SAVE</b>未解決なら失敗、成功なら更新</div>
+				</div>
+				<p class="limit-line"><strong>保証範囲:</strong> 直前snapshotの参照が対象です。複数世代の旧参照を累積保全する仕組みではなく、全deployでの実行もリポジトリだけでは確認できません。</p>
+			</div>
+			<details class="evidence">
+				<summary>実装根拠とキャッシュ方針</summary>
+				<ul>
+					<li>Live data: Thread / Search / Profileは<code>no-store</code></li>
+					<li>Tag一覧: <code>force-cache</code> + 300秒revalidation</li>
+					<li>Static asset / R2画像: 1年<code>immutable</code></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/scripts/check-save-next-static-assets.ts">静的asset検証script</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/docs/incidents/2026-02-04-next-static-assets-404-incident.md">障害記録</a></li>
+				</ul>
+			</details>
+		</section>
+
+		<section class="section" id="cloudflare">
+			<header class="section-head">
+				<p class="section-index">06 / Cloudflare</p>
+				<h2>サービス名ではなく、<br><span class="emphasis">担当する責務</span>で整理する</h2>
+				<p class="lead">実行・SQL・object storage・接続管理を、Cloudflareのmanaged serviceへ分担しています。</p>
+			</header>
+			<div class="cloud-grid">
+				<article class="cloud-card"><span class="cloud-code">WORKERS</span><h3>Application実行</h3><p>Next.js / OpenNextのFrontendと、Hono APIのBackendを別Workerで実行します。</p></article>
+				<article class="cloud-card"><span class="cloud-code">D1</span><h3>構造化データ</h3><p>Thread、Post、通知、トレンドに加え、Better Authのuser / sessionも保存します。</p></article>
+				<article class="cloud-card"><span class="cloud-code">R2</span><h3>画像とCache</h3><p>投稿・プロフィール画像を保存します。別bucketはOpenNext incremental cacheに使います。</p></article>
+				<article class="cloud-card"><span class="cloud-code">DURABLE OBJECTS</span><h3>状態を集約</h3><p>ThreadRoomがWebSocketをthread単位に集約。別DOはOpenNextの再検証queueを担当します。</p></article>
+			</div>
+			<div class="cloud-fact"><strong>コードから言えること:</strong> 常時起動VM、Kubernetes、外部RDB serverの設定はありません。実際の料金・plan・「費用が選定理由だったか」は未確認です。</div>
+			<details class="evidence">
+				<summary>実装根拠</summary>
+				<ul>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/wrangler.jsonc">Frontend Wrangler設定</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/wrangler.jsonc">Backend Wrangler設定</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/backend/src/routes/bbs/media/methods/upload.ts">R2画像upload</a></li>
+				</ul>
+			</details>
+		</section>
+
+		<section class="section" id="ux">
+			<header class="section-head">
+				<p class="section-index">07 / Mobile UX</p>
+				<h2>操作した、待っている、失敗した。<br><span class="emphasis">各状態へ反応を返す</span></h2>
+				<p class="lead">スマートフォンで「押せたか分からない」「止まったように見える」を減らすための実装です。</p>
+			</header>
+			<div class="ux-layout">
+				<div class="phone" role="img" aria-label="コトバドのモバイルUIを表した模式図">
+					<div class="phone-screen">
+						<div class="phone-top">コトバド</div>
+						<div class="pull">↓ 下にスワイプで更新</div>
+						<div class="phone-post"><strong>試合について語るスレッド</strong><div class="skeleton"></div><div class="skeleton short"></div><span class="like">♥ 12</span></div>
+						<div class="phone-post"><strong>新しい投稿</strong><div class="skeleton"></div><div class="skeleton short"></div></div>
+						<div class="phone-nav"><strong>ホーム</strong><span>検索</span><span>通知</span></div>
+					</div>
+				</div>
+				<div class="feedback-list">
+					<article class="feedback"><span class="feedback-key">Tap</span><div><strong>押したことを即時に伝える</strong><p>Bottom Navigationのactive tabを先に反映し、Buttonにはscale feedbackを付けます。</p></div></article>
+					<article class="feedback"><span class="feedback-key">Wait</span><div><strong>待ち時間の理由を見せる</strong><p>Link pending、投稿送信中の操作無効化とaria-label、初回Post skeletonで処理中を示します。</p></div></article>
+					<article class="feedback"><span class="feedback-key">Respond</span><div><strong>結果をすぐ返し、失敗時は戻す</strong><p>Thread likeはcountとanimationをoptimisticに更新し、error時にrollbackします。</p></div></article>
+					<article class="feedback"><span class="feedback-key">Adapt</span><div><strong>端末と利用状況へ合わせる</strong><p>PWA standalone、safe area、pull-to-refresh、reduced motion、大量Post時のanimation抑制を実装します。</p></div></article>
+				</div>
+			</div>
+			<div class="cloud-fact"><strong>PWAの現在地:</strong> Manifest、standalone起動、productionでのService Worker登録はあります。Offline cache、Web Push、Background Syncは未実装です。</div>
+			<details class="evidence">
+				<summary>実装根拠</summary>
+				<ul>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/app/manifest.ts">PWA Manifest</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/components/feature/navigation/MobileBottomNav.tsx">Mobile Bottom Navigation</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/components/feature/navigation/PwaPullToRefresh.tsx">Pull-to-refresh</a></li>
+					<li><a href="https://github.com/nematatu/kotobad/blob/main/packages/frontend/src/app/threads/%5Bid%5D/components/likeButton.tsx">Optimistic like</a></li>
+				</ul>
+			</details>
+		</section>
+
+		<section class="section" id="interview">
+			<header class="section-head">
+				<p class="section-index">08 / Interview</p>
+				<h2>面接で伝える<span class="emphasis">4本柱</span></h2>
+				<p class="lead">スライドには一言、口頭では設計範囲とtrade-offまで説明します。</p>
+			</header>
+			<div class="interview-grid">
+				<article class="interview-card"><h3>共有SchemaでAPI境界を型安全に</h3><p class="slide-line">主なBBS APIでZodをValidation・OpenAPI・TypeScript型・Response検証へ再利用。</p><p class="speaking">Hono RPCやDB schema自動生成ではない点も説明し、型安全性の実際の範囲を明確にします。</p></article>
+				<article class="interview-card"><h3>WebSocketは通知、HTTPは正本</h3><p class="slide-line">Thread単位のDOが新規Postを通知し、SWRでD1から再取得。</p><p class="speaking">即時性を得つつ、WebSocketとDBの二重状態管理を避けた責務分離を説明します。</p></article>
+				<article class="interview-card"><h3>Cache障害をBuild guardへ</h3><p class="slide-line">immutable cacheを維持し、直前snapshotの欠落assetを検査・復旧。</p><p class="speaking">iOS上の旧CSS、woff2 404、Workers CPU超過から再発防止へつなげた過程を説明します。</p></article>
+				<article class="interview-card"><h3>Mobileで反応が返るUX</h3><p class="slide-line">Tap・待機・遷移・失敗の各状態へfeedbackを対応。</p><p class="speaking">見た目ではなく、操作認知と不安低減を目的として、rollbackやreduced motionまで説明します。</p></article>
+			</div>
+
+			<div class="qa">
+				<h3>聞かれやすい質問</h3>
+				<details><summary>なぜ通常APIだけでなくWebSocketを使ったのですか？</summary><p>他Userの新規投稿をpollingなしで通知するためです。投稿データ自体はSocketへ載せず、通知後に通常APIでD1の正本を取り直します。</p></details>
+				<details><summary>Durable Objectsは何を保存していますか？</summary><p>ApplicationのThreadRoomは永続データを保存しません。<code>thread:{threadId}</code>単位で接続中socketをまとめ、<code>post.created</code>をfan-outします。</p></details>
+				<details><summary>FrontendからDBまで完全に型安全ですか？</summary><p>いいえ。主なBBS API / BFFでは共有Zod schemaで境界を検証し、DrizzleはDB queryを型推論しますが、DBからZodの自動生成やHono RPC clientは使っていません。</p></details>
+				<details><summary>Cloudflareを選んだ理由は費用ですか？</summary><p>コードから確認できるのは、Workers、D1、R2、DOへ基盤を集約し、常時起動VMや外部RDB設定を持たないことです。本人の選定理由と実料金は未確認なので断定しません。</p></details>
+				<details><summary>WebSocket切断中のeventはどうなりますか？</summary><p>指数backoffで再接続しますが、event履歴、replay、再接続直後の明示的な全件refetchはありません。現行の保証は接続中の変更通知です。</p></details>
+				<details><summary>自動テストはありますか？</summary><p>現状、test runnerとtest suiteは確認できず、<code>.github/workflows</code>も存在しません。確認済みの自動検証はTypeScript typecheck、Next build、Biome、pre-commitのlint-stagedです。</p></details>
+			</div>
+		</section>
+
+		<section class="section" id="scope">
+			<header class="section-head">
+				<p class="section-index">Verified scope</p>
+				<h2>言えることと、<br><span class="emphasis">言わないこと</span></h2>
+				<p class="lead">この資料はリポジトリの実装・設定を根拠にしています。外部環境は確認済み範囲を越えて断定しません。</p>
+			</header>
+			<div class="scope-grid">
+				<div class="scope-card confirmed"><h3>確認済み</h3><ul><li>Frontend / Backend / Sharedのtypecheck成功</li><li>Frontend build成功</li><li>packageだけでなくimport・route・設定で実利用を確認</li><li>Better Auth / Google OAuth、DB schema、WebSocket、PWA、cache実装を確認</li></ul></div>
+				<div class="scope-card limited"><h3>未実装・未確認</h3><ul><li>Turnstileはserver-side validatorのみで、client widget / token生成は未実装。現行clientのままFrontendの<code>upload</code> / <code>createThread</code> / <code>createPost</code>、Backendの<code>auth</code> / <code>authSensitive</code>を有効化すると、token未送信requestが403になります</li><li>自動test runner / test suiteは確認できず、GitHub Actions workflowは存在しない</li><li>WebSocket replay / heartbeatは未実装</li><li>Production Dashboard設定、remote migration、cache hit率は未確認</li><li>Cloudflareの実料金と本人の選定理由は未確認</li></ul></div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="footer">
+		<div class="footer-links"><a href="./kotobad-technical-presentation-research.md">全調査結果・想定問答12件を読む</a><a href="https://github.com/nematatu/kotobad">GitHub Repository</a></div>
+		<div>調査基準日 2026-08-13 ／ 実装・設定を優先し、未確認事項は明記</div>
+	</footer>
+</body>
+</html>

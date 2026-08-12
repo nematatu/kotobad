@@ -1,4 +1,6 @@
 - [README](README.md)
+- <a href="./kotobad-technical-presentation.html" target="_blank" rel="noopener">技術プレゼンHTML版（図解）</a>
+- [技術プレゼン調査資料（LINEヤフー新卒面接向け）](kotobad-technical-presentation-research.md)
 
 - Incidents
   - [2026 01 03 Next Build Prerender](incidents/2026-01-03-next-build-prerender.md)

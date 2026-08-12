@@ -136,10 +136,16 @@
 
 - 2026-05-04時点では段階導入として、環境変数で明示したscopeのみTurnstileを検証します。
 - frontend BFFでは upload、createThread、createPost に `verifyTurnstileToken` を追加済みです。
-- backend better-authでは auth / authSensitive に `turnstileMiddleware` を追加済みです。
+- backend better-authでは auth / authSensitive を判定する `turnstileMiddleware` を追加済みです。
 - デフォルトでは `TURNSTILE_ENFORCE_SCOPES` が空なら検証しません。
-- 推奨初期値は `TURNSTILE_ENFORCE_SCOPES=authSensitive,upload,createThread,createPost` です。
-- tokenは `x-turnstile-token` header、または `cf-turnstile-response` / `turnstileToken` fieldで受け取ります。
+- 2026-08-13再確認時点では、Git管理対象外の`packages/frontend/.env.local`と`packages/backend/.dev.vars`の`TURNSTILE_ENFORCE_SCOPES`は、どちらも空です。デプロイ環境の設定値はリポジトリから確認できません。
+- client側には、認証、upload、createThread、createPostのいずれにもTurnstile widgetとtoken生成処理がありません。対応するscopeを有効化すると、現行UIからのtoken未送信requestは403になります。
+  - frontend BFFの`upload` / `createThread` / `createPost`では、各Route Handlerの`verifyTurnstileToken`が403を返します。
+  - backend better-authの`auth`では、現行clientがtokenを付与しない`get-session`とOAuth callbackが403になります。
+  - backend better-authの`authSensitive`では、token未送信の`sign-in/social`が403になります。
+  - `*`は、その環境の全scopeを有効化します。
+  - client側のtoken生成を実装するまでは、これらのscopeを有効化してはいけません。
+- backendの認証middlewareはtokenを`x-turnstile-token` headerから受け取ります。frontend BFF側の検証はheaderに加え、`cf-turnstile-response` / `turnstileToken` fieldも受け取ります。
 - CloudflareのSiteverify APIでサーバー側検証します。
   参照: <https://developers.cloudflare.com/turnstile/get-started/server-side-validation/>
 
