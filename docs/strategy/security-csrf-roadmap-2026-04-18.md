@@ -33,6 +33,8 @@
   参照: `packages/frontend/src/middleware.ts`
 - CSRFトークン発行Route Handlerを実装済み。
   参照: `packages/frontend/src/app/threads/api/csrf-token/route.ts`
+- CSRF cookieは`HttpOnly`、`Path=/`、`SameSite=Strict`、`Max-Age=3600`です。本番のみ`Secure`を付け、cookie名は`__Host-csrf_token`（開発時は`dev_csrf_token`）です。Domainは指定していません。
+  参照: `packages/frontend/src/app/threads/api/csrf-token/route.ts`
 - BFFの`bffFetcher`は、受信requestの`x-csrf-token`をBackend APIへ転送します。
   参照: `packages/frontend/src/lib/api/fetcher/bffFetcher.ts`
 - Backend `/bbs`では、`Origin/Referer`に加えて`X-CSRF-Token`とCSRF cookie（`__Host-csrf_token`または`dev_csrf_token`）を照合します。
@@ -60,7 +62,7 @@
 
 ### P2: 早めに実施
 1. `allowHeaders` への `X-CSRF-Token` 追加は実装済みです（2026-08-13）。
-2. Cookie属性の見直し（Path/Domain/Max-Age含む）
+2. CSRF cookieの`Path`、`Domain`、`Max-Age`、`SameSite`、`Secure`を明示設定済みです（2026-08-13）。
 3. `bffFetcher` / fetcher群の責務整理（送信ヘッダー・cookie付与ルールの統一）
 
 ### P3: 継続改善

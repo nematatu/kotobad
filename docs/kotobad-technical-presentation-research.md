@@ -169,6 +169,7 @@ flowchart LR
 - Next.js BFFはCookie、Origin、CSRF token、method、body、queryをBackendへ転送します。
 - 通常のBBS requestにはHMAC-SHA-256署名を追加します。
 - Hono BackendはHMAC、Origin、CSRF token、必要なsessionを検証します。
+- CSRF cookieは`HttpOnly`、`Path=/`、`SameSite=Strict`、`Max-Age=3600`です。本番のみ`Secure`を付け、Domainは指定しません（`packages/frontend/src/app/threads/api/csrf-token/route.ts`）。
 - BackendはDrizzle経由でD1を操作します。
 - Frontend BFFは多くのrequestとresponseを共有Zod schemaで検証します。
 - HMAC実装は`packages/frontend/src/lib/api/security/ensureInternalSecret.ts`です。
@@ -843,10 +844,11 @@ flowchart LR
 
 ## Rollout / Test Plan
 
-- API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にします。
-- `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一します。
-- `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認します。
+- API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にしました。
+- `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一しました。
+- `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認済みです。
 - `/bbs/*`のunsafe requestでBackendがCSRF cookie/headerを照合し、BFFが`x-csrf-token`を転送する実装と回帰テストを追加済みです。
+- CSRF cookieの`SameSite=Strict`、`HttpOnly`、`Path=/`、`Max-Age=3600`、本番`Secure`を明示しました。
 - DB migrationは変更しません。
 - `docs/_sidebar.md`から本資料へ遷移できることを確認します。
 - Mermaid code blockがMarkdownとして閉じていることを確認します。
