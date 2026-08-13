@@ -20,6 +20,23 @@ import {
 import { resolveViewerUserId } from "./viewer-session";
 
 const SortSchema = z.enum(["new", "old"]).default("new");
+const SEARCH_QUERY_MIN_LENGTH = 2;
+
+export const tokenizeThreadSearchQuery = (query: string): string[] =>
+	query
+		.trim()
+		.split(/\s+/)
+		.map((token) => token.replace(/["'`*]/g, ""))
+		.filter((token) => token.length > 0);
+
+const SearchQuerySchema = z
+	.string()
+	.trim()
+	.min(SEARCH_QUERY_MIN_LENGTH)
+	.refine((query) => tokenizeThreadSearchQuery(query).length > 0, {
+		message: "Search query must contain searchable characters",
+	});
+
 const TrendLimitSchema = z.coerce
 	.number()
 	.int()
@@ -144,7 +161,7 @@ export const searchThreadRoute = createRoute({
 	description: "検索",
 	request: {
 		query: z.object({
-			q: z.string().openapi({
+			q: SearchQuerySchema.openapi({
 				description: "検索キーワード",
 				example: "hono",
 			}),
@@ -169,7 +186,7 @@ export const searchThreadRoute = createRoute({
 			},
 		},
 		400: {
-			description: "クエリパラメータがありません",
+			description: "クエリパラメータが不正です",
 			content: {
 				"application/json": {
 					schema: SimpleErrorResponse,
@@ -418,19 +435,11 @@ export const searchThreadRouter: RouteHandler<
 		const viewerUserId = await resolveViewerUserId(c);
 
 		const { q, page, limit, sort } = c.req.valid("query");
-		const rawQuery = (q ?? "").trim();
 		const offset = (page - 1) * limit;
 
 		c.header("Cache-Control", "no-store");
 
-		if (!rawQuery || rawQuery.length < 2) {
-			return c.json({ error: "Query parameter 'q' is required" }, 400);
-		}
-
-		const tokens = rawQuery
-			.split(/\s+/)
-			.map((token) => token.replace(/["'`*]/g, ""))
-			.filter((token) => token.length > 0);
+		const tokens = tokenizeThreadSearchQuery(q);
 
 		if (tokens.length === 0) {
 			return c.json({ error: "Query parameter 'q' is required" }, 400);

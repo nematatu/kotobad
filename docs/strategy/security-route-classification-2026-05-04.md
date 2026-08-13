@@ -154,6 +154,7 @@
 - realtime WebSocketは未認証です。backend rate limitは追加済みですが、接続中WebSocket数の上限は未確認です。
 - `better-auth-handler.ts` は `origin` を毎回 `console.log` しています。
 - search系はbackend rate limitを追加済みです。`/bbs/threads/search`の`limit`はZodで1〜50に制限し、50は通過、51はhandler実行前に400となることを実Requestで確認済みです。
+- 検索語はtrim後2文字以上かつ、二重引用符、単一引用符、backtick、asteriskを除去した検索tokenが1件以上ある場合だけhandlerへ渡します。1文字、空白だけ、除去対象記号だけの入力がhandler実行前に400となることを実Requestで確認済みです。
 - `/bbs/threads/search`の検索語最大長と`page`最大値は未設定です。
 
 ## Acceptance Criteria
