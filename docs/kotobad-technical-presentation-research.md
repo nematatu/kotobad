@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件と、静的アセット検査CLIのローカル統合テスト2件が成功しました。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件と、静的アセット検査CLIのローカル統合テスト7件が成功しました。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -95,7 +95,7 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。静的アセット検査CLIは、一時ディレクトリ、偽Wrangler、ローカルHTTP serverを使い、欠落assetの復旧と復旧不能時の失敗停止を検証します。Frontend Applicationのtest runnerとE2Eは確認できません。
+- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。静的アセット検査CLIは、一時ディレクトリ、偽Wrangler、ローカルHTTP serverを使い、復旧、復旧不能時の停止、R2取得失敗、不正snapshot、初回baselineを検証します。Frontend Applicationのtest runnerとE2Eは確認できません。
 - `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
 
 ### 1.2 実装済みと誤認しないもの
@@ -500,13 +500,15 @@ Cache-Control: public, max-age=31536000, immutable
 - `.open-next/assets/_next/static`を再帰走査します。
 - CSSとJS内の`/_next/static/...`参照を収集します。
 - R2から前回snapshotを取得します。
-- 前回参照されたassetが今回のbuild結果にあるか確認します。
+- 前回snapshotと今回のCSS/JSが参照するassetが、今回のbuild結果にあるか確認します。
 - 欠落時はfallback originから復旧を試みます。
 - Fallback originは`ASSET_FALLBACK_ORIGIN`、`NEXT_PUBLIC_FRONTEND_URL`、`https://kotobad.com`の順です。
 - 復旧後に再検査します。
 - 未解決ならbuildを失敗させます。
 - 成功時は今回の参照一覧をR2へ保存します。
 - 必須環境変数は`R2_SNAPSHOT_BUCKET`と`R2_KEY`です。
+- 通常実行はR2取得失敗、snapshot不在、不正JSON、不正field、不正asset pathで停止し、snapshotを更新しません。
+- 初回baselineの作成だけは`ALLOW_MISSING_R2_SNAPSHOT=true`を明示します。このflagを通常buildへ常設する設計ではありません。
 - Snapshotは現行参照一覧であり、過去参照の累積一覧ではありません。
 - 検査成功時にR2 snapshotを更新するため、後続のdeployが失敗した場合でもsnapshotだけが先に更新されます。現行実装には、deploy成功後にsnapshotを確定するtransaction処理はありません。
 
@@ -515,6 +517,8 @@ Cache-Control: public, max-age=31536000, immutable
 - 末尾の`)`、`]`、`}`、`,`、`;`を除去します。
 - Directory参照を除外します。
 - 拡張子のある参照だけを対象にします。
+- URL queryをdisk pathとsnapshotから除外します。
+- `/_next/static/`外へ解決されるsnapshot pathを拒否します。
 - CSSとJSだけをscanします。
 
 ### 6.7 Scriptが必要になった理由
@@ -535,7 +539,7 @@ Cache-Control: public, max-age=31536000, immutable
 - Rootの`build:frontend:cf`もwrapperを呼びます。
 - 通常の`deploy:frontend`にはcheckerを明示的に連結していません。
 - Pre-commitには含まれません。
-- `.github/workflows/ci.yml`の`test`から、偽WranglerとローカルHTTP serverを使うstatic asset checkerの統合テストを実行します。実R2への接続とOpenNext build成果物の検査はCIで実行しません。
+- `.github/workflows/ci.yml`の`test`から、偽WranglerとローカルHTTP serverを使うstatic asset checkerの統合テスト7件を実行します。実R2への接続とOpenNext build成果物の検査はCIで実行しません。
 - Cloudflare Dashboard側のBuild commandは未確認です。
 - 全deployで必ず実行されるとは断定しません。
 

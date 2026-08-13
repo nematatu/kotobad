@@ -44,7 +44,8 @@
   - Compares against the R2 snapshot and fails if a referenced asset is missing.
   - Saves the updated snapshot to R2 on success.
 - Required env vars: `R2_SNAPSHOT_BUCKET`, `R2_KEY`.
-  - Optional: `WRANGLER_CONFIG`, `WRANGLER_BIN`, `ASSETS_DIR`, `SNAPSHOT_FILE`.
+- Optional: `WRANGLER_CONFIG`, `WRANGLER_BIN`, `ASSETS_DIR`, `SNAPSHOT_FILE`.
+- `ALLOW_MISSING_R2_SNAPSHOT=true` is only for explicitly creating the initial baseline. Do not set it for normal builds.
 
 ## Documentation Consistency (Required)
 - **You must check and fix doc/implementation mismatches after every change. This is mandatory.**

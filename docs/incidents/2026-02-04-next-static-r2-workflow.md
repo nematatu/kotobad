@@ -33,9 +33,13 @@ cf:build
 
 ## 注意
 - ローカルのスナップショットは一時ファイルに保存し、実行終了後に自動削除される（リポジトリに残らない）
-- 初回はR2キーが存在しなくても、**自動でベースラインを作成してアップロード**される
+- 通常実行ではR2取得失敗やsnapshot不在をエラーとして停止する
+- 初回baselineを作成するときだけ`ALLOW_MISSING_R2_SNAPSHOT=true`を明示する。このflagを通常buildへ常設しない
 - 参照範囲は **CSS + JS（標準）**
 - `url(/_next/static/...woff2)` のような参照に含まれる末尾 `)` などは、比較前に正規化して除去する
+- URL queryはdisk pathとsnapshotから除去する
+- 前回snapshotだけでなく、今回のCSS/JSが参照するassetも存在確認する
+- 壊れたJSON、不正なsnapshot field、`/_next/static/`外へ解決されるpathはエラーとして停止する
 - fallback origin は `ASSET_FALLBACK_ORIGIN` → `NEXT_PUBLIC_FRONTEND_URL` → `https://kotobad.com` の順で決定する
 - 後続deployが失敗してもR2 snapshotは元へ戻らない。deploy成功後だけsnapshotを確定するtransaction処理は未実装
 
@@ -44,6 +48,8 @@ cf:build
 - 一時assets、偽Wrangler、local HTTP serverを使い、scriptを別processとして実行する
 - 旧snapshotの欠落assetをHTTP 200で復旧し、更新snapshotをputする経路を確認する
 - HTTP 404で復旧できない場合に非0で終了し、snapshotをputしない経路を確認する
+- R2 get失敗、不正JSON、不正path、今回build自身の欠落参照でputせず停止する経路を確認する
+- `ALLOW_MISSING_R2_SNAPSHOT=true`を明示した初回だけbaselineをputする経路を確認する
 - 実Cloudflare認証、remote R2、production origin、deploy後の配信はこのtestの対象外
 
 ## 参照先
