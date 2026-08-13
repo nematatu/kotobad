@@ -11,6 +11,7 @@
 			"packages/**/src/**/*.tsx",
 			"packages/backend/drizzle.config.ts",
 			"scripts/check-save-next-static-assets.ts",
+			"scripts/deploy-frontend-production.ts",
 			"scripts/**/*.test.ts"
 		]
 	},

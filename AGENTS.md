@@ -42,9 +42,12 @@
 - Script: `scripts/check-save-next-static-assets.ts`
   - Scans `.open-next/assets/_next/static/**/*.css|js` for `/_next/static/...` refs.
   - Compares against the R2 snapshot and fails if a referenced asset is missing.
-  - Saves the updated snapshot to R2 on success.
+  - Default `check-and-save` mode saves the updated snapshot immediately after a successful check.
+- Production deploy: `scripts/deploy-frontend-production.ts`
+  - Runs OpenNext build → guard `prepare` → OpenNext production deploy → guard `commit`.
+  - `prepare` restores missing assets but does not update R2. `commit` updates R2 only after deploy succeeds.
 - Required env vars: `R2_SNAPSHOT_BUCKET`, `R2_KEY`.
-- Optional: `WRANGLER_CONFIG`, `WRANGLER_BIN`, `ASSETS_DIR`, `SNAPSHOT_FILE`.
+- Optional: `WRANGLER_CONFIG`, `WRANGLER_BIN`, `ASSETS_DIR`, `SNAPSHOT_FILE`, `CANDIDATE_SNAPSHOT_FILE`.
 - `ALLOW_MISSING_R2_SNAPSHOT=true` is only for explicitly creating the initial baseline. Do not set it for normal builds.
 
 ## Documentation Consistency (Required)
@@ -53,7 +56,9 @@
 - Do not introduce automated doc-check scripts (per user request). The check is required and must be done by the agent.
 
 ## Testing Guidelines
-- No test runner configured yet. If adding tests, document how to run them.
+- Bun test is configured. Run all repository tests with `bun run test`.
+- Static asset tests use temporary assets, fake Wrangler/OpenNext executables, and a local HTTP server. They do not access remote R2 or deploy to Cloudflare.
+- Document both verified behavior and external/runtime behavior that remains unverified.
 
 ## Commit & Pull Request Guidelines
 - Commit messages follow **Conventional Commits** (e.g., `feat:`, `fix:`).

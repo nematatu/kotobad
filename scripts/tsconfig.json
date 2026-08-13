@@ -15,6 +15,8 @@
 	},
 	"files": [
 		"check-save-next-static-assets.test.ts",
-		"check-save-next-static-assets.ts"
+		"check-save-next-static-assets.ts",
+		"deploy-frontend-production.test.ts",
+		"deploy-frontend-production.ts"
 	]
 }

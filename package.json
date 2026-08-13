@@ -34,7 +34,7 @@
 		"check": "biome check --write",
 		"typecheck": "bun --filter '*' typecheck && bun run typecheck:scripts",
 		"typecheck:scripts": "bunx tsc -p scripts/tsconfig.json",
-		"test": "bun --filter '@kotobad/backend' test && bun test scripts/check-save-next-static-assets.test.ts",
+		"test": "bun --filter '@kotobad/backend' test && bun test scripts/*.test.ts",
 		"maintenance:knip": "bunx knip --fix --allow-remove-files && bun update --recursive",
 		"maintenance:check": "bunx knip && bun audit --audit-level=high && bun run typecheck && bun run build:frontend",
 		"prepare": "husky",

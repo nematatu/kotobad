@@ -25,16 +25,22 @@
 
 ## 仕組み (スクリプト)
 - `scripts/check-save-next-static-assets.ts`
-  - 1回の実行で「R2から取得 → 比較 → 必要なら fallback origin から復旧 → ローカル更新 → R2保存」まで行う
+  - Productionでは`prepare`で「R2取得 → 比較 → fallback復旧 → local candidate作成」を行い、R2は更新しない
+  - Deploy成功後に`commit`でcandidateをR2へ保存する
+  - 引数なしは従来互換の`check-and-save`として、検査直後にR2へ保存する
   - `url(/_next/static/...woff2)` などの末尾 `)` は比較前に正規化する
   - 旧参照先が復旧できない場合のみ失敗
 
+- `scripts/deploy-frontend-production.ts`
+  - OpenNext build → guard prepare → production deploy → guard commitを順番に実行する
+  - 検査またはdeploy失敗時はsnapshotをcommitしない
+
 ### R2前提の運用
 ```
-# ビルド後（R2から取得して比較 → OKならR2保存）
+# Production deploy（build → 検査・復旧 → deploy → R2保存）
 R2_SNAPSHOT_BUCKET=kotobad-assets-snapshot R2_KEY=ops/next-static-assets-snapshot.json \
 WRANGLER_CONFIG=packages/frontend/wrangler.jsonc \
-bun scripts/check-save-next-static-assets.ts
+bun run deploy:frontend
 ```
 
 ## 注意
@@ -42,6 +48,8 @@ bun scripts/check-save-next-static-assets.ts
 - 通常実行ではR2取得失敗やsnapshot不在をエラーとして停止する
 - 初回baselineを作成するときだけ`ALLOW_MISSING_R2_SNAPSHOT=true`を明示する。このflagを通常buildへ常設しない
 - 壊れたJSONや不正なasset pathはbaselineとして上書きせず停止する
+- Deploy成功後のR2 put失敗ではcommandは非0になるが、完了済みdeployは自動rollbackしない
+- Preview deployとCloudflare Dashboard側の独自commandは、repositoryのproduction wrapperとは別経路
 
 ## 運用メモ
 - フォント/デザイン変更時は「旧static保持」が最重要

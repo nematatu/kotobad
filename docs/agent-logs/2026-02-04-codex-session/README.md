@@ -140,10 +140,12 @@
 - 追加:
   - `build:check-and-save-assets`: `bun run cf:build && bun ../../scripts/check-save-next-static-assets.ts`
 
+※ 上記は2026-02-04時点の作業記録です。2026-08-13現在はproduction `deploy`が`scripts/deploy-frontend-production.ts`を呼び、build → guard prepare → deploy → guard commitの順で実行します。`build:check-and-save-assets`は互換commandとして残っています。
+
 ### 6-4. CI / Cloudflare Build command
 - `bun run build:check-and-save-assets`
 
-※ 上記は2026-02-04時点の作業記録です。2026-08-13現在は、偽Wranglerとlocal HTTP serverを使うCLI統合testをrootの`bun run test`から実行します。実R2への接続はtest対象外です。
+※ 上記は2026-02-04時点の作業記録です。2026-08-13現在は、fake Wrangler / OpenNextとlocal HTTP serverを使うguard 7件・deploy wrapper 6件の統合testをrootの`bun run test`から実行します。実R2接続と実Cloudflare deployはtest対象外です。
 
 ---
 

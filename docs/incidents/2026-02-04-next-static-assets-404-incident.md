@@ -266,7 +266,7 @@ Worker exceeded CPU time limit.
   参照先アセットが消えていれば **ビルドを失敗させる**
 - **スナップショットは R2 に保存**し、毎回更新
 
-> 2026-08-13更新: 現行scriptはR2取得失敗と不正snapshotを初回扱いにせず停止します。初回baseline作成時のみ`ALLOW_MISSING_R2_SNAPSHOT=true`を明示します。以下のログは2026-02-04当時の記録です。
+> 2026-08-13更新: 現行scriptはR2取得失敗と不正snapshotを初回扱いにせず停止します。初回baseline作成時のみ`ALLOW_MISSING_R2_SNAPSHOT=true`を明示します。Production deployはbuild → guard prepare → deploy → guard commitの順で、deploy成功後にsnapshotを確定します。以下のログは2026-02-04当時の記録です。
 
 ## 実装（ワークフロー）
 1. **ビルド成果物の CSS/JS から参照を抽出**

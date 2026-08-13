@@ -11,10 +11,14 @@ const DEFAULT_SNAPSHOT = join(
 const DEFAULT_WRANGLER_CONFIG = "wrangler.jsonc";
 const DEFAULT_WRANGLER_BIN = "wrangler";
 const DEFAULT_ASSET_FALLBACK_ORIGIN = "https://kotobad.com";
+const DEFAULT_MODE = "check-and-save";
+const SUPPORTED_MODES = new Set([DEFAULT_MODE, "prepare", "commit"]);
 
 const assetsDir = process.env.ASSETS_DIR ?? DEFAULT_ASSETS_DIR;
 const snapshotFile = process.env.SNAPSHOT_FILE ?? DEFAULT_SNAPSHOT;
 const shouldCleanupSnapshot = !process.env.SNAPSHOT_FILE;
+const candidateSnapshotFile = process.env.CANDIDATE_SNAPSHOT_FILE;
+const mode = process.argv[2] ?? DEFAULT_MODE;
 
 const r2SnapshotBucket = process.env.R2_SNAPSHOT_BUCKET;
 const r2Key = process.env.R2_KEY;
@@ -140,9 +144,9 @@ const normalizeSnapshotRefs = (refs: string[]) =>
 		return pathname;
 	});
 
-const loadSnapshot = async (): Promise<Snapshot | null> => {
+const loadSnapshot = async (path = snapshotFile): Promise<Snapshot | null> => {
 	try {
-		const json = await readFile(snapshotFile, "utf8");
+		const json = await readFile(path, "utf8");
 		return parseSnapshot(JSON.parse(json));
 	} catch (error) {
 		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
@@ -152,14 +156,14 @@ const loadSnapshot = async (): Promise<Snapshot | null> => {
 	}
 };
 
-const saveSnapshot = async (refs: string[]) => {
+const saveSnapshot = async (refs: string[], path = snapshotFile) => {
 	const snapshot: Snapshot = {
 		createdAt: new Date().toISOString(),
 		assetsDir,
 		refs,
 	};
-	await Bun.write(snapshotFile, JSON.stringify(snapshot, null, 2));
-	console.log(`Saved snapshot: ${snapshotFile}`);
+	await Bun.write(path, JSON.stringify(snapshot, null, 2));
+	console.log(`Saved snapshot: ${path}`);
 };
 
 const cleanupSnapshot = async () => {
@@ -185,7 +189,6 @@ const exists = async (path: string) => {
 };
 
 const runWrangler = async (args: string[]) => {
-	await mkdir(dirname(snapshotFile), { recursive: true });
 	return new Promise<void>((resolve, reject) => {
 		const child = spawn(wranglerBin, args, {
 			stdio: "inherit",
@@ -215,6 +218,7 @@ const restoreMissingAsset = async (ref: string) => {
 
 const fetchSnapshotFromR2 = async () => {
 	try {
+		await mkdir(dirname(snapshotFile), { recursive: true });
 		await runWrangler([
 			"r2",
 			"object",
@@ -235,7 +239,7 @@ const fetchSnapshotFromR2 = async () => {
 	}
 };
 
-const saveSnapshotToR2 = async () => {
+const saveSnapshotToR2 = async (path = snapshotFile) => {
 	await runWrangler([
 		"r2",
 		"object",
@@ -243,7 +247,7 @@ const saveSnapshotToR2 = async () => {
 		`${r2SnapshotBucket}/${r2Key}`,
 		"--remote",
 		"--file",
-		snapshotFile,
+		path,
 		"--config",
 		wranglerConfig,
 	]);
@@ -251,6 +255,32 @@ const saveSnapshotToR2 = async () => {
 
 const main = async () => {
 	try {
+		if (!SUPPORTED_MODES.has(mode)) {
+			throw new Error(
+				`Unsupported mode: ${mode}. Expected ${Array.from(SUPPORTED_MODES).join(", ")}.`,
+			);
+		}
+
+		if (mode === "commit") {
+			if (!candidateSnapshotFile) {
+				throw new Error("CANDIDATE_SNAPSHOT_FILE is required in commit mode.");
+			}
+			const candidate = await loadSnapshot(candidateSnapshotFile);
+			if (!candidate) {
+				throw new Error(
+					`Candidate snapshot not found: ${candidateSnapshotFile}`,
+				);
+			}
+			normalizeSnapshotRefs(candidate.refs);
+			await saveSnapshotToR2(candidateSnapshotFile);
+			console.log(`Committed deploy snapshot: ${candidateSnapshotFile}`);
+			return;
+		}
+
+		if (mode === "prepare" && !candidateSnapshotFile) {
+			throw new Error("CANDIDATE_SNAPSHOT_FILE is required in prepare mode.");
+		}
+
 		const currentRefs = await collectRefs();
 
 		await fetchSnapshotFromR2();
@@ -267,7 +297,9 @@ const main = async () => {
 		}
 
 		const previousRefs = normalizeSnapshotRefs(snapshot?.refs ?? []);
-		const refsToCheck = Array.from(new Set([...previousRefs, ...currentRefs]));
+		const refsToCheck = Array.from(
+			new Set([...previousRefs, ...currentRefs]),
+		).sort();
 
 		const missing: string[] = [];
 		for (const ref of refsToCheck) {
@@ -303,6 +335,14 @@ const main = async () => {
 				);
 			}
 			throw new Error("Missing assets detected");
+		}
+
+		if (mode === "prepare" && candidateSnapshotFile) {
+			await saveSnapshot(currentRefs, candidateSnapshotFile);
+			console.log(
+				`Prepared deploy snapshot with ${refsToCheck.length} protected refs`,
+			);
+			return;
 		}
 
 		await saveSnapshot(currentRefs);
