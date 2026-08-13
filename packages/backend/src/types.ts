@@ -18,6 +18,8 @@ export type Bindings = {
 	TURNSTILE_SECRET_KEY?: string;
 	TURNSTILE_ENFORCE_SCOPES?: string;
 	TURNSTILE_ALLOWED_HOSTNAMES?: string;
+	API_DOCS_USERNAME?: string;
+	API_DOCS_PASSWORD?: string;
 };
 
 type BetterAuthUserTokenPayload = {
