@@ -15,7 +15,7 @@
 - 新規投稿通知にはWebSocketとDurable Objectsを使います。
 - FrontendとBackendは共有Zod schemaをAPI契約として利用します。
 - PWAはstandalone起動に対応しますが、offline cacheとWeb Pushは未実装です。
-- BackendにBunの初期回帰テストとGitHub Actions CIを追加しました。Frontendの自動テスト、統合テスト、E2Eは未実装です。
+- Backendの回帰テストに加え、静的アセット検査CLIのローカル統合テストをGitHub Actionsで実行します。Frontend Applicationの自動テストとE2Eは未実装です。
 
 ## Background
 
@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件が成功しました。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件と、静的アセット検査CLIのローカル統合テスト2件が成功しました。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -95,7 +95,7 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
+- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。静的アセット検査CLIは、一時ディレクトリ、偽Wrangler、ローカルHTTP serverを使い、欠落assetの復旧と復旧不能時の失敗停止を検証します。Frontend Applicationのtest runnerとE2Eは確認できません。
 - `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
 
 ### 1.2 実装済みと誤認しないもの
@@ -508,6 +508,7 @@ Cache-Control: public, max-age=31536000, immutable
 - 成功時は今回の参照一覧をR2へ保存します。
 - 必須環境変数は`R2_SNAPSHOT_BUCKET`と`R2_KEY`です。
 - Snapshotは現行参照一覧であり、過去参照の累積一覧ではありません。
+- 検査成功時にR2 snapshotを更新するため、後続のdeployが失敗した場合でもsnapshotだけが先に更新されます。現行実装には、deploy成功後にsnapshotを確定するtransaction処理はありません。
 
 ### 6.6 誤検知対策
 
@@ -534,7 +535,7 @@ Cache-Control: public, max-age=31536000, immutable
 - Rootの`build:frontend:cf`もwrapperを呼びます。
 - 通常の`deploy:frontend`にはcheckerを明示的に連結していません。
 - Pre-commitには含まれません。
-- `.github/workflows/ci.yml`でtypecheck、Biome、test、Backend build、Frontend buildを実行する設定です。ただしstatic asset checkerはこのCIに含めていません。
+- `.github/workflows/ci.yml`の`test`から、偽WranglerとローカルHTTP serverを使うstatic asset checkerの統合テストを実行します。実R2への接続とOpenNext build成果物の検査はCIで実行しません。
 - Cloudflare Dashboard側のBuild commandは未確認です。
 - 全deployで必ず実行されるとは断定しません。
 
@@ -797,7 +798,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはBun testでZodエラーフォーマットの回帰テストを実行します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
+- 回答案: BackendはBun testでZodエラーフォーマットを検証します。静的アセット検査CLIは、偽WranglerとローカルHTTP serverを使い、復旧成功と復旧不能時の停止を実プロセスで検証します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。実R2接続とFrontend ApplicationのE2Eは未確認です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -805,9 +806,10 @@ flowchart LR
 
 ## Risks
 
-- Frontendの統合テストとE2Eがないため、Backendの単体テストだけでは画面からAPIまでのRuntime regressionを検出できません。
+- 静的アセット検査CLIにはローカル統合テストがありますが、Frontend Applicationの統合テストとE2Eがないため、画面からAPIまでのRuntime regressionは検出できません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
 - Static asset checkerが全deployで必ず実行されるかは未確認です。
+- Static asset checkerは検査成功時にR2 snapshotを更新するため、後続deploy失敗時にsnapshotだけが先行します。
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
 - Module-level memoryのrate limitはGlobalに一貫した制限ではありません。

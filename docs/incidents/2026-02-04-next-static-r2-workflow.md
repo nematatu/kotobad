@@ -16,8 +16,9 @@
 2. **R2の前回スナップショットと比較**
    - 前回参照されていたアセットが欠けていれば、まず fallback origin から復旧を試みる
    - 復旧できない場合のみ **デプロイ中断**
-3. **デプロイ成功後に新スナップショットを保存**
-   - 次回の比較用にR2へ保存
+3. **検査成功時に新スナップショットを保存**
+   - 次回の比較用にR2へ保存する
+   - 現行scriptはdeploy処理を含まないため、後続deployの成功前にsnapshotが更新される
 
 ## 使うスクリプト
 - `scripts/check-save-next-static-assets.ts`
@@ -36,6 +37,14 @@ cf:build
 - 参照範囲は **CSS + JS（標準）**
 - `url(/_next/static/...woff2)` のような参照に含まれる末尾 `)` などは、比較前に正規化して除去する
 - fallback origin は `ASSET_FALLBACK_ORIGIN` → `NEXT_PUBLIC_FRONTEND_URL` → `https://kotobad.com` の順で決定する
+- 後続deployが失敗してもR2 snapshotは元へ戻らない。deploy成功後だけsnapshotを確定するtransaction処理は未実装
+
+## 自動テスト
+- `scripts/check-save-next-static-assets.test.ts`
+- 一時assets、偽Wrangler、local HTTP serverを使い、scriptを別processとして実行する
+- 旧snapshotの欠落assetをHTTP 200で復旧し、更新snapshotをputする経路を確認する
+- HTTP 404で復旧できない場合に非0で終了し、snapshotをputしない経路を確認する
+- 実Cloudflare認証、remote R2、production origin、deploy後の配信はこのtestの対象外
 
 ## 参照先
 - `docs/incidents/2026-02-04-next-static-cache-404.md`
