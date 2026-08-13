@@ -42,8 +42,9 @@
 - セキュリティ変更では、成功、入力欠落、不一致、許可外入力の拒否ケースを確認します。
 - BFFのheaderやcookie転送を変更した場合は、Backend向け`fetch`へ渡った値を確認します。
 - 複数Application境界に影響する場合は、ローカルHTTP統合テストを追加します。
+- 複数middlewareが同じstatusを返す拒否ケースでは、Application境界の受信数とresponse bodyを確認し、拒否した層を特定します。
 - rootの`bun run test`から、Backend、Frontend、HTTP統合テストをすべて実行します。
-- CIではruntime testとHTTP統合テストの後に、typecheck、Biome、Backend build、Frontend buildを実行します。
+- CIではruntime testとHTTP統合テストの後に、typecheck、Biome、Backend build、Frontend buildを実行します。Test stepは10分、Job全体は30分でtimeoutします。
 
 ## Current Coverage
 
@@ -55,8 +56,15 @@
 - `packages/backend/src/utils/formatZodValidationError.test.ts`
   - Zod errorのpathとfallbackを確認します。
 - `packages/backend/src/middleware/api-docs-auth.test.ts`
-  - API docs資格情報の解決を確認します。
-  - `/doc`と`/specification`への実Requestは未確認です。
+  - API docs資格情報の設定済み・未設定を確認します。
+  - Honoへ実Requestを渡し、未設定時の503、認証なし・不正資格情報の401、正しいBasic Authによる`/doc`、`/doc/*`、`/specification`の200を確認します。
+- `packages/backend/src/middleware/internal-auth.test.ts`
+  - HMAC header欠落、不正署名、許容時間外の過去・未来timestampを拒否することを確認します。
+  - 署名後のmethod、path、query改変を拒否し、`OPTIONS`と`/bbs/realtime/`の例外、正常通過を確認します。
+- `packages/backend/src/routes/index.test.ts`
+  - 実際の`mainRouter`へ実Requestを渡し、`/bbs/*`のmiddleware登録順を確認します。
+  - CSRF不正時はCSRF middlewareの403、CSRF正常かつHMAC欠落時はinternal auth middlewareの403、両方正常なら未定義routeの404へ到達することを確認します。
+  - D1やBetter Authを必要としない未定義routeに限定したテストです。
 
 ### Frontend runtime test
 
@@ -64,6 +72,7 @@
   - 本文tokenとcookie値の一致、64桁hex、ProductionとDevelopmentのcookie属性、`no-store`を確認します。
 - `packages/frontend/src/middleware.test.ts`
   - unsafe methodの一致token、header欠落、token不一致、safe methodを確認します。
+  - Productionでは`__Host-csrf_token`だけを受理し、Developmentでは`dev_csrf_token`だけを受理することを実`NextRequest`で確認します。
 - `packages/frontend/src/lib/api/fetcher/bffFetcher.client.test.ts`
   - token取得、unsafe requestへのheader付与、403後のtoken再取得と1回の再試行を確認します。
 - `packages/frontend/src/lib/api/fetcher/bffFetcher.test.ts`
@@ -76,8 +85,10 @@
   - 実際のNext.js開発serverとテスト用Hono serverをloopbackで起動します。
   - `CSRF token発行 -> Next middleware -> setThreadLike Route Handler -> BffFetcherRaw -> Backend CSRF middleware -> Backend internal auth middleware`をHTTPで通します。
   - 正常requestが200でBackend handlerへ到達することを確認します。
-  - CSRF header欠落がFrontendで403となり、Backend handlerへ到達しないことを確認します。
-  - 許可外OriginがBackendで403となり、Backend handlerへ到達しないことを確認します。
+  - CSRF header欠落がFrontendで`Invalid CSRF token.`の403となり、テスト用Backend serverへ到達しないことを受信数で確認します。
+  - 許可外Originのrequestがテスト用Backend serverへ到達し、Backend CSRF middlewareで`Forbidden origin.`の403となることを、受信数、response body、Backend handler未到達で確認します。
+  - テスト用Backend serverはOSが割り当てたportを使用し、Next.jsのbuild出力先と一時tsconfigは実行単位で分離します。通常の`packages/frontend/tsconfig.json`は実行前後の内容一致も検証します。
+  - HTTP requestと子process終了にtimeoutを設け、正常・異常のどちらでもFrontend、Backend、build出力のcleanupをすべて試行します。
   - テスト用Hono serverはD1、Better Auth、本番routerを使用しません。
 
 ## Unverified Scope

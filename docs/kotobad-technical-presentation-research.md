@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: Backend 22件（Zodエラーフォーマット2件、API docs認証8件、CSRF 12件）、Frontend 10件、Next.js開発serverからテスト用Hono serverまでのHTTP統合テスト（成功・Frontend拒否・Backend拒否の3シナリオ）が成功しました。API docs認証はHonoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: Backend 37件（Zodエラーフォーマット2件、API docs認証8件、CSRF 12件、internal auth 12件、実`mainRouter`のmiddleware登録順3件）、Frontend 11件、Next.js開発serverからテスト用Hono serverまでのHTTP統合テスト（成功・Frontend拒否・Backend拒否の3シナリオ）が成功しました。API docs認証はHonoへ実Requestを渡して503、401、200を確認しました。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -72,7 +72,7 @@
 
 | 分類 | 実利用を確認した技術 | 実装上の用途 | 根拠 |
 | --- | --- | --- | --- |
-| Frontend | Next.js 16.2.9、React 19.2.6、TypeScript 6 | App Router、Server Component、Client Component、Route Handler | `packages/frontend/package.json:41-43,63` |
+| Frontend | Next.js 16.2.9、React 19.2.6、TypeScript 6 | App Router、Server Component、Client Component、Route Handler | `packages/frontend/package.json:42-44,64` |
 | Frontend data | SWR、`swr/immutable` | 投稿、通知、リアクション候補、BWF live demo | `packages/frontend/src/app/threads/[id]/components/ThreadPostsStream.tsx:21-30` |
 | Frontend form | React Hook Form | 投稿、スレッド、プロフィール等のフォーム | `packages/frontend/src/app/threads/[id]/components/CreatePostForm.tsx:5-8` |
 | Backend / API | Hono 4、`@hono/zod-openapi`、Swagger UI | Worker API、middleware、OpenAPI | `packages/backend/package.json:20-27` |
@@ -83,20 +83,20 @@
 | Storage | Cloudflare R2 | 投稿、スレッド、プロフィール画像 | `packages/backend/src/routes/bbs/media/methods/upload.ts:169-177` |
 | Infrastructure | Cloudflare Workers、OpenNext、Workers Assets | FrontendとBackendの実行、static asset配信 | `packages/frontend/wrangler.jsonc`、`packages/backend/wrangler.jsonc` |
 | PWA | Manifest、Service Worker、Apple PWA metadata | standalone起動、icon、startup image | `packages/frontend/src/app/manifest.ts` |
-| Styling / UI | Tailwind CSS 4、Radix UI、CVA、Motion、Framer Motion、Lottie、Sonner | Responsive UI、dialog、animation、toast | `packages/frontend/package.json:23-52` |
+| Styling / UI | Tailwind CSS 4、Radix UI、CVA、Motion、Framer Motion、Lottie、Sonner | Responsive UI、dialog、animation、toast | `packages/frontend/package.json:21-52,63` |
 | Lint / Format | Biome | Format、lint、import整理 | `biome.json` |
-| Git hooks | Husky、lint-staged | Pre-commitでstaged TS/TSXにBiome | `.husky/pre-commit`、`package.json:43-47` |
-| 開発ツール | Bun workspaces、Wrangler、Drizzle Kit、Knip、Docsify、Scaffdog、mise | Dev、deploy、migration、文書生成 | `package.json:21-41` |
+| Git hooks | Husky、lint-staged | Pre-commitでstaged TS/TSXにBiome | `.husky/pre-commit`、`package.json:8-9,41,46-50` |
+| 開発ツール | Bun workspaces、Wrangler、Drizzle Kit、Knip、Docsify、Scaffdog、mise | Dev、deploy、migration、文書生成 | `package.json:21-44` |
 
 ### 1.1 実利用を確認できないもの
 
-- `@opentelemetry/api`は`packages/frontend/package.json:22`にあります。
+- `@opentelemetry/api`は`packages/frontend/package.json:23`にあります。
 - Repository内の直接importと独自計装設定は確認できません。
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはZodエラーフォーマット、API docs認証middleware、CSRF middlewareのruntime testがあります。FrontendにはCSRF Route Handler、middleware、Client/Server fetcherのruntime testがあります。さらにNext.js開発serverからテスト用Hono serverまでのHTTP統合テストがあります。実BrowserとCloudflare本番を含むE2Eは未実装です。
-- rootの`bun run test`はBackendとFrontendの両方を実行し、`.github/workflows/ci.yml`でも同じtest scriptを実行します。
+- BackendにはZodエラーフォーマット、API docs認証、CSRF、internal authのmiddleware runtime testがあります。実`mainRouter`へのRequestでCSRF、internal auth、未定義routeの順に到達することも確認します。FrontendにはCSRF Route Handler、middleware、Client/Server fetcherのruntime testがあります。さらにNext.js開発serverからテスト用Hono serverまでのHTTP統合テストがあります。実BrowserとCloudflare本番を含むE2Eは未実装です。
+- rootの`bun run test`はBackend、Frontend、HTTP統合テストを順に実行し、`.github/workflows/ci.yml`でも同じtest scriptを実行します。
 
 ### 1.2 実装済みと誤認しないもの
 
@@ -455,11 +455,11 @@ sequenceDiagram
 | Next fetch cache | Tag一覧だけ`force-cache` + `revalidate: 300` | `packages/frontend/src/app/threads/lib/getTags.ts:13-18` |
 | Thread data | 一覧、詳細、検索、Trendは`no-store` | `packages/frontend/src/app/threads/lib` |
 | Profile data | `no-store` | `packages/frontend/src/app/users/[id]/lib/getUserProfileById.ts` |
-| Server fetcher | Defaultは`cache: "no-cache"` | `packages/frontend/src/lib/api/fetcher/bffFetcher.ts:68-72` |
+| Server fetcher | Defaultは`cache: "no-cache"` | `packages/frontend/src/lib/api/fetcher/bffFetcher.ts:75-78` |
 | Backend Thread GET | `Cache-Control: no-store` | `packages/backend/src/routes/bbs/threads/methods/get.ts` |
 | Client cache | SWR | `packages/frontend/src/app/threads/[id]/components/ThreadPostsStream.tsx`、`packages/frontend/src/components/feature/header/component/notification/useNotifications.ts` |
 | OpenNext | R2 incremental cache、D1 tag cache、DO queue | `packages/frontend/open-next.config.ts` |
-| Static asset | 1年`immutable` | `packages/frontend/next.config.js:9-24` |
+| Static asset | 1年`immutable` | `packages/frontend/next.config.js:10-25` |
 | R2 image | 1年`immutable` | `packages/backend/src/routes/bbs/media/methods/upload.ts:169-174` |
 | Service Worker | Custom fetch cacheなし | `packages/frontend/public/sw.js` |
 | Workers Cache API | Application固有利用を確認できず | Repository-wide search |
@@ -493,7 +493,7 @@ Cache-Control: public, max-age=31536000, immutable
 ```
 
 - Productionの`/_next/static/*`へ設定します。
-- 設定は`packages/frontend/next.config.js:9-24`です。
+- 設定は`packages/frontend/next.config.js:10-25`です。
 - R2 imageもupload時に同じcache policyを設定します。
 
 ### 6.5 Static asset消失防止script
@@ -783,7 +783,7 @@ flowchart LR
 
 #### 7. 認証とAPI保護はどうしていますか
 
-- 回答案: Better AuthのD1-backed sessionとGoogle OAuthを使います。通常BBS APIにはHMAC、Frontend CSRF token、Backend Origin検証、scope別rate limitがあります。TurnstileはServer-side validatorのみ実装済みで、Client側のwidget / token生成は未実装のため、end-to-endで有効化できる状態ではありません。
+- 回答案: Better AuthのD1-backed sessionとGoogle OAuthを使います。通常BBS APIにはHMAC、FrontendとBackendのCSRF token検証、BackendのOrigin検証、scope別rate limitがあります。TurnstileはServer-side validatorのみ実装済みで、Client側のwidget / token生成は未実装のため、end-to-endで有効化できる状態ではありません。
 
 #### 8. ISRとcacheはどう使い分けますか
 
@@ -799,7 +799,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはZodエラーフォーマット、API docs認証middlewareの503・401・200、CSRF middlewareを、FrontendはCSRF発行Route、middleware、Client/Server fetcherをBun testで実行します。加えて実際のNext.js開発serverとテスト用Hono serverを起動し、CSRF発行からBFF、BackendのCSRF/HMAC middlewareまでをHTTPで検証します。GitHub Actionsではこれらのtest、TypeScript typecheck、Biome、両buildを実行します。実BrowserとCloudflare本番を含むE2Eは未実装です。
+- 回答案: BackendはZodエラーフォーマット、API docs認証middlewareの503・401・200、CSRF、internal authをBun testで確認します。さらに実`mainRouter`へRequestを送り、CSRF不正403、CSRF正常・HMAC欠落403、両方正常後の404で本番middleware登録順を固定します。FrontendはCSRF発行Route、middleware、Client/Server fetcherをBun testで実行します。加えて実際のNext.js開発serverとテスト用Hono serverを起動し、CSRF発行からBFF、BackendのCSRF/HMAC middlewareまでをHTTPで検証します。GitHub Actionsではこれらのtest、TypeScript typecheck、Biome、両buildを実行します。実BrowserとCloudflare本番を含むE2Eは未実装です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -807,7 +807,7 @@ flowchart LR
 
 ## Risks
 
-- Next.js開発serverからテスト用Hono serverまでのCSRF HTTP統合テストはありますが、実Browserのcookie制御、Production build、OpenNext、Cloudflare本番を含むE2Eはありません。
+- Next.js開発serverからテスト用Hono serverまでのCSRF HTTP統合テストはありますが、実Browserのcookie制御、Production buildを起動したHTTP経路、OpenNext、Cloudflare本番を含むE2Eはありません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
 - Backend CSRFはOrigin/Refererに加えてdouble-submit cookie（`__Host-csrf_token`または`dev_csrf_token`）と`x-csrf-token`を照合します。CSRF cookieとheaderの受け渡しはBFF経由に依存します。
 - Static asset checkerが全deployで必ず実行されるかは未確認です。

@@ -82,6 +82,7 @@
 | `/bbs/threads/trending` | `packages/backend/src/routes/bbs/threads/methods/get.ts` | GET | 公開GET | 任意session参照のみ | 必須 |
 | `/bbs/threads/create` | `packages/backend/src/routes/bbs/threads/methods/create.ts` | POST | unsafe method / 投稿・作成系 | 必須 | 必須 |
 | `/bbs/threads/likes/set` | `packages/backend/src/routes/bbs/threads/methods/likes.ts` | POST | unsafe method / リアクション系 | 必須 | 必須 |
+| `/bbs/labels` | `packages/backend/src/routes/bbs/tags/methods/get.ts` | GET | 公開GET / タグ一覧 | 不要 | 必須 |
 | `/bbs/users/update` | `packages/backend/src/routes/bbs/users/methods/update.ts` | PATCH | unsafe method / upload系 | 必須 | 必須 |
 | `/bbs/users/{id}` | `packages/backend/src/routes/bbs/users/methods/get.ts` | GET | 公開GET | 不要 | 必須 |
 | `/bbs/users/players` | `packages/backend/src/routes/bbs/users/methods/players.ts` | GET | 公開GET / search系 | 不要 | 必須 |

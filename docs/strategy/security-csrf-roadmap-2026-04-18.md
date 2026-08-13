@@ -50,9 +50,12 @@
 - `OPTIONS` と `/bbs/realtime/` はinternal auth検証の例外。
   参照: `packages/backend/src/middleware/internal-auth.ts`
 
-## 未実装・未確認（2026-08-13確認）
+## 自動テストの検証範囲と未確認事項（2026-08-13確認）
+
 ### 1. セキュリティ回帰テスト
 - Backend CSRF middlewareは、一致token、欠落、不一致、過長token、許可外Origin、Referer fallback、safe methodのruntime testを追加済みです。
+- Backend internal auth middlewareは、header欠落、不正署名、過去・未来timestamp、method・path・query改変、`OPTIONS`・realtime例外、正常通過のruntime testを追加済みです。
+- 実`mainRouter`へのRequestで、CSRF不正403、CSRF正常・HMAC欠落403、CSRF・HMAC正常後の404を確認し、`/bbs/*`のmiddleware登録順を固定しています。
 - CSRF token Route Handlerは、本文とcookieのtoken一致、ProductionとDevelopmentの属性をruntime testで確認済みです。
 - Frontend middleware、Browser側fetcherのtoken付与と403再試行、Server側BFFのCookie・Origin・CSRF・HMAC header転送をruntime testで確認済みです。
 - `scripts/test-csrf-request-chain.ts`で、Next.js開発serverからテスト用Hono serverまでの実HTTP経路を確認済みです。
@@ -72,7 +75,7 @@
 ### P3: 継続改善
 1. XSS対策の強化（出力エスケープ、CSP、危険なHTML挿入点の監査）
 2. 監査ログ/アラート整備（403増加、異常Origin、失敗トークン）
-3. BrowserからBackendまでを通すCSRF E2Eシナリオの自動化
+3. 実Browserでcookie制約を確認し、Cloudflare本番Backendまで通すCSRF E2Eシナリオの自動化
 
 ## 補足メモ
 - `application/json` 制限は補助策であり、単独ではCSRF対策にならない。
