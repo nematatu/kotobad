@@ -15,7 +15,7 @@
 - 新規投稿通知にはWebSocketとDurable Objectsを使います。
 - FrontendとBackendは共有Zod schemaをAPI契約として利用します。
 - PWAはstandalone起動に対応しますが、offline cacheとWeb Pushは未実装です。
-- Backendの回帰テストに加え、静的アセット検査CLIのローカル統合テストをGitHub Actionsで実行します。Frontend Applicationの自動テストとE2Eは未実装です。
+- Backendの回帰テストに加え、静的アセット検査CLIとproduction deploy wrapperのローカル統合テストをGitHub Actionsで実行します。Frontend Applicationの自動テストとE2Eは未実装です。
 
 ## Background
 
@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件と、静的アセット検査CLIのローカル統合テスト7件が成功しました。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件、静的アセット検査CLIのローカル統合テスト7件、production deploy wrapperのローカル統合テスト6件が成功しました。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -95,7 +95,7 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。静的アセット検査CLIは、一時ディレクトリ、偽Wrangler、ローカルHTTP serverを使い、復旧、復旧不能時の停止、R2取得失敗、不正snapshot、初回baselineを検証します。Frontend Applicationのtest runnerとE2Eは確認できません。
+- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。静的アセット検査CLIとproduction deploy wrapperは、一時directory、fake Wrangler / OpenNext、local HTTP serverを使い、復旧、失敗停止、deploy後のsnapshot確定、signal処理を検証します。Frontend Applicationのtest runnerとE2Eは確認できません。
 - `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
 
 ### 1.2 実装済みと誤認しないもの
@@ -505,12 +505,15 @@ Cache-Control: public, max-age=31536000, immutable
 - Fallback originは`ASSET_FALLBACK_ORIGIN`、`NEXT_PUBLIC_FRONTEND_URL`、`https://kotobad.com`の順です。
 - 復旧後に再検査します。
 - 未解決ならbuildを失敗させます。
-- 成功時は今回の参照一覧をR2へ保存します。
+- Productionの`prepare` modeは成功時に今回の参照一覧をlocal candidateへ保存し、R2は更新しません。
+- Production deploy成功後の`commit` modeがcandidateを再検証してR2へ保存します。
+- 引数なしの`check-and-save` modeは従来互換として、検査成功直後にR2へ保存します。
 - 必須環境変数は`R2_SNAPSHOT_BUCKET`と`R2_KEY`です。
 - 通常実行はR2取得失敗、snapshot不在、不正JSON、不正field、不正asset pathで停止し、snapshotを更新しません。
 - 初回baselineの作成だけは`ALLOW_MISSING_R2_SNAPSHOT=true`を明示します。このflagを通常buildへ常設する設計ではありません。
 - Snapshotは現行参照一覧であり、過去参照の累積一覧ではありません。
-- 検査成功時にR2 snapshotを更新するため、後続のdeployが失敗した場合でもsnapshotだけが先に更新されます。現行実装には、deploy成功後にsnapshotを確定するtransaction処理はありません。
+- Production wrapperはOpenNext build → guard prepare → OpenNext deploy → guard commitの順で、deploy失敗時はR2 snapshotを更新しません。
+- Deploy成功後のR2 put失敗は非0で通知しますが、完了済みCloudflare deployを自動rollbackしません。
 
 ### 6.6 誤検知対策
 
@@ -537,11 +540,15 @@ Cache-Control: public, max-age=31536000, immutable
 
 - Frontendの`build:check-and-save-assets`では実行されます。
 - Rootの`build:frontend:cf`もwrapperを呼びます。
-- 通常の`deploy:frontend`にはcheckerを明示的に連結していません。
+- `packages/frontend`のproduction `deploy`は`scripts/deploy-frontend-production.ts`を呼び、build、prepare、deploy、commitを順番に実行します。
+- Rootの`deploy:frontend`もFrontendのproduction `deploy`を呼びます。
+- `build:check-and-save-assets`は従来互換の即時保存commandであり、production deploy wrapperからは使用しません。
+- `deploy:frontend:preview`はstatic asset snapshotを更新しません。
 - Pre-commitには含まれません。
-- `.github/workflows/ci.yml`の`test`から、偽WranglerとローカルHTTP serverを使うstatic asset checkerの統合テスト7件を実行します。実R2への接続とOpenNext build成果物の検査はCIで実行しません。
+- `.github/workflows/ci.yml`の`test`から、fake Wrangler / OpenNextとlocal HTTP serverを使う統合テスト13件を実行します。実R2への接続と実Cloudflare deployはCIで実行しません。
 - Cloudflare Dashboard側のBuild commandは未確認です。
-- 全deployで必ず実行されるとは断定しません。
+- Repositoryのproduction scriptを経由しない外部deployでも必ず実行されるとは断定しません。
+- Repository内にproduction deployの排他制御はなく、並行deploy時のsnapshot競合は未解決です。
 
 ## 7. UX / UI
 
@@ -794,7 +801,7 @@ flowchart LR
 
 #### 9. Static assetの404問題をどう解決しましたか
 
-- 回答案: 前回CSSとJSが参照した`/_next/static/*`をR2 snapshotへ保存します。次Buildで存在確認し、欠落時はProduction originから復旧します。復旧不能ならBuildを失敗させます。全deployでwrapperが実行されるかは未確認です。
+- 回答案: 前回CSS/JSと今回buildが参照する`/_next/static/*`を検査し、欠落時はProduction originから復旧します。Productionでは復旧済み成果物をdeployし、成功後だけR2 snapshotを確定します。復旧不能またはdeploy失敗ならsnapshotを更新しません。実R2とCloudflare配信のE2Eは未確認です。
 
 #### 10. Optimistic UIはどこで使いますか
 
@@ -802,7 +809,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはBun testでZodエラーフォーマットを検証します。静的アセット検査CLIは、偽WranglerとローカルHTTP serverを使い、復旧成功と復旧不能時の停止を実プロセスで検証します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。実R2接続とFrontend ApplicationのE2Eは未確認です。
+- 回答案: BackendはBun testでZodエラーフォーマットを検証します。静的アセット関連はfake Wrangler / OpenNextとlocal HTTP serverを使い、guard 7件とdeploy wrapper 6件を実processで検証します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。実R2接続、実Cloudflare deploy、Frontend ApplicationのE2Eは未確認です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -812,8 +819,9 @@ flowchart LR
 
 - 静的アセット検査CLIにはローカル統合テストがありますが、Frontend Applicationの統合テストとE2Eがないため、画面からAPIまでのRuntime regressionは検出できません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
-- Static asset checkerが全deployで必ず実行されるかは未確認です。
-- Static asset checkerは検査成功時にR2 snapshotを更新するため、後続deploy失敗時にsnapshotだけが先行します。
+- Repository外のDashboard commandなど、production wrapperを経由しないdeployでstatic asset checkerが実行されるかは未確認です。
+- Deploy成功後のR2 snapshot commit失敗では、commandは非0になりますが完了済みdeployは自動rollbackされません。
+- 並行production deployを直列化する設定はrepository内で確認できません。
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
 - Module-level memoryのrate limitはGlobalに一貫した制限ではありません。
@@ -822,7 +830,7 @@ flowchart LR
 ## Open Questions
 
 - Cloudflare DashboardのProduction Build commandは未確認です。
-- Static asset checkerがProduction deployで必ず実行されるかは未確認です。
+- Cloudflare Dashboardなどrepository外のProduction deploy経路がwrapperを使用するかは未確認です。
 - ProductionのTurnstile scopeは未確認です。
 - Productionの`APP_ENV`がどの設定から注入されるかは未確認です。
 - Cloudflare Image Transformationsのaccount有効状態は未確認です。
@@ -846,10 +854,8 @@ flowchart LR
 
 ## Rollout / Test Plan
 
-- 本変更は文書追加だけです。
-- Application codeとmigrationは変更しません。
-- `docs/_sidebar.md`から本資料へ遷移できることを確認します。
-- Mermaid code blockがMarkdownとして閉じていることを確認します。
-- Repository内の重要pathが現存することを確認します。
-- `git diff --check`でMarkdown diffを確認します。
+- Production deploy wrapperとstatic asset guardのmodeを変更します。Application routeとmigrationは変更しません。
+- `bun run test`でBackend 2件、guard 7件、deploy wrapper 6件を確認します。
+- `bun run typecheck`、Biome、Backend Wrangler dry-run、Frontend production buildを確認します。
+- `git diff --check`でcodeと文書のdiffを確認します。
 - Production deployは実施しません。

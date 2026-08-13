@@ -10,29 +10,44 @@
 - 旧キャッシュが参照するアセットが消えないようにする
 - デプロイ時に「消えてしまう参照」を事前に検知して止める
 
-## ワークフロー（概要）
-1. **ビルド後に成果物をスキャン**
-   - `/_next/static/**/*.css|js` を読み、参照アセット一覧を抽出
-2. **R2の前回スナップショットと比較**
-   - 前回参照されていたアセットが欠けていれば、まず fallback origin から復旧を試みる
-   - 復旧できない場合のみ **デプロイ中断**
-3. **検査成功時に新スナップショットを保存**
-   - 次回の比較用にR2へ保存する
-   - 現行scriptはdeploy処理を含まないため、後続deployの成功前にsnapshotが更新される
+## Production deployのワークフロー
+1. **OpenNext build**
+   - `.open-next/assets/_next/static`を生成する
+2. **Guard prepare**
+   - CSS/JSから今回の参照を抽出する
+   - R2の前回snapshotを取得・検証する
+   - 前回と今回の参照先を検査し、欠落assetをfallback originから復旧する
+   - 今回の参照一覧をlocalのcandidate snapshotへ保存する。この段階ではR2を更新しない
+3. **OpenNext production deploy**
+   - 復旧済みの同一OpenNext成果物をdeployする
+4. **Guard commit**
+   - deploy成功後にcandidate snapshotをR2へ保存する
+
+検査またはdeployが失敗した場合はcommitへ進まないため、未deployのsnapshotがR2へ先行することを防ぐ。
 
 ## 使うスクリプト
 - `scripts/check-save-next-static-assets.ts`
-  - 1回の実行で **比較 + R2保存** まで行う
+  - `prepare`: 検査・復旧・candidate作成。R2 putは行わない
+  - `commit`: candidateの再検証とR2 putだけを行う
+  - 引数なし: 従来互換の`check-and-save`として、検査成功直後にR2へ保存する
+- `scripts/deploy-frontend-production.ts`
+  - productionのbuild、prepare、deploy、commitを順番に実行する
+  - 成功・失敗・SIGINT・SIGTERMで一時directoryを削除する
 
-## 実際の流れ（ビルド後に実行）
+## Productionでの実行経路
 ```
 cf:build
-→ check+save（R2から取得して比較 → OKならR2保存）
-→ deploy（必要な場合のみ）
+→ prepare（R2取得 → 比較 → 復旧 → local candidate作成）
+→ deploy --env production
+→ commit（candidateをR2へ保存）
 ```
 
+`packages/frontend`の`deploy`とrootの`deploy:frontend`がこのwrapperを呼ぶ。preview deployは対象外。
+
+`build:check-and-save-assets`は互換維持のため残しており、OpenNext build後に引数なしの`check-and-save`を実行する。このcommandはproductionの二段階deployでは使用しない。
+
 ## 注意
-- ローカルのスナップショットは一時ファイルに保存し、実行終了後に自動削除される（リポジトリに残らない）
+- Production wrapperのsnapshotは一時directoryに保存し、正常終了・通常の失敗・SIGINT・SIGTERMで削除する
 - 通常実行ではR2取得失敗やsnapshot不在をエラーとして停止する
 - 初回baselineを作成するときだけ`ALLOW_MISSING_R2_SNAPSHOT=true`を明示する。このflagを通常buildへ常設しない
 - 参照範囲は **CSS + JS（標準）**
@@ -41,7 +56,9 @@ cf:build
 - 前回snapshotだけでなく、今回のCSS/JSが参照するassetも存在確認する
 - 壊れたJSON、不正なsnapshot field、`/_next/static/`外へ解決されるpathはエラーとして停止する
 - fallback origin は `ASSET_FALLBACK_ORIGIN` → `NEXT_PUBLIC_FRONTEND_URL` → `https://kotobad.com` の順で決定する
-- 後続deployが失敗してもR2 snapshotは元へ戻らない。deploy成功後だけsnapshotを確定するtransaction処理は未実装
+- deploy成功後のR2 putが失敗した場合、commandは非0で終了するが、完了したCloudflare deployは自動rollbackしない
+- repository内にproduction deployの排他制御はない。並行deploy時のsnapshot競合はこのwrapperだけでは防げない
+- SIGKILLやprocess自体の強制終了では、一時directoryのcleanupを保証できない
 
 ## 自動テスト
 - `scripts/check-save-next-static-assets.test.ts`
@@ -50,7 +67,13 @@ cf:build
 - HTTP 404で復旧できない場合に非0で終了し、snapshotをputしない経路を確認する
 - R2 get失敗、不正JSON、不正path、今回build自身の欠落参照でputせず停止する経路を確認する
 - `ALLOW_MISSING_R2_SNAPSHOT=true`を明示した初回だけbaselineをputする経路を確認する
-- 実Cloudflare認証、remote R2、production origin、deploy後の配信はこのtestの対象外
+- `scripts/deploy-frontend-production.test.ts`
+- fake OpenNext、fake Wrangler、local HTTP serverを使い、wrapperを別processとして実行する
+- 成功時のbuild → get/prepare → deploy → put/commit順序を確認する
+- build失敗、復旧失敗、deploy失敗では後続処理とR2 putを行わないことを確認する
+- deploy後のput失敗を非0で通知することを確認する
+- SIGTERMを子process groupへ転送し、commitせず一時directoryを削除することを確認する
+- 実Cloudflare認証、remote R2、production origin、実deploy後の配信は自動testの対象外
 
 ## 参照先
 - `docs/incidents/2026-02-04-next-static-cache-404.md`
