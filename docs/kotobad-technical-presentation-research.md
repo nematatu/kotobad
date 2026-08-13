@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件が成功しました。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: Backend 5件（Zodエラーフォーマット2件、検索query validation 3件）が成功しました。検索validationはOpenAPIHonoへ実Requestを渡し、最大50件の通過、51件のhandler到達前400、default 20件を確認します。DB query自体は未実行です。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -95,7 +95,7 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
+- BackendにはBun testによるZodエラーフォーマットと検索query validationのruntime testがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
 - `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
 
 ### 1.2 実装済みと誤認しないもの
@@ -243,6 +243,7 @@ flowchart LR
 - APIは`createRoute()`でmethod、path、request、responseを定義します。
 - Handlerは`RouteHandler<typeof route, AppEnvironment>`で型付けします。
 - Validation後のrequestは`c.req.valid("json")`または`c.req.valid("query")`で取得します。
+- Thread検索の`limit`は共有`PERPAGE`を最大値として1〜50へ制限します。OpenAPIHonoへ実Requestを渡すruntime testで、上限超過時にhandlerへ到達しないことを確認します。
 - 投稿作成の実例は`packages/backend/src/routes/bbs/posts/methods/create.ts:18-105`です。
 - Thread routeの登録は`packages/backend/src/routes/bbs/threads/index.ts:17-23`です。
 
@@ -797,7 +798,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはBun testでZodエラーフォーマットの回帰テストを実行します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
+- 回答案: BackendはZodエラーフォーマットに加え、検索routeへ実Requestを渡し、`limit=50`の通過、51のhandler到達前400、default 20を確認します。これはquery validationのruntime testであり、DB queryの統合テストではありません。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -811,6 +812,7 @@ flowchart LR
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
 - Module-level memoryのrate limitはGlobalに一貫した制限ではありません。
+- Thread検索の取得件数は最大50へ制限していますが、検索語最大長と`page`最大値は未設定です。
 - `worker-configuration.d.ts`と手書きBinding型に差があります。
 
 ## Open Questions
