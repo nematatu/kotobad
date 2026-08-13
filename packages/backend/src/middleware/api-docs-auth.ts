@@ -1,11 +1,15 @@
 import { basicAuth } from "hono/basic-auth";
 import { createMiddleware } from "hono/factory";
-import type { AppEnvironment, Bindings } from "../types";
+import type { Bindings } from "../types";
 
 type ApiDocsBindings = Pick<
 	Bindings,
 	"API_DOCS_USERNAME" | "API_DOCS_PASSWORD"
 >;
+
+type ApiDocsEnvironment = {
+	Bindings: ApiDocsBindings;
+};
 
 export type ApiDocsCredentials = {
 	username: string;
@@ -22,7 +26,7 @@ export const resolveApiDocsCredentials = (
 	return { username, password };
 };
 
-export const apiDocsAuthMiddleware = createMiddleware<AppEnvironment>(
+export const apiDocsAuthMiddleware = createMiddleware<ApiDocsEnvironment>(
 	async (c, next) => {
 		const credentials = resolveApiDocsCredentials(c.env);
 
