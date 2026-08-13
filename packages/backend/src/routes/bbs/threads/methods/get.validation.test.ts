@@ -69,4 +69,39 @@ describe("searchThreadRoute query validation", () => {
 		assert.equal(response.status, 200);
 		assert.equal(validatedQueries[0]?.limit, 20);
 	});
+
+	test("trims a valid query before the handler runs", async () => {
+		const validatedQueries: SearchQuery[] = [];
+		const app = createSearchValidationApp((query) => {
+			validatedQueries.push(query);
+		});
+
+		const response = await app.request(
+			"http://backend.test/search?q=%20test%20",
+		);
+
+		assert.equal(response.status, 200);
+		assert.equal(validatedQueries[0]?.q, "test");
+	});
+
+	for (const [caseName, query] of [
+		["one character", "a"],
+		["whitespace only", "  "],
+		["stripped symbols only", "**"],
+	] as const) {
+		test(`rejects ${caseName} before the handler runs`, async () => {
+			let handlerCallCount = 0;
+			const app = createSearchValidationApp(() => {
+				handlerCallCount += 1;
+			});
+
+			const params = new URLSearchParams({ q: query });
+			const response = await app.request(
+				`http://backend.test/search?${params.toString()}`,
+			);
+
+			assert.equal(response.status, 400);
+			assert.equal(handlerCallCount, 0);
+		});
+	}
 });
