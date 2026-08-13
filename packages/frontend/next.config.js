@@ -2,6 +2,7 @@ const {initOpenNextCloudflareForDev} = require("@opennextjs/cloudflare")
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   transpilePackages: ["@kotobad/shared"],
   experimental: {
     externalDir: true,
