@@ -141,6 +141,8 @@
 ### 6-4. CI / Cloudflare Build command
 - `bun run build:check-and-save-assets`
 
+※ 上記は2026-02-04時点の作業記録です。2026-08-13現在は、偽Wranglerとlocal HTTP serverを使うCLI統合testをrootの`bun run test`から実行します。実R2への接続はtest対象外です。
+
 ---
 
 ## 7. 検索機能まわり（AI向けメモ）
