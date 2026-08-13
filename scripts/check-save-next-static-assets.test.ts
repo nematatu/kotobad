@@ -55,8 +55,8 @@ const createGuardFixture = async (
 	const wranglerBin = join(temporaryDir, "fake-wrangler");
 
 	await Bun.write(
-		join(assetsDir, "chunks", "app.js"),
-		'const font = "/_next/static/media/current.woff2";',
+		join(assetsDir, "css", "app.css"),
+		"@font-face { src: url(/_next/static/media/current.woff2?v=1); }",
 	);
 	await Bun.write(join(assetsDir, "media", "current.woff2"), "current-font");
 	await Bun.write(
@@ -82,11 +82,14 @@ while [ "$#" -gt 0 ]; do
 done
 printf '%s\n' "$operation:$original_args" >> "$ASSET_GUARD_TEST_LOG"
 if [ "$operation" = "get" ]; then
-	cp "$ASSET_GUARD_TEST_R2_SOURCE" "$snapshot_file"
+	if [ "\${ASSET_GUARD_TEST_GET_EXIT:-0}" -ne 0 ]; then
+		exit "$ASSET_GUARD_TEST_GET_EXIT"
+	fi
+	cp "$ASSET_GUARD_TEST_R2_SOURCE" "$snapshot_file" || exit 74
 	exit 0
 fi
 if [ "$operation" = "put" ]; then
-	cp "$snapshot_file" "$ASSET_GUARD_TEST_R2_UPLOAD"
+	cp "$snapshot_file" "$ASSET_GUARD_TEST_R2_UPLOAD" || exit 74
 	exit 0
 fi
 exit 64
@@ -106,12 +109,24 @@ exit 64
 	};
 };
 
-const runGuard = async (fixture: GuardFixture) => {
+type RunGuardOptions = {
+	allowMissingSnapshot?: boolean;
+	getExitCode?: number;
+};
+
+const runGuard = async (
+	fixture: GuardFixture,
+	options: RunGuardOptions = {},
+) => {
 	const child = Bun.spawn([process.execPath, guardScript], {
 		env: {
 			...process.env,
+			ALLOW_MISSING_R2_SNAPSHOT: options.allowMissingSnapshot
+				? "true"
+				: "false",
 			ASSETS_DIR: fixture.assetsDir,
 			ASSET_FALLBACK_ORIGIN: fixture.fallbackOrigin,
+			ASSET_GUARD_TEST_GET_EXIT: String(options.getExitCode ?? 0),
 			ASSET_GUARD_TEST_LOG: fixture.commandLog,
 			ASSET_GUARD_TEST_R2_SOURCE: fixture.r2Source,
 			ASSET_GUARD_TEST_R2_UPLOAD: fixture.r2Upload,
@@ -170,6 +185,118 @@ describe("Next.js static asset guard", () => {
 	test("欠落assetを復旧できない場合はsnapshotを更新せず失敗する", async () => {
 		const server = await startFallbackServer(404, "Not Found");
 		const fixture = await createGuardFixture(server.origin);
+
+		try {
+			const result = await runGuard(fixture);
+
+			expect(result.exitCode).not.toBe(0);
+			expect(result.wranglerOperations).toEqual(["get"]);
+			expect(result.stderr).toContain("Missing assets detected");
+			expect(await Bun.file(fixture.r2Upload).exists()).toBe(false);
+		} finally {
+			await server.close();
+			await rm(fixture.temporaryDir, { force: true, recursive: true });
+		}
+	});
+
+	test("R2 snapshotの取得に失敗した場合はbaselineで上書きしない", async () => {
+		const server = await startFallbackServer(200, "unused");
+		const fixture = await createGuardFixture(server.origin);
+
+		try {
+			const result = await runGuard(fixture, { getExitCode: 42 });
+
+			expect(result.exitCode).not.toBe(0);
+			expect(result.wranglerOperations).toEqual(["get"]);
+			expect(result.stderr).toContain("wrangler failed");
+			expect(await Bun.file(fixture.r2Upload).exists()).toBe(false);
+		} finally {
+			await server.close();
+			await rm(fixture.temporaryDir, { force: true, recursive: true });
+		}
+	});
+
+	test("初回baseline作成を明示した場合だけsnapshot未取得を許可する", async () => {
+		const server = await startFallbackServer(200, "unused");
+		const fixture = await createGuardFixture(server.origin);
+
+		try {
+			const result = await runGuard(fixture, {
+				allowMissingSnapshot: true,
+				getExitCode: 42,
+			});
+			const uploadedSnapshot = JSON.parse(
+				await readFile(fixture.r2Upload, "utf8"),
+			) as { refs: string[] };
+
+			expect(result.exitCode).toBe(0);
+			expect(result.wranglerOperations).toEqual(["get", "put"]);
+			expect(uploadedSnapshot.refs).toEqual([
+				"/_next/static/media/current.woff2",
+			]);
+		} finally {
+			await server.close();
+			await rm(fixture.temporaryDir, { force: true, recursive: true });
+		}
+	});
+
+	test("壊れたR2 snapshotをbaselineとして上書きしない", async () => {
+		const server = await startFallbackServer(200, "unused");
+		const fixture = await createGuardFixture(server.origin);
+		await Bun.write(fixture.r2Source, "{invalid-json");
+
+		try {
+			const result = await runGuard(fixture);
+
+			expect(result.exitCode).not.toBe(0);
+			expect(result.wranglerOperations).toEqual(["get"]);
+			expect(await Bun.file(fixture.r2Upload).exists()).toBe(false);
+		} finally {
+			await server.close();
+			await rm(fixture.temporaryDir, { force: true, recursive: true });
+		}
+	});
+
+	test("snapshotの不正なasset pathを無視せず失敗する", async () => {
+		const server = await startFallbackServer(200, "unused");
+		const fixture = await createGuardFixture(server.origin);
+		await Bun.write(
+			fixture.r2Source,
+			JSON.stringify({
+				assetsDir: "previous-build",
+				createdAt: "2026-08-12T00:00:00.000Z",
+				refs: ["/_next/static/../../secret.js"],
+			}),
+		);
+
+		try {
+			const result = await runGuard(fixture);
+
+			expect(result.exitCode).not.toBe(0);
+			expect(result.wranglerOperations).toEqual(["get"]);
+			expect(result.stderr).toContain("Invalid snapshot asset reference");
+			expect(await Bun.file(fixture.r2Upload).exists()).toBe(false);
+		} finally {
+			await server.close();
+			await rm(fixture.temporaryDir, { force: true, recursive: true });
+		}
+	});
+
+	test("今回のCSSまたはJSが参照する欠落assetも検査する", async () => {
+		const server = await startFallbackServer(404, "Not Found");
+		const fixture = await createGuardFixture(server.origin);
+		await Bun.write(
+			join(fixture.assetsDir, "css", "app.css"),
+			"@font-face { src: url(/_next/static/media/missing-current.woff2); }",
+		);
+		await Bun.write(
+			fixture.r2Source,
+			JSON.stringify({
+				assetsDir: "previous-build",
+				createdAt: "2026-08-12T00:00:00.000Z",
+				refs: [],
+			}),
+		);
 
 		try {
 			const result = await runGuard(fixture);
