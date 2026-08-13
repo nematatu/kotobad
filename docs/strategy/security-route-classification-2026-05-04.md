@@ -1,4 +1,4 @@
-# kotobad セキュリティルート分類（2026-05-04）
+# kotobad セキュリティルート分類（2026-05-04、2026-08-13更新）
 
 ## Summary
 
@@ -24,7 +24,8 @@
 - BFF internal auth: `packages/frontend/src/lib/api/fetcher/bffFetcher.ts`
   - Backend API へ `x-internal-ts` と `x-internal-signature` を付与します。
 - backend CSRF Origin/Referer: `packages/backend/src/middleware/csrf-origin.ts`
-  - `/bbs/*` の unsafe method で `Origin` / `Referer` を検証します。
+  - `/bbs/*` の unsafe method で `Origin` / `Referer` とCSRF cookie/headerを検証します。
+  - CSRF headerは`packages/frontend/src/lib/api/fetcher/bffFetcher.ts`からBackendへ転送します。
 - backend internal auth: `packages/backend/src/middleware/internal-auth.ts`
   - `/bbs/*` にHMAC検証を適用します。
   - `OPTIONS` と `/bbs/realtime/` は例外です。
@@ -81,6 +82,7 @@
 | `/bbs/threads/trending` | `packages/backend/src/routes/bbs/threads/methods/get.ts` | GET | 公開GET | 任意session参照のみ | 必須 |
 | `/bbs/threads/create` | `packages/backend/src/routes/bbs/threads/methods/create.ts` | POST | unsafe method / 投稿・作成系 | 必須 | 必須 |
 | `/bbs/threads/likes/set` | `packages/backend/src/routes/bbs/threads/methods/likes.ts` | POST | unsafe method / リアクション系 | 必須 | 必須 |
+| `/bbs/labels` | `packages/backend/src/routes/bbs/tags/methods/get.ts` | GET | 公開GET / タグ一覧 | 不要 | 必須 |
 | `/bbs/users/update` | `packages/backend/src/routes/bbs/users/methods/update.ts` | PATCH | unsafe method / upload系 | 必須 | 必須 |
 | `/bbs/users/{id}` | `packages/backend/src/routes/bbs/users/methods/get.ts` | GET | 公開GET | 不要 | 必須 |
 | `/bbs/users/players` | `packages/backend/src/routes/bbs/users/methods/players.ts` | GET | 公開GET / search系 | 不要 | 必須 |

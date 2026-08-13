@@ -26,7 +26,8 @@ export async function BffFetcherRaw(
 	const mergeHeaders = toHeaders(headers);
 
 	if (!skipCookie) {
-		// Cookie と request 由来の origin は、認証付きリクエストでのみ付与する。
+		const requestHeaders = await nextHeaders();
+		// Cookie、Origin、CSRF tokenは、認証付きrequestのcontextから引き継ぐ。
 		const cookieStore = await cookies();
 		const cookieHeader = cookieStore.toString();
 		if (!mergeHeaders.has("cookie") && cookieHeader) {
@@ -34,7 +35,6 @@ export async function BffFetcherRaw(
 		}
 
 		if (!mergeHeaders.has("origin")) {
-			const requestHeaders = await nextHeaders();
 			const requestOrigin = requestHeaders.get("origin");
 
 			if (requestOrigin) {
@@ -51,6 +51,13 @@ export async function BffFetcherRaw(
 				if (host) {
 					mergeHeaders.set("origin", `${proto}://${host}`);
 				}
+			}
+		}
+
+		if (!mergeHeaders.has("x-csrf-token")) {
+			const csrfToken = requestHeaders.get("x-csrf-token");
+			if (csrfToken) {
+				mergeHeaders.set("x-csrf-token", csrfToken);
 			}
 		}
 	}

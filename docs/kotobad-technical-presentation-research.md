@@ -15,7 +15,7 @@
 - 新規投稿通知にはWebSocketとDurable Objectsを使います。
 - FrontendとBackendは共有Zod schemaをAPI契約として利用します。
 - PWAはstandalone起動に対応しますが、offline cacheとWeb Pushは未実装です。
-- BackendにBunの初期回帰テストとGitHub Actions CIを追加しました。Frontendの自動テスト、統合テスト、E2Eは未実装です。
+- BackendとFrontendにBunのruntime testを追加し、Next.js開発serverからテスト用Hono serverまでのCSRF HTTP統合テストもGitHub Actions CIの必須経路へ追加しました。実BrowserとCloudflare本番を含むE2Eは未実装です。
 
 ## Background
 
@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: Backend 10件（Zodエラーフォーマット2件、API docs認証8件）が成功しました。API docs認証は資格情報解決に加え、Honoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: Backend 37件（Zodエラーフォーマット2件、API docs認証8件、CSRF 12件、internal auth 12件、実`mainRouter`のmiddleware登録順3件）、Frontend 11件、Next.js開発serverからテスト用Hono serverまでのHTTP統合テスト（成功・Frontend拒否・Backend拒否の3シナリオ）が成功しました。API docs認証はHonoへ実Requestを渡して503、401、200を確認しました。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -72,7 +72,7 @@
 
 | 分類 | 実利用を確認した技術 | 実装上の用途 | 根拠 |
 | --- | --- | --- | --- |
-| Frontend | Next.js 16.2.9、React 19.2.6、TypeScript 6 | App Router、Server Component、Client Component、Route Handler | `packages/frontend/package.json:41-43,63` |
+| Frontend | Next.js 16.2.9、React 19.2.6、TypeScript 6 | App Router、Server Component、Client Component、Route Handler | `packages/frontend/package.json:42-44,64` |
 | Frontend data | SWR、`swr/immutable` | 投稿、通知、リアクション候補、BWF live demo | `packages/frontend/src/app/threads/[id]/components/ThreadPostsStream.tsx:21-30` |
 | Frontend form | React Hook Form | 投稿、スレッド、プロフィール等のフォーム | `packages/frontend/src/app/threads/[id]/components/CreatePostForm.tsx:5-8` |
 | Backend / API | Hono 4、`@hono/zod-openapi`、Swagger UI | Worker API、middleware、OpenAPI | `packages/backend/package.json:20-27` |
@@ -83,20 +83,20 @@
 | Storage | Cloudflare R2 | 投稿、スレッド、プロフィール画像 | `packages/backend/src/routes/bbs/media/methods/upload.ts:169-177` |
 | Infrastructure | Cloudflare Workers、OpenNext、Workers Assets | FrontendとBackendの実行、static asset配信 | `packages/frontend/wrangler.jsonc`、`packages/backend/wrangler.jsonc` |
 | PWA | Manifest、Service Worker、Apple PWA metadata | standalone起動、icon、startup image | `packages/frontend/src/app/manifest.ts` |
-| Styling / UI | Tailwind CSS 4、Radix UI、CVA、Motion、Framer Motion、Lottie、Sonner | Responsive UI、dialog、animation、toast | `packages/frontend/package.json:23-52` |
+| Styling / UI | Tailwind CSS 4、Radix UI、CVA、Motion、Framer Motion、Lottie、Sonner | Responsive UI、dialog、animation、toast | `packages/frontend/package.json:21-52,63` |
 | Lint / Format | Biome | Format、lint、import整理 | `biome.json` |
-| Git hooks | Husky、lint-staged | Pre-commitでstaged TS/TSXにBiome | `.husky/pre-commit`、`package.json:43-47` |
-| 開発ツール | Bun workspaces、Wrangler、Drizzle Kit、Knip、Docsify、Scaffdog、mise | Dev、deploy、migration、文書生成 | `package.json:21-41` |
+| Git hooks | Husky、lint-staged | Pre-commitでstaged TS/TSXにBiome | `.husky/pre-commit`、`package.json:8-9,41,46-50` |
+| 開発ツール | Bun workspaces、Wrangler、Drizzle Kit、Knip、Docsify、Scaffdog、mise | Dev、deploy、migration、文書生成 | `package.json:21-44` |
 
 ### 1.1 実利用を確認できないもの
 
-- `@opentelemetry/api`は`packages/frontend/package.json:22`にあります。
+- `@opentelemetry/api`は`packages/frontend/package.json:23`にあります。
 - Repository内の直接importと独自計装設定は確認できません。
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマットとAPI docs認証middlewareのruntime testがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
-- `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
+- BackendにはZodエラーフォーマット、API docs認証、CSRF、internal authのmiddleware runtime testがあります。実`mainRouter`へのRequestでCSRF、internal auth、未定義routeの順に到達することも確認します。FrontendにはCSRF Route Handler、middleware、Client/Server fetcherのruntime testがあります。さらにNext.js開発serverからテスト用Hono serverまでのHTTP統合テストがあります。実BrowserとCloudflare本番を含むE2Eは未実装です。
+- rootの`bun run test`はBackend、Frontend、HTTP統合テストを順に実行し、`.github/workflows/ci.yml`でも同じtest scriptを実行します。
 
 ### 1.2 実装済みと誤認しないもの
 
@@ -143,7 +143,7 @@ flowchart LR
 
     U -->|"HTML / navigation"| N
     U -->|"same-origin API"| BFF
-    BFF -->|"Cookie + Origin + HMAC"| H
+    BFF -->|"Cookie + Origin + CSRF + HMAC"| H
     N -->|"Server-side fetch + HMAC"| H
     N --> AS
 
@@ -166,9 +166,10 @@ flowchart LR
 ### 2.1 HTTP request flow
 
 - Browserは`/threads/api/*`または`/auth/api/*`を呼びます。
-- Next.js BFFはCookie、Origin、method、body、queryをBackendへ転送します。
+- Next.js BFFはCookie、Origin、CSRF token、method、body、queryをBackendへ転送します。
 - 通常のBBS requestにはHMAC-SHA-256署名を追加します。
-- Hono BackendはHMAC、Origin、必要なsessionを検証します。
+- Hono BackendはHMAC、Origin、CSRF token、必要なsessionを検証します。
+- CSRF cookieは`HttpOnly`、`Path=/`、`SameSite=Strict`、`Max-Age=3600`です。本番のみ`Secure`を付け、Domainは指定しません（`packages/frontend/src/app/threads/api/csrf-token/route.ts`）。
 - BackendはDrizzle経由でD1を操作します。
 - Frontend BFFは多くのrequestとresponseを共有Zod schemaで検証します。
 - HMAC実装は`packages/frontend/src/lib/api/security/ensureInternalSecret.ts`です。
@@ -454,11 +455,11 @@ sequenceDiagram
 | Next fetch cache | Tag一覧だけ`force-cache` + `revalidate: 300` | `packages/frontend/src/app/threads/lib/getTags.ts:13-18` |
 | Thread data | 一覧、詳細、検索、Trendは`no-store` | `packages/frontend/src/app/threads/lib` |
 | Profile data | `no-store` | `packages/frontend/src/app/users/[id]/lib/getUserProfileById.ts` |
-| Server fetcher | Defaultは`cache: "no-cache"` | `packages/frontend/src/lib/api/fetcher/bffFetcher.ts:68-72` |
+| Server fetcher | Defaultは`cache: "no-cache"` | `packages/frontend/src/lib/api/fetcher/bffFetcher.ts:75-78` |
 | Backend Thread GET | `Cache-Control: no-store` | `packages/backend/src/routes/bbs/threads/methods/get.ts` |
 | Client cache | SWR | `packages/frontend/src/app/threads/[id]/components/ThreadPostsStream.tsx`、`packages/frontend/src/components/feature/header/component/notification/useNotifications.ts` |
 | OpenNext | R2 incremental cache、D1 tag cache、DO queue | `packages/frontend/open-next.config.ts` |
-| Static asset | 1年`immutable` | `packages/frontend/next.config.js:9-24` |
+| Static asset | 1年`immutable` | `packages/frontend/next.config.js:10-25` |
 | R2 image | 1年`immutable` | `packages/backend/src/routes/bbs/media/methods/upload.ts:169-174` |
 | Service Worker | Custom fetch cacheなし | `packages/frontend/public/sw.js` |
 | Workers Cache API | Application固有利用を確認できず | Repository-wide search |
@@ -492,7 +493,7 @@ Cache-Control: public, max-age=31536000, immutable
 ```
 
 - Productionの`/_next/static/*`へ設定します。
-- 設定は`packages/frontend/next.config.js:9-24`です。
+- 設定は`packages/frontend/next.config.js:10-25`です。
 - R2 imageもupload時に同じcache policyを設定します。
 
 ### 6.5 Static asset消失防止script
@@ -782,7 +783,7 @@ flowchart LR
 
 #### 7. 認証とAPI保護はどうしていますか
 
-- 回答案: Better AuthのD1-backed sessionとGoogle OAuthを使います。通常BBS APIにはHMAC、Frontend CSRF token、Backend Origin検証、scope別rate limitがあります。TurnstileはServer-side validatorのみ実装済みで、Client側のwidget / token生成は未実装のため、end-to-endで有効化できる状態ではありません。
+- 回答案: Better AuthのD1-backed sessionとGoogle OAuthを使います。通常BBS APIにはHMAC、FrontendとBackendのCSRF token検証、BackendのOrigin検証、scope別rate limitがあります。TurnstileはServer-side validatorのみ実装済みで、Client側のwidget / token生成は未実装のため、end-to-endで有効化できる状態ではありません。
 
 #### 8. ISRとcacheはどう使い分けますか
 
@@ -798,7 +799,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはZodエラーフォーマットに加え、API docs認証middlewareへ実Requestを渡し、未設定503、認証なし・不正資格情報401、正しいBasic Auth 200をBun testで確認します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
+- 回答案: BackendはZodエラーフォーマット、API docs認証middlewareの503・401・200、CSRF、internal authをBun testで確認します。さらに実`mainRouter`へRequestを送り、CSRF不正403、CSRF正常・HMAC欠落403、両方正常後の404で本番middleware登録順を固定します。FrontendはCSRF発行Route、middleware、Client/Server fetcherをBun testで実行します。加えて実際のNext.js開発serverとテスト用Hono serverを起動し、CSRF発行からBFF、BackendのCSRF/HMAC middlewareまでをHTTPで検証します。GitHub Actionsではこれらのtest、TypeScript typecheck、Biome、両buildを実行します。実BrowserとCloudflare本番を含むE2Eは未実装です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -806,8 +807,9 @@ flowchart LR
 
 ## Risks
 
-- Frontendの統合テストとE2Eがないため、Backendの単体テストだけでは画面からAPIまでのRuntime regressionを検出できません。
+- Next.js開発serverからテスト用Hono serverまでのCSRF HTTP統合テストはありますが、実Browserのcookie制御、Production buildを起動したHTTP経路、OpenNext、Cloudflare本番を含むE2Eはありません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
+- Backend CSRFはOrigin/Refererに加えてdouble-submit cookie（`__Host-csrf_token`または`dev_csrf_token`）と`x-csrf-token`を照合します。CSRF cookieとheaderの受け渡しはBFF経由に依存します。
 - Static asset checkerが全deployで必ず実行されるかは未確認です。
 - `revalidateTag`に対応するtag付きfetchを確認できません。
 - WebSocketにはReplay、Heartbeat、Jitter、User向けerror表示がありません。
@@ -842,9 +844,12 @@ flowchart LR
 
 ## Rollout / Test Plan
 
-- API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にします。
-- `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一します。
-- `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認します。
+- API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にしました。
+- `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一しました。
+- `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認済みです。
+- `/bbs/*`のunsafe requestでBackendがCSRF cookie/headerを照合し、BFFがCookie、Origin、`x-csrf-token`、HMAC headerを転送する実装とruntime testを追加済みです。
+- CSRF cookieの`SameSite=Strict`、`HttpOnly`、`Path=/`、`Max-Age=3600`、本番`Secure`を明示し、本文tokenとの一致、ProductionとDevelopmentの属性をruntime testで検証しています。
+- `scripts/test-csrf-request-chain.ts`で、Next.js開発serverからテスト用Hono serverまでの成功、Frontend拒否、Backend拒否を実HTTPで検証しています。
 - DB migrationは変更しません。
 - `docs/_sidebar.md`から本資料へ遷移できることを確認します。
 - Mermaid code blockがMarkdownとして閉じていることを確認します。

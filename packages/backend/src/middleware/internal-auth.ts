@@ -3,6 +3,10 @@ import { signHmac } from "@kotobad/shared/src/utils/internalAuth/signHmac";
 import { createMiddleware } from "hono/factory";
 import type { AppEnvironment } from "../types";
 
+type InternalAuthEnvironment = {
+	Bindings: Pick<AppEnvironment["Bindings"], "INTERNAL_API_SECRET">;
+};
+
 const ALLOWED_SKEW_MS = 60_000;
 
 const timingSafeEqual = (a: string, b: string): boolean => {
@@ -15,7 +19,7 @@ const timingSafeEqual = (a: string, b: string): boolean => {
 	return diff === 0;
 };
 
-export const internalAuthMiddleware = createMiddleware<AppEnvironment>(
+export const internalAuthMiddleware = createMiddleware<InternalAuthEnvironment>(
 	async (c, next) => {
 		const secret = c.env.INTERNAL_API_SECRET;
 		if (!secret) throw new Error("INTERNAL_API_SECRET is not configured");
