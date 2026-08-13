@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: BackendのZodエラーフォーマット回帰テスト2件が成功しました。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: Backend 10件（Zodエラーフォーマット2件、API docs認証8件）が成功しました。API docs認証は資格情報解決に加え、Honoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -95,7 +95,7 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマットの回帰テストがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
+- BackendにはBun testによるZodエラーフォーマットとAPI docs認証middlewareのruntime testがあります。Frontendのtest runner、統合テスト、E2Eは確認できません。
 - `.github/workflows/ci.yml`でtest、typecheck、Biome、Backend build、Frontend buildを実行する設定です。
 
 ### 1.2 実装済みと誤認しないもの
@@ -798,7 +798,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはBun testでZodエラーフォーマットの回帰テストを実行します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
+- 回答案: BackendはZodエラーフォーマットに加え、API docs認証middlewareへ実Requestを渡し、未設定503、認証なし・不正資格情報401、正しいBasic Auth 200をBun testで確認します。GitHub Actionsではtest、TypeScript typecheck、Biome、BackendのWrangler dry-run、Frontend buildを実行します。Frontendの統合テストとE2Eは未実装です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -844,7 +844,7 @@ flowchart LR
 
 - API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にします。
 - `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一します。
-- `resolveApiDocsCredentials`の設定済み・未設定ケースをBun testで確認します。
+- `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認します。
 - DB migrationは変更しません。
 - `docs/_sidebar.md`から本資料へ遷移できることを確認します。
 - Mermaid code blockがMarkdownとして閉じていることを確認します。
