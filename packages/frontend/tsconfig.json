@@ -40,9 +40,7 @@
     ".next/types/**/*.ts",
     "src/app/auth/logout",
     "next.config.js",
-    ".next/dev/types/**/*.ts",
-    ".next-csrf-integration/types/**/*.ts",
-    ".next-csrf-integration/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

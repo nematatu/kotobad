@@ -10,6 +10,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       NEXT_PUBLIC_API_URL: http://127.0.0.1:8787
       NEXT_PUBLIC_FRONTEND_URL: http://localhost:3000
@@ -28,6 +29,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run runtime and HTTP integration tests
+        timeout-minutes: 10
         run: bun run test
 
       - name: Typecheck

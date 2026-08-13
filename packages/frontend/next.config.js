@@ -3,6 +3,9 @@ const {initOpenNextCloudflareForDev} = require("@opennextjs/cloudflare")
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  typescript: {
+    tsconfigPath: process.env.NEXT_TSCONFIG_PATH || "tsconfig.json",
+  },
   transpilePackages: ["@kotobad/shared"],
   experimental: {
     externalDir: true,

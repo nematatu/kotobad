@@ -3,7 +3,7 @@ import { isUnsafeMethod } from "@/lib/api/security/utils/httpMethod";
 
 const PROTECTED_PREFIXES = ["/threads/api/"];
 
-const cookieName =
+const resolveCsrfCookieName = () =>
 	process.env.NODE_ENV === "production"
 		? "__Host-csrf_token"
 		: "dev_csrf_token";
@@ -74,7 +74,7 @@ export function middleware(req: NextRequest) {
 	if (isProtectedPath(pathname)) {
 		if (!isUnsafeMethod(req.method)) return NextResponse.next();
 
-		const cookieToken = req.cookies.get(cookieName)?.value;
+		const cookieToken = req.cookies.get(resolveCsrfCookieName())?.value;
 		const headerToken = req.headers.get("x-csrf-token");
 
 		if (!cookieToken || !headerToken || cookieToken !== headerToken) {
