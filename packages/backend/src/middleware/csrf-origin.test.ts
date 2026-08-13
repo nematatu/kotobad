@@ -8,8 +8,13 @@ const createCsrfTestApp = () => {
 		Bindings: { ALLOWED_ORIGINS?: string };
 	}>();
 	app.use("/bbs/*", csrfOriginMiddleware);
+	app.on(["GET", "HEAD", "OPTIONS"], "/bbs/test", (c) => c.text("ok"));
 	app.post("/bbs/test", (c) => c.text("ok"));
 	return app;
+};
+
+const allowedEnvironment = {
+	ALLOWED_ORIGINS: "https://kotobad.com",
 };
 
 describe("isValidCsrfToken", () => {
@@ -50,7 +55,7 @@ describe("csrfOriginMiddleware", () => {
 					"X-CSRF-Token": "token-123",
 				},
 			},
-			{ ALLOWED_ORIGINS: "https://kotobad.com" },
+			allowedEnvironment,
 		);
 
 		assert.equal(response.status, 200);
@@ -65,7 +70,7 @@ describe("csrfOriginMiddleware", () => {
 				method: "POST",
 				headers: { Origin: "https://kotobad.com" },
 			},
-			{ ALLOWED_ORIGINS: "https://kotobad.com" },
+			allowedEnvironment,
 		);
 
 		assert.equal(response.status, 403);
@@ -73,4 +78,100 @@ describe("csrfOriginMiddleware", () => {
 			error: "Invalid CSRF token.",
 		});
 	});
+
+	test("rejects a mismatched CSRF cookie and header", async () => {
+		const app = createCsrfTestApp();
+		const response = await app.request(
+			"http://backend.test/bbs/test",
+			{
+				method: "POST",
+				headers: {
+					Origin: "https://kotobad.com",
+					Cookie: "__Host-csrf_token=cookie-token",
+					"X-CSRF-Token": "header-token",
+				},
+			},
+			allowedEnvironment,
+		);
+
+		assert.equal(response.status, 403);
+		assert.deepEqual(await response.json(), {
+			error: "Invalid CSRF token.",
+		});
+	});
+
+	test("rejects an overlong CSRF token", async () => {
+		const app = createCsrfTestApp();
+		const longToken = "a".repeat(2049);
+		const response = await app.request(
+			"http://backend.test/bbs/test",
+			{
+				method: "POST",
+				headers: {
+					Origin: "https://kotobad.com",
+					Cookie: `__Host-csrf_token=${longToken}`,
+					"X-CSRF-Token": longToken,
+				},
+			},
+			allowedEnvironment,
+		);
+
+		assert.equal(response.status, 403);
+		assert.deepEqual(await response.json(), {
+			error: "Invalid CSRF token.",
+		});
+	});
+
+	test("rejects an unsafe request from a disallowed origin", async () => {
+		const app = createCsrfTestApp();
+		const response = await app.request(
+			"http://backend.test/bbs/test",
+			{
+				method: "POST",
+				headers: {
+					Origin: "https://attacker.example",
+					Cookie: "__Host-csrf_token=token-123",
+					"X-CSRF-Token": "token-123",
+				},
+			},
+			allowedEnvironment,
+		);
+
+		assert.equal(response.status, 403);
+		assert.deepEqual(await response.json(), {
+			error: "Forbidden origin.",
+		});
+	});
+
+	test("uses the Referer origin when Origin is absent", async () => {
+		const app = createCsrfTestApp();
+		const response = await app.request(
+			"http://backend.test/bbs/test",
+			{
+				method: "POST",
+				headers: {
+					Referer: "https://kotobad.com/threads/123?from=notification",
+					Cookie: "__Host-csrf_token=token-123",
+					"X-CSRF-Token": "token-123",
+				},
+			},
+			allowedEnvironment,
+		);
+
+		assert.equal(response.status, 200);
+		assert.equal(await response.text(), "ok");
+	});
+
+	for (const method of ["GET", "HEAD", "OPTIONS"] as const) {
+		test(`allows the safe ${method} method without origin or CSRF token`, async () => {
+			const app = createCsrfTestApp();
+			const response = await app.request(
+				"http://backend.test/bbs/test",
+				{ method },
+				allowedEnvironment,
+			);
+
+			assert.equal(response.status, 200);
+		});
+	}
 });
