@@ -52,19 +52,22 @@
 
 ## 未実装・未確認（2026-08-13確認）
 ### 1. セキュリティ回帰テスト
-- CSRF middlewareのcookie/header照合とHTTP挙動のruntime testは追加済みです。
-- CSRF token Route Handlerの`Set-Cookie`属性runtime testも追加済みです。
-- BrowserからNext BFF、Backendまでを通すE2Eシナリオは未確認です。
+- Backend CSRF middlewareは、一致token、欠落、不一致、過長token、許可外Origin、Referer fallback、safe methodのruntime testを追加済みです。
+- CSRF token Route Handlerは、本文とcookieのtoken一致、ProductionとDevelopmentの属性をruntime testで確認済みです。
+- Frontend middleware、Browser側fetcherのtoken付与と403再試行、Server側BFFのCookie・Origin・CSRF・HMAC header転送をruntime testで確認済みです。
+- `scripts/test-csrf-request-chain.ts`で、Next.js開発serverからテスト用Hono serverまでの実HTTP経路を確認済みです。
+- 実Browserのcookie制御とCloudflare本番を含むE2Eシナリオは未確認です。
 
 ## 今後の実施項目（優先順）
 ### P1: 先に必須
 1. Backend CSRFトークン照合とBFFからのheader転送は実装済みです（2026-08-13）。
-2. CSRF middlewareの回帰テストを追加済みです。BrowserからBackendまでのE2Eは未実装です。
+2. CSRF middleware、Frontend middleware、Client/Server fetcherの回帰テストを追加済みです。
+3. Next.js開発serverからテスト用Hono serverまでのHTTP統合テストを追加済みです。実BrowserとCloudflare本番は未確認です。
 
 ### P2: 早めに実施
 1. `allowHeaders` への `X-CSRF-Token` 追加は実装済みです（2026-08-13）。
 2. CSRF cookieの`Path`、`Domain`、`Max-Age`、`SameSite`、`Secure`を明示設定済みです（2026-08-13）。
-3. `bffFetcher` / fetcher群の責務整理（送信ヘッダー・cookie付与ルールの統一）
+3. `bffFetcher` / fetcher群の送信header・cookie付与ルールはruntime testで固定済みです。責務のコード上の統一は未実施です。
 
 ### P3: 継続改善
 1. XSS対策の強化（出力エスケープ、CSP、危険なHTML挿入点の監査）

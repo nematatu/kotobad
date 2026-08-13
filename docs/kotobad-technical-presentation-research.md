@@ -15,7 +15,7 @@
 - 新規投稿通知にはWebSocketとDurable Objectsを使います。
 - FrontendとBackendは共有Zod schemaをAPI契約として利用します。
 - PWAはstandalone起動に対応しますが、offline cacheとWeb Pushは未実装です。
-- BackendにBunの回帰テスト、FrontendにCSRF Route Handlerのruntime test、GitHub Actions CIを追加しました。Frontendの統合テストとE2Eは未実装です。
+- BackendとFrontendにBunのruntime testを追加し、Next.js開発serverからテスト用Hono serverまでのCSRF HTTP統合テストもGitHub Actions CIの必須経路へ追加しました。実BrowserとCloudflare本番を含むE2Eは未実装です。
 
 ## Background
 
@@ -64,7 +64,7 @@
 - Frontend build時はローカルBackendが起動していなかったため、タグ取得は実装どおり空配列へfallbackしました。
 - 2026-08-13の認証修正後もFrontend / Backendのtypecheck、Frontend buildに成功しました。Next.js BFF経由で`get-session`と`sign-in/social`が200となり、後者がGoogle認可URLを返すことを確認しました。Google callback完了後のsession確立は、実Googleアカウント操作を行っていないため未確認です。
 - `bun run build:backend`: BackendのWrangler dry-run（minify、トップレベルbindings）として成功しました。
-- `bun run test`: Backend 15件（Zodエラーフォーマット2件、API docs認証8件、CSRF token照合とHono middleware 5件）とFrontend 1件（CSRF Route Handlerの`Set-Cookie`属性）が成功しました。API docs認証は資格情報解決に加え、Honoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
+- `bun run test`: Backend 22件（Zodエラーフォーマット2件、API docs認証8件、CSRF 12件）、Frontend 10件、Next.js開発serverからテスト用Hono serverまでのHTTP統合テスト（成功・Frontend拒否・Backend拒否の3シナリオ）が成功しました。API docs認証はHonoへ実Requestを渡して503、401、200を確認します。GitHub Actionsの実行結果自体は未確認です。
 - `git status --short --branch`: 調査開始時はcleanでした。
 - Cloudflare本番環境、Dashboard設定、remote migration適用状態は未確認です。
 
@@ -95,7 +95,7 @@
 - OpenTelemetryを独自導入済みとは説明できません。
 - `@tailwindcss/line-clamp`は`tailwind.config.ts`に設定があります。
 - Tailwind CSS 4の現行buildで旧configが読み込まれることは、repositoryの読み取りだけでは確認できません。
-- BackendにはBun testによるZodエラーフォーマット、API docs認証middleware、CSRF middlewareのruntime回帰テストがあります。FrontendにもCSRF Route Handlerのruntime testがあります。Frontendの統合テストとE2Eは確認できません。
+- BackendにはZodエラーフォーマット、API docs認証middleware、CSRF middlewareのruntime testがあります。FrontendにはCSRF Route Handler、middleware、Client/Server fetcherのruntime testがあります。さらにNext.js開発serverからテスト用Hono serverまでのHTTP統合テストがあります。実BrowserとCloudflare本番を含むE2Eは未実装です。
 - rootの`bun run test`はBackendとFrontendの両方を実行し、`.github/workflows/ci.yml`でも同じtest scriptを実行します。
 
 ### 1.2 実装済みと誤認しないもの
@@ -799,7 +799,7 @@ flowchart LR
 
 #### 11. Testはどうしていますか
 
-- 回答案: BackendはBun testでZodエラーフォーマット、API docs認証middlewareの503・401・200、CSRF middlewareのHTTP挙動を検証し、FrontendはCSRF Route Handlerの`Set-Cookie`属性を検証します。GitHub ActionsではBackendとFrontendのtest、TypeScript typecheck、Biome、両buildを実行します。Frontendの統合テストとE2Eは未実装です。
+- 回答案: BackendはZodエラーフォーマット、API docs認証middlewareの503・401・200、CSRF middlewareを、FrontendはCSRF発行Route、middleware、Client/Server fetcherをBun testで実行します。加えて実際のNext.js開発serverとテスト用Hono serverを起動し、CSRF発行からBFF、BackendのCSRF/HMAC middlewareまでをHTTPで検証します。GitHub Actionsではこれらのtest、TypeScript typecheck、Biome、両buildを実行します。実BrowserとCloudflare本番を含むE2Eは未実装です。
 
 #### 12. PWAはOfflineでも動きますか
 
@@ -807,7 +807,7 @@ flowchart LR
 
 ## Risks
 
-- Frontendの統合テストとE2Eがないため、Route Handlerとmiddlewareのruntime testだけでは画面からAPIまでのregressionを検出できません。
+- Next.js開発serverからテスト用Hono serverまでのCSRF HTTP統合テストはありますが、実Browserのcookie制御、Production build、OpenNext、Cloudflare本番を含むE2Eはありません。
 - TurnstileはServer-side validatorのみで、Client側のwidget / token生成は未実装です。Frontendの`upload` / `createThread` / `createPost`、Backendの`auth` / `authSensitive`のいずれも、有効化すると現行UIからのtoken未送信requestが403になります。
 - Backend CSRFはOrigin/Refererに加えてdouble-submit cookie（`__Host-csrf_token`または`dev_csrf_token`）と`x-csrf-token`を照合します。CSRF cookieとheaderの受け渡しはBFF経由に依存します。
 - Static asset checkerが全deployで必ず実行されるかは未確認です。
@@ -847,8 +847,9 @@ flowchart LR
 - API docsのBasic Auth情報を環境変数へ移し、未設定時はfail closed（503）にしました。
 - `/doc`、`/doc/*`、`/specification`の保護範囲をmiddlewareで統一しました。
 - `resolveApiDocsCredentials`の設定済み・未設定に加え、`apiDocsAuthMiddleware`の503、401、200をHonoの実Requestで確認済みです。
-- `/bbs/*`のunsafe requestでBackendがCSRF cookie/headerを照合し、BFFが`x-csrf-token`を転送する実装と回帰テストを追加済みです。
-- CSRF cookieの`SameSite=Strict`、`HttpOnly`、`Path=/`、`Max-Age=3600`、本番`Secure`を明示し、Route Handlerの`Set-Cookie`属性をruntime testで検証しています。
+- `/bbs/*`のunsafe requestでBackendがCSRF cookie/headerを照合し、BFFがCookie、Origin、`x-csrf-token`、HMAC headerを転送する実装とruntime testを追加済みです。
+- CSRF cookieの`SameSite=Strict`、`HttpOnly`、`Path=/`、`Max-Age=3600`、本番`Secure`を明示し、本文tokenとの一致、ProductionとDevelopmentの属性をruntime testで検証しています。
+- `scripts/test-csrf-request-chain.ts`で、Next.js開発serverからテスト用Hono serverまでの成功、Frontend拒否、Backend拒否を実HTTPで検証しています。
 - DB migrationは変更しません。
 - `docs/_sidebar.md`から本資料へ遷移できることを確認します。
 - Mermaid code blockがMarkdownとして閉じていることを確認します。
