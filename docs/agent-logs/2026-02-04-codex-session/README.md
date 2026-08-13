@@ -132,6 +132,8 @@
 注意:
 - エラーメッセージに `R2_BUCKET` が残っているため文言統一が必要
 
+※ 上記は2026-02-04時点の課題です。2026-08-13現在は`R2_SNAPSHOT_BUCKET and R2_KEY are required.`へ修正済みです。また、通常実行はR2取得失敗を握りつぶさず、初回baseline作成時だけ`ALLOW_MISSING_R2_SNAPSHOT=true`を要求します。
+
 ### 6-3. package.json（frontend）
 - `packages/frontend/package.json`
 - **deploy は変更しない**

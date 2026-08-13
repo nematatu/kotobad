@@ -1,10 +1,9 @@
-import { readdir, readFile, stat, mkdir, rm } from "node:fs/promises";
-import { join, relative, dirname } from "node:path";
-import { tmpdir } from "node:os";
 import { spawn } from "node:child_process";
+import { mkdir, readdir, readFile, rm, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join, relative } from "node:path";
 
-const DEFAULT_ASSETS_DIR =
-	".open-next/assets/_next/static";
+const DEFAULT_ASSETS_DIR = ".open-next/assets/_next/static";
 const DEFAULT_SNAPSHOT = join(
 	tmpdir(),
 	`next-static-assets-snapshot-${process.pid}-${Date.now()}.json`,
@@ -20,11 +19,11 @@ const shouldCleanupSnapshot = !process.env.SNAPSHOT_FILE;
 const r2SnapshotBucket = process.env.R2_SNAPSHOT_BUCKET;
 const r2Key = process.env.R2_KEY;
 if (!r2SnapshotBucket || !r2Key) {
-	console.error("R2_BUCKET and R2_KEY are required.");
+	console.error("R2_SNAPSHOT_BUCKET and R2_KEY are required.");
 	process.exit(1);
 }
-const wranglerConfig =
-	process.env.WRANGLER_CONFIG ?? DEFAULT_WRANGLER_CONFIG;
+const allowMissingR2Snapshot = process.env.ALLOW_MISSING_R2_SNAPSHOT === "true";
+const wranglerConfig = process.env.WRANGLER_CONFIG ?? DEFAULT_WRANGLER_CONFIG;
 const wranglerBin = process.env.WRANGLER_BIN ?? DEFAULT_WRANGLER_BIN;
 const assetFallbackOrigin =
 	process.env.ASSET_FALLBACK_ORIGIN ??
@@ -46,13 +45,24 @@ const normalizeAssetRef = (ref: string) => {
 	return normalized;
 };
 
+const getAssetPathname = (ref: string) => {
+	try {
+		const url = new URL(normalizeAssetRef(ref), "https://assets.invalid");
+		const pathname = decodeURIComponent(url.pathname);
+		if (!pathname.startsWith("/_next/static/")) return null;
+		if (pathname.includes("\\")) return null;
+		if (pathname.split("/").some((segment) => segment === "..")) return null;
+		return pathname;
+	} catch {
+		return null;
+	}
+};
+
 const isAssetRef = (ref: string) => {
-	const normalized = normalizeAssetRef(ref);
-	if (normalized.endsWith("/")) return false;
-	const last = normalized.split("/").pop() ?? "";
-	const q = last.indexOf("?");
-	const clean = q === -1 ? last : last.slice(0, q);
-	return clean.includes(".");
+	const pathname = getAssetPathname(ref);
+	if (!pathname || pathname.endsWith("/")) return false;
+	const last = pathname.split("/").pop() ?? "";
+	return last.includes(".");
 };
 
 type Snapshot = {
@@ -79,7 +89,7 @@ const walk = async (dir: string): Promise<string[]> => {
 	return files;
 };
 
-// ファイルを読み込んで、そのファイル内で、正規表現(assetのパスが存在するか)でフィルター 
+// ファイルを読み込んで、そのファイル内で、正規表現(assetのパスが存在するか)でフィルター
 
 // match =  [
 //    ["/_next/static/media/abc123.woff2", index: 74, ...],
@@ -92,20 +102,53 @@ const collectRefs = async () => {
 		if (!isTextAsset(file)) continue;
 		const content = await readFile(file, "utf8");
 		for (const match of content.matchAll(refRegex)) {
-			const ref = normalizeAssetRef(match[0]);
-			if (!isAssetRef(ref)) continue;
-			refs.add(ref);
+			const pathname = getAssetPathname(match[0]);
+			if (!pathname || !isAssetRef(pathname)) continue;
+			refs.add(pathname);
 		}
 	}
 	return Array.from(refs).sort();
 };
 
+const parseSnapshot = (value: unknown): Snapshot => {
+	if (!value || typeof value !== "object") {
+		throw new Error("Invalid snapshot: expected an object");
+	}
+	const snapshot = value as Record<string, unknown>;
+	if (
+		typeof snapshot.createdAt !== "string" ||
+		typeof snapshot.assetsDir !== "string" ||
+		!Array.isArray(snapshot.refs) ||
+		!snapshot.refs.every((ref) => typeof ref === "string")
+	) {
+		throw new Error("Invalid snapshot: required fields are malformed");
+	}
+
+	return {
+		assetsDir: snapshot.assetsDir,
+		createdAt: snapshot.createdAt,
+		refs: snapshot.refs,
+	};
+};
+
+const normalizeSnapshotRefs = (refs: string[]) =>
+	refs.map((ref) => {
+		const pathname = getAssetPathname(ref);
+		if (!pathname || !isAssetRef(pathname)) {
+			throw new Error(`Invalid snapshot asset reference: ${ref}`);
+		}
+		return pathname;
+	});
+
 const loadSnapshot = async (): Promise<Snapshot | null> => {
 	try {
 		const json = await readFile(snapshotFile, "utf8");
-		return JSON.parse(json) as Snapshot;
-	} catch {
-		return null;
+		return parseSnapshot(JSON.parse(json));
+	} catch (error) {
+		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+			return null;
+		}
+		throw error;
 	}
 };
 
@@ -124,9 +167,13 @@ const cleanupSnapshot = async () => {
 	await rm(snapshotFile, { force: true });
 };
 
-
-const toDiskPath = (ref: string) =>
-	join(assetsDir, normalizeAssetRef(ref).replace("/_next/static/", ""));
+const toDiskPath = (ref: string) => {
+	const pathname = getAssetPathname(ref);
+	if (!pathname || !isAssetRef(pathname)) {
+		throw new Error(`Invalid static asset reference: ${ref}`);
+	}
+	return join(assetsDir, pathname.replace("/_next/static/", ""));
+};
 
 const exists = async (path: string) => {
 	try {
@@ -137,15 +184,15 @@ const exists = async (path: string) => {
 	}
 };
 
-const runWrangler = async (args: string[], allowFail = false) => {
+const runWrangler = async (args: string[]) => {
 	await mkdir(dirname(snapshotFile), { recursive: true });
 	return new Promise<void>((resolve, reject) => {
 		const child = spawn(wranglerBin, args, {
 			stdio: "inherit",
 		});
-		child.on("close", (code) => {
+		child.once("error", reject);
+		child.once("close", (code) => {
 			if (code === 0) return resolve();
-			if (allowFail) return resolve();
 			reject(new Error(`wrangler failed: ${wranglerBin} ${args.join(" ")}`));
 		});
 	});
@@ -167,8 +214,8 @@ const restoreMissingAsset = async (ref: string) => {
 };
 
 const fetchSnapshotFromR2 = async () => {
-	await runWrangler(
-		[
+	try {
+		await runWrangler([
 			"r2",
 			"object",
 			"get",
@@ -178,11 +225,15 @@ const fetchSnapshotFromR2 = async () => {
 			snapshotFile,
 			"--config",
 			wranglerConfig,
-		],
-		true,
-	);
+		]);
+	} catch (error) {
+		if (!allowMissingR2Snapshot) throw error;
+		await rm(snapshotFile, { force: true });
+		console.warn(
+			"R2 snapshot could not be loaded. ALLOW_MISSING_R2_SNAPSHOT=true was set, so a new baseline will be created.",
+		);
+	}
 };
-
 
 const saveSnapshotToR2 = async () => {
 	await runWrangler([
@@ -203,64 +254,56 @@ const main = async () => {
 		const currentRefs = await collectRefs();
 
 		await fetchSnapshotFromR2();
-	const snapshot = await loadSnapshot();
-	if (!snapshot) {
-		console.warn(
-			`Snapshot not found: ${snapshotFile}. Creating a new baseline.`,
-		);
-		await saveSnapshot(currentRefs);
-		await saveSnapshotToR2();
-		console.log(`Saved ${currentRefs.length} refs`);
-		return;
-	}
-
-  // R2からロードしたスナップショットに保存されていたrefs
-	const refsToCheck = Array.from(
-		new Set(snapshot.refs.map(normalizeAssetRef).filter(isAssetRef)),
-	);
-
-	const missing: string[] = [];
-	for (const ref of refsToCheck) {
-		const path = toDiskPath(ref);
-
-    // 前のスナップショットに保存されていたrefの存在を確認
-    // 存在しなければ、missing配列に追加
-		if (!(await exists(path))) {
-			missing.push(ref);
-		}
-	}
-
-	for (const ref of missing) {
-		try {
-			await restoreMissingAsset(ref);
-		} catch (error) {
-			console.warn(
-				error instanceof Error ? error.message : `asset fetch failed: ${ref}`,
+		const snapshot = await loadSnapshot();
+		if (!snapshot && !allowMissingR2Snapshot) {
+			throw new Error(
+				"R2 snapshot was not downloaded. Set ALLOW_MISSING_R2_SNAPSHOT=true only when creating the initial baseline.",
 			);
 		}
-	}
-
-	const unresolvedMissing: string[] = [];
-	for (const ref of refsToCheck) {
-		const path = toDiskPath(ref);
-		if (!(await exists(path))) {
-			unresolvedMissing.push(ref);
+		if (!snapshot) {
+			console.warn(
+				`Snapshot not found: ${snapshotFile}. Creating a new baseline.`,
+			);
 		}
-	}
 
-  // missingが存在する
-  // すなわち、前回のビルド時に参照していたassetsが、今のディレクトリに見つからなかった！
-  // → 今回の変更で、削除したということ。
-  // → 配信された(各端末にキャッシュされた)ファイルでは、そのassetを参照しているはず。
-  // → 今の状態だと、404になり、無駄ループ的に、存在しないファイルを参照しようとしてしまう。
+		const previousRefs = normalizeSnapshotRefs(snapshot?.refs ?? []);
+		const refsToCheck = Array.from(new Set([...previousRefs, ...currentRefs]));
 
-	if (unresolvedMissing.length > 0) {
-		console.error("アセットが削除されました。404になる可能性があります。");
-		for (const ref of unresolvedMissing) {
-			console.error(`- ${ref} -> ${relative(process.cwd(), toDiskPath(ref))}`);
+		const missing: string[] = [];
+		for (const ref of refsToCheck) {
+			const path = toDiskPath(ref);
+			if (!(await exists(path))) {
+				missing.push(ref);
+			}
 		}
-		throw new Error("Missing assets detected");
-	}
+
+		for (const ref of missing) {
+			try {
+				await restoreMissingAsset(ref);
+			} catch (error) {
+				console.warn(
+					error instanceof Error ? error.message : `asset fetch failed: ${ref}`,
+				);
+			}
+		}
+
+		const unresolvedMissing: string[] = [];
+		for (const ref of refsToCheck) {
+			const path = toDiskPath(ref);
+			if (!(await exists(path))) {
+				unresolvedMissing.push(ref);
+			}
+		}
+
+		if (unresolvedMissing.length > 0) {
+			console.error("アセットが削除されました。404になる可能性があります。");
+			for (const ref of unresolvedMissing) {
+				console.error(
+					`- ${ref} -> ${relative(process.cwd(), toDiskPath(ref))}`,
+				);
+			}
+			throw new Error("Missing assets detected");
+		}
 
 		await saveSnapshot(currentRefs);
 		await saveSnapshotToR2();

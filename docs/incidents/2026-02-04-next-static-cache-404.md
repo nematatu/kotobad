@@ -39,7 +39,9 @@ bun scripts/check-save-next-static-assets.ts
 
 ## 注意
 - ローカルのスナップショットは一時ファイルに保存し、実行終了後に自動削除される（リポジトリに残らない）
-- 初回はR2キーが存在しなくても、**自動でベースラインを作成してアップロード**される
+- 通常実行ではR2取得失敗やsnapshot不在をエラーとして停止する
+- 初回baselineを作成するときだけ`ALLOW_MISSING_R2_SNAPSHOT=true`を明示する。このflagを通常buildへ常設しない
+- 壊れたJSONや不正なasset pathはbaselineとして上書きせず停止する
 
 ## 運用メモ
 - フォント/デザイン変更時は「旧static保持」が最重要
