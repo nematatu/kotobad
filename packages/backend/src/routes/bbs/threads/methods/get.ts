@@ -152,7 +152,7 @@ export const searchThreadRoute = createRoute({
 				description: "ページ番号",
 				example: "1",
 			}),
-			limit: z.coerce.number().int().min(1).default(20).openapi({
+			limit: z.coerce.number().int().min(1).max(PERPAGE).default(20).openapi({
 				description: "1ページあたりの件数",
 				example: "20",
 			}),
