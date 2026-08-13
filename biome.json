@@ -9,7 +9,8 @@
 		"includes": [
 			"packages/**/src/**/*.ts",
 			"packages/**/src/**/*.tsx",
-			"packages/backend/drizzle.config.ts"
+			"packages/backend/drizzle.config.ts",
+			"scripts/**/*.test.ts"
 		]
 	},
 	"formatter": {
