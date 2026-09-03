@@ -28,8 +28,8 @@
 	},
 	"devDependencies": {
 		"@types/node": "^25.6.0",
-		"@cloudflare/workers-types": "^4.20260426.1",
+		"@cloudflare/workers-types": "4.20260702.1",
 		"drizzle-kit": "^0.31.10",
-		"wrangler": "^4.104.0"
+		"wrangler": "4.129.0"
 	}
 }

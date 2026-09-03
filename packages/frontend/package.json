@@ -61,6 +61,6 @@
 		"postcss-load-config": "^6.0.1",
 		"tailwindcss": "^4.2.4",
 		"typescript": "^6.0.3",
-		"wrangler": "^4.104.0"
+		"wrangler": "4.129.0"
 	}
 }
