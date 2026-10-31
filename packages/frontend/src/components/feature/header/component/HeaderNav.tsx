@@ -9,15 +9,16 @@ type Props = {
 };
 
 const isActiveHref = (pathname: string, href: string) => {
-	if (href === "/") {
+	const cleanHref = href.split("?")[0];
+	if (cleanHref === "/") {
 		return pathname === "/";
 	}
 
-	if (href === "/threads") {
+	if (cleanHref === "/threads") {
 		return pathname === "/threads" || pathname.startsWith("/threads/");
 	}
 
-	return pathname === href || pathname.startsWith(`${href}/`);
+	return pathname === cleanHref || pathname.startsWith(`${cleanHref}/`);
 };
 
 const HeaderNav = ({ links }: Props) => {

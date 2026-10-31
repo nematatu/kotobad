@@ -1,10 +1,16 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import LogoStickerIcon from "@/assets/logo/logo-sticker.svg";
+import {
+	isDemoModeActive,
+	setDemoMode,
+	useDemoMode,
+} from "@/lib/auth/demoMode";
 import { BwfMatchCard } from "./components/BwfMatchCard";
+
 import { BwfMatchToolbar, type BwfViewTab } from "./components/BwfMatchToolbar";
 import { BwfTournamentList } from "./components/BwfTournamentList";
 import {
@@ -34,6 +40,22 @@ const BwfLiveDemoLoading = () => (
 
 function BwfLiveDemoContent() {
 	const searchParams = useSearchParams();
+	const { isDemo: isDemoSession, isReady } = useDemoMode();
+
+	const demoParam = searchParams.get("demo");
+	const isDemoQuery =
+		demoParam === "true" || demoParam === "1" || searchParams.has("demo");
+	const isDemoParamFalse = demoParam === "false" || demoParam === "0";
+
+	const isDemoActive =
+		!isDemoParamFalse && (isDemoQuery || isDemoSession || isDemoModeActive());
+
+	useEffect(() => {
+		if (isDemoQuery) {
+			setDemoMode(true);
+		}
+	}, [isDemoQuery]);
+
 	const defaultTabParam = searchParams.get("tab") as BwfViewTab | null;
 
 	const [currentTab, setCurrentTab] = useState<BwfViewTab>(
@@ -50,12 +72,16 @@ function BwfLiveDemoContent() {
 		data: feedResult,
 		isValidating,
 		mutate,
-	} = useSWR(["bwf-live-feed"], () => fetchBwfLiveFeed(), {
-		keepPreviousData: true,
-		revalidateOnFocus: false,
-		revalidateOnReconnect: false,
-		refreshInterval: autoRefresh && !forcedDemoMode ? 15_000 : 0,
-	});
+	} = useSWR(
+		isDemoActive ? ["bwf-live-feed"] : null,
+		() => fetchBwfLiveFeed(),
+		{
+			keepPreviousData: true,
+			revalidateOnFocus: false,
+			revalidateOnReconnect: false,
+			refreshInterval: autoRefresh && !forcedDemoMode ? 15_000 : 0,
+		},
+	);
 
 	// If forced demo mode is active or feed failed/empty, we use demo matches
 	const isDemo = forcedDemoMode || (feedResult ? feedResult.isFallback : false);
@@ -125,6 +151,15 @@ function BwfLiveDemoContent() {
 	const handleToggleDataSource = () => {
 		setForcedDemoMode((prev) => !prev);
 	};
+
+	// Gate: if not in demo mode, return 404
+	if (isReady && !isDemoActive) {
+		return notFound();
+	}
+
+	if (!isReady && !isDemoQuery) {
+		return <BwfLiveDemoLoading />;
+	}
 
 	return (
 		<div className="relative min-h-screen bg-[#f8fbff] text-slate-900 dark:bg-[#0f172a] dark:text-slate-100">

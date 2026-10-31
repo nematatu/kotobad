@@ -9,7 +9,7 @@ export const headerNavLinks: ActionLinkItem[] = [
 	},
 	{
 		label: "BWFライブデモ",
-		href: "/bwf-live-demo",
+		href: "/bwf-live-demo?demo=true",
 		viewTransitionKey: viewTransitionKeys.threadListNavigation,
 	},
 	{

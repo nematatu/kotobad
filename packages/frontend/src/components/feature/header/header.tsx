@@ -4,7 +4,9 @@ import type { TagType } from "@kotobad/shared/src/types/tag";
 import { motion } from "motion/react";
 import { Suspense, useEffect, useRef, useState } from "react";
 import ThemeToggle from "@/components/feature/theme/ThemeToggle";
+import { useDemoMode } from "@/lib/auth/demoMode";
 import { useUser } from "../provider/UserProvider";
+
 import HeaderLogo from "./component/HeaderLogo";
 import HeaderMobileMenu from "./component/HeaderMobileMenu";
 import HeaderNav from "./component/HeaderNav";
@@ -79,6 +81,12 @@ const Header = ({ tags }: Props) => {
 		};
 	}, []);
 
+	const { isDemo } = useDemoMode();
+
+	const visibleLinks = isDemo
+		? headerNavLinks
+		: headerNavLinks.filter((item) => !item.href.startsWith("/bwf-live-demo"));
+
 	return (
 		<motion.div
 			ref={headerRef}
@@ -88,12 +96,12 @@ const Header = ({ tags }: Props) => {
 		>
 			<div className="mx-auto flex min-h-12 items-center gap-3 px-5 py-2 sm:min-h-14">
 				<div className="flex items-center gap-2 shrink-0">
-					<HeaderMobileMenu links={headerNavLinks} isLoading={isLoading} />
+					<HeaderMobileMenu links={visibleLinks} isLoading={isLoading} />
 					<div className="hidden md:flex">
 						<HeaderLogo />
 					</div>
 				</div>
-				<HeaderNav links={headerNavLinks} />
+				<HeaderNav links={visibleLinks} />
 				<div className="ml-auto flex items-center gap-2 shrink-0">
 					<div className="hidden [@media(min-width:496px)]:block">
 						<ThemeToggle />

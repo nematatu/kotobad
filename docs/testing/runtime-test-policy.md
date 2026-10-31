@@ -23,7 +23,7 @@
 - Frontend: `packages/frontend/src/app/auth/api/demo-login/route.test.ts`
   - GETの405拒否、POSTでのデモユーザーサインイン成功、ユーザー未作成時のサインアップ自動フォールバック、Cookie転送を確認します。
 - Frontend: `packages/frontend/src/lib/auth/demoMode.test.ts`
-  - URLクエリ `demo=true` / `demo=1` / `demo` での有効化、`demo=false` での無効化、`sessionStorage` への永続化、`demo.` ホスト名判定を確認します。
+  - URLクエリ `demo=true` / `demo=1` / `demo` での有効化、`demo=false` での無効化、`sessionStorage` への永続化、`demo.` ホスト名判定を確認します（デモログインボタン、BWFライブデモリンク、`/bwf-live-demo` 画面のゲーティングに利用）。
 - Frontend: `packages/frontend/src/app/bwf-live-demo/lib/*.test.ts`
   - 日本人選手名マッピング（漢字変換・判定）、ラウンドやコートの和名変換、デモスコアの更新ステップ実行を確認します。
 - Shared: `packages/shared/src/config/hiddenThreads.test.ts`
