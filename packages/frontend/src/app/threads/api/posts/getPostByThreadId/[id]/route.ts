@@ -1,4 +1,6 @@
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import { PostListSchema } from "@kotobad/shared/src/schemas/post";
+
 import type { PostListType } from "@kotobad/shared/src/types/post";
 import { NextResponse } from "next/server";
 import { BffFetcher, type BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
@@ -15,6 +17,10 @@ export async function GET(req: Request, { params }: Params) {
 
 	const renderedparams = await params;
 	const { id } = renderedparams;
+
+	if (isHiddenThreadId(id)) {
+		return NextResponse.json({ error: "Posts not found" }, { status: 404 });
+	}
 
 	try {
 		const res = await getPostByThreadId(id);

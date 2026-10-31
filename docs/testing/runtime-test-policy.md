@@ -26,6 +26,8 @@
   - URLクエリ `demo=true` / `demo=1` / `demo` での有効化、`demo=false` での無効化、`sessionStorage` への永続化、`demo.` ホスト名判定を確認します。
 - Frontend: `packages/frontend/src/app/bwf-live-demo/lib/*.test.ts`
   - 日本人選手名マッピング（漢字変換・判定）、ラウンドやコートの和名変換、デモスコアの更新ステップ実行を確認します。
+- Shared: `packages/shared/src/config/hiddenThreads.test.ts`
+  - デモ用非表示スレッドID（文字列・数値）の判定と未指定時のフォールバックを確認します。
 - root: `bun run test`
   - BackendとFrontendの両方のruntime testを実行します。
 - CI: `.github/workflows/ci.yml`

@@ -1,4 +1,6 @@
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+
 import { formatDate } from "@kotobad/shared/src/utils/date/formatDate";
 import { notFound } from "next/navigation";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
@@ -27,7 +29,11 @@ export default async function ThreadDetailPage({
 			? parsedHighlightPostId
 			: null;
 
-	if (!Number.isInteger(threadId) || threadId <= 0) {
+	if (
+		!Number.isInteger(threadId) ||
+		threadId <= 0 ||
+		isHiddenThreadId(threadId)
+	) {
 		return notFound();
 	}
 

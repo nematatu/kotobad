@@ -1,6 +1,8 @@
 "use client";
 
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
+
 import { getRelativeDate } from "@kotobad/shared/src/utils/date/getRelativeDate";
 import { ArrowRight } from "lucide-react";
 import {
@@ -30,7 +32,9 @@ export const ThreadList = ({
 	highlightQuery = "",
 	variant = "default",
 }: ThreadListType) => {
-	const threadList: ThreadType[] = threads;
+	const threadList: ThreadType[] = threads.filter(
+		(thread) => !isHiddenThreadId(thread.id),
+	);
 	const router = useViewTransitionRouter();
 	const isProfileTimeline = variant === "profileTimeline";
 	const firstImageThreadIndex = threadList.findIndex(

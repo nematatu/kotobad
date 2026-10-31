@@ -1,6 +1,8 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
+
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
 import { and, count, inArray, like } from "drizzle-orm";
 import { threads } from "../../../../../drizzle/schema";
@@ -236,13 +238,20 @@ export const getAllThreadRouter: RouteHandler<
 			db.select({ value: count() }).from(threads),
 		]);
 
-		const totalCount = totalCountResult[0]?.value ?? 0;
+		const filteredThreads = threadsResult.filter(
+			(thread) => !isHiddenThreadId(thread.id),
+		);
+		const totalCount = Math.max(
+			0,
+			(totalCountResult[0]?.value ?? 0) -
+				(threadsResult.length - filteredThreads.length),
+		);
 		const likeMap = await getThreadLikeSummaryMap({
 			db,
-			threadIds: threadsResult.map((thread) => thread.id),
+			threadIds: filteredThreads.map((thread) => thread.id),
 			viewerUserId,
 		});
-		const threadsResponse = threadsResult.map((thread) => {
+		const threadsResponse = filteredThreads.map((thread) => {
 			const like = likeMap.get(thread.id);
 			return toThreadResponse({
 				...thread,
@@ -271,6 +280,9 @@ export const getThreadByIdRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const id = Number(c.req.param("id"));
+		if (isHiddenThreadId(id)) {
+			return c.json({ error: "Thread not found" }, 404);
+		}
 		const viewerUserId = await resolveViewerUserId(c);
 
 		const thread = await db.query.threads.findFirst({
@@ -386,6 +398,9 @@ export const getTrendingThreadRouter: RouteHandler<
 			}),
 		);
 		const rankedThreads = rankedThreadIds.flatMap((threadId) => {
+			if (isHiddenThreadId(threadId)) {
+				return [];
+			}
 			const thread = threadMap.get(threadId);
 			return thread ? [thread] : [];
 		});
@@ -474,19 +489,26 @@ export const searchThreadRouter: RouteHandler<
 			db.select({ value: count() }).from(threads).where(whereClause),
 		]);
 
+		const filteredThreads = threadsResult.filter(
+			(thread) => !isHiddenThreadId(thread.id),
+		);
 		const likeMap = await getThreadLikeSummaryMap({
 			db,
-			threadIds: threadsResult.map((thread) => thread.id),
+			threadIds: filteredThreads.map((thread) => thread.id),
 			viewerUserId,
 		});
-		const threadsResponse = threadsResult.map((thread) =>
+		const threadsResponse = filteredThreads.map((thread) =>
 			toThreadResponse({
 				...thread,
 				likeCount: likeMap.get(thread.id)?.likeCount ?? 0,
 				likedByMe: likeMap.get(thread.id)?.likedByMe ?? false,
 			}),
 		);
-		const totalCount = totalCountResult[0]?.value ?? 0;
+		const totalCount = Math.max(
+			0,
+			(totalCountResult[0]?.value ?? 0) -
+				(threadsResult.length - filteredThreads.length),
+		);
 
 		return c.json({ threads: threadsResponse, totalCount }, 200);
 	} catch (error: unknown) {

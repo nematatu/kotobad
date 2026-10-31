@@ -1,6 +1,8 @@
 import type { RouteHandler } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import { getErrorMessage } from "@kotobad/shared/src/utils/error/getErrorMessage";
+
 import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { posts as postsTable } from "../../../../../drizzle/schema";
 import { createAuth } from "../../../../auth";
@@ -75,6 +77,9 @@ export const getPostByThreadIdRouter: RouteHandler<
 	try {
 		const db = c.get("db");
 		const threadId = Number(c.req.param("threadId"));
+		if (isHiddenThreadId(threadId)) {
+			return c.json({ error: "Post not found" }, 404);
+		}
 		const viewerUserId = await resolveViewerUserId(c);
 
 		const posts = await db.query.posts.findMany({

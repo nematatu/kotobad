@@ -1,4 +1,6 @@
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
+
 import type { ThreadListType } from "@kotobad/shared/src/types/thread";
 import type { BffFetcherError } from "@/lib/api/fetcher/bffFetcher";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher";
@@ -31,9 +33,16 @@ export async function getThreads({
 		raw = ThreadListSchema.parse({ threads: [], totalCount: 0 });
 	}
 
+	const visibleThreads = raw.threads.filter(
+		(thread) => !isHiddenThreadId(thread.id),
+	);
+
 	const safeResponse = {
-		threads: raw.threads.map(normalizeThread),
-		totalCount: raw.totalCount,
+		threads: visibleThreads.map(normalizeThread),
+		totalCount: Math.max(
+			0,
+			raw.totalCount - (raw.threads.length - visibleThreads.length),
+		),
 	};
 
 	const threadsResponse: ThreadListType = ThreadListSchema.parse(safeResponse);

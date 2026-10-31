@@ -1,6 +1,8 @@
 "use client";
 
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import type { PostListType } from "@kotobad/shared/src/types/post";
+
 import { useCallback, useEffect, useRef } from "react";
 import useSWR from "swr";
 import { BffFetcher } from "@/lib/api/fetcher/bffFetcher.client";
@@ -16,7 +18,10 @@ type Props = {
 };
 
 export const ThreadPostsStream = ({ threadId, highlightPostId }: Props) => {
-	const swrKey = ["GET_POSTS_BY_THREADID", threadId] as const;
+	const isHidden = isHiddenThreadId(threadId);
+	const swrKey = isHidden
+		? null
+		: (["GET_POSTS_BY_THREADID", threadId] as const);
 
 	const { data, error, mutate } = useSWR<PostListType>(
 		swrKey,
@@ -47,10 +52,14 @@ export const ThreadPostsStream = ({ threadId, highlightPostId }: Props) => {
 		}, 150);
 	}, [mutate]);
 
-	useThreadPostRealtime(threadId, (postId) => {
+	useThreadPostRealtime(isHidden ? 0 : threadId, (postId) => {
 		if (postId <= latestPostIdRef.current) return;
 		queueRefresh();
 	});
+
+	if (isHidden) {
+		return null;
+	}
 
 	const shouldShowFallback = typeof data === "undefined" && !error;
 

@@ -1,6 +1,8 @@
 "use client";
 
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import { PERPAGE } from "@kotobad/shared/src/config/thread";
+
 import { ThreadListSchema } from "@kotobad/shared/src/schemas/thread";
 import type { TagListType } from "@kotobad/shared/src/types/tag";
 import type { ThreadType } from "@kotobad/shared/src/types/thread";
@@ -57,12 +59,17 @@ export default function ThreadPageClient({
 }: Props) {
 	const normalizedInitialQuery = (initialQuery ?? "").trim();
 	const initialIsSearch = normalizedInitialQuery.length >= MIN_QUERY_CHARS;
+	const visibleInitialThreads = initialThreads.filter(
+		(thread) => !isHiddenThreadId(thread.id),
+	);
 	const [state, setState] = useState<SearchState>(() => ({
 		...initialState,
 		inputValue: initialIsSearch ? normalizedInitialQuery : "",
 		activeQuery: initialIsSearch ? normalizedInitialQuery : "",
-		threads: initialIsSearch ? initialThreads : [],
-		count: initialIsSearch ? (initialSearchCount ?? initialThreads.length) : 0,
+		threads: initialIsSearch ? visibleInitialThreads : [],
+		count: initialIsSearch
+			? (initialSearchCount ?? visibleInitialThreads.length)
+			: 0,
 	}));
 	const set = useCallback((patch: Partial<SearchState>) => {
 		setState((prev) => ({ ...prev, ...patch }));
@@ -101,8 +108,14 @@ export default function ThreadPageClient({
 				const resThreadList = await res.json();
 				const parsed = ThreadListSchema.parse(resThreadList);
 				const { threads = [], totalCount: count = 0 } = parsed;
+				const visibleThreads = threads.filter(
+					(thread) => !isHiddenThreadId(thread.id),
+				);
 
-				set({ threads, count });
+				set({
+					threads: visibleThreads,
+					count: Math.max(0, count - (threads.length - visibleThreads.length)),
+				});
 			} catch {
 				set({ error: "検索に失敗しました", threads: [], count: 0 });
 			} finally {

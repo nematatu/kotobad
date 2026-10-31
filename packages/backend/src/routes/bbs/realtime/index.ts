@@ -1,5 +1,7 @@
+import { isHiddenThreadId } from "@kotobad/shared/src/config/hiddenThreads";
 import { Hono } from "hono";
 import { getThreadRoomStub } from "../../../realtime/thread-event";
+
 import type { AppEnvironment } from "../../../types";
 
 const realtimeRouter = new Hono<AppEnvironment>();
@@ -11,7 +13,11 @@ realtimeRouter.get("/threads/:threadId/ws", async (c): Promise<Response> => {
 	}
 
 	const threadId = Number(c.req.param("threadId"));
-	if (!Number.isInteger(threadId) || threadId <= 0) {
+	if (
+		!Number.isInteger(threadId) ||
+		threadId <= 0 ||
+		isHiddenThreadId(threadId)
+	) {
 		return c.json({ error: "Invalid threadId" }, 400);
 	}
 
