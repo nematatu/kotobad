@@ -1,0 +1,12 @@
+{
+  "name": "kotobad-slides-marp",
+  "private": true,
+  "scripts": {
+    "dev": "marp -s .",
+    "build": "marp slides.md -o slides.html",
+    "pdf": "marp slides.md --pdf"
+  },
+  "dependencies": {
+    "@marp-team/marp-cli": "^4.0.0"
+  }
+}

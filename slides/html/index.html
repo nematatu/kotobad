@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kotobad — バドミントン掲示板</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
+<style>
+  :root { --r-main-font: "Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r-heading-font: "Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif; --r-main-color: #0f172a; --r-heading-color: #0f172a; --r-background-color: #ffffff; --r-link-color: #2563eb; --r-selection-background-color: #2563eb; }
+  .reveal h1 { font-size: 2.2em; font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; }
+  .reveal h2 { font-size: 1.6em; font-weight: 800; line-height: 1.1; }
+  .reveal p, .reveal li { font-size: 0.9em; line-height: 1.6; color: #475569; }
+  .reveal .lead { font-size: 1.1em; color: #0f172a; font-weight: 600; }
+  .reveal .big { font-size: 3.5em; font-weight: 900; color: #2563eb; line-height: 1; }
+  .reveal section { text-align: left; }
+  .reveal .center { text-align: center; }
+  .reveal .dark { background: #0f172a; color: #f1f5f9; }
+  .reveal .dark h1, .reveal .dark h2 { color: #f1f5f9; }
+  .reveal .dark p, .reveal .dark li { color: #a5b4cc; }
+  .reveal .dark .lead { color: #f1f5f9; }
+  .reveal .dark .big { color: #60a5fa; }
+  .reveal .fullbleed { padding: 0; }
+  .reveal .fullbleed img { width: 100%; height: 100%; object-fit: cover; }
+  .reveal .caption { position: absolute; bottom: 40px; left: 60px; background: rgba(15,23,42,0.85); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.7em; font-weight: 600; }
+  .reveal .bullet { display: flex; gap: 16px; align-items: flex-start; margin: 8px 0; }
+  .reveal .bullet::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #2563eb; margin-top: 12px; flex-shrink: 0; }
+  .reveal .dark .bullet::before { background: #60a5fa; }
+  .reveal .logo-row { display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: center; }
+  .reveal .logo-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .reveal .logo-item img { width: 64px; height: 64px; border: none; background: #fff; border-radius: 10px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .reveal .logo-item span { font-size: 0.5em; color: #475569; }
+  .reveal .dark .logo-item span { color: #a5b4cc; }
+  .reveal .stat { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .reveal .stat .num { font-size: 2.5em; font-weight: 900; color: #2563eb; line-height: 1; }
+  .reveal .dark .stat .num { color: #60a5fa; }
+  .reveal .stat .label { font-size: 0.6em; color: #475569; }
+  .reveal .dark .stat .label { color: #a5b4cc; }
+  .reveal .toc-item { font-size: 0.8em; color: #475569; padding-left: 16px; border-left: 4px solid #2563eb; margin: 6px 0; }
+  .reveal .pill { display: inline-block; padding: 6px 16px; border: 1px solid rgba(15,23,42,0.15); border-radius: 999px; font-size: 0.6em; color: #475569; margin: 4px; }
+  .reveal .dark .pill { border-color: rgba(148,163,184,0.3); color: #a5b4cc; }
+  .reveal img { max-height: 500px; }
+  .reveal .text-block { max-width: 900px; }
+  .reveal .mermaid-diagram { display: flex; justify-content: center; }
+  .reveal .mermaid-diagram svg { max-width: 100%; max-height: 500px; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- 1 Title -->
+<section class="dark center">
+  <img src="./assets/logo.svg" alt="kotobad" style="width:120px;height:120px;border:none;background:#fff;border-radius:20px;padding:16px;" />
+  <h1>kotobad</h1>
+  <p class="lead">バドミントン特化の掲示板 Web サイト</p>
+  <p style="color:#a5b4cc;">交流の場に、試合通知とライブスコアを足した</p>
+  <p style="font-size:0.5em;color:#60a5fa;margin-top:16px;">技育展2026 オンライン予選 / チーム 劇団ひとり / tatu</p>
+</section>
+
+<!-- 2 TOC -->
+<section>
+  <h2>今日話すこと</h2>
+  <div class="toc-item">バドミントンに専用の交流の場がない</div>
+  <div class="toc-item">kotobad が解決する</div>
+  <div class="toc-item">実際の画面</div>
+  <div class="toc-item">技術スタックとシステム構成</div>
+  <div class="toc-item">リアルタイム、型安全、キャッシュ、セキュリティ</div>
+  <div class="toc-item">こだわりと今後の展望</div>
+</section>
+
+<!-- 3 Problem -->
+<section class="center">
+  <p class="lead">バドミントンは、マイナースポーツ</p>
+  <h1>専用の交流の場がない</h1>
+</section>
+
+<!-- 4 Problem detail -->
+<section>
+  <h2>情報が、あちこちに散らばる</h2>
+  <div class="text-block">
+    <div class="bullet"><p>SNS やチャットに会話が分散</p></div>
+    <div class="bullet"><p>試合の通知や結果を追う手段が乏しい</p></div>
+    <div class="bullet"><p>コミュニティが盛り上がりにくい</p></div>
+  </div>
+</section>
+
+<!-- 5 Solution -->
+<section class="dark center">
+  <p style="font-size:0.7em;color:#60a5fa;font-weight:600;">kotobad が解決する</p>
+  <h1>掲示板 × 試合通知 × ライブスコア</h1>
+  <p style="color:#a5b4cc;">交流の場に、試合通知とライブスコアを足した</p>
+</section>
+
+<!-- 6 Full-bleed threads list -->
+<section class="fullbleed">
+  <img src="./assets/threads-list.png" alt="threads list" />
+  <div class="caption">実際の画面: スレッド一覧</div>
+</section>
+
+<!-- 7 Full-bleed thread detail -->
+<section class="fullbleed">
+  <img src="./assets/thread-detail.png" alt="thread detail" />
+  <div class="caption">実際の画面: スレッド詳細</div>
+</section>
+
+<!-- 8 Features -->
+<section>
+  <h2>主な機能</h2>
+  <div class="text-block">
+    <div class="bullet"><p>掲示板 — ユーザーがスレッドを立てて会話</p></div>
+    <div class="bullet"><p>自動スレッド — 試合ごとに自動生成、ライブチャット</p></div>
+    <div class="bullet"><p>試合通知 — 気になる試合の通知を受け取る</p></div>
+    <div class="bullet"><p>ライブスコア — 進行中の点数をリアルタイム表示</p></div>
+  </div>
+</section>
+
+<!-- 9 UX -->
+<section>
+  <h2>ユーザー体験にこだわる</h2>
+  <div class="text-block">
+    <div class="bullet"><p>PWA 対応、ホーム画面から起動</p></div>
+    <div class="bullet"><p>クリック時のローディングアニメーション</p></div>
+    <div class="bullet"><p>モバイル最適化のナビゲーション</p></div>
+    <div class="bullet"><p>プルトゥリフレッシュ</p></div>
+  </div>
+</section>
+
+<!-- 10 Tech stack -->
+<section class="dark center">
+  <h2>使用技術</h2>
+  <div class="logo-row" style="margin: 16px 0;">
+    <div class="logo-item"><img src="./assets/nextjs.svg" alt="Next.js" /><span>Next.js 16</span></div>
+    <div class="logo-item"><img src="./assets/react.svg" alt="React" /><span>React 19</span></div>
+    <div class="logo-item"><img src="./assets/typescript.svg" alt="TypeScript" /><span>TypeScript</span></div>
+    <div class="logo-item"><img src="./assets/hono.svg" alt="Hono" /><span>Hono</span></div>
+    <div class="logo-item"><img src="./assets/cloudflare.svg" alt="Cloudflare" /><span>Cloudflare</span></div>
+    <div class="logo-item"><img src="./assets/zod.svg" alt="Zod" /><span>Zod</span></div>
+    <div class="logo-item"><img src="./assets/drizzle.svg" alt="Drizzle" /><span>Drizzle</span></div>
+    <div class="logo-item"><img src="./assets/bun.svg" alt="Bun" /><span>Bun</span></div>
+    <div class="logo-item"><img src="./assets/radix.svg" alt="Radix" /><span>Radix UI</span></div>
+    <div class="logo-item"><img src="./assets/tailwind.svg" alt="Tailwind" /><span>Tailwind</span></div>
+    <div class="logo-item"><img src="./assets/google.svg" alt="Google" /><span>Google OAuth</span></div>
+  </div>
+  <p style="color:#a5b4cc;font-size:0.6em;">フロントエンド: Next.js / バックエンド: Hono / DB: Cloudflare D1 / 保存: R2</p>
+</section>
+
+<!-- 11 Architecture -->
+<section class="center">
+  <h2>システム構成</h2>
+  <div class="mermaid-diagram">
+    <pre class="mermaid">
+flowchart LR
+    U[ユーザー / PWA] --> FE[Next.js 16]
+    U --> BFF[Next.js BFF]
+    BFF -->|Cookie + HMAC| BE[Hono Backend]
+    FE -->|Server fetch + HMAC| BE
+    BE -->|Drizzle| D1[(D1)]
+    BE --> R2[(R2)]
+    U -->|WebSocket| BE
+    BE --> DO[ThreadRoom DO]
+    DO -->|post.created| U
+    </pre>
+  </div>
+</section>
+
+<!-- 12 Realtime -->
+<section>
+  <h2>リアルタイム: WebSocket + Durable Objects</h2>
+  <div class="text-block">
+    <div class="bullet"><p>Thread 単位の Durable Object が socket を集約</p></div>
+    <div class="bullet"><p>新規投稿時に post.created を通知</p></div>
+    <div class="bullet"><p>通知を受けたら SWR で D1 の正本を再取得</p></div>
+    <div class="bullet"><p>WebSocket は変更通知、HTTP は正本取得</p></div>
+  </div>
+</section>
+
+<!-- 13 Type safety -->
+<section>
+  <h2>型安全: 共有 Zod スキーマ</h2>
+  <div class="text-block">
+    <div class="bullet"><p>Frontend と Backend で同じ Zod を共有</p></div>
+    <div class="bullet"><p>Validation、OpenAPI、TypeScript 型、Response 検証を一つの契約から</p></div>
+    <div class="bullet"><p>HTTP 境界の runtime data を検査</p></div>
+  </div>
+</section>
+
+<!-- 14 Cache -->
+<section>
+  <h2>キャッシュと静的アセット保護</h2>
+  <div class="text-block">
+    <div class="bullet"><p>ライブデータは no-store、タグは 5 分、静的は 1 年 immutable</p></div>
+    <div class="bullet"><p>iOS で古い CSS が削除済み woff2 を要求し 404 連発した障害</p></div>
+    <div class="bullet"><p>R2 スナップショットで前回参照 asset を検査</p></div>
+    <div class="bullet"><p>欠落時は本番 origin から復旧、復旧不能なら build 失敗</p></div>
+  </div>
+</section>
+
+<!-- 15 Security -->
+<section class="dark center">
+  <h2>セキュリティへのこだわり</h2>
+  <div style="display: flex; gap: 60px; justify-content: center; margin: 16px 0;">
+    <div class="stat"><span class="num">18</span><span class="label">OpenAPI 登録 API</span></div>
+    <div class="stat"><span class="num">48</span><span class="label">テスト (37+11)</span></div>
+  </div>
+  <div class="text-block" style="margin: 0 auto;">
+    <div class="bullet"><p>AI に一任せず、XSS / CSRF を自分の目で確認</p></div>
+    <div class="bullet"><p>ペネトレーションテストを実施</p></div>
+    <div class="bullet"><p>HMAC + CSRF + Origin の多層防御</p></div>
+  </div>
+</section>
+
+<!-- 16 DB -->
+<section>
+  <h2>データベース設計</h2>
+  <div class="text-block">
+    <div class="bullet"><p>Cloudflare D1 + Drizzle ORM</p></div>
+    <div class="bullet"><p>threads / posts / tags / reactions / notifications</p></div>
+    <div class="bullet"><p>(threadId, localId) の unique 制約で採番競合を防ぐ</p></div>
+    <div class="bullet"><p>最大 3 回リトライ</p></div>
+  </div>
+</section>
+
+<!-- 17 Craft -->
+<section class="dark center">
+  <h2>地味なこだわり</h2>
+  <div style="display: flex; gap: 40px; align-items: center; justify-content: center; margin: 16px 0;">
+    <img src="./assets/logo-moji.svg" alt="logo moji" style="max-height: 160px; border: none; background: transparent;" />
+    <img src="./assets/pwa-icon.png" alt="pwa icon" style="width: 120px; height: 120px; border-radius: 20px;" />
+  </div>
+  <div class="text-block" style="margin: 0 auto;">
+    <div class="bullet"><p>ロゴ (文字とアイコン) を自作</p></div>
+    <div class="bullet"><p>PWA 対応、プルトゥリフレッシュ、ボトムナビ</p></div>
+    <div class="bullet"><p>Safe area、Reduced motion 対応</p></div>
+  </div>
+</section>
+
+<!-- 18 Future -->
+<section>
+  <h2>今後の展望</h2>
+  <div class="text-block">
+    <div class="bullet"><p>モバイルネイティブアプリの開発</p></div>
+    <div class="bullet"><p>オフライン対応の強化</p></div>
+    <div class="bullet"><p>Web Push 通知</p></div>
+    <div class="bullet"><p>コミュニティの拡大</p></div>
+  </div>
+</section>
+
+<!-- 19 Summary -->
+<section class="dark center">
+  <h2>まとめ</h2>
+  <div class="text-block" style="margin: 0 auto;">
+    <div class="bullet"><p>バドミントン特化の掲示板 + 試合通知 + ライブスコア</p></div>
+    <div class="bullet"><p>Cloudflare 上に集約したフルスタック構成</p></div>
+    <div class="bullet"><p>リアルタイム通知と型安全な API 契約</p></div>
+    <div class="bullet"><p>UX とセキュリティへのこだわり</p></div>
+  </div>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 24px;">
+    <span class="pill">kotobad.com</span>
+    <span class="pill">github.com/nematatu/kotobad</span>
+    <span class="pill">youtube.com/watch?v=Hrrha3mdc2s</span>
+  </div>
+</section>
+
+<!-- 20 Thanks -->
+<section class="dark center">
+  <img src="./assets/logo.svg" alt="kotobad" style="width: 120px; height: 120px; border: none; background: #fff; border-radius: 20px; padding: 16px;" />
+  <h1>ありがとうございました</h1>
+  <p class="lead">ご質問をお待ちしています</p>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 24px;">
+    <span class="pill">kotobad.com</span>
+    <span class="pill">github.com/nematatu/kotobad</span>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    width: 1280,
+    height: 720,
+    margin: 0.04,
+    minScale: 0.2,
+    maxScale: 2.0
+  });
+  Reveal.on('slidechanged', function() {
+    const slide = Reveal.getCurrentSlide();
+    const node = slide.querySelector('.mermaid');
+    if (node && !node.querySelector('svg')) {
+      mermaid.run({ nodes: [node] }).catch(function(){});
+    }
+  });
+  // Render mermaid on first slide if present
+  const first = Reveal.getCurrentSlide();
+  const firstNode = first.querySelector('.mermaid');
+  if (firstNode && !firstNode.querySelector('svg')) {
+    mermaid.run({ nodes: [firstNode] }).catch(function(){});
+  }
+</script>
+</body>
+</html>
