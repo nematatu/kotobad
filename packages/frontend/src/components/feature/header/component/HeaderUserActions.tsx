@@ -2,9 +2,11 @@
 
 import type { TagType } from "@kotobad/shared/src/types/tag";
 import { useEffect, useState } from "react";
+import DemoLoginButton from "@/components/feature/button/auth/DemoLoginButton";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 import type { UserState } from "@/components/feature/provider/UserProvider";
 import { UserPopover } from "@/components/feature/user/popover/UserPopover";
+import { useDemoMode } from "@/lib/auth/demoMode";
 import CreateThreadDialog from "./createThreadDialog";
 import { NotificationBell } from "./notification/NotificationBell";
 
@@ -16,6 +18,7 @@ type Props = {
 
 const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
 	const [isHydrated, setIsHydrated] = useState(false);
+	const { isDemo } = useDemoMode();
 
 	useEffect(() => {
 		setIsHydrated(true);
@@ -46,6 +49,10 @@ const HeaderUserActions = ({ isLoading, user, tags }: Props) => {
 				</div>
 			</div>
 		);
+	}
+
+	if (isDemo) {
+		return <DemoLoginButton />;
 	}
 
 	return <GoogleOAuth />;

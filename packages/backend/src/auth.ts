@@ -25,7 +25,7 @@ const buildPreviewOriginMatcher = (suffix: string) => {
 };
 
 const maybeAddPreviewOrigin = (
-	env: Bindings,
+	_env: Bindings,
 	restRequest: Request | undefined,
 	allowList: string[] = [],
 ) => {
@@ -43,7 +43,7 @@ const maybeAddPreviewOrigin = (
 			return allowList;
 		}
 		const matcher = buildPreviewOriginMatcher(suffix);
-		if (matcher.test(url.hostname)) {
+		if (matcher.test(url.hostname) || url.hostname === "demo.kotobad.com") {
 			return allowList.includes(origin) ? allowList : [...allowList, origin];
 		}
 		return allowList;

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
+import AuthForm from "@/components/feature/auth/AuthForm";
 
 export default async function AuthPathPage({
 	params,
@@ -13,18 +13,20 @@ export default async function AuthPathPage({
 		redirect("/auth/sign-in");
 	}
 
+	const isSignUp = normalizedPath === "sign-up";
+
 	return (
 		<main className="container flex min-h-[70vh] grow items-center justify-center p-4 md:p-6">
 			<section className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
 				<h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-					{normalizedPath === "sign-up" ? "アカウント登録" : "ログイン"}
+					{isSignUp ? "アカウント登録" : "ログイン"}
 				</h1>
 				<p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-					Googleアカウントで続行できます。
+					{isSignUp
+						? "コトバドのアカウントを作成して参加しましょう。"
+						: "アカウントにログインして続行できます。"}
 				</p>
-				<div className="mt-4">
-					<GoogleOAuth />
-				</div>
+				<AuthForm isSignUp={isSignUp} />
 			</section>
 		</main>
 	);

@@ -27,6 +27,9 @@ export const isAllowedOrigin = (
 		if (url.protocol !== "https:") {
 			return false;
 		}
+		if (url.hostname === "demo.kotobad.com") {
+			return true;
+		}
 		return previewHostnamePattern.test(url.hostname);
 	} catch {
 		return false;

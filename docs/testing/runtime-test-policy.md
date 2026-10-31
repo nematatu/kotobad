@@ -16,8 +16,14 @@
 
 - Backend: `packages/backend/src/middleware/csrf-origin.test.ts`
   - Hono middlewareへ実際のPOST requestを渡し、valid tokenが通ること、token欠落が403になることを確認します。
+- Backend: `packages/backend/src/utils/isAllowedOrigin.test.ts`
+  - 設定済みOrigin、`demo.kotobad.com`、CloudflareプレビューURLの許可と許可外Originの拒否を確認します。
 - Frontend: `packages/frontend/src/app/threads/api/csrf-token/route.test.ts`
   - Route Handlerを実際に呼び、`Set-Cookie`の`Secure`、`HttpOnly`、`SameSite`、`Path`、`Max-Age`を確認します。
+- Frontend: `packages/frontend/src/app/auth/api/demo-login/route.test.ts`
+  - GETの405拒否、POSTでのデモユーザーサインイン成功、ユーザー未作成時のサインアップ自動フォールバック、Cookie転送を確認します。
+- Frontend: `packages/frontend/src/lib/auth/demoMode.test.ts`
+  - URLクエリ `demo=true` / `demo=1` / `demo` での有効化、`demo=false` での無効化、`sessionStorage` への永続化、`demo.` ホスト名判定を確認します。
 - root: `bun run test`
   - BackendとFrontendの両方のruntime testを実行します。
 - CI: `.github/workflows/ci.yml`

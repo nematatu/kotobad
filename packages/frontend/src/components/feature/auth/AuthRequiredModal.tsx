@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo/logo.svg";
 import LogoMojiIcon from "@/assets/logo/logo-moji.svg";
+import DemoLoginButton from "@/components/feature/button/auth/DemoLoginButton";
 import GoogleOAuth from "@/components/feature/button/auth/googleOAuth";
 import { useUser } from "@/components/feature/provider/UserProvider";
 import { AUTH_REQUIRED_EVENT } from "@/lib/auth/authRequiredEvent";
+import { useDemoMode } from "@/lib/auth/demoMode";
 
 const EXIT_ANIMATION_MS = 180;
 
 export default function AuthRequiredModal() {
 	const { user, isLoading } = useUser();
+	const { isDemo, setDemoMode } = useDemoMode();
+	const [showGoogleAuth, setShowGoogleAuth] = useState(false);
 	const [visible, setVisible] = useState(false);
 	const [isRendered, setIsRendered] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
@@ -92,8 +96,33 @@ export default function AuthRequiredModal() {
 				<p className="mt-2 text-center text-xs text-slate-500">
 					コトバドは、バドミントンを語り合う掲示板です。
 				</p>
-				<div className="mt-4">
-					<GoogleOAuth />
+				<div className="mt-4 flex flex-col items-center gap-2">
+					{isDemo && !showGoogleAuth ? (
+						<>
+							<DemoLoginButton className="w-full" />
+							<button
+								type="button"
+								onClick={() => setShowGoogleAuth(true)}
+								className="text-xs text-slate-500 hover:text-slate-700 underline"
+							>
+								Googleアカウントでログイン
+							</button>
+						</>
+					) : (
+						<>
+							<GoogleOAuth />
+							<button
+								type="button"
+								onClick={() => {
+									setDemoMode(true);
+									setShowGoogleAuth(false);
+								}}
+								className="text-xs text-slate-400 hover:text-slate-600 underline"
+							>
+								デモアカウントで試す
+							</button>
+						</>
+					)}
 				</div>
 			</div>
 		</div>

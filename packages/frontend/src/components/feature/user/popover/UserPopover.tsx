@@ -42,8 +42,15 @@ export function UserPopover({ onProfileNavigate }: Props) {
 					}}
 				>
 					<div className="bg-blue-50 px-4 py-2">
-						<div className="flex justify-between">
-							<div className="text-lg">{user?.name}</div>
+						<div className="flex justify-between items-center">
+							<div className="flex items-center gap-1.5">
+								<div className="text-lg">{user?.name}</div>
+								{user?.email === "demo@kotobad.com" && (
+									<span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+										デモ
+									</span>
+								)}
+							</div>
 							<ArrowUpRight className="text-gray-400 w-4" />
 						</div>
 					</div>

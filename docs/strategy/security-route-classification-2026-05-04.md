@@ -37,6 +37,7 @@
 | Route | 実体 | Method | 分類 | 認証 | CSRF | Backend internal auth |
 | --- | --- | --- | --- | --- | --- | --- |
 | `/auth/api/[...betterAuthPath]` | `packages/frontend/src/app/auth/api/[...betterAuthPath]/route.ts` | GET/POST/PUT/PATCH/DELETE/OPTIONS/HEAD | auth系 | better-auth側に委譲 | frontend middleware対象外 | なし |
+| `/auth/api/demo-login` | `packages/frontend/src/app/auth/api/demo-login/route.ts` | POST | auth系 / デモログイン | 不要（デモアカウント自動生成・発行） | frontend middleware対象外 | 必須（BFF内部署名） |
 | `/threads/api/csrf-token` | `packages/frontend/src/app/threads/api/csrf-token/route.ts` | GET | 公開GET / CSRF token発行 | 不要 | GETのため対象外 | なし |
 | `/threads/api/media/upload` | `packages/frontend/src/app/threads/api/media/upload/route.ts` | POST | unsafe method / upload系 | backendで必須 | 対象 | 必須 |
 | `/threads/api/notifications/count` | `packages/frontend/src/app/threads/api/notifications/count/route.ts` | GET | 認証必須GET / notifications系 | backendで必須 | GETのため対象外 | 必須 |
