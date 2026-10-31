@@ -1,18 +1,38 @@
 import { z } from "zod";
+import { DEMO_TOURNAMENTS, INITIAL_DEMO_MATCHES } from "./demoMatches";
+import { isJapanesePlayer, japanesePlayerName } from "./japanesePlayerNames";
+import type {
+	BwfEventType,
+	BwfGameScore,
+	BwfMatchSummary,
+	BwfPlayerSummary,
+	BwfTeamSummary,
+	BwfTournamentSummary,
+} from "./types";
+import { displayCourt, displayRound } from "./utils";
 
 const BWF_MATCH_CENTER_BASE_URL =
 	"https://extranet-lv.bwfbadminton.com/api/match-center";
 const DEFAULT_TOURNAMENT_ID = "5623";
 
 const PlayerSchema = z.object({
+	id: z.union([z.string(), z.number()]).optional(),
 	fullName: z.string().optional(),
 	name_display: z.string().optional(),
 	nameShort: z.string().optional(),
 	playerLink: z.string().optional(),
+	avatar: z
+		.object({
+			thumbnailUrl: z.string().optional(),
+			url_cloudinary: z.string().optional(),
+		})
+		.optional(),
 });
 
 const CountrySchema = z.object({
 	custom_code: z.string().optional(),
+	code: z.string().optional(),
+	flag_url: z.string().optional(),
 });
 
 const EmptyArraySchema = z.array(z.unknown()).transform(() => null);
@@ -41,6 +61,7 @@ const LiveDetailSchema = z.object({
 	team2_g2_score: z.number().nullable().optional(),
 	team2_g3_score: z.number().nullable().optional(),
 	match_state_name: z.string().nullable().optional(),
+	serving_team: z.union([z.number(), z.string()]).nullable().optional(),
 });
 
 const MatchDetailSchema = z.object({
@@ -94,85 +115,15 @@ const BwfCurrentLiveResponseSchema = z.object({
 
 type PlayerModel = z.infer<typeof PlayerSchema>;
 type CountryModel = z.infer<typeof CountrySchema>;
-type NullablePlayerModel = PlayerModel | null;
-type NullableCountryModel = CountryModel | null;
 
-export type BwfLiveMatch = {
-	liveId: number;
-	matchId: string;
-	code: string;
-	status: string;
-	statusLabel: string;
-	courtCode: string | null;
-	courtName: string | null;
-	durationMinutes: number | null;
-	event: string | null;
-	round: string | null;
-	team1Name: string;
-	team2Name: string;
-	team1Countries: string[];
-	team2Countries: string[];
-	team1PlayerLinks: string[];
-	team2PlayerLinks: string[];
-	games: Array<{
-		label: string;
-		team1: number | null;
-		team2: number | null;
-	}>;
+export type BwfLiveFeedResult = {
+	ok: boolean;
+	isFallback: boolean;
+	fetchedAt: string;
+	tournaments: BwfTournamentSummary[];
+	matches: BwfMatchSummary[];
+	message?: string;
 };
-
-type BwfLiveMatchesResult =
-	| {
-			ok: true;
-			tournamentId: string;
-			fetchedAt: string;
-			liveCount: number | null;
-			matchCount: number | null;
-			matches: BwfLiveMatch[];
-	  }
-	| {
-			ok: false;
-			tournamentId: string;
-			reason: "request_failed" | "invalid_response";
-			message: string;
-	  };
-
-type BwfCurrentLiveTournament = {
-	id: string;
-	code: string;
-	name: string;
-	date: string | null;
-	venueName: string | null;
-	link: string | null;
-	logoUrl: string | null;
-	categoryName: string | null;
-};
-
-type BwfLiveTournamentSection =
-	| {
-			ok: true;
-			tournament: BwfCurrentLiveTournament;
-			liveCount: number | null;
-			matchCount: number | null;
-			matches: BwfLiveMatch[];
-	  }
-	| {
-			ok: false;
-			tournament: BwfCurrentLiveTournament;
-			message: string;
-	  };
-
-type BwfCurrentLiveTournamentSectionsResult =
-	| {
-			ok: true;
-			fetchedAt: string;
-			tournaments: BwfLiveTournamentSection[];
-	  }
-	| {
-			ok: false;
-			reason: "request_failed" | "invalid_response";
-			message: string;
-	  };
 
 const normalizeBwfTournamentId = (value?: string) =>
 	value && /^\d+$/.test(value) ? value : DEFAULT_TOURNAMENT_ID;
@@ -191,259 +142,303 @@ const buildBwfLiveMatchesUrl = (tournamentId?: string) => {
 const buildBwfCurrentLiveUrl = () =>
 	new URL("vue-current-live", `${BWF_MATCH_CENTER_BASE_URL}/`);
 
-const getPlayerName = (player?: NullablePlayerModel) =>
-	player?.fullName ?? player?.name_display ?? player?.nameShort ?? null;
-
-const getTeamName = (
-	primary?: NullablePlayerModel,
-	secondary?: NullablePlayerModel,
-) => {
-	const names = [getPlayerName(primary), getPlayerName(secondary)].filter(
-		(name): name is string => Boolean(name),
-	);
-
-	if (names.length === 0) {
-		return "TBD";
-	}
-
-	return names.join(" / ");
-};
-
-const getPlayerLinks = (
-	primary?: NullablePlayerModel,
-	secondary?: NullablePlayerModel,
-) =>
-	[primary?.playerLink, secondary?.playerLink].filter((link): link is string =>
-		Boolean(link),
-	);
-
-const getCountryCodes = (
-	primary?: NullableCountryModel,
-	secondary?: NullableCountryModel,
-) =>
-	Array.from(
-		new Set(
-			[primary?.custom_code, secondary?.custom_code].filter(
-				(code): code is string => Boolean(code),
-			),
-		),
-	);
-
-const getGames = (liveDetail: z.infer<typeof LiveDetailSchema>) =>
-	[
-		{
-			label: "G1",
-			team1: liveDetail.team1_g1_score ?? null,
-			team2: liveDetail.team2_g1_score ?? null,
-		},
-		{
-			label: "G2",
-			team1: liveDetail.team1_g2_score ?? null,
-			team2: liveDetail.team2_g2_score ?? null,
-		},
-		{
-			label: "G3",
-			team1: liveDetail.team1_g3_score ?? null,
-			team2: liveDetail.team2_g3_score ?? null,
-		},
-	].filter((game) => game.team1 !== null || game.team2 !== null);
-
-const toSortValue = (value: string | null | undefined) => {
-	if (!value) {
-		return Number.MAX_SAFE_INTEGER;
-	}
-
-	const parsed = Number(value);
-	return Number.isFinite(parsed) ? parsed : Number.MAX_SAFE_INTEGER;
-};
-
-const toTournamentSummary = (
-	tournament: z.infer<typeof CurrentLiveTournamentSchema>,
-): BwfCurrentLiveTournament => ({
-	id: String(tournament.id),
-	code: tournament.code,
-	name: tournament.name,
-	date: tournament.date ?? null,
-	venueName: tournament.venue_name ?? null,
-	link: tournament.tmtLink ?? null,
-	logoUrl: tournament.tmtLogo ?? null,
-	categoryName: tournament.category_model?.name ?? null,
-});
-
-async function getBwfLiveMatches(
-	tournamentId?: string,
-): Promise<BwfLiveMatchesResult> {
-	const resolvedTournamentId = normalizeBwfTournamentId(tournamentId);
-	const targetUrl = buildBwfLiveMatchesUrl(resolvedTournamentId);
-
-	let response: Response;
-	try {
-		response = await fetch(targetUrl, {
-			method: "GET",
-			headers: {
-				accept: "application/json",
-			},
-			cache: "no-store",
-		});
-	} catch (error) {
-		return {
-			ok: false,
-			tournamentId: resolvedTournamentId,
-			reason: "request_failed",
-			message:
-				error instanceof Error
-					? error.message
-					: "BWF 公式 live matches API への接続に失敗しました。",
-		};
-	}
-
-	if (!response.ok) {
-		return {
-			ok: false,
-			tournamentId: resolvedTournamentId,
-			reason: "request_failed",
-			message: `BWF 公式 live matches API の取得に失敗しました (HTTP ${response.status})。`,
-		};
-	}
-
-	const raw = await response.json();
-	const parsed = BwfLiveMatchesResponseSchema.safeParse(raw);
-
-	if (!parsed.success) {
-		return {
-			ok: false,
-			tournamentId: resolvedTournamentId,
-			reason: "invalid_response",
-			message: "BWF 公式 live matches API の返却形式が想定と異なります。",
-		};
-	}
-
-	const matches = parsed.data.results
-		.map((item) => ({
-			liveId: item.live_detail.id,
-			matchId: item.live_detail.match_id,
-			code: item.match_detail.code,
-			status: item.live_detail.match_state,
-			statusLabel:
-				item.live_detail.match_state_name ?? item.live_detail.match_state,
-			courtCode: item.live_detail.court_code ?? null,
-			courtName: item.live_detail.court_name ?? null,
-			durationMinutes: item.live_detail.duration ?? null,
-			event: item.live_detail.event ?? null,
-			round: item.live_detail.round ?? null,
-			team1Name: getTeamName(
-				item.match_detail.t1p1_player_model,
-				item.match_detail.t1p2_player_model,
-			),
-			team2Name: getTeamName(
-				item.match_detail.t2p1_player_model,
-				item.match_detail.t2p2_player_model,
-			),
-			team1Countries: getCountryCodes(
-				item.match_detail.t1p1country_model,
-				item.match_detail.t1p2country_model,
-			),
-			team2Countries: getCountryCodes(
-				item.match_detail.t2p1country_model,
-				item.match_detail.t2p2country_model,
-			),
-			team1PlayerLinks: getPlayerLinks(
-				item.match_detail.t1p1_player_model,
-				item.match_detail.t1p2_player_model,
-			),
-			team2PlayerLinks: getPlayerLinks(
-				item.match_detail.t2p1_player_model,
-				item.match_detail.t2p2_player_model,
-			),
-			games: getGames(item.live_detail),
-		}))
-		.sort((a, b) => {
-			const courtDiff = toSortValue(a.courtCode) - toSortValue(b.courtCode);
-			if (courtDiff !== 0) {
-				return courtDiff;
-			}
-
-			return Number(a.matchId) - Number(b.matchId);
-		});
-
-	const first = parsed.data.results.at(0);
+function extractPlayer(
+	playerModel?: PlayerModel | null,
+	countryModel?: CountryModel | null,
+): BwfPlayerSummary | null {
+	if (!playerModel) return null;
+	const originalName =
+		playerModel.fullName ||
+		playerModel.name_display ||
+		playerModel.nameShort ||
+		"Unknown Player";
+	const countryCode =
+		countryModel?.custom_code || countryModel?.code || undefined;
+	const isJpn = isJapanesePlayer(originalName, countryCode);
+	const kanji = isJpn ? japanesePlayerName(originalName) : undefined;
 
 	return {
-		ok: true,
-		tournamentId: resolvedTournamentId,
-		fetchedAt: new Date().toISOString(),
-		liveCount: first?.live_count ?? null,
-		matchCount: first?.match_count ?? null,
-		matches,
+		id: playerModel.id ? String(playerModel.id) : undefined,
+		name: kanji || originalName,
+		originalName,
+		countryCode: countryCode?.toUpperCase(),
+		flagUrl: countryModel?.flag_url,
+		photoUrl:
+			playerModel.avatar?.thumbnailUrl || playerModel.avatar?.url_cloudinary,
+		isJapanese: isJpn,
 	};
 }
 
-export async function getBwfCurrentLiveTournaments(): Promise<BwfCurrentLiveTournamentSectionsResult> {
-	let response: Response;
+function buildTeamSummary(
+	p1Model?: PlayerModel | null,
+	p2Model?: PlayerModel | null,
+	c1Model?: CountryModel | null,
+	c2Model?: CountryModel | null,
+): BwfTeamSummary {
+	const p1 = extractPlayer(p1Model, c1Model);
+	const p2 = extractPlayer(p2Model, c2Model);
+	const players: BwfPlayerSummary[] = [p1, p2].filter(
+		(p): p is BwfPlayerSummary => p !== null,
+	);
+
+	if (players.length === 0) {
+		players.push({
+			name: "TBD",
+			originalName: "TBD",
+			isJapanese: false,
+		});
+	}
+
+	const countryCode =
+		c1Model?.custom_code ||
+		c1Model?.code ||
+		c2Model?.custom_code ||
+		c2Model?.code;
+	const isJapanese = players.some((p) => p.isJapanese);
+
+	return {
+		countryCode: countryCode?.toUpperCase(),
+		flagUrl: c1Model?.flag_url || c2Model?.flag_url,
+		isJapanese,
+		players,
+	};
+}
+
+function parseMatchEventType(
+	matchState: string,
+	scores: BwfGameScore[],
+): BwfEventType {
+	const state = matchState.toUpperCase();
+	if (state === "P" || state === "LIVE" || state === "IN_PROGRESS") {
+		// If 2 sets are already won, it's completed
+		let t1Wins = 0;
+		let t2Wins = 0;
+		for (const s of scores) {
+			if ((s.team1 >= 21 && s.team1 - s.team2 >= 2) || s.team1 === 30) {
+				t1Wins += 1;
+			} else if ((s.team2 >= 21 && s.team2 - s.team1 >= 2) || s.team2 === 30) {
+				t2Wins += 1;
+			}
+		}
+		if (t1Wins >= 2 || t2Wins >= 2) return "completed";
+		return "live";
+	}
+	if (state === "F" || state === "C" || state === "FINISHED") {
+		return "completed";
+	}
+	return "scheduled";
+}
+
+function extractScores(
+	liveDetail: z.infer<typeof LiveDetailSchema>,
+): BwfGameScore[] {
+	const scores: BwfGameScore[] = [];
+	const g1t1 = liveDetail.team1_g1_score;
+	const g1t2 = liveDetail.team2_g1_score;
+	const g2t1 = liveDetail.team1_g2_score;
+	const g2t2 = liveDetail.team2_g2_score;
+	const g3t1 = liveDetail.team1_g3_score;
+	const g3t2 = liveDetail.team2_g3_score;
+
+	const servingTeam =
+		liveDetail.serving_team === 1 || liveDetail.serving_team === "1"
+			? 1
+			: liveDetail.serving_team === 2 || liveDetail.serving_team === "2"
+				? 2
+				: undefined;
+
+	if (g1t1 != null || g1t2 != null) {
+		scores.push({
+			game: 1,
+			team1: g1t1 ?? 0,
+			team2: g1t2 ?? 0,
+		});
+	}
+	if (g2t1 != null || g2t2 != null) {
+		scores.push({
+			game: 2,
+			team1: g2t1 ?? 0,
+			team2: g2t2 ?? 0,
+		});
+	}
+	if (g3t1 != null || g3t2 != null) {
+		scores.push({
+			game: 3,
+			team1: g3t1 ?? 0,
+			team2: g3t2 ?? 0,
+		});
+	}
+
+	if (scores.length > 0 && servingTeam) {
+		scores[scores.length - 1].servingTeam = servingTeam;
+	}
+
+	return scores;
+}
+
+export async function fetchBwfLiveFeed(): Promise<BwfLiveFeedResult> {
+	const now = new Date().toISOString();
+
 	try {
-		response = await fetch(buildBwfCurrentLiveUrl(), {
+		const liveTournamentsRes = await fetch(buildBwfCurrentLiveUrl(), {
 			method: "GET",
 			headers: {
-				accept: "application/json",
+				accept: "application/json,text/plain,*/*",
+				"accept-language": "en-US,en;q=0.9",
+				referer: "https://bwfbadminton.com/",
 			},
 			cache: "no-store",
 		});
-	} catch (error) {
-		return {
-			ok: false,
-			reason: "request_failed",
-			message:
-				error instanceof Error
-					? error.message
-					: "BWF 公式 current live API への接続に失敗しました。",
-		};
-	}
 
-	if (!response.ok) {
-		return {
-			ok: false,
-			reason: "request_failed",
-			message: `BWF 公式 current live API の取得に失敗しました (HTTP ${response.status})。`,
-		};
-	}
-
-	const raw = await response.json();
-	const parsed = BwfCurrentLiveResponseSchema.safeParse(raw);
-
-	if (!parsed.success) {
-		return {
-			ok: false,
-			reason: "invalid_response",
-			message: "BWF 公式 current live API の返却形式が想定と異なります。",
-		};
-	}
-
-	const sections = await Promise.all(
-		parsed.data.results.map(async (tournament) => {
-			const summary = toTournamentSummary(tournament);
-			const liveMatches = await getBwfLiveMatches(summary.id);
-
-			if (!liveMatches.ok) {
-				return {
-					ok: false,
-					tournament: summary,
-					message: liveMatches.message,
-				} satisfies BwfLiveTournamentSection;
-			}
-
+		if (!liveTournamentsRes.ok) {
 			return {
 				ok: true,
-				tournament: summary,
-				liveCount: liveMatches.liveCount,
-				matchCount: liveMatches.matchCount,
-				matches: liveMatches.matches,
-			} satisfies BwfLiveTournamentSection;
-		}),
-	);
+				isFallback: true,
+				fetchedAt: now,
+				tournaments: DEMO_TOURNAMENTS,
+				matches: INITIAL_DEMO_MATCHES,
+				message: `BWF公式APIへの接続が制限されているため、デモ用ライブデータを表示しています。(HTTP ${liveTournamentsRes.status})`,
+			};
+		}
 
-	return {
-		ok: true,
-		fetchedAt: new Date().toISOString(),
-		tournaments: sections,
-	};
+		const rawTournaments = await liveTournamentsRes.json();
+		const parsedTournaments =
+			BwfCurrentLiveResponseSchema.safeParse(rawTournaments);
+
+		if (
+			!parsedTournaments.success ||
+			parsedTournaments.data.results.length === 0
+		) {
+			return {
+				ok: true,
+				isFallback: true,
+				fetchedAt: now,
+				tournaments: DEMO_TOURNAMENTS,
+				matches: INITIAL_DEMO_MATCHES,
+				message:
+					"現在進行中の公式大会がないため、デモ用ライブデータを表示しています。",
+			};
+		}
+
+		const tournaments: BwfTournamentSummary[] = [];
+		const allMatches: BwfMatchSummary[] = [];
+
+		for (const t of parsedTournaments.data.results) {
+			const tId = String(t.id);
+			let matchesRes: Response;
+			try {
+				matchesRes = await fetch(buildBwfLiveMatchesUrl(tId), {
+					method: "GET",
+					headers: {
+						accept: "application/json,text/plain,*/*",
+						referer: "https://bwfbadminton.com/",
+					},
+					cache: "no-store",
+				});
+			} catch {
+				continue;
+			}
+
+			if (!matchesRes.ok) continue;
+
+			const rawMatches = await matchesRes.json();
+			const parsedMatches = BwfLiveMatchesResponseSchema.safeParse(rawMatches);
+			if (!parsedMatches.success) continue;
+
+			const results = parsedMatches.data.results;
+			const liveCount = results.filter(
+				(r) => r.live_detail.match_state.toUpperCase() === "P",
+			).length;
+
+			tournaments.push({
+				id: tId,
+				code: t.code,
+				name: t.name,
+				categoryName: t.category_model?.name,
+				date: t.date ?? undefined,
+				venueName: t.venue_name ?? undefined,
+				link: t.tmtLink ?? undefined,
+				logoUrl: t.tmtLogo ?? undefined,
+				liveCount,
+				matchCount: results.length,
+			});
+
+			for (const item of results) {
+				const team1 = buildTeamSummary(
+					item.match_detail.t1p1_player_model,
+					item.match_detail.t1p2_player_model,
+					item.match_detail.t1p1country_model,
+					item.match_detail.t1p2country_model,
+				);
+				const team2 = buildTeamSummary(
+					item.match_detail.t2p1_player_model,
+					item.match_detail.t2p2_player_model,
+					item.match_detail.t2p1country_model,
+					item.match_detail.t2p2country_model,
+				);
+
+				const scores = extractScores(item.live_detail);
+				const eventType = parseMatchEventType(
+					item.live_detail.match_state,
+					scores,
+				);
+				const hasJapanesePlayer = team1.isJapanese || team2.isJapanese;
+
+				allMatches.push({
+					id: `${tId}-${item.live_detail.id}-${item.live_detail.match_id}`,
+					code: item.match_detail.code,
+					tournamentId: tId,
+					tournamentName: t.name,
+					tournamentCategory: t.category_model?.name,
+					tournamentLogoUrl: t.tmtLogo ?? undefined,
+					tournamentLink: t.tmtLink ?? undefined,
+					teams: [team1, team2],
+					scores,
+					eventType,
+					statusLabel:
+						item.live_detail.match_state_name ||
+						(eventType === "live"
+							? "ライブ中"
+							: eventType === "completed"
+								? "試合終了"
+								: "開始前"),
+					round: item.live_detail.round ?? undefined,
+					displayRound: displayRound(item.live_detail.round),
+					court: item.live_detail.court_name ?? undefined,
+					displayCourt: displayCourt(item.live_detail.court_name),
+					durationMinutes: item.live_detail.duration ?? null,
+					hasJapanesePlayer,
+				});
+			}
+		}
+
+		if (allMatches.length === 0) {
+			return {
+				ok: true,
+				isFallback: true,
+				fetchedAt: now,
+				tournaments: DEMO_TOURNAMENTS,
+				matches: INITIAL_DEMO_MATCHES,
+				message:
+					"現在取得可能な公式ライブ試合がありません。デモ用データを表示しています。",
+			};
+		}
+
+		return {
+			ok: true,
+			isFallback: false,
+			fetchedAt: now,
+			tournaments: tournaments.length > 0 ? tournaments : DEMO_TOURNAMENTS,
+			matches: allMatches,
+		};
+	} catch (error) {
+		return {
+			ok: true,
+			isFallback: true,
+			fetchedAt: now,
+			tournaments: DEMO_TOURNAMENTS,
+			matches: INITIAL_DEMO_MATCHES,
+			message: `公式APIへの接続エラー (${error instanceof Error ? error.message : "ネットワーク障害"}) のため、デモ用データを表示しています。`,
+		};
+	}
 }
